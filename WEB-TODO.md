@@ -3,13 +3,14 @@
 - هذا الملف هو خطة تنفيذ تفصيلية خطوة بخطوة لبناء موقع Depth باستخدام Next.js 14 (App Router) مع TypeScript، Tailwind CSS، Framer Motion، وتبنّي هوية الألوان/الخطوط/الموشن حسب أدلة الهوية.
 - قاعدة توسيع المصطلحات: يتم توسيع أي اختصار عند ظهوره أول مرة، مثل SEO (Search Engine Optimization — تحسين محركات البحث)، CTA (Call To Action — دعوة لاتخاذ إجراء)، GA4 (Google Analytics 4 — تحليلات جوجل 4)، إلخ.
 - مصادر الحقيقة SSOT (Single Source of Truth — مصدر واحد للحقيقة):
-  - الألوان/التوكنز: `Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`
+- الألوان/التوكنز: `Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`
   - الأسعار/السياسات: `Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md`
 
 ---
 
 ### P0 — متطلبات وتمهيد (قبل البدء)
 - [ ] تثبيت لون الأكسنت الافتراضي: Purple 2025 أو Indigo 2025 (حسب `02-Color-Palettes-Spec.html`).
+- [x] قرار الأكسنت: Indigo 2025 (مع إمكانية سويتش لاحقاً لـ Purple 2025 للمعاينة فقط).
 - [ ] توفير ملفات خط دبي الحديث (Dubai) بصيغة WOFF2 (Regular/Medium/Bold) مع الرخصة.
 - [ ] جمع 6–10 أمثلة Portfolio (صورة/ريل + وصف سطرين) بصيغ WebP/MP4 (MPEG‑4 Part 14 — إم بي إي جي‑4 جزء 14) أو WebM (WebM — صيغة فيديو ويب مفتوحة).
 - [ ] نصوص أقسام الصفحة (Hero/Value/Process/Packages/FAQ/Contact) مختصرة.
@@ -52,6 +53,18 @@
 - [ ] إضافة ملفات الخط إلى `public/fonts/`:
   - `Dubai-Regular.woff2`, `Dubai-Medium.woff2`, `Dubai-Bold.woff2`
   - Inter عبر `next/font/google` أو self-host حسب التفضيل.
+  
+  حالة الملفات (محدثة):
+  - [x] `Dubai-Regular.woff2` موجود (تم تحويله من TTF → WOFF2).
+  - [x] `Dubai-Medium.woff2` موجود (تم تحويله من TTF → WOFF2).
+  - [x] `Dubai-Bold.woff2` موجود (تم تحويله من TTF → WOFF2).
+
+  تحويل TTF (TrueType Font — خط تروتايب) إلى WOFF2 (Web Open Font Format 2 — تنسيق خطوط ويب مفتوح):
+  ```bash
+  brew install woff2 # مرة واحدة فقط
+  cd "Depth/public/fonts"
+  # تم التحويل والحذف: لا توجد ملفات TTF حالياً (Regular/Medium/Bold متوفرة كـ .woff2)
+  ```
 - [ ] تعريف الخطوط في `app/layout.tsx`:
   ```ts
   import localFont from "next/font/local";
@@ -75,7 +88,7 @@
 
 ---
 
-### P3 — الألوان والتوكنز وربط Tailwind
+### P3 — الألوان والتوكنز وربط Tailwind (الأكسنت الافتراضي: Indigo 2025)
 - [ ] إنشاء/تعديل `app/globals.css` لتضمين توكنز من `02-Color-Palettes-Spec.html`:
   ```css
   :root{
@@ -83,8 +96,8 @@
     --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
     --neutral-300:#C2CDD8; --neutral-400:#A9B7C5; --neutral-500:#90A1B2; --neutral-600:#6A7D8F;
     --neutral-700:#44515D; --neutral-800:#28313A; --neutral-900:#0B0F14;
-    /* Accent (Purple 2025 الافتراضي) */
-    --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
+    /* Accent (Indigo 2025 — الافتراضي) */
+    --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
     /* Aliases */
     --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
     --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
@@ -92,8 +105,9 @@
     --radius:14px; --radius-sm:10px; --shadow:0 8px 30px rgba(0,0,0,.08);
     --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--accent-400);
   }
-  [data-palette="indigo2025"]{
-    --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
+  /* معاينة اختيارية: سويتش إلى Purple 2025 عند الحاجة */
+  [data-palette="purple2025"]{
+    --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
   }
   ```
 - [ ] ربط Tailwind بهذه التوكنز داخل `tailwind.config.ts` (ألوان/ظلال/أنصاف أقطار/حاويات).
@@ -101,6 +115,7 @@
 
 معايير القبول:
 - **أزرار CTA** تستخدم `--accent-500` (Hover `--accent-700`، Disabled `--accent-300`). التباين ≥ 4.5:1.
+ - السمة الافتراضية للأكسنت Indigo 2025 مفعّلة على الجذر.
 
 ---
 
@@ -249,6 +264,8 @@
 - [ ] إنشاء مشروع على Vercel؛ إعداد بيئة Production + Previews.
 - [ ] ربط الدومين؛ تفعيل HTTPS؛ التحقق من Headers/Caching.
 - [ ] إعداد متغيرات البيئة إذا استُخدمت مفاتيح.
+- [x] توثيق إعداد البريد/الدومين في `EMAIL-DOMAIN-SETUP.md` (MX/SPF/DKIM/DMARC، مجموعات، 2FA).
+- [ ] إضافة سجلات DNS التالية على Squarespace (MX/SPF/DMARC)، وتوليد DKIM 2048‑bit من Admin Console.
 
 معايير القبول:
 - **الموقع مباشر** على الدومين الرسمي؛ زمن استجابة سريع عالمي.
@@ -301,6 +318,7 @@ npx playwright test
 - [ ] وصول: تباين AA، تنقل لوحة المفاتيح، Focus واضح، Alt نصوص.
 - [ ] تجاوب ممتاز على الشاشات الشائعة.
 - [ ] نشر على الدومين + مراقبة أساسية مفعّلة.
+- [ ] بريد الدومين يعمل (MX/SPF/DKIM/DMARC مفعّلة) وفق `EMAIL-DOMAIN-SETUP.md`.
 
 — انتهى —
 
