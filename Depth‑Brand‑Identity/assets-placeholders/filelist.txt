@@ -1,0 +1,12 @@
+Expected files (FINAL):
+01_Logo/Depth_Icon_Primary_Mono_Black_1024.png
+01_Logo/Depth_Logo_Primary_Lockup_Latin_SRGB.svg
+01_Logo/Depth_Logo_Primary_Lockup_Bilingual_SRGB.svg
+02_Guides/Depth_Color-Type_OnePager.pdf
+02_Guides/Depth_Logo-Use_OnePager.pdf
+03_Motion/Depth_Intro_1.0s.aep
+03_Motion/Depth_Outro_0.7s.aep
+03_Motion/renders/Depth_Intro_1080p_MP4.mp4
+03_Motion/renders/Depth_Outro_1080p_MP4.mp4
+04_Social/Depth_Avatar_1080x1080.png
+04_Social/Depth_LowerThird_Template.prproj
