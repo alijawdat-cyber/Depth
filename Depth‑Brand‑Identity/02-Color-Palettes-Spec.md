@@ -18,7 +18,7 @@
 ### استخدامات عملية (ملخّص معتمد)
 - **Light Mode**: خلفية `--bg-light`؛ نص أساسي `--text-light`؛ الشعار Stroke `--text-light`.
 - **Dark Mode**: خلفية `--bg-dark`؛ نص أساسي `--text-dark`؛ الشعار Stroke `--text-dark`.
-- **CTA (Call To Action — دعوة لاتخاذ إجراء)**: زر Primary = `--accent-400`، Hover = `--accent-500`, Disabled = `--accent-300` مع نص داكن `--ink-900` عند الحاجة.
+ - **CTA (Call To Action — دعوة لاتخاذ إجراء)**: زر Primary = `--accent-500`، Hover = `--accent-700`, Disabled = `--accent-300` مع نص داكن `--ink-900` عند الحاجة.
 - **Patterns**: خطوط كنتورية 3–6% فوق `--ink-900` أو 4–6% فوق `--neutral-50`.
 - **Motion**: Reveal بخط Accent، Parallax 16–24px، مدة Intro 1.0s/Outro 0.7s.
 

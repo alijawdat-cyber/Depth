@@ -16,3 +16,10 @@
 - Renders: H.264 MP4، WebM عند الحاجة؛ Bitrate مطابق للمنصة.
 - AE (Adobe After Effects — أدوبي أفتر إفكتس):
   - 1080p/2160p؛ 24/30 FPS (Frames Per Second — الإطارات بالثانية).
+  - Presets: ارفع `.epr` (EPR — Encoder Preset — إعداد ترميز) لـ (YouTube 1080p/Instagram/Reels) ضمن `assets-placeholders/03_Motion/`.
+
+### PDF (طباعة)
+- ارفع `.joboptions` (PDF/X‑4) ضمن `export-presets/`.
+
+### Color Profiles (بروفايلات اللون)
+- ICC (International Color Consortium — اتحاد اللون الدولي): `sRGB_v4_ICC_preference.icc`, `FOGRA39.icc` داخل `export-presets/`.
