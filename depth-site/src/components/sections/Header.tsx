@@ -39,16 +39,14 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          {mounted && (
-            <Button
-              variant="secondary"
-              onClick={toggleTheme}
-              aria-label="toggle theme"
-              className="hidden sm:inline-flex"
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            </Button>
-          )}
+          <Button
+            variant="secondary"
+            onClick={toggleTheme}
+            aria-label="toggle theme"
+            className="hidden sm:inline-flex"
+          >
+            {mounted ? (theme === "dark" ? <Sun size={16} /> : <Moon size={16} />) : null}
+          </Button>
           <a
             href="https://wa.me/"
             target="_blank"
@@ -72,11 +70,9 @@ export default function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2 mt-3">
-            {mounted && (
-              <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
-                {theme === "dark" ? "وضع فاتح" : "وضع داكن"}
-              </Button>
-            )}
+            <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
+              <span suppressHydrationWarning>{mounted ? (theme === "dark" ? "وضع فاتح" : "وضع داكن") : "تبديل الوضع"}</span>
+            </Button>
             <a
               href="https://wa.me/"
               target="_blank"

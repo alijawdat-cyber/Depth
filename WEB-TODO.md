@@ -11,7 +11,7 @@
 ### P0 — متطلبات وتمهيد (قبل البدء)
 - [ ] تثبيت لون الأكسنت الافتراضي: Purple 2025 أو Indigo 2025 (حسب `02-Color-Palettes-Spec.html`).
 - [x] قرار الأكسنت: Indigo 2025 (مع إمكانية سويتش لاحقاً لـ Purple 2025 للمعاينة فقط).
-- [ ] توفير ملفات خط دبي الحديث (Dubai) بصيغة WOFF2 (Regular/Medium/Bold) مع الرخصة.
+- [x] توفير ملفات خط دبي الحديث (Dubai) بصيغة WOFF2 (Regular/Medium/Bold) مع الرخصة. (منسوخة إلى `depth-site/public/fonts`)
 - [ ] جمع 6–10 أمثلة Portfolio (صورة/ريل + وصف سطرين) بصيغ WebP/MP4 (MPEG‑4 Part 14 — إم بي إي جي‑4 جزء 14) أو WebM (WebM — صيغة فيديو ويب مفتوحة).
 - [ ] نصوص أقسام الصفحة (Hero/Value/Process/Packages/FAQ/Contact) مختصرة.
 - [ ] بريد رسمي + رقم واتساب + روابط سوشيال + عنوان الاستوديو.
@@ -27,7 +27,7 @@
   ```bash
   npx create-next-app@latest depth-site --ts --eslint --app --src-dir --tailwind --use-npm --import-alias "@/*"
   ```
-- [ ] تثبيت مكتبات مساندة حديثة ومتوافقة:
+- [x] تثبيت مكتبات مساندة حديثة ومتوافقة:
   ```bash
   npm i framer-motion next-seo next-sitemap next-themes clsx tailwind-merge tailwind-variants lenis zod react-hook-form lucide-react
   npm i -D @types/node @types/react @types/react-dom @tailwindcss/typography @tailwindcss/forms @tailwindcss/container-queries autoprefixer postcss eslint-plugin-jsx-a11y @playwright/test
@@ -36,6 +36,7 @@
   ```bash
   npx playwright install --with-deps
   ```
+ - [x] تم إعداد Playwright (المتصفحات منصّبة).
 - [ ] (اختياري) إضافة Radix UI (Accessible Primitives — مكوّنات وصول جاهزة) وتهيئة shadcn/ui للمكونات المتوافقة:
   ```bash
   npm i @radix-ui/react-dropdown-menu @radix-ui/react-dialog @radix-ui/react-tabs @radix-ui/react-slot
@@ -65,7 +66,7 @@
   cd "Depth/public/fonts"
   # تم التحويل والحذف: لا توجد ملفات TTF حالياً (Regular/Medium/Bold متوفرة كـ .woff2)
   ```
-- [ ] تعريف الخطوط في `app/layout.tsx`:
+- [x] تعريف الخطوط في `app/layout.tsx`:
   ```ts
   import localFont from "next/font/local";
   export const dubai = localFont({
@@ -77,7 +78,7 @@
     variable: "--font-ar"
   });
   ```
-- [ ] تعيين العائلة الافتراضية حسب الاتجاه:
+- [x] تعيين العائلة الافتراضية حسب الاتجاه:
   ```tsx
   <html lang="ar" dir="rtl" className={`${dubai.variable}`}>
   ```
@@ -89,7 +90,7 @@
 ---
 
 ### P3 — الألوان والتوكنز وربط Tailwind (الأكسنت الافتراضي: Indigo 2025)
-- [ ] إنشاء/تعديل `app/globals.css` لتضمين توكنز من `02-Color-Palettes-Spec.html`:
+- [x] إنشاء/تعديل `app/globals.css` لتضمين توكنز من `02-Color-Palettes-Spec.html`:
   ```css
   :root{
     --ink-900:#0B0F14; --ink-800:#1A232C; --slate-600:#6A7D8F;
@@ -111,7 +112,7 @@
   }
   ```
 - [ ] ربط Tailwind بهذه التوكنز داخل `tailwind.config.ts` (ألوان/ظلال/أنصاف أقطار/حاويات).
-- [ ] تمكين Plugins: `@tailwindcss/typography`, `@tailwindcss/forms`, `@tailwindcss/container-queries`.
+ - [x] تمكين Plugins: `@tailwindcss/typography`, `@tailwindcss/forms`, `@tailwindcss/container-queries`.
 
 معايير القبول:
 - **أزرار CTA** تستخدم `--accent-500` (Hover `--accent-700`، Disabled `--accent-300`). التباين ≥ 4.5:1.
@@ -120,8 +121,10 @@
 ---
 
 ### P4 — RTL (Right To Left — من اليمين لليسار) وTheme (Light/Dark)
-- [ ] جعل `dir="rtl"` افتراضياً، واستعمال خصائص CSS المنطقية (inline-start/inline-end) لتقليل فروع الـ CSS.
-- [ ] إضافة `next-themes` لتبديل الداكن/الفاتح عبر `data-theme` أو سمة على `html`.
+- [x] جعل `dir="rtl"` افتراضياً، واستعمال خصائص CSS المنطقية (inline-start/inline-end) لتقليل فروع الـ CSS. (تم ضبطها في `layout.tsx`)
+- [x] إضافة `next-themes` لتبديل الداكن/الفاتح عبر `data-theme` أو سمة على `html`.
+- [x] تفعيل مزوّد الثيم (`ThemeProvider`) عبر كمبوننت `src/app/providers.tsx` وضبط `attribute="data-theme"`.
+- [x] دعم CSS صريح لـ `[data-theme="dark"]` و`[data-theme="light"]` داخل `globals.css`.
 - [ ] إن لزم: `tailwindcss-rtl` أو اعتماد خصائص منطقية فقط (مُفضّل).
 
 معايير القبول:
@@ -265,7 +268,7 @@
 - [ ] ربط الدومين؛ تفعيل HTTPS؛ التحقق من Headers/Caching.
 - [ ] إعداد متغيرات البيئة إذا استُخدمت مفاتيح.
 - [x] توثيق إعداد البريد/الدومين في `EMAIL-DOMAIN-SETUP.md` (MX/SPF/DKIM/DMARC، مجموعات، 2FA).
-- [ ] إضافة سجلات DNS التالية على Squarespace (MX/SPF/DMARC)، وتوليد DKIM 2048‑bit من Admin Console.
+- [x] إضافة سجلات DNS على Squarespace (MX/SPF/DMARC)، وتوليد/نشر DKIM 2048‑bit من Admin Console.
 
 معايير القبول:
 - **الموقع مباشر** على الدومين الرسمي؛ زمن استجابة سريع عالمي.

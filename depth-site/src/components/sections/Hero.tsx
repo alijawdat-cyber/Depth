@@ -13,7 +13,7 @@ export default function Hero() {
         <div className="grid gap-6 md:gap-8">
           <motion.h1
             className="text-3xl md:text-5xl font-bold tracking-tight"
-            initial={{ opacity: 0, y: 16 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
@@ -21,15 +21,15 @@ export default function Hero() {
           </motion.h1>
           <motion.p
             className="text-[var(--slate-600)] text-base md:text-lg max-w-prose"
-            initial={{ opacity: 0, y: 12 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.05 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
             استوديو/وكالة Performance + Content. باقات شهرية وخدمات حسب الطلب.
           </motion.p>
           <motion.div
             className="flex flex-wrap gap-3"
-            initial={{ opacity: 0, y: 8 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           >

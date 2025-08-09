@@ -1,0 +1,119 @@
+   ▲ Next.js 15.4.6
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.68.108:3000
+
+ ✓ Starting...
+ ✓ Ready in 1376ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1058ms (1496 modules)
+ GET / 200 in 1308ms
+ GET / 200 in 261ms
+ ✓ Compiled in 838ms (1510 modules)
+ GET / 200 in 57ms
+ GET / 200 in 114ms
+ ✓ Compiled in 304ms (1510 modules)
+ GET / 200 in 53ms
+ ✓ Compiled in 272ms (1510 modules)
+ GET / 200 in 97ms
+ ✓ Compiled in 348ms (1510 modules)
+ GET / 200 in 53ms
+ ✓ Compiled in 243ms (1510 modules)
+ GET / 200 in 50ms
+ GET / 200 in 124ms
+ ✓ Compiled in 176ms (1510 modules)
+ GET / 200 in 49ms
+ ✓ Compiled in 333ms (1510 modules)
+ GET / 200 in 59ms
+ ✓ Compiled in 305ms (1510 modules)
+ GET / 200 in 42ms
+ GET / 200 in 145ms
+ ✓ Compiled in 255ms (1510 modules)
+ GET / 200 in 32ms
+ ✓ Compiled in 146ms (1510 modules)
+ GET / 200 in 27ms
+ GET / 200 in 98ms
+ GET / 200 in 52ms
+ GET / 200 in 67ms
+ ○ Compiling /icon.svg ...
+ ✓ Compiled /icon.svg in 1017ms (1753 modules)
+ GET /icon.svg?5ed719f022dd2f74 200 in 1095ms
+ GET /favicon.ico 200 in 1135ms
+ GET /favicon.ico 200 in 1132ms
+ GET /apple-touch-icon.png 404 in 1298ms
+ GET /apple-touch-icon-precomposed.png 404 in 1307ms
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ GET /opengraph-image?a8fce446874a4269 500 in 1416ms
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ GET /opengraph-image?a8fce446874a4269 500 in 47ms
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ GET /opengraph-image?a8fce446874a4269 500 in 136ms
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: No fonts are loaded. At least one font is required to calculate the layout.]
+}
+ GET /opengraph-image?a8fce446874a4269 500 in 77ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 566ms (1847 modules)
+ GET / 200 in 338ms
+ GET / 200 in 10ms
+ GET / 200 in 112ms
+ ✓ Compiled in 1165ms (1861 modules)
+ GET / 200 in 75ms
+ GET / 200 in 19ms
+ ✓ Compiled in 507ms (1861 modules)
+ GET / 200 in 51ms
+ GET / 200 in 13ms
+ GET / 200 in 140ms
+ ✓ Compiled in 312ms (1752 modules)
+ GET / 200 in 95ms
+ GET / 200 in 17ms
+ GET / 200 in 114ms
+ ✓ Compiled in 340ms (1756 modules)
+ GET / 200 in 64ms
+ GET / 200 in 64ms
+ GET / 200 in 128ms
+ ✓ Compiled /opengraph-image in 88ms (235 modules)
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: Unsupported OpenType signature wOF2]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: Unsupported OpenType signature wOF2]
+}
+ GET /opengraph-image 500 in 294ms
+ GET / 200 in 244ms
+ GET / 200 in 247ms
+ ✓ Compiled /_error in 246ms (1828 modules)
+ ✓ Compiled in 351ms (1756 modules)
+ GET / 200 in 90ms
+ GET / 200 in 9ms
+ ✓ Compiled /opengraph-image in 86ms (235 modules)
+ GET / 200 in 135ms
+ GET / 200 in 130ms
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: Unsupported OpenType signature wOF2]
+}
+ ⨯ [Error: failed to pipe response] {
+  [cause]: [Error: Unsupported OpenType signature wOF2]
+}
+ GET /opengraph-image 500 in 337ms
+ ✓ Compiled /_error in 197ms (1828 modules)
+ ✓ Compiled in 736ms (2078 modules)
+ GET / 200 in 62ms
+ GET / 200 in 61ms

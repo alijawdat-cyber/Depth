@@ -117,10 +117,7 @@ html, body {
 .brand-logo { transition: transform 0.3s ease; filter: none !important; }
 .brand-logo:hover { transform: scale(1.05); }
 
-/* ضبط مساحة الكاروسيل */
-.carousel-wider .embla__container {
-  gap: 1.5rem;
-}
+/* لا نستخدم embla الآن؛ ضبط المسافات العامة للماركيه يتم داخل المكوّن */
 
 /* تحسين responsive للشعارات */
 @media (min-width: 768px) { .logo-enhanced { max-height: 5.5rem; min-width: 10rem; } }

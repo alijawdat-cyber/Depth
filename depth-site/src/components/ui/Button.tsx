@@ -1,3 +1,5 @@
+"use client";
+
 import { tv } from "tailwind-variants";
 import { clsx } from "clsx";
 import * as React from "react";
@@ -36,7 +38,13 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({ className, variant, size, ...props }: ButtonProps) {
   return (
-    <button className={clsx(buttonStyles({ variant, size }), className)} {...props} />
+    <button
+      className={clsx(buttonStyles({ variant, size }), className)}
+      {...props}
+      // حماية إضافية من اختلاف className بين SSR والعميل في dev
+      data-tv={buttonStyles({ variant, size })}
+      suppressHydrationWarning
+    />
   );
 }
 

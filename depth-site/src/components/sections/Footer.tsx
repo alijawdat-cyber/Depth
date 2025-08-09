@@ -7,7 +7,7 @@ export default function Footer() {
       <Container className="grid gap-6 md:grid-cols-3 items-center">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-[var(--text)]">Depth</span>
-          <span>© {new Date().getFullYear()}</span>
+          <span suppressHydrationWarning>© {new Date().getFullYear()}</span>
         </div>
         <nav className="flex justify-center gap-5">
           <Link href="/services" className="hover:underline">الخدمات</Link>
