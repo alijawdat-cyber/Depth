@@ -3,8 +3,32 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/container-queries";
 
+/* Dubai font */
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Base tokens */
 :root{
+  --font-dubai: "Dubai", sans-serif;
   /* Ink/Neutral scale */
   --ink-900:#0B0F14; --ink-800:#1A232C; --slate-600:#6A7D8F;
   --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
@@ -28,7 +52,7 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  --font-sans: var(--font-ar);
+  --font-sans: var(--font-dubai);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -41,8 +65,15 @@
 
 /* Explicit theme overrides */
 [data-theme="dark"], .dark {
+  /* أساسيات الوضع الداكن */
   --bg: var(--ink-900);
   --text: #FFFFFF;
+  /* أسطح وبوردريات مناسبة للداكن */
+  --card: var(--ink-800);
+  /* حد خفيف واضح على الخلفية الداكنة */
+  --elev: rgba(255, 255, 255, 0.12);
+  /* نص ثانوي أفتح ليتباين مع الخلفية الداكنة */
+  --slate-600: #9AA5B1;
 }
 [data-theme="light"] {
   --bg: var(--neutral-0);
@@ -77,10 +108,14 @@ html, body {
 .logo-enhanced {
   transition: transform 0.3s ease, filter 0.3s ease;
 }
-.logo-enhanced:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
+.logo-enhanced:hover { transform: scale(1.05); }
+/* تطبيع ألوان شعارات العملاء: أبيض صافي بالداكن، ورمادي غامق بالفاتح */
+[data-theme="dark"] .logo-enhanced, .dark .logo-enhanced { filter: brightness(0) invert(1); }
+[data-theme="light"] .logo-enhanced { filter: brightness(0) saturate(0) opacity(.85); }
+
+/* شعار البراند: يظل بألوانه الأصلية في الفاتح والداكن بدون أي فلاتر */
+.brand-logo { transition: transform 0.3s ease; filter: none !important; }
+.brand-logo:hover { transform: scale(1.05); }
 
 /* ضبط مساحة الكاروسيل */
 .carousel-wider .embla__container {
@@ -88,9 +123,5 @@ html, body {
 }
 
 /* تحسين responsive للشعارات */
-@media (min-width: 1024px) {
-  .logo-enhanced {
-    max-height: 6rem; /* 96px */
-    min-width: 10rem; /* 160px */
-  }
-}
+@media (min-width: 768px) { .logo-enhanced { max-height: 5.5rem; min-width: 10rem; } }
+@media (min-width: 1024px) { .logo-enhanced { max-height: 7rem; min-width: 12rem; } }

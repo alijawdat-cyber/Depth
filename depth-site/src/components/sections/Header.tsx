@@ -7,7 +7,7 @@ import { Button, buttonStyles } from "@/components/ui/Button";
 import { useTheme } from "@/lib/theme";
 import { clsx } from "clsx";
 import { Menu, X, Sun, Moon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navLinks = [
   { href: "/services", label: "الخدمات" },
@@ -19,6 +19,9 @@ const navLinks = [
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
+  // امنع تغيّر الأيقونة بين SSR والعميل لتجنّب hydration mismatch
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
   const [open, setOpen] = useState(false);
 
@@ -26,7 +29,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)]">
       <Container className="flex items-center justify-between h-14">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
-          <Image src="/depth-logo.svg" alt="Depth" width={400} height={85} className="h-16 md:h-20 w-auto min-w-32 logo-enhanced" />
+          <Image src="/depth-logo.svg" alt="Depth" width={400} height={85} className="h-16 md:h-20 w-auto min-w-32 brand-logo" priority />
         </Link>
         <nav className="hidden md:flex items-center gap-5 text-sm">
           {navLinks.map((l) => (
@@ -36,9 +39,16 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="hidden sm:inline-flex">
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </Button>
+          {mounted && (
+            <Button
+              variant="secondary"
+              onClick={toggleTheme}
+              aria-label="toggle theme"
+              className="hidden sm:inline-flex"
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </Button>
+          )}
           <a
             href="https://wa.me/"
             target="_blank"
@@ -62,9 +72,11 @@ export default function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2 mt-3">
-            <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
-              {theme === "dark" ? "وضع فاتح" : "وضع داكن"}
-            </Button>
+            {mounted && (
+              <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
+                {theme === "dark" ? "وضع فاتح" : "وضع داكن"}
+              </Button>
+            )}
             <a
               href="https://wa.me/"
               target="_blank"

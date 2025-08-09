@@ -4,8 +4,6 @@ import { useEffect } from "react";
 import { ThemeProvider } from "@/lib/theme";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
-import { DefaultSeo } from "next-seo";
-import { defaultSEO } from "@/lib/seo";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -37,7 +35,6 @@ export default function Providers({ children }: ProvidersProps) {
 
   return (
     <ThemeProvider>
-      <DefaultSeo {...defaultSEO} />
       <MotionConfig
         transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.8 }}
         reducedMotion="user"

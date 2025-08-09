@@ -3,7 +3,7 @@
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { clients } from "@/data/clients";
-import Image from "next/image";
+// لعرض SVG محلي بدون مشاكل، نستخدم <img> بدل next/image
 
 export default function ClientsGrid() {
   return (
@@ -13,16 +13,14 @@ export default function ClientsGrid() {
         <div className="grid gap-5 md:grid-cols-3">
           {clients.map((c) => (
             <article key={c.slug} className="rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--card)]">
-              <div className="flex items-center gap-3 mb-3">
-                <Image
+              <div className="flex items-center justify-center mb-4">
+                <img
                   src={c.logo}
                   alt={`${c.name} logo`}
-                  width={360}
-                  height={100}
-                  sizes="(min-width:1280px) 360px, (min-width:768px) 300px, 240px"
                   className="h-16 md:h-20 w-auto object-contain min-w-28 logo-enhanced"
+                  loading="lazy"
+                  decoding="async"
                 />
-                <h3 className="font-semibold">{c.name}</h3>
               </div>
               {c.story ? <p className="text-sm text-[var(--slate-600)]">{c.story}</p> : null}
               {c.website ? (

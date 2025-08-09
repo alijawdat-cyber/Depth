@@ -11,13 +11,40 @@ export const size = {
 
 export const contentType = "image/png";
 
-// Preload Arabic-capable font from public assets for proper shaping
-const dubaiRegular = fetch(
-  new URL("../../public/fonts/Dubai-Regular.woff2", import.meta.url)
-).then((res) => res.arrayBuffer());
+// حاول تحميل خط محلي من مجلد public (Edge runtime يسمح بـ new URL + import.meta.url)
+async function loadDubai() {
+  try {
+    const url = new URL("../../public/fonts/Dubai-Regular.woff2", import.meta.url);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("font fetch failed");
+    return await res.arrayBuffer();
+  } catch {
+    return null;
+  }
+}
 
 export default async function OGImage() {
   const title = "Depth — محتوى يحرّك النتائج";
+  const dubai = await loadDubai();
+  if (!dubai) {
+    // Fallback هادئ بدون نص لتفادي متطلبات الخطوط على Satori
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "linear-gradient(120deg, #1A232C, #253DB8)",
+          }}
+        />
+      ),
+      { ...size }
+    );
+  }
+
   return new ImageResponse(
     (
       <div
@@ -46,7 +73,7 @@ export default async function OGImage() {
       fonts: [
         {
           name: "Dubai",
-          data: await dubaiRegular,
+          data: dubai,
           style: "normal",
           weight: 400,
         },

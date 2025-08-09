@@ -1,17 +1,8 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
-import { Noto_Naskh_Arabic } from "next/font/google";
 import Providers from "./providers";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const arabic = Noto_Naskh_Arabic({ subsets: ["arabic"], variable: "--font-ar", display: "swap" });
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com").replace(/\/$/, "");
 
@@ -44,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`${arabic.variable}`} suppressHydrationWarning>
-      <body className={`${geistMono.variable} antialiased`}>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <body className="antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
