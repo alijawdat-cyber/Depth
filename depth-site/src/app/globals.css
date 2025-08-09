@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+/* Base tokens */
+:root{
+  /* Ink/Neutral scale */
+  --ink-900:#0B0F14; --ink-800:#1A232C; --slate-600:#6A7D8F;
+  --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
+  --neutral-300:#C2CDD8; --neutral-400:#A9B7C5; --neutral-500:#90A1B2; --neutral-600:#6A7D8F;
+  --neutral-700:#44515D; --neutral-800:#28313A; --neutral-900:#0B0F14;
+  /* Accent (Indigo 2025 — default) */
+  --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
+  /* Aliases */
+  --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
+  --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
+  /* Radii/Shadows/Focus */
+  --radius:14px; --radius-sm:10px; --shadow:0 8px 30px rgba(0,0,0,.08);
+  --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--accent-400);
+}
+
+/* Optional preview: switch to Purple 2025 palette */
+[data-palette="purple2025"]{
+  --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-ar);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--ink-900);
+    --text: #FFFFFF;
+  }
+}
+
+/* Explicit theme overrides */
+[data-theme="dark"], .dark {
+  --bg: var(--ink-900);
+  --text: #FFFFFF;
+}
+[data-theme="light"] {
+  --bg: var(--neutral-0);
+  --text: var(--ink-900);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Utility buttons baseline */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 16px;
+  height: 44px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.btn-cta {
+  background: var(--accent-500);
+  color: var(--text-dark);
+}
+.btn-cta:hover { background: var(--accent-700); }
+.btn-cta:disabled { background: var(--accent-300); opacity: .8; }
+.btn:focus-visible { outline: none; box-shadow: var(--focus); }

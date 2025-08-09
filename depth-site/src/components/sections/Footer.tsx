@@ -1,0 +1,30 @@
+import { Container } from "@/components/ui/Container";
+import Link from "next/link";
+
+export default function Footer() {
+  return (
+    <footer className="mt-16 border-t border-[var(--elev)] py-10 text-sm text-[var(--slate-600)]">
+      <Container className="grid gap-6 md:grid-cols-3 items-center">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-[var(--text)]">Depth</span>
+          <span>© {new Date().getFullYear()}</span>
+        </div>
+        <nav className="flex justify-center gap-5">
+          <Link href="/services" className="hover:underline">الخدمات</Link>
+          <Link href="/work" className="hover:underline">الأعمال</Link>
+          <Link href="/about" className="hover:underline">من نحن</Link>
+          <Link href="/contact" className="hover:underline">تواصل</Link>
+        </nav>
+        <div className="flex justify-end gap-4">
+          <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>
+          <a href="mailto:hello@depth.example" className="hover:underline">Email</a>
+          <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
+          <a href="https://x.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">X</a>
+        </div>
+      </Container>
+    </footer>
+  );
+}
+
+
+
