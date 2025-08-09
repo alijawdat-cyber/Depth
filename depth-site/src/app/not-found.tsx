@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// تجنّب البناء المسبق لهاي الصفحة لأن بعض تبعيات الواجهة (React/SEO) تسبب خطأ وقت الـ prerender
+export const dynamic = "force-dynamic";
+
 export default function NotFound() {
   return (
     <div className="min-h-[50vh] grid place-items-center p-8 text-center">
