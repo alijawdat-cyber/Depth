@@ -7,30 +7,40 @@
 - المسجِّل (Registrar — المسجل): Squarespace Domains
 - حالة التحقق (ICANN — هيئة الإنترنت للأسماء والأرقام المخصصة): Verified عبر رابط البريد (Action Required)
   - مرجع: دليل Squarespace للتحقق: https://support.squarespace.com/hc/en-us/articles/205812218-Verifying-your-Squarespace-managed-domain
+ - Nameservers (خوادم الأسماء):
+   - `ns-cloud-a1.googledomains.com`
+   - `ns-cloud-a2.googledomains.com`
+   - `ns-cloud-a3.googledomains.com`
+   - `ns-cloud-a4.googledomains.com`
 
 ### 2) سجلات DNS (Domain Name System — نظام أسماء النطاقات)
-- MX (Mail Exchange — تبادل البريد) — Google:
-  - `ASPMX.L.GOOGLE.COM.` (prio 1)
-  - `ALT1.ASPMX.L.GOOGLE.COM.` (prio 5)
-  - `ALT2.ASPMX.L.GOOGLE.COM.` (prio 5)
-  - `ALT3.ASPMX.L.GOOGLE.COM.` (prio 10)
-  - `ALT4.ASPMX.L.GOOGLE.COM.` (prio 10)
+- MX (Mail Exchange — تبادل البريد) — Google (الإعداد الحديث):
+  - `SMTP.GOOGLE.COM.` (أولوية 1)
   - TTL: 3600s (مُستحسن)
+  - الحالة: Active/Pass (مفحوصة على أكثر من ريزولفر)
+  - ملاحظة: الإعداد القديم كان خمسة سجلات (`ASPMX/ALT1..ALT4`). لا حاجة لها مع الإعداد الحديث.
 
 - SPF (Sender Policy Framework — إطار سياسة المرسل) — TXT على الجذر `@`:
   - `v=spf1 include:_spf.google.com ~all`
+  - الحالة: Done (موجودة على الجذر)
 
 - DKIM (DomainKeys Identified Mail — مفاتيح نطاق البريد المعرّف):
   - الحجم: 2048‑bit
   - اسم السجل (Host — الاستضافة): `google._domainkey`
-  - القيمة: تُولد من Admin Console → Gmail → Authenticate email → Generate new record
-  - الحالة: Pending حتى نشر الـ TXT ثم Start authentication
+  - القيمة: مولدة من Admin Console (قيمة طويلة موجودة)
+  - الحالة: On/Authenticating (السجل منشور والـ DKIM مفعّل)
 
 - DMARC (Domain-based Message Authentication, Reporting and Conformance — مصادقة وتقارير):
   - اسم: `_dmarc`
   - نوع: TXT
   - قيمة مبدئية (سياسة تحفظية):
     - `v=DMARC1; p=quarantine; rua=mailto:dmarc@depth-agency.com; fo=1; pct=100`
+  - الحالة: Done (منشور ويستلم تقارير إلى `dmarc@depth-agency.com`)
+
+- A/CNAME (استضافة الموقع عبر Vercel):
+  - `@` → A = `76.76.21.21` (TTL: 1h)
+  - `www` → CNAME = `cname.vercel-dns.com` (TTL: 1h)
+  - ملاحظة: تم حذف سجلات Squarespace السابقة (A الأربعة وCNAME `ext-sq.squarespace.com`) وسجل HTTPS (ALPN/IP hint).
 
 ### 3) حسابات ومجموعات البريد
 - المستخدم المدفوع (User — مستخدم): `admin@depth-agency.com` (خطة مرنة)
@@ -44,15 +54,53 @@
 - تعطيل Less secure apps
 
 ### 5) فحوص التشغيل (Post-Setup Checks)
-- Admin Console → Domains → Check MX: يجب أن تكون Passed
+- Admin Console → Domains → Check MX: Passed. ملاحظة: إن ظهرت "Request timed out" في أداة Google Toolbox فهذا خلل أداة مؤقت.
 - إرسال/استلام اختبار من `admin@depth-agency.com` إلى Gmail خارجي والعكس: Passed
 - DKIM: Status = Authenticating/On بعد النشر
 - DMARC: تُقرأ تقارير `rua` إلى بريد `dmarc@depth-agency.com` (اختياري إنشاء Alias)
+- Web/Vercel: 
+  - `A depth-agency.com` = `76.76.21.21`
+  - `CNAME www.depth-agency.com` = `cname.vercel-dns.com`
+  - Vercel Project → Domains: Valid Configuration + Primary = `depth-agency.com` + Redirect `www`→الجذر
+
+#### نتائج فحص مباشرة (مرجعية)
+```
+MX: 1 smtp.google.com.
+SPF: v=spf1 include:_spf.google.com ~all
+DKIM: google._domainkey (2048‑bit) موجود
+DMARC: v=DMARC1; p=quarantine; rua=mailto:dmarc@depth-agency.com; fo=1; pct=100
+NS: ns-cloud-a1..a4.googledomains.com
+```
 
 ### 6) سجل الحالة (Changelog)
+- v2025-08-09:
+  - نقل استضافة الويب إلى Vercel: `@` A = 76.76.21.21، و`www` CNAME = `cname.vercel-dns.com`
+  - حذف سجلات Squarespace (A الأربعة + CNAME `ext-sq.squarespace.com` + HTTPS)
+  - تثبيت Primary Domain على Vercel = `depth-agency.com` وتفعيل تحويل `www` للجذر
+  - إبقاء MX/SPF/DKIM/DMARC كما هي (Google Workspace)
 - v2025-08-08:
   - Domain verified (Squarespace)
-  - Created `EMAIL-DOMAIN-SETUP.md`
-  - جهّزنا MX/SPF نصياً، وDKIM/DMARC Pending للنشر والتفعيل
+  - MX محدث إلى `smtp.google.com` (حديث) — فعال
+  - SPF/DKIM/DMARC منشورة ومفعّلة
+  - توثيق محدث للحالة الفعلية
+
+### 7) إجراء ربط الدومين على Vercel (مختصر عملي)
+1. Vercel → Project → Settings → Domains → Add: `depth-agency.com` + `www.depth-agency.com`.
+2. في إدارة DNS (Squarespace Domains):
+   - احذف: A القديمة (عناوين Squarespace) + CNAME `www` (ext‑sq) + سجل HTTPS.
+   - أضف: `A @ = 76.76.21.21`، و`CNAME www = cname.vercel-dns.com` (TTL 1h).
+3. انتظر 5–30 دقيقة (قد تمتد لساعتين) → اضغط Refresh على Vercel حتى تصير Valid.
+4. عيّن Primary = `depth-agency.com` وفعل تحويل `www` للجذر.
+
+### 8) النشر عبر GitHub (Flow ثابت)
+- الكود داخل الريبو تحت المجلد `depth-site/` (Root Directory بالمشروع على Vercel = `depth-site`).
+- أي تعديل → `git add` + `git commit` + `git push` إلى فرع `main` → Vercel يبني وينشر تلقائيًا.
+- إعدادات البناء (افتراضيًا): Framework = Next.js، Build Command = `next build`، Output = `.next`.
+- متغيرات البيئة (Production فقط):
+  - `NEXT_PUBLIC_SITE_URL = https://depth-agency.com`
+- فحوص بعد النشر:
+  - `/<robots.txt>` و`/sitemap.xml` و`/opengraph-image` تعمل.
+  - مشاركة رابط على واتساب/تويتر تعرض صورة OG.
+  - Pages تعمل بدون أخطاء.
 
 
