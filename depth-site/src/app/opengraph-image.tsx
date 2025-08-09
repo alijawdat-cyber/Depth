@@ -1,11 +1,20 @@
 import { ImageResponse } from "next/og";
 
+// Avoid prerendering at build time due to Satori limitations with Arabic shaping
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
+
 export const size = {
   width: 1200,
   height: 630,
 };
 
 export const contentType = "image/png";
+
+// Preload Arabic-capable font from public assets for proper shaping
+const dubaiRegular = fetch(
+  new URL("../public/fonts/Dubai-Regular.woff2", import.meta.url)
+).then((res) => res.arrayBuffer());
 
 export default async function OGImage() {
   const title = "Depth — محتوى يحرّك النتائج";
@@ -32,7 +41,17 @@ export default async function OGImage() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        {
+          name: "Dubai",
+          data: await dubaiRegular,
+          style: "normal",
+          weight: 400,
+        },
+      ],
+    }
   );
 }
 
