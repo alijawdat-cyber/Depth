@@ -13,7 +13,7 @@ export const contentType = "image/png";
 
 // Preload Arabic-capable font from public assets for proper shaping
 const dubaiRegular = fetch(
-  new URL("../public/fonts/Dubai-Regular.woff2", import.meta.url)
+  new URL("../../public/fonts/Dubai-Regular.woff2", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 export default async function OGImage() {
