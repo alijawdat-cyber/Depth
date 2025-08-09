@@ -3,6 +3,8 @@ export const metadata = {
   description: "باقات شهرية وخدمات مخصصة: إنتاج محتوى، إدارة إعلانات، إستراتيجية وأتمتة.",
 };
 
+export const dynamic = "force-dynamic";
+
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/Button";

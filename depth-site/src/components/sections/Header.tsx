@@ -26,7 +26,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)]">
       <Container className="flex items-center justify-between h-14">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
-          <Image src="/depth-logo.svg" alt="Depth" width={320} height={68} className="h-14 md:h-16 w-auto" />
+          <Image src="/depth-logo.svg" alt="Depth" width={400} height={85} className="h-16 md:h-20 w-auto min-w-32 logo-enhanced" />
         </Link>
         <nav className="hidden md:flex items-center gap-5 text-sm">
           {navLinks.map((l) => (

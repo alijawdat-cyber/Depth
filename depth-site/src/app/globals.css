@@ -72,3 +72,25 @@ html, body {
 .btn-cta:hover { background: var(--accent-700); }
 .btn-cta:disabled { background: var(--accent-300); opacity: .8; }
 .btn:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* تحسين عرض الشعارات */
+.logo-enhanced {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.logo-enhanced:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* ضبط مساحة الكاروسيل */
+.carousel-wider .embla__container {
+  gap: 1.5rem;
+}
+
+/* تحسين responsive للشعارات */
+@media (min-width: 1024px) {
+  .logo-enhanced {
+    max-height: 6rem; /* 96px */
+    min-width: 10rem; /* 160px */
+  }
+}

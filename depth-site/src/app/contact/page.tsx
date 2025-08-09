@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Container } from "@/components/ui/Container";

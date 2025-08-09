@@ -15,10 +15,10 @@ export default function ClientsMarquee() {
               <Image
                 src={c.logo}
                 alt={`${c.name} logo`}
-                width={280}
-                height={80}
-                sizes="(min-width:1280px) 280px, (min-width:768px) 240px, 200px"
-                className="h-14 md:h-16 w-auto object-contain"
+                width={360}
+                height={100}
+                sizes="(min-width:1280px) 360px, (min-width:768px) 300px, 240px"
+                className="h-16 md:h-20 w-auto object-contain min-w-28 logo-enhanced"
               />
             </span>
           ))}

@@ -19,17 +19,17 @@ export default function Testimonials() {
         <SectionHeading title="قالوا عنّا" align="center" className="mb-8" />
         <Carousel options={{ loop: true }}>
           {items.map((t, idx) => (
-            <figure key={t.name} className="min-w-0 shrink-0 basis-full md:basis-[48%] lg:basis-[32%] rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--bg)]">
+            <figure key={t.name} className="min-w-0 shrink-0 basis-full md:basis-[58%] lg:basis-[42%] rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--bg)]">
               <blockquote className="text-sm text-[var(--slate-600)]">{t.quote}</blockquote>
               <figcaption className="mt-4 font-medium flex items-center gap-3">
                 {clients[idx % clients.length] ? (
                   <Image
                     src={clients[idx % clients.length].logo}
                     alt="logo"
-                    width={300}
-                    height={84}
-                    sizes="(min-width:1280px) 300px, (min-width:768px) 260px, 220px"
-                    className="h-14 md:h-16 w-auto object-contain"
+                    width={380}
+                    height={105}
+                    sizes="(min-width:1280px) 380px, (min-width:768px) 320px, 260px"
+                    className="h-16 md:h-20 w-auto object-contain min-w-28 logo-enhanced"
                   />
                 ) : null}
                 <span>{t.name} — <span className="text-[var(--slate-600)]">{t.role}</span></span>

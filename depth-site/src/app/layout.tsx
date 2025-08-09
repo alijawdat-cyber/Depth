@@ -4,6 +4,8 @@ import { Noto_Naskh_Arabic } from "next/font/google";
 import Providers from "./providers";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],

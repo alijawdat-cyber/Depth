@@ -3,6 +3,8 @@ export const metadata = {
   description: "Depth — استوديو/وكالة Performance + Content يركز على النتائج ووضوح القياس.",
 };
 
+export const dynamic = "force-dynamic";
+
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AboutTeam from "@/components/sections/AboutTeam";
