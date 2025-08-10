@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
-import { renderContactEmail, renderAutoreplyEmail } from "@/lib/emailTemplate";
+import { render } from "@react-email/render";
+import ContactNotification from "@/emails/ContactNotification";
+import ContactAutoReply from "@/emails/ContactAutoReply";
 
 // Smart Routing Configuration
 type Inquiry = "pricing" | "support" | "press" | "jobs" | "general";
@@ -17,6 +19,7 @@ const ROUTING_MAP: Record<Inquiry, string> = {
 // Environment Configuration
 const EMAIL_FROM = process.env.MAIL_FROM || "Depth <no-reply@depth-agency.com>";
 const EMAIL_CC_ADMIN = process.env.MAIL_CC_ADMIN || "admin@depth-agency.com";
+const BRAND_URL = process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com";
 const DRY_RUN = process.env.MAIL_DRY_RUN === "1";
 
 const schema = z.object({
@@ -47,13 +50,31 @@ export async function POST(req: Request) {
 
     // Smart Routing: Get target email based on inquiry type
     const targetEmail = ROUTING_MAP[type] || ROUTING_MAP.general;
-    const subject = `[${type.toUpperCase()}] ${name} - ${email}`;
-    const html = renderContactEmail({ 
+    const subject = `[${type.toUpperCase()}] رسالة تواصل جديدة — Depth`;
+
+    // Generate professional email templates
+    const teamEmailHtml = render(ContactNotification({ 
+      type, 
       name, 
-      email, 
+      fromEmail: email, 
       message, 
-      source: source ? `${source} (type: ${type})` : `type: ${type}` 
-    });
+      brandUrl: BRAND_URL 
+    }));
+
+    const autoreplyHtml = render(ContactAutoReply({ 
+      type, 
+      name, 
+      brandUrl: BRAND_URL 
+    }));
+
+    // Auto-reply subject lines
+    const autoreplySubjects = {
+      general: "شكراً لك - سنعود إليك خلال 24 ساعة",
+      pricing: "طلب عرض أسعار - سنعود إليك خلال 8 ساعات", 
+      support: "طلب دعم فني - سنعود إليك خلال 6 ساعات",
+      press: "استفسار إعلامي - سنعود إليك خلال 24 ساعة",
+      jobs: "طلب وظيفة - سنعود إليك خلال 72 ساعة"
+    };
 
     // DRY-RUN Mode: Log without sending
     if (DRY_RUN) {
@@ -63,9 +84,16 @@ export async function POST(req: Request) {
         from: EMAIL_FROM,
         subject,
         type,
+        autoreplySubject: autoreplySubjects[type],
+        brandUrl: BRAND_URL,
         timestamp: new Date().toISOString()
       });
-      return NextResponse.json({ ok: true, mode: "dry-run" });
+      return NextResponse.json({ 
+        ok: true, 
+        mode: "dry-run", 
+        to: targetEmail,
+        cc: EMAIL_CC_ADMIN
+      });
     }
 
     // Production Mode: Send actual emails
@@ -77,35 +105,26 @@ export async function POST(req: Request) {
     
     const resend = new Resend(apiKey);
 
-    // Send to appropriate department with admin CC
+    // 1) Send to appropriate department with admin CC
     await resend.emails.send({
       from: EMAIL_FROM,
       to: [targetEmail],
       cc: [EMAIL_CC_ADMIN],
       replyTo: email,
       subject,
-      html,
+      html: teamEmailHtml,
     });
 
-    // Send autoreply confirmation to user
-    const autoreplyHtml = renderAutoreplyEmail({ name, type });
-    const autoreplySubjects = {
-      general: "شكرًا لك - سنعود إليك خلال 24 ساعة",
-      pricing: "طلب عرض أسعار - سنعود إليك خلال 8 ساعات",
-      support: "طلب دعم فني - سنعود إليك خلال 6 ساعات",
-      press: "استفسار إعلامي - سنعود إليك خلال 24 ساعة",
-      jobs: "طلب وظيفة - سنعود إليك خلال 72 ساعة"
-    };
-    
-    void resend.emails.send({
+    // 2) Send branded autoreply to user
+    await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
       subject: autoreplySubjects[type],
       html: autoreplyHtml,
     });
 
-    console.log(`Email routed successfully: ${type} -> ${targetEmail}`);
-    return NextResponse.json({ ok: true });
+    console.log(`Email routed successfully: ${type} -> ${targetEmail} + autoreply sent`);
+    return NextResponse.json({ ok: true, sent: true });
     
   } catch (e) {
     console.error("contact route error", e);
