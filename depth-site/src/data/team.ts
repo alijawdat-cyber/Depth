@@ -28,7 +28,7 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "hiba",
-    name: "هبة محمد",
+    name: "Hiba Mohammed",
     roleAr: "Studio & Creative Producer",
     roleEn: "Studio & Creative Producer",
     quoteAr:
@@ -39,7 +39,7 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "moh-qasim",
-    name: "محمد قاسم",
+    name: "Mohammed Qasim",
     roleAr: "مصور أول ومحرّر فيديو",
     roleEn: "Senior Photographer & Video Editor",
     quoteAr:
@@ -50,7 +50,7 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "reza",
-    name: "رضا",
+    name: "Reza",
     roleAr: "مصور",
     roleEn: "Photographer",
     quoteAr: "تفاصيل نظيفة وصورة تتكلم قبل النص.",
@@ -59,7 +59,7 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "moh-sh",
-    name: "محمد الشمّري",
+    name: "Mohammed Al-Shammari",
     roleAr: "مصور",
     roleEn: "Photographer",
     quoteAr: "ثبات، زوايا دقيقة، وتسليم بلا ضوضاء.",
@@ -68,8 +68,8 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "hasan",
-    name: "حسن ماجد",
-    roleAr: "جدولة ومنصّات ميتا",
+    name: "Hasan Hashim",
+    roleAr: "Scheduler & Meta Platforms Coordinator",
     roleEn: "Scheduler & Meta Platforms Coordinator",
     quoteAr:
       "منسوب نشر ثابت + تتبّع دقيق = نمو متوقع.",
