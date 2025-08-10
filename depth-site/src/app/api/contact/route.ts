@@ -21,7 +21,8 @@ const ROUTING_MAP: Record<Inquiry, string> = {
 const EMAIL_FROM = process.env.MAIL_FROM || "Depth <no-reply@depth-agency.com>";
 const EMAIL_CC_ADMIN = process.env.MAIL_CC_ADMIN || "admin@depth-agency.com";
 const BRAND_URL = process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com";
-const DRY_RUN = process.env.MAIL_DRY_RUN === "1";
+// DRY_RUN disabled for production - emails will always be sent
+const DRY_RUN = false;
 
 const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
@@ -151,20 +152,12 @@ export async function POST(req: Request) {
       subject,
       autoreplySubject: autoreplySubjects[type],
       brandUrl: BRAND_URL,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      mode: "PRODUCTION_EMAILS_ENABLED"
     };
 
-    // DRY-RUN Mode: Log without sending
-    if (DRY_RUN) {
-      console.log("DRY-RUN Email Configuration:", logData);
-      return NextResponse.json({ 
-        ok: true, 
-        mode: "dry-run", 
-        requestId,
-        to: targetEmail,
-        cc: EMAIL_CC_ADMIN
-      });
-    }
+    // DRY_RUN is disabled - proceeding with actual email sending
+    console.log("📧 SENDING REAL EMAILS - Production Mode:", logData);
 
     // Production Mode: Send actual emails
     const apiKey = process.env.RESEND_API_KEY;
@@ -184,7 +177,7 @@ export async function POST(req: Request) {
     };
 
     // 1) Send to appropriate department with admin CC (multipart)
-    await resend.emails.send({
+    const teamEmailResult = await resend.emails.send({
       from: EMAIL_FROM,
       to: [targetEmail],
       cc: [EMAIL_CC_ADMIN],
@@ -195,8 +188,15 @@ export async function POST(req: Request) {
       headers: customHeaders,
     });
 
+    console.log("✅ Team email sent successfully:", {
+      requestId,
+      emailId: teamEmailResult.data?.id,
+      to: targetEmail,
+      cc: EMAIL_CC_ADMIN
+    });
+
     // 2) Send branded autoreply to user (multipart)
-    await resend.emails.send({
+    const autoreplyResult = await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
       subject: autoreplySubjects[type],
@@ -206,6 +206,12 @@ export async function POST(req: Request) {
         ...customHeaders,
         "X-Depth-Email-Type": "autoreply"
       },
+    });
+
+    console.log("✅ Auto-reply sent successfully:", {
+      requestId,
+      emailId: autoreplyResult.data?.id,
+      to: email
     });
 
     // Enhanced success logging
