@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 import { render } from "@react-email/render";
-import ContactNotification from "@/emails/ContactNotification";
-import ContactAutoReply from "@/emails/ContactAutoReply";
+import { v4 as uuidv4 } from "uuid";
+import ContactNotification, { renderContactNotificationText } from "@/emails/ContactNotification";
+import ContactAutoReply, { renderContactAutoReplyText } from "@/emails/ContactAutoReply";
 
 // Smart Routing Configuration
 type Inquiry = "pricing" | "support" | "press" | "jobs" | "general";
@@ -23,21 +24,59 @@ const BRAND_URL = process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL || "
 const DRY_RUN = process.env.MAIL_DRY_RUN === "1";
 
 const schema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  message: z.string().min(5),
+  name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
+  email: z.string().email("بريد إلكتروني غير صحيح"),
+  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف"),
   type: z.enum(["general", "pricing", "support", "press", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
 });
 
+// Rate limiting storage (in production, use Redis/database)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
+const RATE_LIMIT_MAX = 3; // 3 requests per window
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const current = rateLimitMap.get(ip);
+  
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (current.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  current.count++;
+  return true;
+}
+
 export async function POST(req: Request) {
   try {
+    // Rate limiting
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0] || 
+                     req.headers.get("x-real-ip") || "unknown";
+    
+    if (!checkRateLimit(clientIP)) {
+      return NextResponse.json({ 
+        ok: false, 
+        error: "rate_limit", 
+        message: "تم إرسال عدد كبير من الطلبات. حاول مرة أخرى خلال 10 دقائق" 
+      }, { status: 429 });
+    }
+
     const json = await req.json();
     const parsed = schema.safeParse(json);
     
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: "invalid" }, { status: 400 });
+      return NextResponse.json({ 
+        ok: false, 
+        error: "validation", 
+        details: parsed.error.errors 
+      }, { status: 400 });
     }
     
     const { name, email, message, type, source, honeypot } = parsed.data;
@@ -48,49 +87,80 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true }); // Return success to not alert bots
     }
 
+    // Generate unique request ID for tracking
+    const requestId = uuidv4();
+    const userAgent = req.headers.get("user-agent") || "";
+
     // Smart Routing: Get target email based on inquiry type
     const targetEmail = ROUTING_MAP[type] || ROUTING_MAP.general;
-    const subject = `[${type.toUpperCase()}] رسالة تواصل جديدة — Depth`;
+    
+    // Enhanced subject with prefix
+    const subject = `[DEPTH] ${type.toUpperCase()} — رسالة تواصل جديدة`;
 
-    // Generate professional email templates
+    // Generate professional email templates with multipart (HTML + text)
     const teamEmailHtml = render(ContactNotification({ 
       type, 
       name, 
       fromEmail: email, 
       message, 
-      brandUrl: BRAND_URL 
+      brandUrl: BRAND_URL,
+      requestId
     }));
+
+    const teamEmailText = renderContactNotificationText({
+      type, 
+      name, 
+      fromEmail: email, 
+      message, 
+      brandUrl: BRAND_URL,
+      requestId
+    });
 
     const autoreplyHtml = render(ContactAutoReply({ 
       type, 
       name, 
-      brandUrl: BRAND_URL 
+      brandUrl: BRAND_URL,
+      requestId
     }));
 
-    // Auto-reply subject lines
+    const autoreplyText = renderContactAutoReplyText({ 
+      type, 
+      name, 
+      brandUrl: BRAND_URL,
+      requestId
+    });
+
+    // Auto-reply subject lines with prefix
     const autoreplySubjects = {
-      general: "شكراً لك - سنعود إليك خلال 24 ساعة",
-      pricing: "طلب عرض أسعار - سنعود إليك خلال 8 ساعات", 
-      support: "طلب دعم فني - سنعود إليك خلال 6 ساعات",
-      press: "استفسار إعلامي - سنعود إليك خلال 24 ساعة",
-      jobs: "طلب وظيفة - سنعود إليك خلال 72 ساعة"
+      general: "[DEPTH] تأكيد استلام — سنعود إليك خلال 24 ساعة",
+      pricing: "[DEPTH] طلب عرض أسعار — سنعود إليك خلال 8 ساعات", 
+      support: "[DEPTH] طلب دعم فني — سنعود إليك خلال 6 ساعات",
+      press: "[DEPTH] استفسار إعلامي — سنعود إليك خلال 24 ساعة",
+      jobs: "[DEPTH] طلب وظيفة — سنعود إليك خلال 72 ساعة"
+    };
+
+    // Enhanced logging
+    const logData = {
+      requestId,
+      type,
+      clientIP,
+      userAgent,
+      to: targetEmail,
+      cc: EMAIL_CC_ADMIN,
+      from: EMAIL_FROM,
+      subject,
+      autoreplySubject: autoreplySubjects[type],
+      brandUrl: BRAND_URL,
+      timestamp: new Date().toISOString()
     };
 
     // DRY-RUN Mode: Log without sending
     if (DRY_RUN) {
-      console.log("DRY-RUN Email Configuration:", {
-        to: targetEmail,
-        cc: EMAIL_CC_ADMIN,
-        from: EMAIL_FROM,
-        subject,
-        type,
-        autoreplySubject: autoreplySubjects[type],
-        brandUrl: BRAND_URL,
-        timestamp: new Date().toISOString()
-      });
+      console.log("DRY-RUN Email Configuration:", logData);
       return NextResponse.json({ 
         ok: true, 
         mode: "dry-run", 
+        requestId,
         to: targetEmail,
         cc: EMAIL_CC_ADMIN
       });
@@ -105,7 +175,15 @@ export async function POST(req: Request) {
     
     const resend = new Resend(apiKey);
 
-    // 1) Send to appropriate department with admin CC
+    // Custom headers for tracking and analytics
+    const customHeaders = {
+      "X-Depth-Request-Type": type,
+      "X-Depth-Request-Id": requestId,
+      "X-Depth-Source": source || "contact-form",
+      "X-Depth-Version": "2.0"
+    };
+
+    // 1) Send to appropriate department with admin CC (multipart)
     await resend.emails.send({
       from: EMAIL_FROM,
       to: [targetEmail],
@@ -113,21 +191,52 @@ export async function POST(req: Request) {
       replyTo: email,
       subject,
       html: teamEmailHtml,
+      text: teamEmailText,
+      headers: customHeaders,
     });
 
-    // 2) Send branded autoreply to user
+    // 2) Send branded autoreply to user (multipart)
     await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
       subject: autoreplySubjects[type],
       html: autoreplyHtml,
+      text: autoreplyText,
+      headers: {
+        ...customHeaders,
+        "X-Depth-Email-Type": "autoreply"
+      },
     });
 
-    console.log(`Email routed successfully: ${type} -> ${targetEmail} + autoreply sent`);
-    return NextResponse.json({ ok: true, sent: true });
+    // Enhanced success logging
+    console.log(`Email routed successfully:`, {
+      requestId,
+      type,
+      route: `${type} -> ${targetEmail}`,
+      autoreply: "sent",
+      clientIP,
+      timestamp: new Date().toISOString()
+    });
+
+    return NextResponse.json({ 
+      ok: true, 
+      sent: true, 
+      requestId,
+      estimatedResponse: {
+        general: "24 ساعة",
+        pricing: "8 ساعات",
+        support: "6 ساعات", 
+        press: "24 ساعة",
+        jobs: "72 ساعة"
+      }[type]
+    });
     
   } catch (e) {
     console.error("contact route error", e);
-    return NextResponse.json({ ok: false }, { status: 500 });
+    return NextResponse.json({ 
+      ok: false, 
+      error: "server_error",
+      message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى"
+    }, { status: 500 });
   }
 }

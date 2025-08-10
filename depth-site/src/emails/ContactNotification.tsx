@@ -8,21 +8,12 @@ type Props = {
   fromEmail: string;
   message: string;
   brandUrl: string; // e.g. https://depth-agency.com
+  requestId?: string;
 };
 
 export default function ContactNotification({
-  type, name, fromEmail, message, brandUrl,
+  type, name, fromEmail, message, brandUrl, requestId
 }: Props) {
-  const pill = {
-    background: "#621cf0", 
-    color: "white", 
-    padding: "8px 16px", 
-    borderRadius: "20px", 
-    display: "inline-block", 
-    fontWeight: "600",
-    fontSize: "14px"
-  };
-  
   const labelStyle = {
     color: "#666", 
     fontSize: "12px", 
@@ -55,6 +46,14 @@ export default function ContactNotification({
     jobs: "طلب وظيفة"
   };
 
+  const slaMap = {
+    general: "24 ساعة",
+    pricing: "8 ساعات", 
+    support: "6 ساعات",
+    press: "24 ساعة",
+    jobs: "72 ساعة"
+  };
+
   return (
     <Html dir="rtl" lang="ar">
       <Head />
@@ -71,20 +70,28 @@ export default function ContactNotification({
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo */}
+          {/* Header with Logo - Absolute URL */}
           <Section style={{textAlign: "center", marginBottom: "24px"}}>
             <Img 
               src={`${brandUrl}/brand/logo-512.png`} 
               alt="Depth" 
-              width="64" 
-              height="64"
+              width="96" 
+              height="96"
               style={{borderRadius: "12px"}}
             />
           </Section>
 
           {/* Status Badge */}
           <Section style={{textAlign: "center", marginBottom: "24px"}}>
-            <span style={pill}>
+            <span style={{
+              background: "#621cf0", 
+              color: "white", 
+              padding: "8px 16px", 
+              borderRadius: "20px", 
+              display: "inline-block", 
+              fontWeight: "600",
+              fontSize: "14px"
+            }}>
               📧 رسالة تواصل جديدة
             </span>
           </Section>
@@ -119,7 +126,7 @@ export default function ContactNotification({
                 fontSize: "12px",
                 fontWeight: "600"
               }}>
-                {typeLabels[type]}
+                {typeLabels[type]} — SLA: {slaMap[type]}
               </span>
             </Text>
 
@@ -127,6 +134,47 @@ export default function ContactNotification({
             <div style={messageBox}>
               {message}
             </div>
+
+            {requestId && (
+              <>
+                <Text style={labelStyle}>معرف الطلب</Text>
+                <Text style={{...valueStyle, fontFamily: "monospace", fontSize: "12px", color: "#666"}}>
+                  {requestId}
+                </Text>
+              </>
+            )}
+          </Section>
+
+          {/* Quick Reply Section */}
+          <Section style={{
+            background: "#621cf0",
+            padding: "16px",
+            borderRadius: "12px",
+            margin: "16px 0",
+            textAlign: "center"
+          }}>
+            <Text style={{
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "600",
+              margin: "0 0 8px 0"
+            }}>
+              رد سريع
+            </Text>
+            <Link 
+              href={`mailto:${fromEmail}?subject=Re: [${type.toUpperCase()}] طلبك لدى Depth&body=شكراً لك ${name} على تواصلك معنا.%0A%0A`}
+              style={{
+                color: "white",
+                backgroundColor: "rgba(255,255,255,0.2)",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontSize: "12px",
+                fontWeight: "600"
+              }}
+            >
+              ✉️ رد الآن
+            </Link>
           </Section>
 
           <Hr style={{
@@ -160,4 +208,32 @@ export default function ContactNotification({
       </Body>
     </Html>
   );
+}
+
+// Plain-text version for fallback
+export function renderContactNotificationText(props: Props) {
+  const { type, name, fromEmail, message, requestId } = props;
+  const typeLabels = {
+    general: "استفسار عام",
+    pricing: "طلب أسعار", 
+    support: "دعم فني",
+    press: "استفسار إعلامي",
+    jobs: "طلب وظيفة"
+  };
+
+  return `
+رسالة تواصل جديدة — Depth
+
+الاسم: ${name}
+البريد: ${fromEmail}
+النوع: ${typeLabels[type]}
+${requestId ? `معرف الطلب: ${requestId}` : ''}
+
+الرسالة:
+${message}
+
+---
+تم الإرسال من: depth-agency.com
+للرد: ${fromEmail}
+  `.trim();
 }

@@ -11,12 +11,12 @@ import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const schema = z.object({
-  name: z.string().min(2, "الاسم مطلوب"),
-  email: z.string().email("بريد غير صالح"),
-  message: z.string().min(10, "الرسالة مطلوبة"),
+  name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين").max(100, "الاسم طويل جداً"),
+  email: z.string().email("بريد إلكتروني غير صحيح").max(255, "البريد طويل جداً"),
+  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف").max(2000, "الرسالة طويلة جداً"),
   type: z.enum(["general", "pricing", "support", "press", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
@@ -25,19 +25,49 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const inquiryTypes = [
-  { value: "general", label: "استفسار عام", icon: "💬", desc: "أسئلة عامة حول الخدمات" },
-  { value: "pricing", label: "عرض أسعار", icon: "💰", desc: "طلب عرض أسعار مخصص" },
-  { value: "support", label: "دعم فني", icon: "🔧", desc: "مساعدة تقنية ودعم" },
-  { value: "press", label: "إعلام وصحافة", icon: "📰", desc: "استفسارات إعلامية" },
-  { value: "jobs", label: "وظائف", icon: "👥", desc: "فرص العمل والتوظيف" }
+  { value: "general", label: "استفسار عام", icon: "💬", desc: "أسئلة عامة حول الخدمات", sla: "24 ساعة" },
+  { value: "pricing", label: "عرض أسعار", icon: "💰", desc: "طلب عرض أسعار مخصص", sla: "8 ساعات" },
+  { value: "support", label: "دعم فني", icon: "🔧", desc: "مساعدة تقنية ودعم", sla: "6 ساعات" },
+  { value: "press", label: "إعلام وصحافة", icon: "📰", desc: "استفسارات إعلامية", sla: "24 ساعة" },
+  { value: "jobs", label: "وظائف", icon: "👥", desc: "فرص العمل والتوظيف", sla: "72 ساعة" }
 ];
 
 export default function ContactPage() {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState("general");
-  const { register, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful }, reset, setError, setValue } = useForm<FormData>();
+  const [isOnline, setIsOnline] = useState(true);
+  const { register, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful }, reset, setError, setValue, watch } = useForm<FormData>();
+
+  // Real-time validation
+  const watchName = watch("name");
+  const watchEmail = watch("email");
+  const watchMessage = watch("message");
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Real-time email validation
+  const isValidEmail = (email: string) => {
+    return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const onSubmit = async (data: FormData) => {
+    if (!isOnline) {
+      toast.error("لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مرة أخرى");
+      return;
+    }
+
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
       parsed.error.issues.forEach((issue) => {
@@ -47,25 +77,41 @@ export default function ContactPage() {
       toast.error("يرجى تصحيح الحقول المحددة");
       return;
     }
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      const result = await res.json();
+
       if (res.ok) {
         reset();
         setSelectedType("general");
         const selectedInquiry = inquiryTypes.find(t => t.value === data.type);
-        toast.success(`تم إرسال ${selectedInquiry?.label} بنجاح — سنعاود اتصال خلال ${data.type === "pricing" ? "8 ساعات" : data.type === "support" ? "6 ساعات" : data.type === "jobs" ? "72 ساعة" : "24 ساعة"}`);
+        
+        // Enhanced success message with request ID
+        const successMsg = result.requestId 
+          ? `تم إرسال ${selectedInquiry?.label} بنجاح! سنرد خلال ${selectedInquiry?.sla} • معرف الطلب: ${result.requestId.slice(0, 8)}`
+          : `تم إرسال ${selectedInquiry?.label} بنجاح! سنرد خلال ${selectedInquiry?.sla}`;
+        
+        toast.success(successMsg, { duration: 6000 });
       } else {
-        const { error } = (await res.json().catch(() => ({ error: "" }))) as {
-          error?: string;
+        // Enhanced error handling
+        const errorMessages = {
+          rate_limit: result.message || "تم إرسال عدد كبير من الطلبات. حاول مرة أخرى خلال 10 دقائق",
+          validation: "بيانات غير صحيحة. تحقق من الحقول وحاول مرة أخرى",
+          missing_api_key: "الخدمة غير مفعّلة مؤقتاً. حاول مرة أخرى خلال دقائق قليلة",
+          server_error: result.message || "حدث خطأ في الخادم. حاول مرة أخرى"
         };
-        toast.error(error === "missing_api_key" ? "الخدمة غير مفعّلة مؤقتاً — جرّب لاحقاً" : "تعذّر الإرسال، حاول مجدداً");
+
+        const errorMsg = errorMessages[result.error as keyof typeof errorMessages] || "تعذّر الإرسال. حاول مرة أخرى";
+        toast.error(errorMsg);
       }
-    } catch {
-      toast.error("تعذّر الاتصال بالخادم، تأكّد من الشبكة");
+    } catch (error) {
+      toast.error("تعذّر الاتصال بالخادم. تحقق من الشبكة وحاول مرة أخرى");
     }
   };
 
@@ -73,6 +119,8 @@ export default function ContactPage() {
     setSelectedType(type);
     setValue("type", type as any);
   };
+
+  const selectedInquiry = inquiryTypes.find(t => t.value === selectedType);
 
   return (
     <main className="py-16 md:py-24 min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)]">
@@ -98,6 +146,16 @@ export default function ContactPage() {
               className="rounded-lg"
             />
             <span className="text-lg font-semibold text-[var(--text)]">Depth</span>
+          </div>
+
+          {/* Network Status Indicator */}
+          <div className={clsx(
+            "px-2 py-1 rounded-full text-xs font-medium",
+            isOnline 
+              ? "bg-green-100 text-green-800 border border-green-200" 
+              : "bg-red-100 text-red-800 border border-red-200"
+          )}>
+            {isOnline ? "🟢 متصل" : "🔴 غير متصل"}
           </div>
         </div>
 
@@ -145,7 +203,8 @@ export default function ContactPage() {
                       <span className="text-2xl">{type.icon}</span>
                       <div className="flex-1">
                         <div className="font-semibold text-[var(--text)] mb-1">{type.label}</div>
-                        <div className="text-xs text-[var(--slate-600)]">{type.desc}</div>
+                        <div className="text-xs text-[var(--slate-600)] mb-1">{type.desc}</div>
+                        <div className="text-xs font-medium text-[#621cf0]">SLA: {type.sla}</div>
                       </div>
                       {selectedType === type.value && (
                         <svg className="w-5 h-5 text-[#621cf0] mt-1" fill="currentColor" viewBox="0 0 20 20">
@@ -159,32 +218,43 @@ export default function ContactPage() {
               <input type="hidden" {...register("type")} value={selectedType} />
             </div>
 
-            {/* Name Field */}
+            {/* Name Field with Real-time Validation */}
             <div className="space-y-2">
               <label className="block text-base font-medium text-[var(--text)]">
                 الاسم <span className="text-red-500">*</span>
+                {watchName && watchName.length >= 2 && (
+                  <span className="text-green-600 text-sm ml-2">✓</span>
+                )}
               </label>
               <input 
                 className={clsx(
                   "w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0]",
-                  errors.name ? "border-red-500" : "border-[var(--elev)]"
+                  errors.name ? "border-red-500" : 
+                  watchName && watchName.length >= 2 ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="أدخل اسمك الكامل"
                 {...register("name")} 
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              <p className="text-xs text-[var(--slate-600)]">
+                {watchName ? `${watchName.length}/100` : "2-100 حرف"}
+              </p>
             </div>
 
-            {/* Email Field */}
+            {/* Email Field with Real-time Validation */}
             <div className="space-y-2">
               <label className="block text-base font-medium text-[var(--text)]">
                 البريد الإلكتروني <span className="text-red-500">*</span>
+                {watchEmail && isValidEmail(watchEmail) && (
+                  <span className="text-green-600 text-sm ml-2">✓</span>
+                )}
               </label>
               <input 
                 type="email" 
                 className={clsx(
                   "w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0]",
-                  errors.email ? "border-red-500" : "border-[var(--elev)]"
+                  errors.email ? "border-red-500" : 
+                  watchEmail && isValidEmail(watchEmail) ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="example@domain.com"
                 {...register("email")} 
@@ -192,35 +262,49 @@ export default function ContactPage() {
               {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
 
-            {/* Message Field */}
+            {/* Message Field with Real-time Validation */}
             <div className="space-y-2">
               <label className="block text-base font-medium text-[var(--text)]">
                 رسالتك <span className="text-red-500">*</span>
+                {watchMessage && watchMessage.length >= 10 && (
+                  <span className="text-green-600 text-sm ml-2">✓</span>
+                )}
               </label>
               <textarea 
                 rows={6} 
                 className={clsx(
                   "w-full px-4 py-3 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] resize-none",
-                  errors.message ? "border-red-500" : "border-[var(--elev)]"
+                  errors.message ? "border-red-500" : 
+                  watchMessage && watchMessage.length >= 10 ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="اكتب رسالتك بالتفصيل..."
                 {...register("message")} 
               />
               {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
+              <p className="text-xs text-[var(--slate-600)]">
+                {watchMessage ? `${watchMessage.length}/2000` : "10-2000 حرف"}
+              </p>
             </div>
 
             {/* Submit Button */}
             <button 
-              disabled={isSubmitting} 
+              disabled={isSubmitting || !isOnline} 
               className={clsx(
                 buttonStyles({ variant: "primary" }), 
                 "w-full h-12 text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100",
-                isSubmitting && "cursor-wait"
+                (isSubmitting || !isOnline) && "cursor-wait"
               )}
               aria-live="polite" 
               aria-busy={isSubmitting}
             >
-              {isSubmitting ? (
+              {!isOnline ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  لا يوجد اتصال
+                </span>
+              ) : isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -243,10 +327,10 @@ export default function ContactPage() {
             {/* Response Time Info */}
             <div className="bg-[var(--card)] border border-[var(--elev)] rounded-xl p-4 text-center">
               <p className="text-sm text-[var(--slate-600)]">
-                ⏱️ <strong>وقت الاستجابة المتوقع:</strong> {" "}
-                {selectedType === "pricing" ? "8 ساعات" : 
-                 selectedType === "support" ? "6 ساعات" : 
-                 selectedType === "jobs" ? "72 ساعة" : "24 ساعة"}
+                ⏱️ <strong>وقت الاستجابة المتوقع:</strong> {selectedInquiry?.sla}
+              </p>
+              <p className="text-xs text-[var(--slate-600)] mt-1">
+                📧 يصل إليك تأكيد فوري + رد من {selectedInquiry?.value === "pricing" ? "فريق المبيعات" : selectedInquiry?.value === "support" ? "فريق الدعم" : selectedInquiry?.value === "press" ? "فريق الإعلام" : selectedInquiry?.value === "jobs" ? "فريق التوظيف" : "فريق خدمة العملاء"}
               </p>
             </div>
           </form>

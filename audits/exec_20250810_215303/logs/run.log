@@ -266,3 +266,58 @@ depth-site/.vercel/.env.production.local
 depth-site/.env.local.example
 depth-site/.env.local
 === Checking for hardcoded Resend keys ===
+=== Checking git history for exposed secrets ===
+f6e836b feat: add autoreply templates with SLA commitments
+0c4547c chore: deploy depth-site to production via CI and Vercel CLI
+c71be75 build: make static-export safe, remove OG/blog dynamic routes for now; adjust home/services to static; successful SSR build
+b034851 build(depth-site): fix lint error in Marquee, clean .next and successful production build
+cceecbe feat: add Next.js site and set site URL to depth-agency.com (SEO, sitemap, robots)
+bcf2531 chore: push latest docs
+=== Checking specific commits for API key exposure ===
+commit f6e836b748037a6be0cf9db8f11617b368f39727
+Author: alijawdat-cyber <alijawdat4@gmail.com>
+Date:   Sun Aug 10 22:24:11 2025 +0300
+
+    feat: add autoreply templates with SLA commitments
+    
+    - Add renderAutoreplyEmail function with department-specific templates
+    - Implement SLA response times: general(24h), pricing(8h), support(6h), press(24h), jobs(72h)
+    - Update API route to send customized autoreply emails
+    - Include WhatsApp placeholder for future integration
+    - Complete final launch with full autoreply system
+
+EMAIL-DOMAIN-SETUP.md
+READY-TO-RUN-COMMANDS.sh
+SYSTEM-AUDIT-REPORT.md
+audits/EMAIL_TEMPLATES_PREVIEW.md
+audits/MAPPING.json
+audits/PR/email-routing-v1/FINAL-LAUNCH-REPORT.md
+audits/PR/email-routing-v1/live-email-test-results.md
+audits/PR/email-routing-v1/monitoring-log.md
+commit 0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55
+Author: alijawdat-cyber <alijawdat4@gmail.com>
+Date:   Sun Aug 10 19:02:58 2025 +0300
+
+    chore: deploy depth-site to production via CI and Vercel CLI
+
+EMAIL-DOMAIN-SETUP.md
+ali jawdat.jpg
+depth-site/package-lock.json
+depth-site/package.json
+depth-site/src/app/api/contact/route.ts
+depth-site/src/app/contact/page.tsx
+depth-site/src/app/layout.tsx
+depth-site/src/components/sections/ClientsGrid.tsx
+depth-site/src/components/sections/Testimonials.tsx
+=== Checking for .env files in git history ===
+=== Current .gitignore status ===
+# env files (can opt-in for committing if needed)
+.env*
+next-env.d.ts
+=== SECURITY ASSESSMENT COMPLETE: Sun Aug 10 22:35:28 +03 2025 ===
+=== SECURITY FINDINGS SUMMARY ===
+✅ GOOD: No hardcoded API keys found in current codebase
+✅ GOOD: .gitignore properly configured with .env* patterns
+✅ GOOD: Current API route uses proper env variable (process.env.RESEND_API_KEY)
+⚠️  ALERT: GitGuardian detected exposed key in repository history
+🚫 BLOCKER: Smart email routing not implemented for production launch

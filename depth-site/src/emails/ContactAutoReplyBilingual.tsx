@@ -7,22 +7,78 @@ type Props = {
   name: string;
   brandUrl: string;
   requestId?: string;
+  lang?: "ar" | "en";
 };
 
-const SLAs = { 
-  general: "خلال 24 ساعة", 
-  pricing: "خلال 8 ساعات", 
-  support: "خلال 6 ساعات", 
-  press: "خلال 24 ساعة", 
-  jobs: "خلال 72 ساعة" 
-} as const;
-
-const teamNames = {
-  general: "خدمة العملاء",
-  pricing: "فريق المبيعات",
-  support: "فريق الدعم الفني",
-  press: "فريق العلاقات الإعلامية",
-  jobs: "فريق الموارد البشرية"
+const content = {
+  ar: {
+    preheader: {
+      general: "استلمنا استفسارك—سنرد خلال 24 ساعة",
+      pricing: "استلمنا طلب الأسعار—سنرد خلال 8 ساعات",
+      support: "استلمنا طلب الدعم—سنرد خلال 6 ساعات", 
+      press: "استلمنا الاستفسار الإعلامي—سنرد خلال 24 ساعة",
+      jobs: "استلمنا طلب الوظيفة—سنرد خلال 72 ساعة"
+    },
+    sla: { 
+      general: "خلال 24 ساعة", 
+      pricing: "خلال 8 ساعات", 
+      support: "خلال 6 ساعات", 
+      press: "خلال 24 ساعة", 
+      jobs: "خلال 72 ساعة" 
+    },
+    teams: {
+      general: "خدمة العملاء",
+      pricing: "فريق المبيعات",
+      support: "فريق الدعم الفني",
+      press: "فريق العلاقات الإعلامية",
+      jobs: "فريق الموارد البشرية"
+    },
+    greeting: "أهلاً وسهلاً",
+    thanks: "شكراً لك على تواصلك معنا! استلمنا رسالتك بنجاح وسيقوم",
+    willReply: "بالرد عليك",
+    expectedResponse: "وقت الاستجابة المتوقع",
+    quickContact: "للتواصل السريع:",
+    email: "البريد الإلكتروني:",
+    whatsapp: "واتساب: سيتم إضافة الرقم لاحقاً",
+    regards: "تحياتنا الحارة،",
+    team: "فريق Depth",
+    tagline: "نبني تجارب رقمية استثنائية",
+    requestId: "معرف الطلب:"
+  },
+  en: {
+    preheader: {
+      general: "We received your inquiry—will reply within 24 hours",
+      pricing: "We received your pricing request—will reply within 8 hours",
+      support: "We received your support request—will reply within 6 hours", 
+      press: "We received your press inquiry—will reply within 24 hours",
+      jobs: "We received your job application—will reply within 72 hours"
+    },
+    sla: { 
+      general: "within 24 hours", 
+      pricing: "within 8 hours", 
+      support: "within 6 hours", 
+      press: "within 24 hours", 
+      jobs: "within 72 hours" 
+    },
+    teams: {
+      general: "Customer Service Team",
+      pricing: "Sales Team",
+      support: "Technical Support Team",
+      press: "Media Relations Team",
+      jobs: "Human Resources Team"
+    },
+    greeting: "Hello",
+    thanks: "Thank you for contacting us! We have successfully received your message and our",
+    willReply: "will reply to you",
+    expectedResponse: "Expected Response Time",
+    quickContact: "For quick contact:",
+    email: "Email:",
+    whatsapp: "WhatsApp: Number will be added later",
+    regards: "Warm regards,",
+    team: "Depth Team",
+    tagline: "Building exceptional digital experiences",
+    requestId: "Request ID:"
+  }
 };
 
 const icons = {
@@ -33,28 +89,22 @@ const icons = {
   jobs: "👥"
 };
 
-const preheaderText = {
-  general: "استلمنا استفسارك—سنرد خلال 24 ساعة",
-  pricing: "استلمنا طلب الأسعار—سنرد خلال 8 ساعات",
-  support: "استلمنا طلب الدعم—سنرد خلال 6 ساعات", 
-  press: "استلمنا الاستفسار الإعلامي—سنرد خلال 24 ساعة",
-  jobs: "استلمنا طلب الوظيفة—سنرد خلال 72 ساعة"
-};
-
-export default function ContactAutoReply({ type, name, brandUrl, requestId }: Props) {
-  const eta = SLAs[type] ?? SLAs.general;
-  const teamName = teamNames[type];
+export default function ContactAutoReplyBilingual({ type, name, brandUrl, requestId, lang = "ar" }: Props) {
+  const t = content[lang];
+  const eta = t.sla[type];
+  const teamName = t.teams[type];
   const icon = icons[type];
-  const preheader = preheaderText[type];
+  const preheader = t.preheader[type];
+  const isArabic = lang === "ar";
   
   return (
-    <Html dir="rtl" lang="ar">
+    <Html dir={isArabic ? "rtl" : "ltr"} lang={lang}>
       <Head />
       <Preview>{preheader}</Preview>
       <Body style={{
         background: "#ffffff", 
         color: "#1a1a1a", 
-        fontFamily: '"Segoe UI", "Noto Sans Arabic", Tahoma, Arial, sans-serif',
+        fontFamily: isArabic ? '"Segoe UI", "Noto Sans Arabic", Tahoma, Arial, sans-serif' : '"Segoe UI", "Inter", Arial, sans-serif',
         margin: 0,
         padding: 0
       }}>
@@ -75,7 +125,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo - Absolute URL */}
+          {/* Header with Logo */}
           <Section style={{textAlign: "center", marginBottom: "32px"}}>
             <Img 
               src={`${brandUrl}/brand/logo-512.png`} 
@@ -95,7 +145,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               color: "#1a1a1a",
               lineHeight: "1.3"
             }}>
-              أهلاً وسهلاً {name}! {icon}
+              {t.greeting} {name}! {icon}
             </Text>
             
             <Text style={{
@@ -104,7 +154,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0 0 24px 0",
               color: "#4a5568"
             }}>
-              شكراً لك على تواصلك معنا! استلمنا رسالتك بنجاح وسيقوم <strong>{teamName}</strong> بالرد عليك <strong style={{color: "#621cf0"}}>{eta}</strong>.
+              {t.thanks} <strong>{teamName}</strong> {t.willReply} <strong style={{color: "#621cf0"}}>{eta}</strong>.
             </Text>
 
             {requestId && (
@@ -118,7 +168,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
                 display: "inline-block",
                 margin: "0 0 16px 0"
               }}>
-                معرف الطلب: {requestId}
+                {t.requestId} {requestId}
               </Text>
             )}
           </Section>
@@ -138,7 +188,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0 0 8px 0",
               opacity: "0.9"
             }}>
-              وقت الاستجابة المتوقع
+              {t.expectedResponse}
             </Text>
             <Text style={{
               color: "white",
@@ -163,7 +213,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0 0 12px 0",
               color: "#2d3748"
             }}>
-              للتواصل السريع:
+              {t.quickContact}
             </Text>
             
             <Text style={{
@@ -171,7 +221,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0 0 8px 0",
               color: "#4a5568"
             }}>
-              📧 البريد الإلكتروني: <Link 
+              📧 {t.email} <Link 
                 href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
                 style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}
               >
@@ -184,7 +234,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0",
               color: "#4a5568"
             }}>
-              📱 واتساب: <strong>سيتم إضافة الرقم لاحقاً</strong>
+              📱 {t.whatsapp}
             </Text>
           </Section>
 
@@ -200,8 +250,8 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0 0 8px 0",
               color: "#2d3748"
             }}>
-              تحياتنا الحارة،<br/>
-              <strong style={{color: "#621cf0"}}>فريق Depth</strong>
+              {t.regards}<br/>
+              <strong style={{color: "#621cf0"}}>{t.team}</strong>
             </Text>
             
             <Text style={{
@@ -209,7 +259,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               color: "#666",
               margin: "0 0 8px 0"
             }}>
-              نبني تجارب رقمية استثنائية
+              {t.tagline}
             </Text>
             
             <Link 
@@ -223,13 +273,25 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
             >
               depth-agency.com
             </Link>
-            
+          </Section>
+
+          {/* Language Toggle Note */}
+          <Section style={{
+            textAlign: "center",
+            marginTop: "24px",
+            padding: "12px",
+            background: "#f8f9fa",
+            borderRadius: "8px"
+          }}>
             <Text style={{
-              fontSize: "12px",
+              fontSize: "11px",
               color: "#666",
-              margin: "8px 0 0 0"
+              margin: 0
             }}>
-              واتساب: <em>سيتم إضافة الرقم لاحقاً</em>
+              {isArabic 
+                ? "This message is also available in English upon request" 
+                : "هذه الرسالة متوفرة أيضاً باللغة العربية عند الطلب"
+              }
             </Text>
           </Section>
         </Container>
@@ -239,26 +301,27 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
 }
 
 // Plain-text version for fallback
-export function renderContactAutoReplyText(props: Props) {
-  const { type, name, requestId } = props;
-  const eta = SLAs[type] ?? SLAs.general;
-  const teamName = teamNames[type];
+export function renderContactAutoReplyBilingualText(props: Props) {
+  const { type, name, requestId, lang = "ar" } = props;
+  const t = content[lang];
+  const eta = t.sla[type];
+  const teamName = t.teams[type];
   const emailAddr = type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello";
 
   return `
-أهلاً وسهلاً ${name}!
+${t.greeting} ${name}!
 
-شكراً لك على تواصلك معنا! استلمنا رسالتك بنجاح وسيقوم ${teamName} بالرد عليك ${eta}.
+${t.thanks} ${teamName} ${t.willReply} ${eta}.
 
-${requestId ? `معرف الطلب: ${requestId}` : ''}
+${requestId ? `${t.requestId} ${requestId}` : ''}
 
-للتواصل السريع:
+${t.quickContact}
 📧 ${emailAddr}@depth-agency.com
-📱 واتساب: سيتم إضافة الرقم لاحقاً
+📱 ${t.whatsapp}
 
-تحياتنا الحارة،
-فريق Depth
+${t.regards}
+${t.team}
 depth-agency.com
-نبني تجارب رقمية استثنائية
+${t.tagline}
   `.trim();
 }
