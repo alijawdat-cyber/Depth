@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ThemeProvider } from "@/lib/theme";
+import { ThemeProvider } from "next-themes";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
 
@@ -34,7 +34,7 @@ export default function Providers({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
       <MotionConfig
         transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.8 }}
         reducedMotion="user"

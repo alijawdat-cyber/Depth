@@ -3,11 +3,11 @@ export const metadata = {
   description: "باقات شهرية وخدمات مخصصة: إنتاج محتوى، إدارة إعلانات، إستراتيجية وأتمتة.",
 };
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { buttonStyles } from "@/components/ui/Button";
+import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
 
 const services = [
@@ -26,6 +26,9 @@ const services = [
 ];
 
 export default function ServicesPage() {
+  const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER;
+  const WA_TEXT = process.env.NEXT_PUBLIC_WA_TEXT || "";
+  const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}` : "https://wa.me/";
   return (
     <main className="py-16 md:py-24">
       <Container>
@@ -41,7 +44,7 @@ export default function ServicesPage() {
           ))}
         </div>
         <div className="flex justify-center mt-10">
-          <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className={clsx(buttonStyles({ variant: "primary" }))}>ابدأ الآن</a>
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className={clsx(buttonStyles({ variant: "primary" }))}>ابدأ الآن</a>
         </div>
       </Container>
     </main>

@@ -15,8 +15,8 @@ export default function ClientsMarquee() {
               <img
                 src={c.logo}
                 alt={`${c.name} logo`}
-                className="h-14 md:h-16 w-auto object-contain logo-enhanced"
-                loading="eager"
+                className={`${c.slug === "blo" ? "h-12 md:h-14" : "h-14 md:h-16"} w-auto object-contain logo-enhanced`}
+                loading="lazy"
                 decoding="async"
               />
             </span>

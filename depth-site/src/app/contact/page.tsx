@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { buttonStyles } from "@/components/ui/Button";
+import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
 
 const schema = z.object({

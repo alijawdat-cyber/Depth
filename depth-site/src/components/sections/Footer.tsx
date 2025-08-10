@@ -9,11 +9,16 @@ export default function Footer() {
           <span className="font-semibold text-[var(--text)]">Depth</span>
           <span suppressHydrationWarning>© {new Date().getFullYear()}</span>
         </div>
-        <nav className="flex justify-center gap-5">
+        <nav className="flex flex-wrap justify-center gap-5">
+          <Link href="/plans" className="hover:underline">الخطط</Link>
           <Link href="/services" className="hover:underline">الخدمات</Link>
           <Link href="/work" className="hover:underline">الأعمال</Link>
           <Link href="/about" className="hover:underline">من نحن</Link>
+          <Link href="/blog" className="hover:underline">المدونة</Link>
           <Link href="/contact" className="hover:underline">تواصل</Link>
+          <Link href="/book" className="hover:underline">حجز</Link>
+          <Link href="/portal" className="hover:underline">بوابة العميل</Link>
+          <Link href="/legal" className="hover:underline">الشروط</Link>
         </nav>
         <div className="flex justify-end gap-4">
           <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>

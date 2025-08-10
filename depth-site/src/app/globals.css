@@ -34,8 +34,8 @@
   --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
   --neutral-300:#C2CDD8; --neutral-400:#A9B7C5; --neutral-500:#90A1B2; --neutral-600:#6A7D8F;
   --neutral-700:#44515D; --neutral-800:#28313A; --neutral-900:#0B0F14;
-  /* Accent (Indigo 2025 — default) */
-  --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
+  /* Accent (Purple 2025 — default) */
+  --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
   /* Aliases */
   --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
   --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
@@ -44,16 +44,16 @@
   --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--accent-400);
 }
 
-/* Optional preview: switch to Purple 2025 palette */
-[data-palette="purple2025"]{
-  --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
+/* Optional preview: switch to Indigo 2025 palette */
+[data-palette="indigo2025"]{
+  --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
   --font-sans: var(--font-dubai);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @media (prefers-color-scheme: dark) {

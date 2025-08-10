@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { buttonStyles } from "@/components/ui/Button";
+import { buttonStyles } from "@/components/ui/buttonStyles";
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
 import { clsx } from "clsx";
 
 export default function Hero() {
+  const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER;
+  const WA_TEXT = process.env.NEXT_PUBLIC_WA_TEXT || "";
+  const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}` : "https://wa.me/";
   return (
     <section className="py-16 md:py-24 bg-[var(--bg)] text-[var(--text)]">
       <Container>
@@ -34,7 +37,7 @@ export default function Hero() {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           >
             <a
-              href="https://wa.me/"
+              href={waHref}
               target="_blank"
               rel="noopener noreferrer"
               className={clsx(buttonStyles({ variant: "primary" }))}

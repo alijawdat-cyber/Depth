@@ -3,6 +3,8 @@ export const metadata = {
   description: "عينة من أعمالنا وحالات النجاح في الأداء والمحتوى.",
 };
 
+// Removed temporary force-dynamic to restore default caching/SSG behavior
+
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ClientsGrid from "@/components/sections/ClientsGrid";
@@ -19,7 +21,7 @@ const cases: Case[] = [
   { client: "عميل C", title: "Landing + Tracking", result: "انخفاض CPA بنسبة 28%" },
 ];
 
-export default function WorkPage() {
+export default async function WorkPage() {
   return (
     <main className="py-16 md:py-24">
       <Container>

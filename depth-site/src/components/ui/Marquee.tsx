@@ -49,7 +49,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       const seam = seamRef.current || 1;
       if (-x >= seam) {
         const cycles = Math.floor(-x / seam);
-        x += cycles * seam; // التفاف دقيق بدون انجراف
+        x += cycles * seam; // التفاف دقيق
       }
 
       track.style.transform = `translateX(${x}px)`;
@@ -62,10 +62,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
 
       await Promise.allSettled(
         imgs.map((img) => {
-          // decode يعطي قياس أدق لو متاح
-          const candidate = img as HTMLImageElement & {
-            decode?: () => Promise<void>;
-          };
+          const candidate = img as HTMLImageElement & { decode?: () => Promise<void> };
           if (typeof candidate.decode === "function") return candidate.decode();
           if (img.complete) return Promise.resolve();
           return new Promise<void>((res) => {
@@ -89,13 +86,13 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
 
       await waitImages();
 
-      // نضيف Clone واحد ونقيس المسافة بين بدايات النسختين
+      // Clone واحد للقياس
       const firstClone = group.cloneNode(true) as HTMLDivElement;
       firstClone.setAttribute("aria-hidden", "true");
       firstClone.setAttribute("data-marquee-clone", "true");
       track.appendChild(firstClone);
 
-      // قياس seam فعلياً
+      // قياس seam فعلياً (يشمل gap الحقيقي)
       let seam =
         Math.abs(
           (track.children[1] as HTMLElement).offsetLeft -
@@ -103,15 +100,14 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
         ) || 0;
 
       if (!seam) {
-        // خطة بديلة: عرض المجموعة + الـrowGap الحقيقي
         const cs = getComputedStyle(track);
-        const rowGap =
-          parseFloat(cs.rowGap || (cs.gap?.split?.(" ")?.[0] ?? "0")) || 0;
-        seam = group.offsetWidth + rowGap;
+        const colGap =
+          parseFloat(cs.columnGap || (cs.gap?.split?.(" ")?.[0] ?? "0")) || 0;
+        seam = group.offsetWidth + colGap;
       }
       seamRef.current = seam;
 
-      // ضمان تغطية عرض >= 3x الكونتينر
+      // نسخ كافية لتغطية ≥ 3x من العرض
       const needed = Math.max(2, Math.ceil((container.offsetWidth * 3) / seam));
       for (let i = 1; i < needed; i++) {
         const clone = group.cloneNode(true) as HTMLDivElement;
@@ -136,11 +132,27 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
 
   return (
     <div ref={containerRef} className="overflow-hidden" dir="ltr">
+      {/* فجوة بين نسخ المجموعة: مضغوطة جداً على الموبايل وتكبر تدريجياً */}
       <div
         ref={trackRef}
-        className="flex flex-nowrap gap-10 whitespace-nowrap will-change-transform motion-reduce:transform-none motion-reduce:transition-none"
+        className="
+          flex flex-nowrap whitespace-nowrap will-change-transform
+          gap-x-[1px] sm:gap-x-3 md:gap-x-6 lg:gap-x-8 xl:gap-x-10
+          motion-reduce:transform-none motion-reduce:transition-none
+        "
       >
-        <div ref={groupRef} className="flex gap-10">
+        {/* داخل المجموعة: شعار جنب شعار جداً على الموبايل */}
+        <div
+          ref={groupRef}
+          className="
+            flex items-center flex-nowrap
+            gap-x-[1px] sm:gap-x-2 md:gap-x-4 lg:gap-x-6 xl:gap-x-8
+            [&>*]:shrink-0
+            [&_*]:m-0 [&_*]:gap-0
+            ![&_*]:p-0 sm:[&_*]:px-1 md:[&_*]:px-2 lg:[&_*]:px-4
+            [&_img]:block
+          "
+        >
           {children}
         </div>
       </div>

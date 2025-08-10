@@ -2,7 +2,7 @@
 
 import SectionHeading from "@/components/ui/SectionHeading";
 import { Container } from "@/components/ui/Container";
-import { buttonStyles } from "@/components/ui/Button";
+import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
 
 type Plan = {
@@ -30,6 +30,9 @@ const plans: Plan[] = [
 ];
 
 export default function Packages() {
+  const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER;
+  const WA_TEXT = process.env.NEXT_PUBLIC_WA_TEXT || "";
+  const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}` : "https://wa.me/";
   return (
     <section id="packages" className="py-16 md:py-24">
       <Container>
@@ -52,7 +55,7 @@ export default function Packages() {
                 ))}
               </ul>
               <a
-                href="https://wa.me/"
+                href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={clsx(buttonStyles({ variant: "primary", size: "md" }), "w-full text-center")}
