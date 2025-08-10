@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { renderContactEmail } from "@/lib/emailTemplate";
 
 const EMAIL_FROM = process.env.EMAIL_FROM || "Depth <hello@depth-agency.com>";
 const EMAIL_TO = process.env.EMAIL_TO || "admin@depth-agency.com";
@@ -36,15 +37,7 @@ export async function POST(req: Request) {
 
     // send to admin (no-op if no API key yet)
     const subject = `رسالة جديدة من ${name} (${email})`;
-    const html = `
-      <div>
-        <p><strong>الاسم:</strong> ${name}</p>
-        <p><strong>البريد:</strong> ${email}</p>
-        <p><strong>المصدر:</strong> ${source ?? "unknown"}</p>
-        <p><strong>الرسالة:</strong></p>
-        <p style="white-space: pre-wrap">${message}</p>
-      </div>
-    `;
+    const html = renderContactEmail({ name, email, message, source });
 
     await resend.emails.send({
       from: EMAIL_FROM,

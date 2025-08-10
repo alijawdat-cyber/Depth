@@ -9,6 +9,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const schema = z.object({
   name: z.string().min(2, "الاسم مطلوب"),
@@ -31,10 +32,27 @@ export default function ContactPage() {
         const field = issue.path[0] as keyof FormData;
         setError(field, { type: "manual", message: issue.message });
       });
+      toast.error("يرجى تصحيح الحقول المحددة");
       return;
     }
-    const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-    if (res.ok) reset();
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        reset();
+        toast.success("تم إرسال الرسالة بنجاح — سنعاودك خلال 24 ساعة");
+      } else {
+        const { error } = (await res.json().catch(() => ({ error: "" }))) as {
+          error?: string;
+        };
+        toast.error(error === "missing_api_key" ? "الخدمة غير مفعّلة مؤقتاً — جرّب لاحقاً" : "تعذّر الإرسال، حاول مجدداً");
+      }
+    } catch {
+      toast.error("تعذّر الاتصال بالخادم، تأكّد من الشبكة");
+    }
   };
 
   return (
@@ -80,7 +98,9 @@ export default function ContactPage() {
             <textarea rows={5} className="w-full px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--elev)] bg-[var(--bg)]" {...register("message")} />
             {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>}
           </div>
-          <button disabled={isSubmitting} className={clsx(buttonStyles({ variant: "primary" }))}>
+          <button disabled={isSubmitting} className={clsx(buttonStyles({ variant: "primary" }), "disabled:opacity-60 disabled:cursor-not-allowed")}
+            aria-live="polite" aria-busy={isSubmitting}
+          >
             {isSubmitting ? "يتم الإرسال..." : isSubmitSuccessful ? "تم الإرسال" : "أرسل"}
           </button>
         </form>

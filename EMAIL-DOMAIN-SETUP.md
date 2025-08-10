@@ -132,4 +132,32 @@ NS: ns-cloud-a1..a4.googledomains.com
 #### ملاحظة تقنية — API الموقع
 - مسار `src/app/api/contact/route.ts` مرتبط بـ Resend ويرسل إلى `EMAIL_TO`، ويتجاهل الطلبات التي تحتوي حقل honeypot (مكافحة سبام).
 
+### 9) تحسين وتطوير المراسلات (Roadmap عملي)
+- إرسال الموقع (Transactional):
+  - تفعيل قالب HTML رسمي للرسائل (RTL + خط Dubai + توقيع مختصر) — يُضاف لاحقًا داخل `/api/contact` أو عبر Resend Templates.
+  - إضافة `Reply-To` ديناميكي إلى بريد المرسل (مفعّل حاليًا)، وموضوع واضح: `رسالة جديدة من {name}`.
+  - التقاط `UTM`/المصدر في الفورم وإظهاره في الرسالة (موجود حقل `source`).
+  - حماية إضافية: Turnstile من Cloudflare (Site/Secret Keys كـ ENV) + Rate‑limit خفيف على IP.
+
+- استلام/توزيع داخلي:
+  - مجموعة `hello@` نشطة وتوزّع على `admin@`. يمكن إضافة أعضاء آخرين لاحقًا.
+  - إن لزم، تفعيل Collaborative Inbox للمجموعة (تعيين/حل المحادثات).
+
+- مراقبة السمعة والتسليم:
+  - تفعيل Google Postmaster Tools للدومين ومراقبة Reputation وDelivery Errors.
+  - بعد أسبوعين بدون مشاكل: رفع DMARC إلى `p=reject` + يمكن إضافة `adkim=s; aspf=s; sp=reject` لصرامة أعلى.
+
+- سجلات وأتمتة (اختياري):
+  - إنشاء Webhook من Resend للأحداث (delivered/bounced/complained) وربطه بمسار جديد مثل `/api/resend/webhook` لتخزين الأحداث (Notion/Airtable/DB).
+  - تخزين رسائل الفورم في Google Sheet أو Airtable مع Timestamp وUTM.
+
+- رسائل تأكيد للمرسل (Auto‑reply):
+  - نص بسيط بالعربية يؤكّد الاستلام مع زمن استجابة متوقّع ورابط WhatsApp/حجز.
+
+- سياسة التوقيعات (Signature Standard):
+  - الاسم | الدور | `depth-agency.com` | `hello@depth-agency.com` | روابط اجتماعية.
+
+- خصوصية/صفحات قانونية:
+  - تحديث صفحة `legal` لنقطة جمع البيانات من نموذج الاتصال ومدة الاحتفاظ.
+
 
