@@ -1,13 +1,8 @@
-export const metadata = {
-  title: "الأعمال",
-  description: "عينة من أعمالنا وحالات النجاح في الأداء والمحتوى.",
-};
-
-// Removed temporary force-dynamic to restore default caching/SSG behavior
-
+"use client";
 import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ClientsGrid from "@/components/sections/ClientsGrid";
+import { useRouter } from "next/navigation";
 
 type Case = {
   client: string;
@@ -21,10 +16,24 @@ const cases: Case[] = [
   { client: "عميل C", title: "Landing + Tracking", result: "انخفاض CPA بنسبة 28%" },
 ];
 
-export default async function WorkPage() {
+export default function WorkPage() {
+  const router = useRouter();
+  
   return (
     <main className="py-16 md:py-24">
       <Container>
+        {/* زر الرجوع */}
+        <div className="mb-8">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-sm text-[var(--slate-600)] hover:text-[var(--text)] transition-colors duration-200"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            رجوع
+          </button>
+        </div>
         <SectionHeading title="الأعمال" subtitle="اختيارات سريعة من نماذج العمل والنتائج" align="center" className="mb-10" />
         <div className="grid gap-5 md:grid-cols-3">
           {cases.map((c) => (

@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   name: z.string().min(2, "الاسم مطلوب"),
@@ -18,6 +19,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function ContactPage() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful }, reset, setError } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
@@ -36,6 +38,18 @@ export default function ContactPage() {
   return (
     <main className="py-16 md:py-24">
       <Container>
+        {/* زر الرجوع */}
+        <div className="mb-8">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-sm text-[var(--slate-600)] hover:text-[var(--text)] transition-colors duration-200"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            رجوع
+          </button>
+        </div>
         <SectionHeading title="تواصل" subtitle="رد سريع خلال 24 ساعة" align="center" className="mb-10" />
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl md:mx-auto grid gap-4">
           <div>
