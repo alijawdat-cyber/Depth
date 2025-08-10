@@ -39,7 +39,9 @@ function useCount(ref: React.RefObject<HTMLSpanElement | null>, to: number, dura
       el.textContent = String(val);
       if (p < 1) requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    // في iOS Safari، rAF قد يبطؤ أثناء التمرير. نضمن بدء العد بعد أول frame مرئي.
+    const id = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(id);
   }, [ref, to, duration]);
 }
 

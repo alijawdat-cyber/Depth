@@ -114,18 +114,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (max-width: 768px) {
-  /* تقليل الحركات للموبايل */
-  * {
-    animation-duration: 0.3s !important;
-    transition-duration: 0.3s !important;
-  }
-  
-  /* تحسين الأداء */
-  .will-change-transform {
-    will-change: auto;
-  }
-}
+/* ملاحظة مهمة: لا نقلص زمن الـ animation عالمياً حتى لا نفسد ماركيه/موشن 
+   خصوصاً على Safari iOS. بدلاً من ذلك نترك المدد كما هي */
 
 /* Utility buttons baseline */
 .btn {
