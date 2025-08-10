@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Container } from "@/components/ui/Container";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 type Stat = { label: string; value: number; suffix?: string };
 const stats: Stat[] = [
@@ -11,13 +12,12 @@ const stats: Stat[] = [
   { label: "تخفيض CPA", value: 28, suffix: "%" },
 ];
 
-function useCount(ref: React.RefObject<HTMLSpanElement | null>, to: number, duration = 1400) {
+function useCount(ref: React.RefObject<HTMLSpanElement | null>, to: number, duration = 1400, isMobile = false) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     
-    // تحسين للموبايل - تقليل التحديثات
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    // تحسين للموبايل - تقليل التحديثات (responsive)
     const updateInterval = isMobile ? 50 : 16; // أقل تحديثات للموبايل
     
     let start: number | null = null;
@@ -42,16 +42,18 @@ function useCount(ref: React.RefObject<HTMLSpanElement | null>, to: number, dura
     // في iOS Safari، rAF قد يبطؤ أثناء التمرير. نضمن بدء العد بعد أول frame مرئي.
     const id = requestAnimationFrame(step);
     return () => cancelAnimationFrame(id);
-  }, [ref, to, duration]);
+  }, [ref, to, duration, isMobile]);
 }
 
 export default function Stats() {
+  const isMobile = useIsMobile();
+
   return (
     <section className="py-12">
       <Container className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {stats.map((s) => (
           <div key={s.label} className="rounded-[var(--radius)] border border-[var(--elev)] p-5 bg-[var(--card)] text-center">
-            <StatNumber value={s.value} suffix={s.suffix} />
+            <StatNumber value={s.value} suffix={s.suffix} isMobile={isMobile} />
             <div className="text-sm text-[var(--slate-600)] mt-1">{s.label}</div>
           </div>
         ))}
@@ -60,9 +62,9 @@ export default function Stats() {
   );
 }
 
-function StatNumber({ value, suffix }: { value: number; suffix?: string }) {
+function StatNumber({ value, suffix, isMobile }: { value: number; suffix?: string; isMobile: boolean }) {
   const ref = useRef<HTMLSpanElement | null>(null);
-  useCount(ref, value);
+  useCount(ref, value, 1400, isMobile);
   return (
     <div className="text-2xl font-bold">
       <span ref={ref}>0</span>{suffix}

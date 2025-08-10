@@ -126,7 +126,7 @@ export default function TrustSection() {
                     alt={t.name}
                     width={56}
                     height={56}
-                    className="h-14 w-14 rounded-full ring-1 ring-[var(--elev)] shadow-sm object-contain invert"
+                    className="h-14 w-14 rounded-full ring-1 ring-[var(--elev)] shadow-sm object-contain logo-enhanced"
                   />
                 ) : (
                   <div className="h-14 w-14 rounded-full ring-1 ring-[var(--elev)] grid place-items-center bg-[var(--card)]/90 shadow-sm">

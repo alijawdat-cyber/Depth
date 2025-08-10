@@ -9,28 +9,28 @@ export default function ClientsMarquee() {
   return (
     <section className="py-10">
       <Container>
-        <MarqueeSimple 
+        <MarqueeSimple
           speed={40}
           direction="left"
-          pauseOnHover={true}
+          pauseOnHover
           className="overflow-hidden"
+          gap="clamp(10px, 3vw, 56px)"
         >
           {clients.map((c) => (
-            <div key={c.slug} className="flex items-center justify-center mx-6 md:mx-8 lg:mx-12">
+            <span key={c.slug} className="flex items-center justify-center">
               <Image
                 src={c.logo}
                 alt={`${c.name} logo`}
                 width={120}
                 height={60}
-                className="h-12 md:h-16 w-auto object-contain logo-enhanced opacity-90 hover:opacity-100 transition-opacity duration-300"
+                sizes="(max-width:768px) 96px, 120px"
+                className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
                 loading="lazy"
               />
-            </div>
+            </span>
           ))}
         </MarqueeSimple>
       </Container>
     </section>
   );
 }
-
-

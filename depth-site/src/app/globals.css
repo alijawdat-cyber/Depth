@@ -39,6 +39,8 @@
   /* Aliases */
   --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
   --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
+  /* RGB values for fallback usage */
+  --bg-rgb: 255,255,255;
   /* Radii/Shadows/Focus */
   --radius:14px; --radius-sm:10px; --shadow:0 8px 30px rgba(0,0,0,.08);
   --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--accent-400);
@@ -56,30 +58,27 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* Unified Dark Theme System */
+[data-theme="dark"], 
+.dark,
 @media (prefers-color-scheme: dark) {
-  /* نظام الجهاز داكن: وفّر قيم افتراضية كاملة حتى قبل تفعيل مزوّد الثيم */
   :root {
+    /* أساسيات الوضع الداكن */
     --bg: var(--ink-900);
     --text: #FFFFFF;
-    --card: var(--ink-800);
-    --elev: rgba(255, 255, 255, 0.12);
-    --slate-600: #9AA5B1;
+    /* أسطح وبوردريات مناسبة للداكن */
+    --card: rgba(255, 255, 255, 0.08);
+    --elev: rgba(255, 255, 255, 0.24);
+    /* نص ثانوي محسن */
+    --slate-600: #C9D3DD;
+    /* RGB values for dark mode */
+    --bg-rgb: 11,15,20;
   }
-  /* اجعل شعارات العملاء فاتحة على الخلفية الداكنة عند اعتماد تفضيل النظام */
-  .logo-enhanced { filter: brightness(0) invert(1); }
-}
-
-/* Explicit theme overrides */
-[data-theme="dark"], .dark {
-  /* أساسيات الوضع الداكن */
-  --bg: var(--ink-900);
-  --text: #FFFFFF;
-  /* أسطح وبوردريات مناسبة للداكن (أفتح قرب الأبيض) */
-  --card: rgba(255, 255, 255, 0.08);
-  /* حد أوضح */
-  --elev: rgba(255, 255, 255, 0.24);
-  /* نص ثانوي أفتح */
-  --slate-600: #C9D3DD;
+  
+  /* شعارات العملاء - فاتحة على الخلفية الداكنة */
+  .logo-enhanced { 
+    filter: brightness(0) invert(1); 
+  }
 }
 [data-theme="light"] {
   --bg: var(--neutral-0);

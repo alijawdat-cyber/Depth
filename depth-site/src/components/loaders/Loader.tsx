@@ -13,7 +13,16 @@ export default function Loader({ dots = 5, size = 14, gap = 16 }: LoaderProps) {
   const accent500 = "var(--accent-500)";
   const accent400 = "var(--accent-400)";
   const { resolvedTheme } = useTheme();
-  const overlayBg = resolvedTheme === "dark" ? "rgba(11,15,20,0.7)" : "rgba(255,255,255,0.8)";
+  
+  // تحسين التعامل مع التحميل الأولي
+  const getOverlayBg = () => {
+    if (resolvedTheme === "dark") return "rgba(11,15,20,0.7)";
+    if (resolvedTheme === "light") return "rgba(255,255,255,0.8)";
+    // fallback للتحميل الأولي - يتكيف مع prefers-color-scheme
+    return "rgba(var(--bg-rgb, 255,255,255), 0.8)";
+  };
+  
+  const overlayBg = getOverlayBg();
 
   return (
     <div className="fixed inset-0 z-[100] grid place-items-center backdrop-blur-sm" style={{ backgroundColor: overlayBg }}>
