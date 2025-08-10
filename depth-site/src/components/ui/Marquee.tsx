@@ -24,6 +24,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
     // تحسين للموبايل وSafari - تقليل الحركة
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const isSafari = typeof window !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    const isIOS = typeof window !== "undefined" && /iPhone|iPad|iPod|iOS/.test(navigator.userAgent);
     
     if (
       typeof window !== "undefined" &&
@@ -60,7 +61,13 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       }
 
       track.style.transform = `translateX(${x}px)`;
-      rafRef.current = requestAnimationFrame(animate);
+      
+      // حماية إضافية لـ iOS Safari
+      if (isIOS && typeof requestAnimationFrame !== "undefined") {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        rafRef.current = requestAnimationFrame(animate);
+      }
     };
 
     const waitImages = async () => {
