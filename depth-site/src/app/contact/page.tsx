@@ -14,6 +14,8 @@ const schema = z.object({
   name: z.string().min(2, "الاسم مطلوب"),
   email: z.string().email("بريد غير صالح"),
   message: z.string().min(10, "الرسالة مطلوبة"),
+  source: z.string().optional(),
+  honeypot: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -52,6 +54,17 @@ export default function ContactPage() {
         </div>
         <SectionHeading title="تواصل" subtitle="رد سريع خلال 24 ساعة" align="center" className="mb-10" />
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl md:mx-auto grid gap-4">
+          {/* honeypot anti-spam field (should remain empty) */}
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+            {...register("honeypot")}
+          />
+          {/* source marker */}
+          <input type="hidden" defaultValue="/contact" {...register("source")}/>
           <div>
             <label className="block text-sm mb-1">الاسم</label>
             <input className="w-full h-11 px-3 rounded-[var(--radius-sm)] border border-[var(--elev)] bg-[var(--bg)]" {...register("name")} />

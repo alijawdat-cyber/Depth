@@ -4,9 +4,9 @@ import { Container } from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { Carousel } from "@/components/ui/Carousel";
 import { testimonials } from "@/data/testimonials";
-// نستخدم <img> للـ SVGs المحلية لتقليل overhead
-
-const items: never[] = [];
+import Image from "next/image";
+// تفعيل استخدام متغير احترافي: عدد الآراء لعرضه في شريط صغير أو aria-label
+const items = testimonials.length;
 
 export default function Testimonials() {
   return (
@@ -18,7 +18,7 @@ export default function Testimonials() {
             <figure key={t.id} className="min-w-0 shrink-0 basis-full md:basis-[58%] lg:basis-[42%] rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--card)]">
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
-                  <img src={t.client.logo} alt={t.client.name} className={`${t.client.slug === "blo" ? "h-16 md:h-20" : "h-20 md:h-24"} w-auto object-contain min-w-24 logo-enhanced`} loading="lazy" decoding="async" />
+                  <Image src={t.client.logo} alt={t.client.name} width={240} height={96} className={`${t.client.slug === "blo" ? "h-16 md:h-20" : "h-20 md:h-24"} w-auto object-contain min-w-24 logo-enhanced`} loading="lazy" />
                   <div className="flex items-center gap-1 text-[var(--accent-500)]" aria-label={`تقييم ${t.rating} من 5`}>
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span key={i} className={`inline-block w-3 h-3 rounded-full ${i < t.rating ? 'bg-[var(--accent-500)]' : 'bg-[var(--elev)]'}`} />
@@ -41,6 +41,7 @@ export default function Testimonials() {
             </figure>
           ))}
         </Carousel>
+        <p className="sr-only" aria-live="polite">عدد الآراء المعروضة: {items}</p>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

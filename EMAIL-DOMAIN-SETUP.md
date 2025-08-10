@@ -42,6 +42,14 @@
   - `www` → CNAME = `cname.vercel-dns.com` (TTL: 1h)
   - ملاحظة: تم حذف سجلات Squarespace السابقة (A الأربعة وCNAME `ext-sq.squarespace.com`) وسجل HTTPS (ALPN/IP hint).
 
+- Resend (Transactional Sending — إرسال الموقع):
+  - الهدف: تفعيل إرسال رسائل `/contact` من الدومين بشكل موثوق.
+  - السجلات (على ساب‑دومين فقط؛ لا تغيّر إعدادات Google على الجذر):
+    - Host: `send` (MX) → `feedback-smtp.us-east-1.amazonses.com` (Priority 10, TTL: Auto/1h)
+    - Host: `send` (TXT — SPF) → `v=spf1 include:amazonses.com ~all`
+    - Host: `resend._domainkey` (TXT — DKIM) → قيمة طويلة تبدأ بـ `p=...` (مولّدة من Resend)
+  - الحالة: Verified على Resend.
+
 ### 3) حسابات ومجموعات البريد
 - المستخدم المدفوع (User — مستخدم): `admin@depth-agency.com` (خطة مرنة)
 - المجموعات (Groups — مجموعات) المجانية المقترحة: 
@@ -62,6 +70,9 @@
   - `A depth-agency.com` = `76.76.21.21`
   - `CNAME www.depth-agency.com` = `cname.vercel-dns.com`
   - Vercel Project → Domains: Valid Configuration + Primary = `depth-agency.com` + Redirect `www`→الجذر
+- Resend:
+  - Domains → `depth-agency.com` = Status: Verified (MX/TXT/DKIM ✅)
+  - Logs: ظهور رسائل الاختبار المرسلة من `/api/contact`
 
 #### نتائج فحص مباشرة (مرجعية)
 ```
@@ -73,6 +84,12 @@ NS: ns-cloud-a1..a4.googledomains.com
 ```
 
 ### 6) سجل الحالة (Changelog)
+- v2025-08-10:
+  - ربط Resend وإكمال التحقق (Verified): إضافة سجلات `send` (MX + TXT SPF) و`resend._domainkey` (TXT DKIM).
+  - ضبط متغيرات البيئة على Vercel: `RESEND_API_KEY`، `EMAIL_FROM`، `EMAIL_TO`، وتثبيت `NEXT_PUBLIC_SITE_URL` للإنتاج.
+  - تفعيل إرسال الموقع عبر `/api/contact` (مع تحقق Zod وhoneypot للسبام).
+  - اختبار إرسال ناجح ومتابعة عبر Resend → Logs.
+  - المتبقي: إنشاء/تأكيد مجموعة `hello@depth-agency.com` (توجيهها إلى `admin@`)، مراقبة تقارير DMARC أسبوعين ثم رفع السياسة إلى `p=reject` عند النظافة.
 - v2025-08-09:
   - نقل استضافة الويب إلى Vercel: `@` A = 76.76.21.21، و`www` CNAME = `cname.vercel-dns.com`
   - حذف سجلات Squarespace (A الأربعة + CNAME `ext-sq.squarespace.com` + HTTPS)
@@ -92,15 +109,27 @@ NS: ns-cloud-a1..a4.googledomains.com
 3. انتظر 5–30 دقيقة (قد تمتد لساعتين) → اضغط Refresh على Vercel حتى تصير Valid.
 4. عيّن Primary = `depth-agency.com` وفعل تحويل `www` للجذر.
 
+#### 7‑مكرر) ربط الدومين على Resend (للإرسال من الموقع)
+1. Resend → Domains → Add: `depth-agency.com` (Region افتراضي).
+2. أضف سجلات `send` (MX + TXT SPF) و`resend._domainkey` (TXT DKIM) كما أعلاه في DNS (Squarespace).
+3. انتظر، ثم Verify حتى تصير `Verified`.
+4. لا تغيّر سجلات الجذر الخاصة بـ Google.
+
 ### 8) النشر عبر GitHub (Flow ثابت)
 - الكود داخل الريبو تحت المجلد `depth-site/` (Root Directory بالمشروع على Vercel = `depth-site`).
 - أي تعديل → `git add` + `git commit` + `git push` إلى فرع `main` → Vercel يبني وينشر تلقائيًا.
 - إعدادات البناء (افتراضيًا): Framework = Next.js، Build Command = `next build`، Output = `.next`.
 - متغيرات البيئة (Production فقط):
   - `NEXT_PUBLIC_SITE_URL = https://depth-agency.com`
+  - `RESEND_API_KEY = re_...` (من Resend)
+  - `EMAIL_FROM = Depth <hello@depth-agency.com>` (قبل التحقق يمكن استخدام `onboarding@resend.dev` للاختبار)
+  - `EMAIL_TO = admin@depth-agency.com`
 - فحوص بعد النشر:
   - `/<robots.txt>` و`/sitemap.xml` و`/opengraph-image` تعمل.
   - مشاركة رابط على واتساب/تويتر تعرض صورة OG.
   - Pages تعمل بدون أخطاء.
+
+#### ملاحظة تقنية — API الموقع
+- مسار `src/app/api/contact/route.ts` مرتبط بـ Resend ويرسل إلى `EMAIL_TO`، ويتجاهل الطلبات التي تحتوي حقل honeypot (مكافحة سبام).
 
 
