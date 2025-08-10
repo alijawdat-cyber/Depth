@@ -110,14 +110,14 @@ export default function ContactPage() {
         const errorMsg = errorMessages[result.error as keyof typeof errorMessages] || "تعذّر الإرسال. حاول مرة أخرى";
         toast.error(errorMsg);
       }
-    } catch (error) {
+    } catch {
       toast.error("تعذّر الاتصال بالخادم. تحقق من الشبكة وحاول مرة أخرى");
     }
   };
 
   const handleTypeSelect = (type: string) => {
     setSelectedType(type);
-    setValue("type", type as any);
+    setValue("type", type as "general" | "pricing" | "support" | "press" | "jobs");
   };
 
   const selectedInquiry = inquiryTypes.find(t => t.value === selectedType);

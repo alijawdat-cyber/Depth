@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ 
         ok: false, 
         error: "validation", 
-        details: parsed.error.errors 
+        details: parsed.error.issues 
       }, { status: 400 });
     }
     
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
     const subject = `[DEPTH] ${type.toUpperCase()} — رسالة تواصل جديدة`;
 
     // Generate professional email templates with multipart (HTML + text)
-    const teamEmailHtml = render(ContactNotification({ 
+    const teamEmailHtml = await render(ContactNotification({ 
       type, 
       name, 
       fromEmail: email, 
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       requestId
     });
 
-    const autoreplyHtml = render(ContactAutoReply({ 
+    const autoreplyHtml = await render(ContactAutoReply({ 
       type, 
       name, 
       brandUrl: BRAND_URL,
