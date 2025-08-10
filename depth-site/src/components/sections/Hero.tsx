@@ -17,11 +17,11 @@ export default function Hero() {
   const simpleTransition = { duration: isMobile ? 0.3 : 0.6, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] };
   
   return (
-    <section className="py-16 md:py-24 bg-[var(--bg)] text-[var(--text)]">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[var(--bg)] text-[var(--text)]">
       <Container>
         <div className="grid gap-6 md:gap-8">
           <motion.h1
-            className="text-3xl md:text-5xl font-bold tracking-tight"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight"
             initial={reduce ? undefined : { opacity: 0, y: 20 }}
             animate={reduce ? undefined : { opacity: 1, y: 0 }}
             transition={reduce ? undefined : simpleTransition}
@@ -29,7 +29,7 @@ export default function Hero() {
             محتوى يحرّك النتائج — بسرعة، بهامش مضبوط، وقياس واضح.
           </motion.h1>
           <motion.p
-            className="text-[var(--slate-600)] text-base md:text-lg max-w-prose"
+            className="text-[var(--slate-600)] text-sm sm:text-base md:text-lg max-w-prose leading-relaxed"
             initial={reduce ? undefined : { opacity: 0, y: 20 }}
             animate={reduce ? undefined : { opacity: 1, y: 0 }}
             transition={reduce ? undefined : { ...simpleTransition, delay: 0.1 }}

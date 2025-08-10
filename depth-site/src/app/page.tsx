@@ -16,17 +16,17 @@ export const revalidate = 3600;
 
 export default function Home() {
   return (
-    <div className="font-sans">
+    <div className="font-sans min-h-screen w-full overflow-x-hidden">
       <Header />
       <Hero />
-      <div className="my-6" />
+      <div className="my-4 sm:my-6" />
       <TrustSection />
-      <div className="my-6" />
+      <div className="my-4 sm:my-6" />
       <ClientsMarquee />
       <Stats />
       <Packages />
-      <div className="flex justify-center mt-4">
-        <Link href="/plans" className="underline decoration-dotted underline-offset-4">قارن الخطط بالتفصيل</Link>
+      <div className="flex justify-center mt-4 px-3">
+        <Link href="/plans" className="underline decoration-dotted underline-offset-4 text-sm sm:text-base">قارن الخطط بالتفصيل</Link>
       </div>
       <FounderSpotlight />
       <Testimonials />

@@ -57,10 +57,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  /* نظام الجهاز داكن: وفّر قيم افتراضية كاملة حتى قبل تفعيل مزوّد الثيم */
   :root {
     --bg: var(--ink-900);
     --text: #FFFFFF;
+    --card: var(--ink-800);
+    --elev: rgba(255, 255, 255, 0.12);
+    --slate-600: #9AA5B1;
   }
+  /* اجعل شعارات العملاء فاتحة على الخلفية الداكنة عند اعتماد تفضيل النظام */
+  .logo-enhanced { filter: brightness(0) invert(1); }
 }
 
 /* Explicit theme overrides */
@@ -68,21 +74,25 @@
   /* أساسيات الوضع الداكن */
   --bg: var(--ink-900);
   --text: #FFFFFF;
-  /* أسطح وبوردريات مناسبة للداكن */
-  --card: var(--ink-800);
-  /* حد خفيف واضح على الخلفية الداكنة */
-  --elev: rgba(255, 255, 255, 0.12);
-  /* نص ثانوي أفتح ليتباين مع الخلفية الداكنة */
-  --slate-600: #9AA5B1;
+  /* أسطح وبوردريات مناسبة للداكن (أفتح قرب الأبيض) */
+  --card: rgba(255, 255, 255, 0.08);
+  /* حد أوضح */
+  --elev: rgba(255, 255, 255, 0.24);
+  /* نص ثانوي أفتح */
+  --slate-600: #C9D3DD;
 }
 [data-theme="light"] {
   --bg: var(--neutral-0);
   --text: var(--ink-900);
+  --card: var(--neutral-50);
+  --elev: var(--neutral-100);
+  --slate-600: #6A7D8F;
 }
 
 html, body {
   background: var(--bg);
   color: var(--text);
+  min-height: 100%;
 }
 
 /* تحسين الأداء للموبايل وSafari */
@@ -93,6 +103,15 @@ html, body {
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* تحسين الموبايل */
+body {
+  min-width: 320px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @media (max-width: 768px) {

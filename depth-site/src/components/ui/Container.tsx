@@ -9,7 +9,9 @@ export function Container({ className, fluid, ...props }: ContainerProps) {
   return (
     <div
       className={clsx(
-        fluid ? "px-4 sm:px-6" : "max-w-[1200px] mx-auto px-4 sm:px-6",
+        fluid 
+          ? "px-3 sm:px-4 md:px-6" 
+          : "max-w-[1200px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8",
         className
       )}
       {...props}
