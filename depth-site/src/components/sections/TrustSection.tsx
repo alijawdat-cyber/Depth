@@ -136,7 +136,7 @@ export default function TrustSection() {
 
                 {/* Body */}
                 <div className="flex-1">
-                  <p className="text-[15px] leading-7 text-[var(--ink-700)]">"{t.quote}"</p>
+                  <p className="text-[15px] leading-7 text-[var(--ink-700)]">&ldquo;{t.quote}&rdquo;</p>
                   <div className="mt-3 text-[13px] text-[var(--ink-600)]">
                     <span className="font-semibold">{t.name}</span>
                     <span className="mx-1">—</span>
