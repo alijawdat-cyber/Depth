@@ -1,8 +1,7 @@
-name: Build and Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages (manual)
 
 on:
-  push:
-    branches: [ main ]
+  # Disabled automatic runs to avoid conflicts with SSR/Vercel deploy
   workflow_dispatch:
 
 permissions:
