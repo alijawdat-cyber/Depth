@@ -164,3 +164,50 @@ body {
 /* تحسين responsive للشعارات */
 @media (min-width: 768px) { .logo-enhanced { max-height: 5.5rem; min-width: 10rem; } }
 @media (min-width: 1024px) { .logo-enhanced { max-height: 7rem; min-width: 12rem; } }
+
+/* Logo dark mode fix */
+@media (prefers-color-scheme: dark) {
+  .logo svg [fill="#000000"],
+  .logo svg [style*="fill:#000000"],
+  .brand-logo [fill="#000000"],
+  .brand-logo [style*="fill:#000000"] {
+    fill: white !important;
+  }
+}
+
+/* Header logo responsive sizing */
+.brand-logo {
+  transition: transform 0.2s ease, filter 0.2s ease;
+  max-height: 1.75rem; /* 28px base */
+  width: auto;
+  min-width: 7rem; /* 112px - نسبة الشعار المدمج */
+  object-fit: contain;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .brand-logo {
+    max-height: 1.5rem; /* 24px on mobile */
+    min-width: 6rem; /* 96px */
+  }
+}
+
+/* Medium screens and up */
+@media (min-width: 768px) {
+  .brand-logo {
+    max-height: 2rem; /* 32px on md+ */
+    min-width: 7.5rem; /* 120px */
+  }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+  .brand-logo {
+    max-height: 2.25rem; /* 36px on lg+ */
+    min-width: 8rem; /* 128px */
+  }
+}
+
+.brand-logo:hover {
+  transform: scale(1.02);
+}

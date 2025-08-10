@@ -34,7 +34,7 @@ export function Carousel({ options, children, className }: CarouselProps) {
 
   return (
     <div className={className} role="region" aria-roledescription="carousel">
-      <div className="overflow-hidden" ref={setRefs} style={{ touchAction: "pan-y" }}>
+      <div className="overflow-hidden" ref={setRefs} style={{ touchAction: "pan-x pinch-zoom" }}>
         <div className="flex gap-6" aria-live="polite">
           {children}
         </div>

@@ -13,7 +13,7 @@ export default function Testimonials() {
     <section className="py-16 md:py-24 bg-[var(--card)]">
       <Container>
         <SectionHeading title="قالوا عنّا" align="center" className="mb-8" />
-        <Carousel options={{ loop: true, duration: 20 }}>
+        <Carousel options={{ loop: true, duration: 1000 }}>
           {testimonials.map((t) => (
             <figure key={t.id} className="min-w-0 shrink-0 basis-full md:basis-[58%] lg:basis-[42%] rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--card)]">
               <div className="flex items-center justify-between gap-4 mb-4">
