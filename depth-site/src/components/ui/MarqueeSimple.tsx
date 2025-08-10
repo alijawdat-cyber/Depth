@@ -18,7 +18,7 @@ export function MarqueeSimple({
   direction = "left",
   pauseOnHover = true,
   className = "",
-  gap = "56px", // مسافة ثابتة بدلاً من clamp للحصول على نتيجة متسقة
+  gap = "60px", // توحيد القيمة مع ClientsMarquee
 }: MarqueeSimpleProps) {
   const items = React.Children.toArray(children).filter(Boolean);
   
@@ -30,16 +30,19 @@ export function MarqueeSimple({
       pauseOnHover={pauseOnHover}
       gradient={false}
       className={className}
+      style={{
+        gap: gap, // استخدام CSS gap بدلاً من padding
+      }}
     >
-      {/* مهم: لا نضع wrapper div - العناصر مباشرة */}
+      {/* إزالة padding من العناصر لتجنب الفراغ الأخير */}
       {items.map((node, i) => (
         <div
           key={i}
           style={{
             display: "inline-flex",
             alignItems: "center",
-            paddingInlineEnd: gap,
             flexShrink: 0, // يمنع انضغاط العناصر
+            marginInlineEnd: gap, // استخدام margin بدلاً من padding
           }}
         >
           {node}
