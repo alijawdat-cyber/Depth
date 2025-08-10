@@ -23,18 +23,18 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
 
     // تحسين للموبايل وSafari - تقليل الحركة
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-    const isSafari =
-      typeof window !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-
-    // بدلاً من إيقاف الحركة تمامًا عند تفعيل "تقليل الحركة"، نُبطّئها فقط
-    const prefersReduced =
+    const isSafari = typeof window !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    
+    if (
       typeof window !== "undefined" &&
       window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
 
-    // تقليل السرعة للموبايل وSafari وتحترم تقليل الحركة بتهدئة إضافية
-    const adjustedSpeedBase = isMobile || isSafari ? speed * 0.7 : speed;
-    const adjustedSpeed = prefersReduced ? Math.max(10, adjustedSpeedBase * 0.4) : adjustedSpeedBase;
+    // تقليل السرعة للموبايل وSafari لتحسين الأداء
+    const adjustedSpeed = isMobile || isSafari ? speed * 0.7 : speed;
 
     let x = 0;
     let last = 0;
@@ -87,7 +87,9 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       last = 0;
 
       // إزالة الكلونات السابقة
-      Array.from(track.querySelectorAll("[data-marquee-clone]")).forEach((n) => n.remove());
+      Array.from(track.querySelectorAll("[data-marquee-clone]")).forEach((n) =>
+        n.remove()
+      );
 
       await waitImages();
 
@@ -100,12 +102,14 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       // قياس seam فعلياً (يشمل gap الحقيقي)
       let seam =
         Math.abs(
-          (track.children[1] as HTMLElement).offsetLeft - (track.children[0] as HTMLElement).offsetLeft
+          (track.children[1] as HTMLElement).offsetLeft -
+            (track.children[0] as HTMLElement).offsetLeft
         ) || 0;
 
       if (!seam) {
         const cs = getComputedStyle(track);
-        const colGap = parseFloat(cs.columnGap || (cs.gap?.split?.(" ")?.[0] ?? "0")) || 0;
+        const colGap =
+          parseFloat(cs.columnGap || (cs.gap?.split?.(" ")?.[0] ?? "0")) || 0;
         seam = group.offsetWidth + colGap;
       }
       seamRef.current = seam;
@@ -141,6 +145,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
         className="
           flex flex-nowrap whitespace-nowrap will-change-transform
           gap-x-[1px] sm:gap-x-3 md:gap-x-6 lg:gap-x-8 xl:gap-x-10
+          motion-reduce:transform-none motion-reduce:transition-none
         "
       >
         {/* داخل المجموعة: شعار جنب شعار جداً على الموبايل */}

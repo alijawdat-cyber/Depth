@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 24, 32, 48, 64, 96, 128],
     ...(isExport ? { unoptimized: true } : {}),
   },
+  // Vercel deployment: no basePath needed for custom domain
   ...(isExport
     ? {
         output: "export",
