@@ -149,7 +149,7 @@ body {
 .brand-logo { transition: transform 0.3s ease; filter: none !important; }
 .brand-logo:hover { transform: scale(1.05); }
 
-/* لا نستخدم embla الآن؛ ضبط المسافات العامة للماركيه يتم داخل المكوّن */
+/* Marquee spacing is handled by react-fast-marquee */
 
 /* تحسين responsive للشعارات */
 @media (min-width: 768px) { .logo-enhanced { max-height: 5.5rem; min-width: 10rem; } }
@@ -202,12 +202,4 @@ body {
   transform: scale(1.02);
 }
 
-/* iOS Safari fallback لماركيه: تحريك باستخدام Keyframes عندما يتعطل rAF */
-.marquee-fallback {
-  animation: marqueeSlide var(--marquee-duration, 20s) linear infinite;
-  transform: translate3d(0,0,0);
-}
-@keyframes marqueeSlide {
-  from { transform: translate3d(0,0,0); }
-  to { transform: translate3d(calc(-1 * var(--marquee-seam, 600px)), 0, 0); }
-}
+/* Marquee styles for react-fast-marquee */

@@ -1,27 +1,33 @@
 "use client";
 
 import { Container } from "@/components/ui/Container";
-import { Marquee } from "@/components/ui/Marquee";
+import { MarqueeSimple } from "@/components/ui/MarqueeSimple";
 import { clients } from "@/data/clients";
-// ملاحظة: لملفات SVG المحلية نستخدم <img> بدل next/image لتفادي مشاكل الترصيع/الأمان
+import Image from "next/image";
 
 export default function ClientsMarquee() {
   return (
     <section className="py-10">
       <Container>
-        <Marquee>
+        <MarqueeSimple 
+          speed={40}
+          direction="left"
+          pauseOnHover={true}
+          className="overflow-hidden"
+        >
           {clients.map((c) => (
-            <span key={c.slug} className="flex items-center justify-center shrink-0 opacity-90 hover:opacity-100 transition w-[180px]">
-              <img
+            <div key={c.slug} className="flex items-center justify-center mx-6 md:mx-8 lg:mx-12">
+              <Image
                 src={c.logo}
                 alt={`${c.name} logo`}
-                className={`${c.slug === "blo" ? "h-12 md:h-14" : "h-14 md:h-16"} w-auto object-contain logo-enhanced`}
+                width={120}
+                height={60}
+                className="h-12 md:h-16 w-auto object-contain logo-enhanced opacity-90 hover:opacity-100 transition-opacity duration-300"
                 loading="lazy"
-                decoding="async"
               />
-            </span>
+            </div>
           ))}
-        </Marquee>
+        </MarqueeSimple>
       </Container>
     </section>
   );
