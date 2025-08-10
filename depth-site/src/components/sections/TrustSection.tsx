@@ -48,7 +48,7 @@ function Decorations() {
         style={reduce ? undefined : { x: xCircle, y: yCircle }}
       >
         <svg viewBox="0 0 100 100" className="h-full w-full">
-          <circle cx="50" cy="50" r="48" fill="none" stroke="rgb(0 0 0 / 0.12)" strokeWidth="2" />
+          <circle cx="50" cy="50" r="48" fill="none" stroke="var(--slate-300)" strokeWidth="2" />
         </svg>
       </motion.div>
 
@@ -61,15 +61,15 @@ function Decorations() {
         <div className="relative">
           {/* tape */}
           <motion.div
-            className="absolute -top-3 left-6 h-6 w-16 rounded-[2px] bg-[#E8E2D9]"
+            className="absolute -top-3 left-6 h-6 w-16 rounded-[2px] bg-[var(--slate-200)] dark:bg-[var(--slate-700)]"
             style={reduce ? undefined : { rotate: tapeRotate }}
           />
           {/* grid card (data-uri background) */}
           <div
-            className="h-24 w-36 rounded-xl ring-1 ring-black/10 shadow-sm bg-white"
+            className="h-24 w-36 rounded-xl ring-1 ring-[var(--elev)] shadow-sm bg-[var(--card)]"
             style={{
               backgroundImage:
-                "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0)",
+                "radial-gradient(circle at 1px 1px, var(--slate-300) 1px, transparent 0)",
               backgroundSize: "12px 12px",
             }}
           />
@@ -92,7 +92,7 @@ export default function TrustSection() {
   } as const;
 
   return (
-    <section dir="rtl" className="relative py-16 md:py-20 bg-[#F6F7F8] text-[var(--ink-900)]">
+    <section dir="rtl" className="relative py-16 md:py-20 bg-[var(--slate-50)] dark:bg-[var(--slate-900)] text-[var(--ink-900)]">
       <Decorations />
       <Container>
         <motion.h2
@@ -114,7 +114,7 @@ export default function TrustSection() {
               whileInView={reduce ? undefined : "show"}
               viewport={{ once: true, margin: "-10% 0px" }}
               className={
-                "mx-auto w-full rounded-3xl ring-1 ring-black/10 shadow-sm bg-white/90 p-5 md:p-6 " +
+                "mx-auto w-full rounded-3xl ring-1 ring-[var(--elev)] shadow-sm bg-[var(--card)]/90 p-5 md:p-6 " +
                 (i === 1 ? "md:ml-auto md:w-[88%]" : "md:w-[92%]")
               }
             >
@@ -126,18 +126,18 @@ export default function TrustSection() {
                     alt={t.name}
                     width={56}
                     height={56}
-                    className="h-14 w-14 rounded-full ring-1 ring-black/10 shadow-sm object-contain grayscale"
+                    className="h-14 w-14 rounded-full ring-1 ring-[var(--elev)] shadow-sm object-contain grayscale"
                   />
                 ) : (
-                  <div className="h-14 w-14 rounded-full ring-1 ring-black/10 grid place-items-center bg-white/90 shadow-sm">
-                    <span className="font-semibold">{t.name.charAt(0)}</span>
+                  <div className="h-14 w-14 rounded-full ring-1 ring-[var(--elev)] grid place-items-center bg-[var(--card)]/90 shadow-sm">
+                    <span className="font-semibold text-[var(--ink-700)]">{t.name.charAt(0)}</span>
                   </div>
                 )}
 
                 {/* Body */}
                 <div className="flex-1">
-                  <p className="text-[15px] leading-7 text-black/70">“{t.quote}”</p>
-                  <div className="mt-3 text-[13px] text-black/60">
+                  <p className="text-[15px] leading-7 text-[var(--ink-700)]">"{t.quote}"</p>
+                  <div className="mt-3 text-[13px] text-[var(--ink-600)]">
                     <span className="font-semibold">{t.name}</span>
                     <span className="mx-1">—</span>
                     <span>{t.title}</span>

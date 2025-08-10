@@ -15,10 +15,25 @@ function useCount(ref: React.RefObject<HTMLSpanElement | null>, to: number, dura
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    
+    // تحسين للموبايل - تقليل التحديثات
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const updateInterval = isMobile ? 50 : 16; // أقل تحديثات للموبايل
+    
     let start: number | null = null;
+    let lastUpdate = 0;
     const from = 0;
+    
     const step = (ts: number) => {
       if (start === null) start = ts;
+      
+      // تحديث أقل للموبايل
+      if (ts - lastUpdate < updateInterval) {
+        requestAnimationFrame(step);
+        return;
+      }
+      lastUpdate = ts;
+      
       const p = Math.min((ts - start) / duration, 1);
       const val = Math.floor(from + (to - from) * p);
       el.textContent = String(val);

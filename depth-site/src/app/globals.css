@@ -85,6 +85,29 @@ html, body {
   color: var(--text);
 }
 
+/* تحسين الأداء للموبايل وSafari */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  /* تقليل الحركات للموبايل */
+  * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+  }
+  
+  /* تحسين الأداء */
+  .will-change-transform {
+    will-change: auto;
+  }
+}
+
 /* Utility buttons baseline */
 .btn {
   display: inline-flex;

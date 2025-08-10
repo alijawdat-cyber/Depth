@@ -21,6 +21,10 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
     const group = groupRef.current;
     if (!container || !track || !group) return;
 
+    // تحسين للموبايل وSafari - تقليل الحركة
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const isSafari = typeof window !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    
     if (
       typeof window !== "undefined" &&
       window.matchMedia &&
@@ -28,6 +32,9 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
     ) {
       return;
     }
+
+    // تقليل السرعة للموبايل وSafari لتحسين الأداء
+    const adjustedSpeed = isMobile || isSafari ? speed * 0.7 : speed;
 
     let x = 0;
     let last = 0;
@@ -44,7 +51,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       const dt = (t - last) / 1000;
       last = t;
 
-      x -= speed * dt;
+      x -= adjustedSpeed * dt;
 
       const seam = seamRef.current || 1;
       if (-x >= seam) {
