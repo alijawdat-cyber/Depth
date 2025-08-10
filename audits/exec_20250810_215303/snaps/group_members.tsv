@@ -1,0 +1,30 @@
+Getting all Groups, may take some time on a large Google Workspace Account...
+Got 9 Groups: billing@depth-agency.com - support@depth-agency.com
+Getting all Members, Managers, Owners for billing@depth-agency.com (1/9)
+Got 1 Member, Manager, Owner for billing@depth-agency.com...
+Getting all Members, Managers, Owners for hello@depth-agency.com (2/9)
+Got 1 Member, Manager, Owner for hello@depth-agency.com...
+Getting all Members, Managers, Owners for invoices@depth-agency.com (3/9)
+Got 1 Member, Manager, Owner for invoices@depth-agency.com...
+Getting all Members, Managers, Owners for jobs@depth-agency.com (4/9)
+Got 1 Member, Manager, Owner for jobs@depth-agency.com...
+Getting all Members, Managers, Owners for legal@depth-agency.com (5/9)
+Got 1 Member, Manager, Owner for legal@depth-agency.com...
+Getting all Members, Managers, Owners for press@depth-agency.com (6/9)
+Got 1 Member, Manager, Owner for press@depth-agency.com...
+Getting all Members, Managers, Owners for sales@depth-agency.com (7/9)
+Got 1 Member, Manager, Owner for sales@depth-agency.com...
+Getting all Members, Managers, Owners for studio@depth-agency.com (8/9)
+Got 1 Member, Manager, Owner for studio@depth-agency.com...
+Getting all Members, Managers, Owners for support@depth-agency.com (9/9)
+Got 1 Member, Manager, Owner for support@depth-agency.com...
+group,type,role,id,status,email
+billing@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+hello@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+invoices@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+jobs@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+legal@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+press@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+sales@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+studio@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+support@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com

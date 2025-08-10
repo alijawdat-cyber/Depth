@@ -52,9 +52,17 @@
 
 ### 3) حسابات ومجموعات البريد
 - المستخدم المدفوع (User — مستخدم): `admin@depth-agency.com` (خطة مرنة)
-- المجموعات (Groups — مجموعات) المجانية المقترحة: 
-  - `hello@depth-agency.com` → توصيل إلى `admin@depth-agency.com`
-  - `sales@`, `billing@`, `support@` → توصيل إلى `hello@`
+- المجموعات (Groups — مجموعات) المنشأة:
+  - `hello@depth-agency.com` → الواجهة العامة (موجودة مسبقاً)
+  - `sales@depth-agency.com` → المبيعات والمتابعة ✅
+  - `support@depth-agency.com` → استفسارات عامة ودعم ✅
+  - `billing@depth-agency.com` → محاسبة ومدفوعات ✅
+  - `invoices@depth-agency.com` → استلام/إرسال فواتير ✅
+  - `studio@depth-agency.com` → الإنتاج الداخلي ✅
+  - `jobs@depth-agency.com` → طلبات التوظيف ✅
+  - `press@depth-agency.com` → الإعلام والعلاقات العامة ✅
+  - `legal@depth-agency.com` → الشؤون القانونية ✅
+- كل المجموعات: `admin@depth-agency.com` هو المالك/المدير
 
 ### 4) الأمان والسياسات
 - 2FA (Two-Factor Authentication — تحقق بخطوتين): Enforce على جميع المستخدمين
@@ -84,7 +92,13 @@ NS: ns-cloud-a1..a4.googledomains.com
 ```
 
 ### 6) سجل الحالة (Changelog)
-- v2025-08-10:
+- v2025-08-10 (مساءً):
+  - إنشاء مجموعات البريد الإضافية عبر GAM: sales@, support@, billing@, invoices@, studio@, jobs@, press@, legal@depth-agency.com
+  - تم تعيين admin@depth-agency.com كمالك/مدير لجميع المجموعات
+  - إعداد Google Cloud Project (gam-project-1o6tc) وService Account للتشغيل الآلي
+  - Domain-wide Delegation مفعّل مع Scopes: admin.directory.group, admin.directory.group.member, apps.groups.settings
+  - المتبقي: ضبط إعدادات استقبال الرسائل الخارجية وإضافة أعضاء فريق لاحقاً
+- v2025-08-10 (صباحاً):
   - ربط Resend وإكمال التحقق (Verified): إضافة سجلات `send` (MX + TXT SPF) و`resend._domainkey` (TXT DKIM).
   - ضبط متغيرات البيئة على Vercel: `RESEND_API_KEY`، `EMAIL_FROM`، `EMAIL_TO`، وتثبيت `NEXT_PUBLIC_SITE_URL` للإنتاج.
   - تفعيل إرسال الموقع عبر `/api/contact` (مع تحقق Zod وhoneypot للسبام).

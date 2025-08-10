@@ -1,0 +1,93 @@
+=== STARTING READ-ONLY AUDIT FOR depth-agency.com ===
+=== DOMAIN & AUTH INFO ===
+Customer ID: C021jbcj1
+Primary Domain: depth-agency.com
+Primary Domain Verified: True
+Customer Creation Time: 2025-08-08T17:26:34Z
+Default Language: ar
+Address:
+  contactName: ali alrubeay
+  organizationName: Depth Studio
+  addressLine1: alnazimya
+  addressLine2: no2
+  locality: karrada
+  region: بغداد
+  postalCode: 10069
+  countryCode: IQ
+Phone: +9647719956000
+Admin Secondary Email: alijawdat4@gmail.com
+User counts as of 2025-08-08:
+  Total Users: 1
+
+=== OAUTH INFO ===
+Client OAuth2 File: /Users/alijawdat/.gam/oauth2.txt
+Client ID: 911199467050-rkpjhs4mem5j2v6522eu49d52ti8t8tt.apps.googleusercontent.com
+Scopes: 47
+  https://www.google.com/m8/feeds
+  https://www.googleapis.com/auth/admin.chrome.printers
+  https://www.googleapis.com/auth/admin.contact.delegation
+  https://www.googleapis.com/auth/admin.datatransfer
+  https://www.googleapis.com/auth/admin.directory.customer
+  https://www.googleapis.com/auth/admin.directory.device.chromebrowsers
+  https://www.googleapis.com/auth/admin.directory.device.chromeos
+  https://www.googleapis.com/auth/admin.directory.device.mobile
+  https://www.googleapis.com/auth/admin.directory.domain
+  https://www.googleapis.com/auth/admin.directory.group
+  https://www.googleapis.com/auth/admin.directory.orgunit
+  https://www.googleapis.com/auth/admin.directory.resource.calendar
+  https://www.googleapis.com/auth/admin.directory.rolemanagement
+  https://www.googleapis.com/auth/admin.directory.user
+  https://www.googleapis.com/auth/admin.directory.user.security
+  https://www.googleapis.com/auth/admin.directory.userschema
+  https://www.googleapis.com/auth/admin.reports.audit.readonly
+  https://www.googleapis.com/auth/admin.reports.usage.readonly
+  https://www.googleapis.com/auth/apps.groups.migration
+  https://www.googleapis.com/auth/apps.groups.settings
+  https://www.googleapis.com/auth/apps.licensing
+  https://www.googleapis.com/auth/calendar
+  https://www.googleapis.com/auth/chrome.management.appdetails.readonly
+  https://www.googleapis.com/auth/chrome.management.policy
+  https://www.googleapis.com/auth/chrome.management.profiles
+  https://www.googleapis.com/auth/chrome.management.reports.readonly
+  https://www.googleapis.com/auth/chrome.management.telemetry.readonly
+  https://www.googleapis.com/auth/classroom.announcements
+  https://www.googleapis.com/auth/classroom.courses
+  https://www.googleapis.com/auth/classroom.coursework.students
+  https://www.googleapis.com/auth/classroom.courseworkmaterials
+  https://www.googleapis.com/auth/classroom.guardianlinks.students
+  https://www.googleapis.com/auth/classroom.profile.emails
+  https://www.googleapis.com/auth/classroom.profile.photos
+  https://www.googleapis.com/auth/classroom.rosters
+  https://www.googleapis.com/auth/classroom.topics
+  https://www.googleapis.com/auth/cloud-identity.groups
+  https://www.googleapis.com/auth/cloud-identity.inboundsso
+  https://www.googleapis.com/auth/cloud-identity.orgunits
+  https://www.googleapis.com/auth/cloud-identity.policies
+  https://www.googleapis.com/auth/cloud-identity.userinvitations
+  https://www.googleapis.com/auth/contacts
+  https://www.googleapis.com/auth/directory.readonly
+  https://www.googleapis.com/auth/ediscovery
+  https://www.googleapis.com/auth/userinfo.email
+  https://www.googleapis.com/auth/userinfo.profile
+  openid
+Google Workspace Admin: admin@depth-agency.com
+Expires: 2025-08-10T21:53:19+00:00
+
+
+=== SERVICE ACCOUNT CHECK ===
+GAM service account check failed
+=== PHASE 1: WORKSPACE INVENTORY ===
+=== PHASE 2: DNS & EMAIL AUTHENTICATION ===
+=== MX RECORDS ===
+1 smtp.google.com.
+
+=== SPF RECORDS ===
+"v=spf1 include:_spf.google.com ~all"
+
+=== DMARC RECORDS ===
+"     v=DMARC1; p=quarantine; rua=mailto:dmarc@depth-agency.com; fo=1; pct=100"
+
+=== DKIM RECORDS ===
+"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtfXGRZ++OEy3fPpPFTeOiFWSpuhhcHdsqbSiWgU7rfInKdsRtIfZs/ZqL6yGJVELJPaYvX5wm+NDRtPm1mGUpwbGoVdI7YyPK3LnwSIptObUWYwj0kpGRikb66/MYNkkKPJxgZSmmGgmhPebG7S6QE2RWyFY2T12eoFTs8KldWd3/PqdIWGGDGmWKhdY7XYIp" "FfHEX+x8htr9Ih4YJZSg9BUlROppId9uTygqcdVseibivhtSK9eYFvMbN1jJxW3HKTqxa3qM+s8T3Lezoxc6EXwuj3Vy5o/CKcSXcYajq3hmb6KBbQaGLuqdCpINNFMgLAsdtyn00tYgqKE/kS9awIDAQAB"
+=== PHASE 3: CODE & WEBSITE ANALYSIS ===
+=== FINAL SUMMARY ===

@@ -1,0 +1,10 @@
+group,type,role,id,status,email
+billing@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+hello@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+invoices@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+jobs@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+legal@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+press@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+sales@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+studio@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+support@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com

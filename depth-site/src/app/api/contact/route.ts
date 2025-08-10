@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
-import { renderContactEmail } from "@/lib/emailTemplate";
+import { renderContactEmail, renderAutoreplyEmail } from "@/lib/emailTemplate";
 
 // Smart Routing Configuration
 type Inquiry = "pricing" | "support" | "press" | "jobs" | "general";
@@ -87,12 +87,21 @@ export async function POST(req: Request) {
       html,
     });
 
-    // Send confirmation to user
+    // Send autoreply confirmation to user
+    const autoreplyHtml = renderAutoreplyEmail({ name, type });
+    const autoreplySubjects = {
+      general: "شكرًا لك - سنعود إليك خلال 24 ساعة",
+      pricing: "طلب عرض أسعار - سنعود إليك خلال 8 ساعات",
+      support: "طلب دعم فني - سنعود إليك خلال 6 ساعات",
+      press: "استفسار إعلامي - سنعود إليك خلال 24 ساعة",
+      jobs: "طلب وظيفة - سنعود إليك خلال 72 ساعة"
+    };
+    
     void resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
-      subject: "تم استلام رسالتك — Depth",
-      html: `<p>شكرًا ${name}! استلمنا رسالتك وسنعود لك قريبًا.</p><p>نوع الطلب: ${type}</p>`,
+      subject: autoreplySubjects[type],
+      html: autoreplyHtml,
     });
 
     console.log(`Email routed successfully: ${type} -> ${targetEmail}`);

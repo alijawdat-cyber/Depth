@@ -1,0 +1,503 @@
+=== EMAIL PATTERNS IN CODE ===
+READY-TO-RUN-COMMANDS.sh-20-    # المجموعات العامة
+READY-TO-RUN-COMMANDS.sh:21:    gam update group hello@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh:22:    gam update group sales@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh:23:    gam update group support@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh-24-    
+--
+READY-TO-RUN-COMMANDS.sh-28-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+READY-TO-RUN-COMMANDS.sh:29:        gam update group studio@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh:30:        gam update group billing@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh:31:        gam update group invoices@$DOMAIN add $role user $email
+READY-TO-RUN-COMMANDS.sh-32-        echo "✅ Added to internal groups"
+--
+READY-TO-RUN-COMMANDS.sh-51-    echo "📈 Checking DMARC reports..."
+READY-TO-RUN-COMMANDS.sh:52:    gam user $PRIMARY_ADMIN print messages query "from:noreply-dmarc-support@google.com" maxResults 10
+READY-TO-RUN-COMMANDS.sh-53-}
+--
+READY-TO-RUN-COMMANDS.sh-98-test_email_delivery() {
+READY-TO-RUN-COMMANDS.sh:99:    local test_group="${1:-hello@$DOMAIN}"
+READY-TO-RUN-COMMANDS.sh-100-    echo "✉️  Testing email delivery to $test_group"
+--
+READY-TO-RUN-COMMANDS.sh-121-  add_team_member designer@depth-agency.com manager
+READY-TO-RUN-COMMANDS.sh:122:  create_alias pr press@depth-agency.com
+READY-TO-RUN-COMMANDS.sh:123:  test_email_delivery sales@depth-agency.com
+READY-TO-RUN-COMMANDS.sh-124-
+--
+EMAIL-DOMAIN-SETUP.md-55-- المجموعات (Groups — مجموعات) المنشأة:
+EMAIL-DOMAIN-SETUP.md:56:  - `hello@depth-agency.com` → الواجهة العامة (موجودة مسبقاً)
+EMAIL-DOMAIN-SETUP.md:57:  - `sales@depth-agency.com` → المبيعات والمتابعة ✅
+EMAIL-DOMAIN-SETUP.md:58:  - `support@depth-agency.com` → استفسارات عامة ودعم ✅
+EMAIL-DOMAIN-SETUP.md:59:  - `billing@depth-agency.com` → محاسبة ومدفوعات ✅
+EMAIL-DOMAIN-SETUP.md:60:  - `invoices@depth-agency.com` → استلام/إرسال فواتير ✅
+EMAIL-DOMAIN-SETUP.md:61:  - `studio@depth-agency.com` → الإنتاج الداخلي ✅
+EMAIL-DOMAIN-SETUP.md:62:  - `jobs@depth-agency.com` → طلبات التوظيف ✅
+EMAIL-DOMAIN-SETUP.md:63:  - `press@depth-agency.com` → الإعلام والعلاقات العامة ✅
+EMAIL-DOMAIN-SETUP.md:64:  - `legal@depth-agency.com` → الشؤون القانونية ✅
+EMAIL-DOMAIN-SETUP.md-65-- كل المجموعات: `admin@depth-agency.com` هو المالك/المدير
+--
+EMAIL-DOMAIN-SETUP.md-95-- v2025-08-10 (مساءً):
+EMAIL-DOMAIN-SETUP.md:96:  - إنشاء مجموعات البريد الإضافية عبر GAM: sales@, support@, billing@, invoices@, studio@, jobs@, press@, legal@depth-agency.com
+EMAIL-DOMAIN-SETUP.md-97-  - تم تعيين admin@depth-agency.com كمالك/مدير لجميع المجموعات
+--
+EMAIL-DOMAIN-SETUP.md-105-  - اختبار إرسال ناجح ومتابعة عبر Resend → Logs.
+EMAIL-DOMAIN-SETUP.md:106:  - المتبقي: إنشاء/تأكيد مجموعة `hello@depth-agency.com` (توجيهها إلى `admin@`)، مراقبة تقارير DMARC أسبوعين ثم رفع السياسة إلى `p=reject` عند النظافة.
+EMAIL-DOMAIN-SETUP.md-107-- v2025-08-09:
+--
+EMAIL-DOMAIN-SETUP.md-138-  - `RESEND_API_KEY = re_...` (من Resend)
+EMAIL-DOMAIN-SETUP.md:139:  - `EMAIL_FROM = Depth <hello@depth-agency.com>` (قبل التحقق يمكن استخدام `onboarding@resend.dev` للاختبار)
+EMAIL-DOMAIN-SETUP.md-140-  - `EMAIL_TO = admin@depth-agency.com`
+--
+EMAIL-DOMAIN-SETUP.md-156-- استلام/توزيع داخلي:
+EMAIL-DOMAIN-SETUP.md:157:  - مجموعة `hello@` نشطة وتوزّع على `admin@`. يمكن إضافة أعضاء آخرين لاحقًا.
+EMAIL-DOMAIN-SETUP.md-158-  - إن لزم، تفعيل Collaborative Inbox للمجموعة (تعيين/حل المحادثات).
+--
+EMAIL-DOMAIN-SETUP.md-171-- سياسة التوقيعات (Signature Standard):
+EMAIL-DOMAIN-SETUP.md:172:  - الاسم | الدور | `depth-agency.com` | `hello@depth-agency.com` | روابط اجتماعية.
+EMAIL-DOMAIN-SETUP.md-173-
+--
+audits/RECOMMENDATIONS.md-25-# تفعيل Collaborative Inbox
+audits/RECOMMENDATIONS.md:26:gam update group hello@depth-agency.com settings enableCollaborativeInbox true
+audits/RECOMMENDATIONS.md:27:gam update group support@depth-agency.com settings enableCollaborativeInbox true
+audits/RECOMMENDATIONS.md-28-```
+--
+audits/RECOMMENDATIONS.md-41-
+audits/RECOMMENDATIONS.md:42:**المشكلة:** جميع النماذج ترسل إلى hello@ مما يخلط الأولويات  
+audits/RECOMMENDATIONS.md-43-**التأثير:** بطء في الرد، خلط بين الاستفسارات العامة والمبيعات  
+--
+audits/RECOMMENDATIONS.md-49-  if (message.includes('عرض') || message.includes('باقة') || message.includes('سعر')) {
+audits/RECOMMENDATIONS.md:50:    return 'sales@depth-agency.com';
+audits/RECOMMENDATIONS.md-51-  }
+audits/RECOMMENDATIONS.md-52-  if (message.includes('مشكلة') || message.includes('خطأ') || message.includes('لا يعمل')) {
+audits/RECOMMENDATIONS.md:53:    return 'support@depth-agency.com';
+audits/RECOMMENDATIONS.md-54-  }
+audits/RECOMMENDATIONS.md-55-  if (message.includes('وظيفة') || message.includes('انضمام') || message.includes('cv')) {
+audits/RECOMMENDATIONS.md:56:    return 'jobs@depth-agency.com';
+audits/RECOMMENDATIONS.md-57-  }
+audits/RECOMMENDATIONS.md:58:  return 'hello@depth-agency.com'; // default
+audits/RECOMMENDATIONS.md-59-};
+--
+audits/RECOMMENDATIONS.md-76-# تحسين إعدادات الرد للمجموعات الداخلية
+audits/RECOMMENDATIONS.md:77:gam update group billing@depth-agency.com replyTo REPLY_TO_MANAGERS
+audits/RECOMMENDATIONS.md:78:gam update group invoices@depth-agency.com replyTo REPLY_TO_MANAGERS  
+audits/RECOMMENDATIONS.md:79:gam update group legal@depth-agency.com replyTo REPLY_TO_MANAGERS
+audits/RECOMMENDATIONS.md:80:gam update group studio@depth-agency.com replyTo REPLY_TO_MANAGERS
+audits/RECOMMENDATIONS.md-81-```
+--
+audits/RECOMMENDATIONS.md-116-- عرض الوظائف المتاحة
+audits/RECOMMENDATIONS.md:117:- نموذج طلب عمل (يرسل إلى jobs@)
+audits/RECOMMENDATIONS.md-118-- رفع CV/Portfolio
+--
+audits/preexec/groups.tsv-1-email
+audits/preexec/groups.tsv:2:billing@depth-agency.com
+audits/preexec/groups.tsv:3:hello@depth-agency.com
+audits/preexec/groups.tsv:4:invoices@depth-agency.com
+audits/preexec/groups.tsv:5:jobs@depth-agency.com
+audits/preexec/groups.tsv:6:legal@depth-agency.com
+audits/preexec/groups.tsv:7:press@depth-agency.com
+audits/preexec/groups.tsv:8:sales@depth-agency.com
+audits/preexec/groups.tsv:9:studio@depth-agency.com
+audits/preexec/groups.tsv:10:support@depth-agency.com
+--
+audits/preexec/group_hello.txt:1:Group: hello@depth-agency.com
+audits/preexec/group_hello.txt-2-  Group Settings:
+--
+audits/preexec/group_hello.txt-66-  Non-Editable Aliases: (1)
+audits/preexec/group_hello.txt:67:    alias: hello@depth-agency.com.test-google-a.com
+audits/preexec/group_hello.txt-68-  Members: (1)
+--
+audits/preexec/group_support.txt:1:Group: support@depth-agency.com
+audits/preexec/group_support.txt-2-  Group Settings:
+--
+audits/preexec/group_support.txt-66-  Non-Editable Aliases: (1)
+audits/preexec/group_support.txt:67:    alias: support@depth-agency.com.test-google-a.com
+audits/preexec/group_support.txt-68-  Members: (1)
+--
+audits/preexec/group_press.txt:1:Group: press@depth-agency.com
+audits/preexec/group_press.txt-2-  Group Settings:
+--
+audits/preexec/group_press.txt-66-  Non-Editable Aliases: (1)
+audits/preexec/group_press.txt:67:    alias: press@depth-agency.com.test-google-a.com
+audits/preexec/group_press.txt-68-  Members: (1)
+--
+audits/preexec/group_members.tsv-1-group,type,role,id,status,email
+audits/preexec/group_members.tsv:2:billing@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:3:hello@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:4:invoices@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:5:jobs@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:6:legal@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:7:press@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:8:sales@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:9:studio@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+audits/preexec/group_members.tsv:10:support@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+--
+audits/preexec/group_legal.txt:1:Group: legal@depth-agency.com
+audits/preexec/group_legal.txt-2-  Group Settings:
+--
+audits/preexec/group_legal.txt-66-  Non-Editable Aliases: (1)
+audits/preexec/group_legal.txt:67:    alias: legal@depth-agency.com.test-google-a.com
+audits/preexec/group_legal.txt-68-  Members: (1)
+--
+audits/preexec/code_scan.txt-2-READY-TO-RUN-COMMANDS.sh-20-    # المجموعات العامة
+audits/preexec/code_scan.txt:3:READY-TO-RUN-COMMANDS.sh:21:    gam update group hello@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt:4:READY-TO-RUN-COMMANDS.sh:22:    gam update group sales@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt:5:READY-TO-RUN-COMMANDS.sh:23:    gam update group support@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt-6-READY-TO-RUN-COMMANDS.sh-24-    
+--
+audits/preexec/code_scan.txt-8-READY-TO-RUN-COMMANDS.sh-28-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+audits/preexec/code_scan.txt:9:READY-TO-RUN-COMMANDS.sh:29:        gam update group studio@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt:10:READY-TO-RUN-COMMANDS.sh:30:        gam update group billing@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt:11:READY-TO-RUN-COMMANDS.sh:31:        gam update group invoices@$DOMAIN add $role user $email
+audits/preexec/code_scan.txt-12-READY-TO-RUN-COMMANDS.sh-32-        echo "✅ Added to internal groups"
+--
+audits/preexec/code_scan.txt-14-READY-TO-RUN-COMMANDS.sh-51-    echo "📈 Checking DMARC reports..."
+audits/preexec/code_scan.txt:15:READY-TO-RUN-COMMANDS.sh:52:    gam user $PRIMARY_ADMIN print messages query "from:noreply-dmarc-support@google.com" maxResults 10
+audits/preexec/code_scan.txt-16-READY-TO-RUN-COMMANDS.sh-53-}
+--
+audits/preexec/code_scan.txt-18-READY-TO-RUN-COMMANDS.sh-98-test_email_delivery() {
+audits/preexec/code_scan.txt:19:READY-TO-RUN-COMMANDS.sh:99:    local test_group="${1:-hello@$DOMAIN}"
+audits/preexec/code_scan.txt-20-READY-TO-RUN-COMMANDS.sh-100-    echo "✉️  Testing email delivery to $test_group"
+--
+audits/preexec/code_scan.txt-22-READY-TO-RUN-COMMANDS.sh-121-  add_team_member designer@depth-agency.com manager
+audits/preexec/code_scan.txt:23:READY-TO-RUN-COMMANDS.sh:122:  create_alias pr press@depth-agency.com
+audits/preexec/code_scan.txt:24:READY-TO-RUN-COMMANDS.sh:123:  test_email_delivery sales@depth-agency.com
+audits/preexec/code_scan.txt-25-READY-TO-RUN-COMMANDS.sh-124-
+--
+audits/preexec/code_scan.txt-27-EMAIL-DOMAIN-SETUP.md-55-- المجموعات (Groups — مجموعات) المنشأة:
+audits/preexec/code_scan.txt:28:EMAIL-DOMAIN-SETUP.md:56:  - `hello@depth-agency.com` → الواجهة العامة (موجودة مسبقاً)
+audits/preexec/code_scan.txt:29:EMAIL-DOMAIN-SETUP.md:57:  - `sales@depth-agency.com` → المبيعات والمتابعة ✅
+audits/preexec/code_scan.txt:30:EMAIL-DOMAIN-SETUP.md:58:  - `support@depth-agency.com` → استفسارات عامة ودعم ✅
+audits/preexec/code_scan.txt:31:EMAIL-DOMAIN-SETUP.md:59:  - `billing@depth-agency.com` → محاسبة ومدفوعات ✅
+audits/preexec/code_scan.txt:32:EMAIL-DOMAIN-SETUP.md:60:  - `invoices@depth-agency.com` → استلام/إرسال فواتير ✅
+audits/preexec/code_scan.txt:33:EMAIL-DOMAIN-SETUP.md:61:  - `studio@depth-agency.com` → الإنتاج الداخلي ✅
+audits/preexec/code_scan.txt:34:EMAIL-DOMAIN-SETUP.md:62:  - `jobs@depth-agency.com` → طلبات التوظيف ✅
+audits/preexec/code_scan.txt:35:EMAIL-DOMAIN-SETUP.md:63:  - `press@depth-agency.com` → الإعلام والعلاقات العامة ✅
+audits/preexec/code_scan.txt:36:EMAIL-DOMAIN-SETUP.md:64:  - `legal@depth-agency.com` → الشؤون القانونية ✅
+audits/preexec/code_scan.txt-37-EMAIL-DOMAIN-SETUP.md-65-- كل المجموعات: `admin@depth-agency.com` هو المالك/المدير
+--
+audits/preexec/code_scan.txt-39-EMAIL-DOMAIN-SETUP.md-95-- v2025-08-10 (مساءً):
+audits/preexec/code_scan.txt:40:EMAIL-DOMAIN-SETUP.md:96:  - إنشاء مجموعات البريد الإضافية عبر GAM: sales@, support@, billing@, invoices@, studio@, jobs@, press@, legal@depth-agency.com
+audits/preexec/code_scan.txt-41-EMAIL-DOMAIN-SETUP.md-97-  - تم تعيين admin@depth-agency.com كمالك/مدير لجميع المجموعات
+--
+audits/preexec/code_scan.txt-43-EMAIL-DOMAIN-SETUP.md-105-  - اختبار إرسال ناجح ومتابعة عبر Resend → Logs.
+audits/preexec/code_scan.txt:44:EMAIL-DOMAIN-SETUP.md:106:  - المتبقي: إنشاء/تأكيد مجموعة `hello@depth-agency.com` (توجيهها إلى `admin@`)، مراقبة تقارير DMARC أسبوعين ثم رفع السياسة إلى `p=reject` عند النظافة.
+audits/preexec/code_scan.txt-45-EMAIL-DOMAIN-SETUP.md-107-- v2025-08-09:
+--
+audits/preexec/code_scan.txt-47-EMAIL-DOMAIN-SETUP.md-138-  - `RESEND_API_KEY = re_...` (من Resend)
+audits/preexec/code_scan.txt:48:EMAIL-DOMAIN-SETUP.md:139:  - `EMAIL_FROM = Depth <hello@depth-agency.com>` (قبل التحقق يمكن استخدام `onboarding@resend.dev` للاختبار)
+audits/preexec/code_scan.txt-49-EMAIL-DOMAIN-SETUP.md-140-  - `EMAIL_TO = admin@depth-agency.com`
+--
+audits/preexec/code_scan.txt-51-EMAIL-DOMAIN-SETUP.md-156-- استلام/توزيع داخلي:
+audits/preexec/code_scan.txt:52:EMAIL-DOMAIN-SETUP.md:157:  - مجموعة `hello@` نشطة وتوزّع على `admin@`. يمكن إضافة أعضاء آخرين لاحقًا.
+audits/preexec/code_scan.txt-53-EMAIL-DOMAIN-SETUP.md-158-  - إن لزم، تفعيل Collaborative Inbox للمجموعة (تعيين/حل المحادثات).
+--
+audits/preexec/code_scan.txt-55-EMAIL-DOMAIN-SETUP.md-171-- سياسة التوقيعات (Signature Standard):
+audits/preexec/code_scan.txt:56:EMAIL-DOMAIN-SETUP.md:172:  - الاسم | الدور | `depth-agency.com` | `hello@depth-agency.com` | روابط اجتماعية.
+audits/preexec/code_scan.txt-57-EMAIL-DOMAIN-SETUP.md-173-
+--
+audits/preexec/code_scan.txt-59-audits/RECOMMENDATIONS.md-25-# تفعيل Collaborative Inbox
+audits/preexec/code_scan.txt:60:audits/RECOMMENDATIONS.md:26:gam update group hello@depth-agency.com settings enableCollaborativeInbox true
+audits/preexec/code_scan.txt:61:audits/RECOMMENDATIONS.md:27:gam update group support@depth-agency.com settings enableCollaborativeInbox true
+audits/preexec/code_scan.txt-62-audits/RECOMMENDATIONS.md-28-```
+
+=== CONTACT/API/FORM PATTERNS ===
+.git/hooks/push-to-checkout.sample-35-# in order to emulate git fetch that is run in the reverse direction
+.git/hooks/push-to-checkout.sample:36:# with git push, as the two-tree form of git read-tree -u -m is
+.git/hooks/push-to-checkout.sample-37-# essentially the same as git switch or git checkout that switches
+.git/hooks/push-to-checkout.sample-38-# branches while keeping the local changes in the working tree that do
+--
+.git/hooks/push-to-checkout.sample-45-# Note that the hook will be executed from the repository directory,
+.git/hooks/push-to-checkout.sample:46:# not from the working tree, so if you want to perform operations on
+.git/hooks/push-to-checkout.sample-47-# the working tree, you will have to adapt your code accordingly, e.g.
+.git/hooks/push-to-checkout.sample-48-# by adding "cd .." or using relative paths.
+--
+.git/hooks/pre-push.sample-13-#
+.git/hooks/pre-push.sample:14:# Information about the commits which are being pushed is supplied as lines to
+.git/hooks/pre-push.sample:15:# the standard input in the form:
+.git/hooks/pre-push.sample-16-#
+.git/hooks/pre-push.sample-17-#   <local ref> <local oid> <remote ref> <remote oid>
+--
+.git/hooks/fsmonitor-watchman.sample-11-# The hook is passed a version (currently 2) and last update token
+.git/hooks/fsmonitor-watchman.sample:12:# formatted as a string and outputs to stdout a new update token and
+.git/hooks/fsmonitor-watchman.sample-13-# all files that have been modified since the update token. Paths must
+.git/hooks/fsmonitor-watchman.sample-14-# be relative to the root of the working tree and separated by a single NUL.
+--
+.git/hooks/pre-commit.sample-23-
+.git/hooks/pre-commit.sample:24:# Cross platform projects tend to avoid non-ASCII filenames; prevent
+.git/hooks/pre-commit.sample-25-# them from being added to the repository. We exploit the fact that the
+.git/hooks/pre-commit.sample-26-# printable range starts at the space character and ends with tilde.
+--
+.git/hooks/pre-commit.sample-36-
+.git/hooks/pre-commit.sample:37:This can cause problems if you want to work with people on other platforms.
+.git/hooks/pre-commit.sample-38-
+.git/hooks/pre-commit.sample-39-To be portable it is advisable to rename the file.
+--
+.git/logs/refs/remotes/origin/main:1:0000000000000000000000000000000000000000 a34cc6e891de83958c8052c1fb82e1dcc6bce41f alijawdat-cyber <alijawdat4@gmail.com> 1754670388 +0300	update by push
+.git/logs/refs/remotes/origin/main:2:a34cc6e891de83958c8052c1fb82e1dcc6bce41f 4a590b5d423b9585d27c6038e1e1883e1a89eb23 alijawdat-cyber <alijawdat4@gmail.com> 1754670648 +0300	update by push
+.git/logs/refs/remotes/origin/main:3:4a590b5d423b9585d27c6038e1e1883e1a89eb23 f67a9317554951edef438d4e66a1672c342b6a87 alijawdat-cyber <alijawdat4@gmail.com> 1754671701 +0300	update by push
+.git/logs/refs/remotes/origin/main:4:f67a9317554951edef438d4e66a1672c342b6a87 49f466a0a4acd89bfaf166801888f176732fc395 alijawdat-cyber <alijawdat4@gmail.com> 1754672176 +0300	update by push
+.git/logs/refs/remotes/origin/main:5:49f466a0a4acd89bfaf166801888f176732fc395 bcf2531c14f87717afa93af6c75e0ee76af52021 alijawdat-cyber <alijawdat4@gmail.com> 1754677006 +0300	update by push
+.git/logs/refs/remotes/origin/main:6:bcf2531c14f87717afa93af6c75e0ee76af52021 cceecbe34180e5743b2c4a485cb1c975975cb45d alijawdat-cyber <alijawdat4@gmail.com> 1754750053 +0300	update by push
+.git/logs/refs/remotes/origin/main:7:cceecbe34180e5743b2c4a485cb1c975975cb45d 02e48739444933c15b34ef8b9baf0a51a16f6566 alijawdat-cyber <alijawdat4@gmail.com> 1754751942 +0300	update by push
+.git/logs/refs/remotes/origin/main:8:02e48739444933c15b34ef8b9baf0a51a16f6566 2c0513d20e360b697aa19e6b6bfc7b58a937aa09 alijawdat-cyber <alijawdat4@gmail.com> 1754752357 +0300	update by push
+.git/logs/refs/remotes/origin/main:9:2c0513d20e360b697aa19e6b6bfc7b58a937aa09 ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 alijawdat-cyber <alijawdat4@gmail.com> 1754752758 +0300	update by push
+.git/logs/refs/remotes/origin/main:10:ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 4855c13164ce35a676dcc2e96784c0ba3d076cd2 alijawdat-cyber <alijawdat4@gmail.com> 1754753689 +0300	update by push
+.git/logs/refs/remotes/origin/main:11:4855c13164ce35a676dcc2e96784c0ba3d076cd2 df55986db598403b3782f2ac1f1be78f34f86123 alijawdat-cyber <alijawdat4@gmail.com> 1754757670 +0300	update by push
+.git/logs/refs/remotes/origin/main:12:df55986db598403b3782f2ac1f1be78f34f86123 716c0bdedbba0406977fc7dffcec32e2dd03e616 alijawdat-cyber <alijawdat4@gmail.com> 1754757997 +0300	update by push
+.git/logs/refs/remotes/origin/main:13:716c0bdedbba0406977fc7dffcec32e2dd03e616 c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 alijawdat-cyber <alijawdat4@gmail.com> 1754774342 +0300	update by push
+.git/logs/refs/remotes/origin/main:14:c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 alijawdat-cyber <alijawdat4@gmail.com> 1754775094 +0300	update by push
+.git/logs/refs/remotes/origin/main:15:1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 b03485176ae76da1e0714fa824cb55ad09ae0218 alijawdat-cyber <alijawdat4@gmail.com> 1754778418 +0300	update by push
+.git/logs/refs/remotes/origin/main:16:b03485176ae76da1e0714fa824cb55ad09ae0218 8e7af9cc18d6f1a52f0820db9db70ffd30057de2 alijawdat-cyber <alijawdat4@gmail.com> 1754783139 +0300	update by push
+.git/logs/refs/remotes/origin/main:17:8e7af9cc18d6f1a52f0820db9db70ffd30057de2 099652f9db398af652e89ad11aa065dda32806f6 alijawdat-cyber <alijawdat4@gmail.com> 1754786180 +0300	update by push
+.git/logs/refs/remotes/origin/main:18:099652f9db398af652e89ad11aa065dda32806f6 c71be751a5cc7929834555903a9eabd8c46e9ca7 alijawdat-cyber <alijawdat4@gmail.com> 1754789082 +0300	update by push
+.git/logs/refs/remotes/origin/main:19:c71be751a5cc7929834555903a9eabd8c46e9ca7 fc395d01b42d5c0c85e8bf26f3bf02f27e347eba alijawdat-cyber <alijawdat4@gmail.com> 1754789161 +0300	update by push
+.git/logs/refs/remotes/origin/main:20:fc395d01b42d5c0c85e8bf26f3bf02f27e347eba 5105f367033d06dbd734edc918e800c51827814d alijawdat-cyber <alijawdat4@gmail.com> 1754789406 +0300	update by push
+.git/logs/refs/remotes/origin/main:21:5105f367033d06dbd734edc918e800c51827814d 6013852485b3d436fe622c805694c6e3b0ada950 alijawdat-cyber <alijawdat4@gmail.com> 1754789489 +0300	update by push
+.git/logs/refs/remotes/origin/main:22:6013852485b3d436fe622c805694c6e3b0ada950 27858d0113cb1edaff8d94a0ed63a195408ef387 alijawdat-cyber <alijawdat4@gmail.com> 1754789848 +0300	update by push
+.git/logs/refs/remotes/origin/main:23:27858d0113cb1edaff8d94a0ed63a195408ef387 6d08c1ce1961225d5280730595ef9fee6356ed6e alijawdat-cyber <alijawdat4@gmail.com> 1754790530 +0300	update by push
+.git/logs/refs/remotes/origin/main:24:6d08c1ce1961225d5280730595ef9fee6356ed6e 3a66f561bb80b676472753128225fd9c77973e1b alijawdat-cyber <alijawdat4@gmail.com> 1754790630 +0300	update by push
+.git/logs/refs/remotes/origin/main:25:3a66f561bb80b676472753128225fd9c77973e1b 01de54d5fdb5c1a05766ac9689a86ae359e03ad5 alijawdat-cyber <alijawdat4@gmail.com> 1754791232 +0300	update by push
+.git/logs/refs/remotes/origin/main:26:01de54d5fdb5c1a05766ac9689a86ae359e03ad5 8f30b7d57eadf347bb318c6d2ed818dede1502fc alijawdat-cyber <alijawdat4@gmail.com> 1754822519 +0300	fetch: fast-forward
+.git/logs/refs/remotes/origin/main:27:8f30b7d57eadf347bb318c6d2ed818dede1502fc 825f0235ef5264e7940fd8ad3043953777609638 alijawdat-cyber <alijawdat4@gmail.com> 1754827822 +0300	update by push
+.git/logs/refs/remotes/origin/main:28:825f0235ef5264e7940fd8ad3043953777609638 52d22f618cdb8b311f3cad3f70414d316f1a69c9 alijawdat-cyber <alijawdat4@gmail.com> 1754828190 +0300	update by push
+.git/logs/refs/remotes/origin/main:29:52d22f618cdb8b311f3cad3f70414d316f1a69c9 6f28f6b093a8ed8b1dbee232463ff67d5d065897 alijawdat-cyber <alijawdat4@gmail.com> 1754828957 +0300	update by push
+.git/logs/refs/remotes/origin/main:30:6f28f6b093a8ed8b1dbee232463ff67d5d065897 f89434c27e1a16ba9b037b080fbdb158f16dacd5 alijawdat-cyber <alijawdat4@gmail.com> 1754829269 +0300	update by push
+.git/logs/refs/remotes/origin/main:31:f89434c27e1a16ba9b037b080fbdb158f16dacd5 47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 alijawdat-cyber <alijawdat4@gmail.com> 1754830231 +0300	update by push
+.git/logs/refs/remotes/origin/main:32:47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 1823d572590ee3b737d154ab0f476fb0ee3fb605 alijawdat-cyber <alijawdat4@gmail.com> 1754830944 +0300	update by push
+.git/logs/refs/remotes/origin/main:33:1823d572590ee3b737d154ab0f476fb0ee3fb605 e7ec8603e10af102bac39c019f6d6dda60dd6735 alijawdat-cyber <alijawdat4@gmail.com> 1754835188 +0300	update by push
+.git/logs/refs/remotes/origin/main:34:e7ec8603e10af102bac39c019f6d6dda60dd6735 748c2490df60002ff8aad35a125967d7e4d2dc22 alijawdat-cyber <alijawdat4@gmail.com> 1754835403 +0300	update by push
+.git/logs/refs/remotes/origin/main:35:748c2490df60002ff8aad35a125967d7e4d2dc22 4e64cce1ce87e586cb5556812e42af6d2112a76d alijawdat-cyber <alijawdat4@gmail.com> 1754837626 +0300	update by push
+.git/logs/refs/remotes/origin/main:36:4e64cce1ce87e586cb5556812e42af6d2112a76d 3718abd00b72930fbce2a8ab4174e690073449da alijawdat-cyber <alijawdat4@gmail.com> 1754838521 +0300	update by push
+.git/logs/refs/remotes/origin/main:37:3718abd00b72930fbce2a8ab4174e690073449da 0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 alijawdat-cyber <alijawdat4@gmail.com> 1754841779 +0300	update by push
+.git/logs/refs/remotes/origin/main:38:0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 f36c1c9cef651ee3eeb08c71878efa8ac4685cb9 alijawdat-cyber <alijawdat4@gmail.com> 1754842137 +0300	update by push
+--
+.git/logs/refs/remotes/origin/cursor/investigate-carousel-display-issue-on-mobile-50e9:1:0000000000000000000000000000000000000000 8f30b7d57eadf347bb318c6d2ed818dede1502fc alijawdat-cyber <alijawdat4@gmail.com> 1754822519 +0300	fetch: storing head
+--
+.git/logs/refs/heads/main:1:0000000000000000000000000000000000000000 a34cc6e891de83958c8052c1fb82e1dcc6bce41f alijawdat-cyber <alijawdat4@gmail.com> 1754670385 +0300	commit (initial): chore: finalize brand identity colors (Purple/Indigo 2025) and feasibility ops docs
+.git/logs/refs/heads/main:2:a34cc6e891de83958c8052c1fb82e1dcc6bce41f a34cc6e891de83958c8052c1fb82e1dcc6bce41f alijawdat-cyber <alijawdat4@gmail.com> 1754670385 +0300	Branch: renamed refs/heads/main to refs/heads/main
+.git/logs/refs/heads/main:3:a34cc6e891de83958c8052c1fb82e1dcc6bce41f 4a590b5d423b9585d27c6038e1e1883e1a89eb23 alijawdat-cyber <alijawdat4@gmail.com> 1754670647 +0300	commit: refactor(brand): finalize single logo spec; remove alternative routes & moodboards; align docs to Purple/Indigo 2025 tokens
+.git/logs/refs/heads/main:4:4a590b5d423b9585d27c6038e1e1883e1a89eb23 f67a9317554951edef438d4e66a1672c342b6a87 alijawdat-cyber <alijawdat4@gmail.com> 1754671700 +0300	commit: Docs: P0 complete — unify CTA tokens and Light/Dark aliases; Ad mgmt 12%+min across docs; Break-even ≈ .8k at 50% margin; align Rate Card in CSV & GTM. P1 kickoff — add One-Pagers (md), placeholder SVG lockups, Excel formulas guide, presets requirements.
+.git/logs/refs/heads/main:5:f67a9317554951edef438d4e66a1672c342b6a87 49f466a0a4acd89bfaf166801888f176732fc395 alijawdat-cyber <alijawdat4@gmail.com> 1754672175 +0300	commit: chore: accept finalized brand docs updates
+.git/logs/refs/heads/main:6:49f466a0a4acd89bfaf166801888f176732fc395 bcf2531c14f87717afa93af6c75e0ee76af52021 alijawdat-cyber <alijawdat4@gmail.com> 1754677005 +0300	commit: chore: push latest docs
+.git/logs/refs/heads/main:7:bcf2531c14f87717afa93af6c75e0ee76af52021 cceecbe34180e5743b2c4a485cb1c975975cb45d alijawdat-cyber <alijawdat4@gmail.com> 1754750051 +0300	commit: feat: add Next.js site and set site URL to depth-agency.com (SEO, sitemap, robots)
+.git/logs/refs/heads/main:8:cceecbe34180e5743b2c4a485cb1c975975cb45d 02e48739444933c15b34ef8b9baf0a51a16f6566 alijawdat-cyber <alijawdat4@gmail.com> 1754751941 +0300	commit: fix(og): make /opengraph-image dynamic + load Dubai font to avoid Satori Arabic shaping error on prerender
+.git/logs/refs/heads/main:9:02e48739444933c15b34ef8b9baf0a51a16f6566 2c0513d20e360b697aa19e6b6bfc7b58a937aa09 alijawdat-cyber <alijawdat4@gmail.com> 1754752355 +0300	commit: fix(og): correct font path for Dubai-Regular.woff2 in edge runtime
+.git/logs/refs/heads/main:10:2c0513d20e360b697aa19e6b6bfc7b58a937aa09 ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 alijawdat-cyber <alijawdat4@gmail.com> 1754752757 +0300	commit: fix: mark not-found as dynamic to prevent prerender useContext error
+.git/logs/refs/heads/main:11:ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 4855c13164ce35a676dcc2e96784c0ba3d076cd2 alijawdat-cyber <alijawdat4@gmail.com> 1754753688 +0300	commit: fix(build): prevent prerender useContext errors by marking layout and affected pages dynamic
+.git/logs/refs/heads/main:12:4855c13164ce35a676dcc2e96784c0ba3d076cd2 df55986db598403b3782f2ac1f1be78f34f86123 alijawdat-cyber <alijawdat4@gmail.com> 1754757669 +0300	commit: docs(dns): update domain setup for Vercel (A @=76.76.21.21, CNAME www=cname.vercel-dns.com) + deploy flow
+.git/logs/refs/heads/main:13:df55986db598403b3782f2ac1f1be78f34f86123 716c0bdedbba0406977fc7dffcec32e2dd03e616 alijawdat-cyber <alijawdat4@gmail.com> 1754757996 +0300	commit: chore: trigger redeploy on Vercel
+.git/logs/refs/heads/main:14:716c0bdedbba0406977fc7dffcec32e2dd03e616 c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 alijawdat-cyber <alijawdat4@gmail.com> 1754774329 +0300	commit: fix(build): make seamWidth const in Marquee; remove app/icon.svg page route; verify public/clients svgs; successful local build
+.git/logs/refs/heads/main:15:c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 alijawdat-cyber <alijawdat4@gmail.com> 1754775093 +0300	commit: chore: trigger deploy
+.git/logs/refs/heads/main:16:1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 b03485176ae76da1e0714fa824cb55ad09ae0218 alijawdat-cyber <alijawdat4@gmail.com> 1754778416 +0300	commit: build(depth-site): fix lint error in Marquee, clean .next and successful production build
+.git/logs/refs/heads/main:17:b03485176ae76da1e0714fa824cb55ad09ae0218 8e7af9cc18d6f1a52f0820db9db70ffd30057de2 alijawdat-cyber <alijawdat4@gmail.com> 1754783137 +0300	commit: ci: add GitHub Actions workflow for Vercel deploy (depth-site)
+.git/logs/refs/heads/main:18:8e7af9cc18d6f1a52f0820db9db70ffd30057de2 099652f9db398af652e89ad11aa065dda32806f6 alijawdat-cyber <alijawdat4@gmail.com> 1754786179 +0300	commit: ci(pages): add GitHub Pages workflow and conditional static export config
+.git/logs/refs/heads/main:19:099652f9db398af652e89ad11aa065dda32806f6 c71be751a5cc7929834555903a9eabd8c46e9ca7 alijawdat-cyber <alijawdat4@gmail.com> 1754789080 +0300	commit: build: make static-export safe, remove OG/blog dynamic routes for now; adjust home/services to static; successful SSR build
+.git/logs/refs/heads/main:20:c71be751a5cc7929834555903a9eabd8c46e9ca7 fc395d01b42d5c0c85e8bf26f3bf02f27e347eba alijawdat-cyber <alijawdat4@gmail.com> 1754789160 +0300	commit: ci: disable auto GitHub Pages; use manual only to avoid static export conflicts
+.git/logs/refs/heads/main:21:fc395d01b42d5c0c85e8bf26f3bf02f27e347eba 5105f367033d06dbd734edc918e800c51827814d alijawdat-cyber <alijawdat4@gmail.com> 1754789401 +0300	commit: تحسين صفحة الفريق: تبسيط التصميم وإضافة أفاتار احترافية
+.git/logs/refs/heads/main:22:5105f367033d06dbd734edc918e800c51827814d 6013852485b3d436fe622c805694c6e3b0ada950 alijawdat-cyber <alijawdat4@gmail.com> 1754789488 +0300	commit: إعادة تشغيل النشر التلقائي
+.git/logs/refs/heads/main:23:6013852485b3d436fe622c805694c6e3b0ada950 27858d0113cb1edaff8d94a0ed63a195408ef387 alijawdat-cyber <alijawdat4@gmail.com> 1754789842 +0300	commit: إضافة زر رجوع بسيط لجميع الصفحات
+.git/logs/refs/heads/main:24:27858d0113cb1edaff8d94a0ed63a195408ef387 6d08c1ce1961225d5280730595ef9fee6356ed6e alijawdat-cyber <alijawdat4@gmail.com> 1754790524 +0300	commit: تحسين الأداء للموبايل وSafari 🚀
+.git/logs/refs/heads/main:25:6d08c1ce1961225d5280730595ef9fee6356ed6e 3a66f561bb80b676472753128225fd9c77973e1b alijawdat-cyber <alijawdat4@gmail.com> 1754790629 +0300	commit: إصلاح quotes في TrustSection لضمان البناء الناجح
+.git/logs/refs/heads/main:26:3a66f561bb80b676472753128225fd9c77973e1b 01de54d5fdb5c1a05766ac9689a86ae359e03ad5 alijawdat-cyber <alijawdat4@gmail.com> 1754791226 +0300	commit: 🔧 إصلاح التجاوب للموبايل والشاشات الصغيرة
+.git/logs/refs/heads/main:27:01de54d5fdb5c1a05766ac9689a86ae359e03ad5 f0db4c84f4148137ce5cf6357015677d174174cc alijawdat-cyber <alijawdat4@gmail.com> 1754827766 +0300	commit: ui: fix light/dark theme card colors in TrustSection, improve brand logo responsive sizing and dark mode handling
+.git/logs/refs/heads/main:28:f0db4c84f4148137ce5cf6357015677d174174cc cd85818df9e7f19d3d4ffceb2c6e5e521df26444 alijawdat-cyber <alijawdat4@gmail.com> 1754827785 +0300	commit: add: marquee component updates
+.git/logs/refs/heads/main:29:cd85818df9e7f19d3d4ffceb2c6e5e521df26444 825f0235ef5264e7940fd8ad3043953777609638 alijawdat-cyber <alijawdat4@gmail.com> 1754827820 +0300	commit (merge): resolve: accept remote Marquee changes
+.git/logs/refs/heads/main:30:825f0235ef5264e7940fd8ad3043953777609638 52d22f618cdb8b311f3cad3f70414d316f1a69c9 alijawdat-cyber <alijawdat4@gmail.com> 1754828189 +0300	commit: config: add vercel deployment note for custom domain
+.git/logs/refs/heads/main:31:52d22f618cdb8b311f3cad3f70414d316f1a69c9 6f28f6b093a8ed8b1dbee232463ff67d5d065897 alijawdat-cyber <alijawdat4@gmail.com> 1754828956 +0300	commit: redeploy: trigger fresh deployment for 2025-08-10 15:29
+.git/logs/refs/heads/main:32:6f28f6b093a8ed8b1dbee232463ff67d5d065897 f89434c27e1a16ba9b037b080fbdb158f16dacd5 alijawdat-cyber <alijawdat4@gmail.com> 1754829268 +0300	commit: build: fresh deployment 15:34:28
+.git/logs/refs/heads/main:33:f89434c27e1a16ba9b037b080fbdb158f16dacd5 47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 alijawdat-cyber <alijawdat4@gmail.com> 1754830230 +0300	commit: fix: update MarqueeSimple component and resolve build issues
+.git/logs/refs/heads/main:34:47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 1823d572590ee3b737d154ab0f476fb0ee3fb605 alijawdat-cyber <alijawdat4@gmail.com> 1754830942 +0300	commit: build: fix TypeScript error in MarqueeSimple, ready for production deployment 2025-08-10 16:02:22
+.git/logs/refs/heads/main:35:1823d572590ee3b737d154ab0f476fb0ee3fb605 7b1c42a2465c9f9a767bc7b568d83ff0e66ce87b alijawdat-cyber <alijawdat4@gmail.com> 1754832900 +0300	commit: ✅ Fix marquee continuous loop issue
+.git/logs/refs/heads/main:36:7b1c42a2465c9f9a767bc7b568d83ff0e66ce87b b8194aa65ccf8cac12923adff879e9b9ef5f4d6a alijawdat-cyber <alijawdat4@gmail.com> 1754833087 +0300	commit: 🔧 CRITICAL FIX: Resolve marquee gap and seamless loop issues
+.git/logs/refs/heads/main:37:b8194aa65ccf8cac12923adff879e9b9ef5f4d6a 4358a99ddac55e28d892ab4bd316da077bee7c89 alijawdat-cyber <alijawdat4@gmail.com> 1754833255 +0300	commit: ✨ SIMPLIFY: Clean marquee implementation with Tailwind margins
+.git/logs/refs/heads/main:38:4358a99ddac55e28d892ab4bd316da077bee7c89 e7ec8603e10af102bac39c019f6d6dda60dd6735 alijawdat-cyber <alijawdat4@gmail.com> 1754835187 +0300	commit: chore: trigger vercel deploy workflow
+.git/logs/refs/heads/main:39:e7ec8603e10af102bac39c019f6d6dda60dd6735 748c2490df60002ff8aad35a125967d7e4d2dc22 alijawdat-cyber <alijawdat4@gmail.com> 1754835401 +0300	commit: ci(vercel): read secrets via job env and omit inline token flags
+.git/logs/refs/heads/main:40:748c2490df60002ff8aad35a125967d7e4d2dc22 4e64cce1ce87e586cb5556812e42af6d2112a76d alijawdat-cyber <alijawdat4@gmail.com> 1754837625 +0300	commit: content(team): rename Hasan to Hasan Hashim; switch all member names to English; ensure roles in English
+.git/logs/refs/heads/main:41:4e64cce1ce87e586cb5556812e42af6d2112a76d 3718abd00b72930fbce2a8ab4174e690073449da alijawdat-cyber <alijawdat4@gmail.com> 1754838520 +0300	commit: content(team): rename Hasan to Hasan Majid
+.git/logs/refs/heads/main:42:3718abd00b72930fbce2a8ab4174e690073449da 0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 alijawdat-cyber <alijawdat4@gmail.com> 1754841778 +0300	commit: chore: deploy depth-site to production via CI and Vercel CLI
+.git/logs/refs/heads/main:43:0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 f36c1c9cef651ee3eeb08c71878efa8ac4685cb9 alijawdat-cyber <alijawdat4@gmail.com> 1754842136 +0300	commit: feat(contact): تنبيه احترافي عبر sonner + قالب بريد RTL + تصحيح ايميل الفوتر
+--
+.git/logs/HEAD:1:0000000000000000000000000000000000000000 a34cc6e891de83958c8052c1fb82e1dcc6bce41f alijawdat-cyber <alijawdat4@gmail.com> 1754670385 +0300	commit (initial): chore: finalize brand identity colors (Purple/Indigo 2025) and feasibility ops docs
+.git/logs/HEAD:2:a34cc6e891de83958c8052c1fb82e1dcc6bce41f 0000000000000000000000000000000000000000 alijawdat-cyber <alijawdat4@gmail.com> 1754670385 +0300	Branch: renamed refs/heads/main to refs/heads/main
+.git/logs/HEAD:3:a34cc6e891de83958c8052c1fb82e1dcc6bce41f a34cc6e891de83958c8052c1fb82e1dcc6bce41f alijawdat-cyber <alijawdat4@gmail.com> 1754670385 +0300	Branch: renamed refs/heads/main to refs/heads/main
+.git/logs/HEAD:4:a34cc6e891de83958c8052c1fb82e1dcc6bce41f 4a590b5d423b9585d27c6038e1e1883e1a89eb23 alijawdat-cyber <alijawdat4@gmail.com> 1754670647 +0300	commit: refactor(brand): finalize single logo spec; remove alternative routes & moodboards; align docs to Purple/Indigo 2025 tokens
+.git/logs/HEAD:5:4a590b5d423b9585d27c6038e1e1883e1a89eb23 f67a9317554951edef438d4e66a1672c342b6a87 alijawdat-cyber <alijawdat4@gmail.com> 1754671700 +0300	commit: Docs: P0 complete — unify CTA tokens and Light/Dark aliases; Ad mgmt 12%+min across docs; Break-even ≈ .8k at 50% margin; align Rate Card in CSV & GTM. P1 kickoff — add One-Pagers (md), placeholder SVG lockups, Excel formulas guide, presets requirements.
+.git/logs/HEAD:6:f67a9317554951edef438d4e66a1672c342b6a87 49f466a0a4acd89bfaf166801888f176732fc395 alijawdat-cyber <alijawdat4@gmail.com> 1754672175 +0300	commit: chore: accept finalized brand docs updates
+.git/logs/HEAD:7:49f466a0a4acd89bfaf166801888f176732fc395 bcf2531c14f87717afa93af6c75e0ee76af52021 alijawdat-cyber <alijawdat4@gmail.com> 1754677005 +0300	commit: chore: push latest docs
+.git/logs/HEAD:8:bcf2531c14f87717afa93af6c75e0ee76af52021 cceecbe34180e5743b2c4a485cb1c975975cb45d alijawdat-cyber <alijawdat4@gmail.com> 1754750051 +0300	commit: feat: add Next.js site and set site URL to depth-agency.com (SEO, sitemap, robots)
+.git/logs/HEAD:9:cceecbe34180e5743b2c4a485cb1c975975cb45d 02e48739444933c15b34ef8b9baf0a51a16f6566 alijawdat-cyber <alijawdat4@gmail.com> 1754751941 +0300	commit: fix(og): make /opengraph-image dynamic + load Dubai font to avoid Satori Arabic shaping error on prerender
+.git/logs/HEAD:10:02e48739444933c15b34ef8b9baf0a51a16f6566 2c0513d20e360b697aa19e6b6bfc7b58a937aa09 alijawdat-cyber <alijawdat4@gmail.com> 1754752355 +0300	commit: fix(og): correct font path for Dubai-Regular.woff2 in edge runtime
+.git/logs/HEAD:11:2c0513d20e360b697aa19e6b6bfc7b58a937aa09 ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 alijawdat-cyber <alijawdat4@gmail.com> 1754752757 +0300	commit: fix: mark not-found as dynamic to prevent prerender useContext error
+.git/logs/HEAD:12:ea779b7b61d6b95d8d2d900e5aa8cba3f68f9973 4855c13164ce35a676dcc2e96784c0ba3d076cd2 alijawdat-cyber <alijawdat4@gmail.com> 1754753688 +0300	commit: fix(build): prevent prerender useContext errors by marking layout and affected pages dynamic
+.git/logs/HEAD:13:4855c13164ce35a676dcc2e96784c0ba3d076cd2 df55986db598403b3782f2ac1f1be78f34f86123 alijawdat-cyber <alijawdat4@gmail.com> 1754757669 +0300	commit: docs(dns): update domain setup for Vercel (A @=76.76.21.21, CNAME www=cname.vercel-dns.com) + deploy flow
+.git/logs/HEAD:14:df55986db598403b3782f2ac1f1be78f34f86123 716c0bdedbba0406977fc7dffcec32e2dd03e616 alijawdat-cyber <alijawdat4@gmail.com> 1754757996 +0300	commit: chore: trigger redeploy on Vercel
+.git/logs/HEAD:15:716c0bdedbba0406977fc7dffcec32e2dd03e616 c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 alijawdat-cyber <alijawdat4@gmail.com> 1754774329 +0300	commit: fix(build): make seamWidth const in Marquee; remove app/icon.svg page route; verify public/clients svgs; successful local build
+.git/logs/HEAD:16:c7efc61bb5dbbff5ffccd25c89819ef92a1410f4 1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 alijawdat-cyber <alijawdat4@gmail.com> 1754775093 +0300	commit: chore: trigger deploy
+.git/logs/HEAD:17:1ea03f6b2c8a11e95ffedfa769c1984f6b9ceb32 b03485176ae76da1e0714fa824cb55ad09ae0218 alijawdat-cyber <alijawdat4@gmail.com> 1754778416 +0300	commit: build(depth-site): fix lint error in Marquee, clean .next and successful production build
+.git/logs/HEAD:18:b03485176ae76da1e0714fa824cb55ad09ae0218 8e7af9cc18d6f1a52f0820db9db70ffd30057de2 alijawdat-cyber <alijawdat4@gmail.com> 1754783137 +0300	commit: ci: add GitHub Actions workflow for Vercel deploy (depth-site)
+.git/logs/HEAD:19:8e7af9cc18d6f1a52f0820db9db70ffd30057de2 099652f9db398af652e89ad11aa065dda32806f6 alijawdat-cyber <alijawdat4@gmail.com> 1754786179 +0300	commit: ci(pages): add GitHub Pages workflow and conditional static export config
+.git/logs/HEAD:20:099652f9db398af652e89ad11aa065dda32806f6 c71be751a5cc7929834555903a9eabd8c46e9ca7 alijawdat-cyber <alijawdat4@gmail.com> 1754789080 +0300	commit: build: make static-export safe, remove OG/blog dynamic routes for now; adjust home/services to static; successful SSR build
+.git/logs/HEAD:21:c71be751a5cc7929834555903a9eabd8c46e9ca7 fc395d01b42d5c0c85e8bf26f3bf02f27e347eba alijawdat-cyber <alijawdat4@gmail.com> 1754789160 +0300	commit: ci: disable auto GitHub Pages; use manual only to avoid static export conflicts
+.git/logs/HEAD:22:fc395d01b42d5c0c85e8bf26f3bf02f27e347eba 5105f367033d06dbd734edc918e800c51827814d alijawdat-cyber <alijawdat4@gmail.com> 1754789401 +0300	commit: تحسين صفحة الفريق: تبسيط التصميم وإضافة أفاتار احترافية
+.git/logs/HEAD:23:5105f367033d06dbd734edc918e800c51827814d 6013852485b3d436fe622c805694c6e3b0ada950 alijawdat-cyber <alijawdat4@gmail.com> 1754789488 +0300	commit: إعادة تشغيل النشر التلقائي
+.git/logs/HEAD:24:6013852485b3d436fe622c805694c6e3b0ada950 27858d0113cb1edaff8d94a0ed63a195408ef387 alijawdat-cyber <alijawdat4@gmail.com> 1754789842 +0300	commit: إضافة زر رجوع بسيط لجميع الصفحات
+.git/logs/HEAD:25:27858d0113cb1edaff8d94a0ed63a195408ef387 6d08c1ce1961225d5280730595ef9fee6356ed6e alijawdat-cyber <alijawdat4@gmail.com> 1754790524 +0300	commit: تحسين الأداء للموبايل وSafari 🚀
+.git/logs/HEAD:26:6d08c1ce1961225d5280730595ef9fee6356ed6e 3a66f561bb80b676472753128225fd9c77973e1b alijawdat-cyber <alijawdat4@gmail.com> 1754790629 +0300	commit: إصلاح quotes في TrustSection لضمان البناء الناجح
+.git/logs/HEAD:27:3a66f561bb80b676472753128225fd9c77973e1b 01de54d5fdb5c1a05766ac9689a86ae359e03ad5 alijawdat-cyber <alijawdat4@gmail.com> 1754791226 +0300	commit: 🔧 إصلاح التجاوب للموبايل والشاشات الصغيرة
+.git/logs/HEAD:28:01de54d5fdb5c1a05766ac9689a86ae359e03ad5 f0db4c84f4148137ce5cf6357015677d174174cc alijawdat-cyber <alijawdat4@gmail.com> 1754827766 +0300	commit: ui: fix light/dark theme card colors in TrustSection, improve brand logo responsive sizing and dark mode handling
+.git/logs/HEAD:29:f0db4c84f4148137ce5cf6357015677d174174cc cd85818df9e7f19d3d4ffceb2c6e5e521df26444 alijawdat-cyber <alijawdat4@gmail.com> 1754827785 +0300	commit: add: marquee component updates
+.git/logs/HEAD:30:cd85818df9e7f19d3d4ffceb2c6e5e521df26444 825f0235ef5264e7940fd8ad3043953777609638 alijawdat-cyber <alijawdat4@gmail.com> 1754827820 +0300	commit (merge): resolve: accept remote Marquee changes
+.git/logs/HEAD:31:825f0235ef5264e7940fd8ad3043953777609638 52d22f618cdb8b311f3cad3f70414d316f1a69c9 alijawdat-cyber <alijawdat4@gmail.com> 1754828189 +0300	commit: config: add vercel deployment note for custom domain
+.git/logs/HEAD:32:52d22f618cdb8b311f3cad3f70414d316f1a69c9 6f28f6b093a8ed8b1dbee232463ff67d5d065897 alijawdat-cyber <alijawdat4@gmail.com> 1754828956 +0300	commit: redeploy: trigger fresh deployment for 2025-08-10 15:29
+.git/logs/HEAD:33:6f28f6b093a8ed8b1dbee232463ff67d5d065897 f89434c27e1a16ba9b037b080fbdb158f16dacd5 alijawdat-cyber <alijawdat4@gmail.com> 1754829268 +0300	commit: build: fresh deployment 15:34:28
+.git/logs/HEAD:34:f89434c27e1a16ba9b037b080fbdb158f16dacd5 47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 alijawdat-cyber <alijawdat4@gmail.com> 1754830230 +0300	commit: fix: update MarqueeSimple component and resolve build issues
+.git/logs/HEAD:35:47a3ebddcb0b70c4625c0a87d2b0905ea026e7c5 1823d572590ee3b737d154ab0f476fb0ee3fb605 alijawdat-cyber <alijawdat4@gmail.com> 1754830942 +0300	commit: build: fix TypeScript error in MarqueeSimple, ready for production deployment 2025-08-10 16:02:22
+.git/logs/HEAD:36:1823d572590ee3b737d154ab0f476fb0ee3fb605 7b1c42a2465c9f9a767bc7b568d83ff0e66ce87b alijawdat-cyber <alijawdat4@gmail.com> 1754832900 +0300	commit: ✅ Fix marquee continuous loop issue
+.git/logs/HEAD:37:7b1c42a2465c9f9a767bc7b568d83ff0e66ce87b b8194aa65ccf8cac12923adff879e9b9ef5f4d6a alijawdat-cyber <alijawdat4@gmail.com> 1754833087 +0300	commit: 🔧 CRITICAL FIX: Resolve marquee gap and seamless loop issues
+.git/logs/HEAD:38:b8194aa65ccf8cac12923adff879e9b9ef5f4d6a 4358a99ddac55e28d892ab4bd316da077bee7c89 alijawdat-cyber <alijawdat4@gmail.com> 1754833255 +0300	commit: ✨ SIMPLIFY: Clean marquee implementation with Tailwind margins
+.git/logs/HEAD:39:4358a99ddac55e28d892ab4bd316da077bee7c89 e7ec8603e10af102bac39c019f6d6dda60dd6735 alijawdat-cyber <alijawdat4@gmail.com> 1754835187 +0300	commit: chore: trigger vercel deploy workflow
+.git/logs/HEAD:40:e7ec8603e10af102bac39c019f6d6dda60dd6735 748c2490df60002ff8aad35a125967d7e4d2dc22 alijawdat-cyber <alijawdat4@gmail.com> 1754835401 +0300	commit: ci(vercel): read secrets via job env and omit inline token flags
+.git/logs/HEAD:41:748c2490df60002ff8aad35a125967d7e4d2dc22 4e64cce1ce87e586cb5556812e42af6d2112a76d alijawdat-cyber <alijawdat4@gmail.com> 1754837625 +0300	commit: content(team): rename Hasan to Hasan Hashim; switch all member names to English; ensure roles in English
+.git/logs/HEAD:42:4e64cce1ce87e586cb5556812e42af6d2112a76d 3718abd00b72930fbce2a8ab4174e690073449da alijawdat-cyber <alijawdat4@gmail.com> 1754838520 +0300	commit: content(team): rename Hasan to Hasan Majid
+.git/logs/HEAD:43:3718abd00b72930fbce2a8ab4174e690073449da 0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 alijawdat-cyber <alijawdat4@gmail.com> 1754841778 +0300	commit: chore: deploy depth-site to production via CI and Vercel CLI
+.git/logs/HEAD:44:0c4547c27a5affd4f54c5111ac8f95b2a0cb7c55 f36c1c9cef651ee3eeb08c71878efa8ac4685cb9 alijawdat-cyber <alijawdat4@gmail.com> 1754842136 +0300	commit: feat(contact): تنبيه احترافي عبر sonner + قالب بريد RTL + تصحيح ايميل الفوتر
+--
+.git/config-1-[core]
+.git/config:2:	repositoryformatversion = 0
+.git/config-3-	filemode = true
+.git/config-4-	bare = false
+--
+SYSTEM-AUDIT-REPORT.md-52-|---------|--------|----------|
+SYSTEM-AUDIT-REPORT.md:53:| **MX Records** | ✅ صحيح | `1 smtp.google.com.` |
+SYSTEM-AUDIT-REPORT.md-54-| **SPF** | ✅ صحيح | `v=spf1 include:_spf.google.com ~all` |
+SYSTEM-AUDIT-REPORT.md-55-| **DKIM** | ✅ مفعّل | 2048-bit `google._domainkey` |
+--
+SYSTEM-AUDIT-REPORT.md-165-[الاسم] — [الدور]
+SYSTEM-AUDIT-REPORT.md:166:Depth | استوديو/وكالة Performance + Content
+SYSTEM-AUDIT-REPORT.md-167-depth-agency.com | hello@depth-agency.com
+SYSTEM-AUDIT-REPORT.md-168-```
+--
+depth-site/src/data/team.ts-71-    name: "Hasan Majid",
+depth-site/src/data/team.ts:72:    roleAr: "Scheduler & Meta Platforms Coordinator",
+depth-site/src/data/team.ts:73:    roleEn: "Scheduler & Meta Platforms Coordinator",
+depth-site/src/data/team.ts-74-    quoteAr:
+depth-site/src/data/team.ts-75-      "منسوب نشر ثابت + تتبّع دقيق = نمو متوقع.",
+--
+EMAIL-DOMAIN-SETUP.md-32-
+EMAIL-DOMAIN-SETUP.md:33:- DMARC (Domain-based Message Authentication, Reporting and Conformance — مصادقة وتقارير):
+EMAIL-DOMAIN-SETUP.md-34-  - اسم: `_dmarc`
+EMAIL-DOMAIN-SETUP.md-35-  - نوع: TXT
+--
+EMAIL-DOMAIN-SETUP.md-47-  - السجلات (على ساب‑دومين فقط؛ لا تغيّر إعدادات Google على الجذر):
+EMAIL-DOMAIN-SETUP.md:48:    - Host: `send` (MX) → `feedback-smtp.us-east-1.amazonses.com` (Priority 10, TTL: Auto/1h)
+EMAIL-DOMAIN-SETUP.md-49-    - Host: `send` (TXT — SPF) → `v=spf1 include:amazonses.com ~all`
+EMAIL-DOMAIN-SETUP.md:50:    - Host: `resend._domainkey` (TXT — DKIM) → قيمة طويلة تبدأ بـ `p=...` (مولّدة من Resend)
+EMAIL-DOMAIN-SETUP.md-51-  - الحالة: Verified على Resend.
+EMAIL-DOMAIN-SETUP.md-52-
+--
+EMAIL-DOMAIN-SETUP.md-82-  - Domains → `depth-agency.com` = Status: Verified (MX/TXT/DKIM ✅)
+EMAIL-DOMAIN-SETUP.md:83:  - Logs: ظهور رسائل الاختبار المرسلة من `/api/contact`
+EMAIL-DOMAIN-SETUP.md-84-
+EMAIL-DOMAIN-SETUP.md-85-#### نتائج فحص مباشرة (مرجعية)
+EMAIL-DOMAIN-SETUP.md-86-```
+EMAIL-DOMAIN-SETUP.md:87:MX: 1 smtp.google.com.
+EMAIL-DOMAIN-SETUP.md-88-SPF: v=spf1 include:_spf.google.com ~all
+EMAIL-DOMAIN-SETUP.md-89-DKIM: google._domainkey (2048‑bit) موجود
+--
+EMAIL-DOMAIN-SETUP.md-101-- v2025-08-10 (صباحاً):
+EMAIL-DOMAIN-SETUP.md:102:  - ربط Resend وإكمال التحقق (Verified): إضافة سجلات `send` (MX + TXT SPF) و`resend._domainkey` (TXT DKIM).
+EMAIL-DOMAIN-SETUP.md-103-  - ضبط متغيرات البيئة على Vercel: `RESEND_API_KEY`، `EMAIL_FROM`، `EMAIL_TO`، وتثبيت `NEXT_PUBLIC_SITE_URL` للإنتاج.
+EMAIL-DOMAIN-SETUP.md:104:  - تفعيل إرسال الموقع عبر `/api/contact` (مع تحقق Zod وhoneypot للسبام).
+EMAIL-DOMAIN-SETUP.md-105-  - اختبار إرسال ناجح ومتابعة عبر Resend → Logs.
+EMAIL-DOMAIN-SETUP.md-106-  - المتبقي: إنشاء/تأكيد مجموعة `hello@depth-agency.com` (توجيهها إلى `admin@`)، مراقبة تقارير DMARC أسبوعين ثم رفع السياسة إلى `p=reject` عند النظافة.
+--
+EMAIL-DOMAIN-SETUP.md-113-  - Domain verified (Squarespace)
+EMAIL-DOMAIN-SETUP.md:114:  - MX محدث إلى `smtp.google.com` (حديث) — فعال
+EMAIL-DOMAIN-SETUP.md-115-  - SPF/DKIM/DMARC منشورة ومفعّلة
+EMAIL-DOMAIN-SETUP.md-116-  - توثيق محدث للحالة الفعلية
+--
+EMAIL-DOMAIN-SETUP.md-127-1. Resend → Domains → Add: `depth-agency.com` (Region افتراضي).
+EMAIL-DOMAIN-SETUP.md:128:2. أضف سجلات `send` (MX + TXT SPF) و`resend._domainkey` (TXT DKIM) كما أعلاه في DNS (Squarespace).
+EMAIL-DOMAIN-SETUP.md-129-3. انتظر، ثم Verify حتى تصير `Verified`.
+EMAIL-DOMAIN-SETUP.md-130-4. لا تغيّر سجلات الجذر الخاصة بـ Google.
+--
+EMAIL-DOMAIN-SETUP.md-138-  - `RESEND_API_KEY = re_...` (من Resend)
+EMAIL-DOMAIN-SETUP.md:139:  - `EMAIL_FROM = Depth <hello@depth-agency.com>` (قبل التحقق يمكن استخدام `onboarding@resend.dev` للاختبار)
+EMAIL-DOMAIN-SETUP.md-140-  - `EMAIL_TO = admin@depth-agency.com`
+EMAIL-DOMAIN-SETUP.md-141-- فحوص بعد النشر:
+--
+EMAIL-DOMAIN-SETUP.md-146-#### ملاحظة تقنية — API الموقع
+EMAIL-DOMAIN-SETUP.md:147:- مسار `src/app/api/contact/route.ts` مرتبط بـ Resend ويرسل إلى `EMAIL_TO`، ويتجاهل الطلبات التي تحتوي حقل honeypot (مكافحة سبام).
+EMAIL-DOMAIN-SETUP.md-148-
+EMAIL-DOMAIN-SETUP.md-149-### 9) تحسين وتطوير المراسلات (Roadmap عملي)
+EMAIL-DOMAIN-SETUP.md-150-- إرسال الموقع (Transactional):
+EMAIL-DOMAIN-SETUP.md:151:  - تفعيل قالب HTML رسمي للرسائل (RTL + خط Dubai + توقيع مختصر) — يُضاف لاحقًا داخل `/api/contact` أو عبر Resend Templates.
+EMAIL-DOMAIN-SETUP.md-152-  - إضافة `Reply-To` ديناميكي إلى بريد المرسل (مفعّل حاليًا)، وموضوع واضح: `رسالة جديدة من {name}`.
+EMAIL-DOMAIN-SETUP.md-153-  - التقاط `UTM`/المصدر في الفورم وإظهاره في الرسالة (موجود حقل `source`).
+--
+EMAIL-DOMAIN-SETUP.md-164-- سجلات وأتمتة (اختياري):
+EMAIL-DOMAIN-SETUP.md:165:  - إنشاء Webhook من Resend للأحداث (delivered/bounced/complained) وربطه بمسار جديد مثل `/api/resend/webhook` لتخزين الأحداث (Notion/Airtable/DB).
+EMAIL-DOMAIN-SETUP.md-166-  - تخزين رسائل الفورم في Google Sheet أو Airtable مع Timestamp وUTM.
+EMAIL-DOMAIN-SETUP.md-167-
+--
+depth-site/README.md:1:This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+depth-site/README.md-2-
+depth-site/README.md-3-## Getting Started
+--
+depth-site/README.md-33-
+depth-site/README.md:34:The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+depth-site/README.md-35-
+depth-site/README.md-36-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+--
+Depth‑Core‑Docs/1-Objectives-and-90Day-Plan.md-8-  - 8–10 عقود نشطة بنهاية 90 يوم.
+Depth‑Core‑Docs/1-Objectives-and-90Day-Plan.md:9:- **KPIs (Key Performance Indicators — مؤشرات الأداء)**:
+Depth‑Core‑Docs/1-Objectives-and-90Day-Plan.md-10-  - زمن الاستجابة/التسليم، قبول من أول نسخة، عدد الأصول/مصوّر/شهر، هامش إجمالي/بند، ROAS (Return On Ad Spend — عائد الإنفاق الإعلاني) عند إدارة الإعلانات، احتفاظ ≥ 80%.
+Depth‑Core‑Docs/1-Objectives-and-90Day-Plan.md-11-
+--
+Depth‑Core‑Docs/4-Website-Light-Plan.md-5-- **المحتوى**: قيمة Depth بسرعة/هامش/قياس؛ إثبات اجتماعي مختصر؛ CTA واضحة.
+Depth‑Core‑Docs/4-Website-Light-Plan.md:6:- **النماذج**: Google Forms/Typeform؛ إشعارات بريد + Google Sheet.
+Depth‑Core‑Docs/4-Website-Light-Plan.md-7-- **التحليلات**: Google Analytics 4 + Meta Pixel للتتبّع والتحسين.
+Depth‑Core‑Docs/4-Website-Light-Plan.md-8-- **الأداء**: صور مضغوطة، فيديوهات قصيرة Web‑optimized، CDN خفيف.
+--
+depth-site/src/components/loaders/Loader.tsx-45-        @keyframes dotWave {
+depth-site/src/components/loaders/Loader.tsx:46:          0%, 60%, 100% { transform: translateY(0); opacity: 0.85; }
+depth-site/src/components/loaders/Loader.tsx:47:          30% { transform: translateY(-8px); opacity: 1; }
+depth-site/src/components/loaders/Loader.tsx-48-        }
+depth-site/src/components/loaders/Loader.tsx-49-        @media (prefers-reduced-motion: reduce) {
+--
+Depth‑Core‑Docs/4-Sales-Brief-Mini.md-12-- **قيود/مخاطر**: مواقع/مودلز/موسمية/امتثال ……………………………
+Depth‑Core‑Docs/4-Sales-Brief-Mini.md:13:- **KPIs (Key Performance Indicators — مؤشرات الأداء)**: زمن الاستجابة، قبول من أول نسخة ≥ 70%، عدد الأصول، الهامش، ROAS (Return On Ad Spend — عائد الإنفاق الإعلاني) عند وجود Ads.
+--
+Depth‑Core‑Docs/3-Marketing-and-GTM.md-13-- **قياس الأداء**:
+Depth‑Core‑Docs/3-Marketing-and-GTM.md:14:  - KPIs (Key Performance Indicators — مؤشرات الأداء): زمن استجابة/تسليم، قبول من أول نسخة، عدد الأصول، هامش، ROAS (Return On Ad Spend — عائد الإنفاق الإعلاني) عند Ads.
+--
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-9-1) الرؤية ونموذج العمل
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md:10:	•	وكالة Performance + Content بقدرات إنتاج داخل الاستوديو + شبكة فريلانسر.
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-11-	•	Case Studies حيّة للعلامات الخمس (In Off, Clinica A, Sport & More, Nava, Blue) كنقطة جذب ومصداقية.
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-12-	•	وعد القيمة: سرعة مدروسة + جودة إنتاج + قياس أداء شفاف + عقود واضحة.
+--
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-28-	•	مصور (Photographer) — محمد الشمري — Freelance.
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md:29:	•	منسّق الجدولة ومنصّات ميتا (Scheduler & Meta Platforms Coordinator) — حسن ماجد — موظف/هجين.
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-30-
+Depth‑Core‑Docs/6-Feasibility-and-Operations-FINAL.md-31-تعويضات مثبتة:
+--
+depth-site/src/components/pages/BookClient.tsx-36-        ) : (
+depth-site/src/components/pages/BookClient.tsx:37:          <form
+depth-site/src/components/pages/BookClient.tsx-38-            className="grid gap-3"
+depth-site/src/components/pages/BookClient.tsx-39-            onSubmit={(e) => {
+--
+depth-site/src/components/pages/BookClient.tsx-85-            <button type="submit" className={clsx(buttonStyles({ variant: "primary" }))}>إرسال</button>
+depth-site/src/components/pages/BookClient.tsx:86:          </form>
+depth-site/src/components/pages/BookClient.tsx-87-        )}
+depth-site/src/components/pages/BookClient.tsx-88-      </section>
+--
+audits/RECOMMENDATIONS.md-46-```javascript
+audits/RECOMMENDATIONS.md:47:// في /api/contact/route.ts
+audits/RECOMMENDATIONS.md-48-const getDestinationEmail = (message, source) => {
+audits/RECOMMENDATIONS.md-49-  if (message.includes('عرض') || message.includes('باقة') || message.includes('سعر')) {
+--
+audits/RECOMMENDATIONS.md-141-  try {
+audits/RECOMMENDATIONS.md:142:    await resend.send(data);
+audits/RECOMMENDATIONS.md-143-  } catch (error) {
+audits/RECOMMENDATIONS.md-144-    console.warn('Resend failed, trying backup...');
+audits/RECOMMENDATIONS.md:145:    await sendgrid.send(data);

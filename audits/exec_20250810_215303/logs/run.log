@@ -1,0 +1,262 @@
+=== Phase 0 START: Sun Aug 10 21:53:03 +03 2025 ===
+OUTPUT DIR: audits/exec_20250810_215303
+=== GAM Domain Info ===
+Customer ID: C021jbcj1
+Primary Domain: depth-agency.com
+Primary Domain Verified: True
+Customer Creation Time: 2025-08-08T17:26:34Z
+Default Language: ar
+Address:
+  contactName: ali alrubeay
+  organizationName: Depth Studio
+  addressLine1: alnazimya
+  addressLine2: no2
+  locality: karrada
+  region: بغداد
+  postalCode: 10069
+  countryCode: IQ
+Phone: +9647719956000
+Admin Secondary Email: alijawdat4@gmail.com
+User counts as of 2025-08-08:
+  Total Users: 1
+=== GAM OAuth Info ===
+Client OAuth2 File: /Users/alijawdat/.gam/oauth2.txt
+Client ID: 911199467050-rkpjhs4mem5j2v6522eu49d52ti8t8tt.apps.googleusercontent.com
+Scopes: 47
+  https://www.google.com/m8/feeds
+  https://www.googleapis.com/auth/admin.chrome.printers
+  https://www.googleapis.com/auth/admin.contact.delegation
+  https://www.googleapis.com/auth/admin.datatransfer
+  https://www.googleapis.com/auth/admin.directory.customer
+  https://www.googleapis.com/auth/admin.directory.device.chromebrowsers
+  https://www.googleapis.com/auth/admin.directory.device.chromeos
+  https://www.googleapis.com/auth/admin.directory.device.mobile
+  https://www.googleapis.com/auth/admin.directory.domain
+  https://www.googleapis.com/auth/admin.directory.group
+  https://www.googleapis.com/auth/admin.directory.orgunit
+  https://www.googleapis.com/auth/admin.directory.resource.calendar
+  https://www.googleapis.com/auth/admin.directory.rolemanagement
+  https://www.googleapis.com/auth/admin.directory.user
+  https://www.googleapis.com/auth/admin.directory.user.security
+  https://www.googleapis.com/auth/admin.directory.userschema
+  https://www.googleapis.com/auth/admin.reports.audit.readonly
+  https://www.googleapis.com/auth/admin.reports.usage.readonly
+  https://www.googleapis.com/auth/apps.groups.migration
+  https://www.googleapis.com/auth/apps.groups.settings
+  https://www.googleapis.com/auth/apps.licensing
+  https://www.googleapis.com/auth/calendar
+  https://www.googleapis.com/auth/chrome.management.appdetails.readonly
+  https://www.googleapis.com/auth/chrome.management.policy
+  https://www.googleapis.com/auth/chrome.management.profiles
+  https://www.googleapis.com/auth/chrome.management.reports.readonly
+  https://www.googleapis.com/auth/chrome.management.telemetry.readonly
+  https://www.googleapis.com/auth/classroom.announcements
+  https://www.googleapis.com/auth/classroom.courses
+  https://www.googleapis.com/auth/classroom.coursework.students
+  https://www.googleapis.com/auth/classroom.courseworkmaterials
+  https://www.googleapis.com/auth/classroom.guardianlinks.students
+  https://www.googleapis.com/auth/classroom.profile.emails
+  https://www.googleapis.com/auth/classroom.profile.photos
+  https://www.googleapis.com/auth/classroom.rosters
+  https://www.googleapis.com/auth/classroom.topics
+  https://www.googleapis.com/auth/cloud-identity.groups
+  https://www.googleapis.com/auth/cloud-identity.inboundsso
+  https://www.googleapis.com/auth/cloud-identity.orgunits
+  https://www.googleapis.com/auth/cloud-identity.policies
+  https://www.googleapis.com/auth/cloud-identity.userinvitations
+  https://www.googleapis.com/auth/contacts
+  https://www.googleapis.com/auth/directory.readonly
+  https://www.googleapis.com/auth/ediscovery
+  https://www.googleapis.com/auth/userinfo.email
+  https://www.googleapis.com/auth/userinfo.profile
+  openid
+Google Workspace Admin: admin@depth-agency.com
+Expires: 2025-08-10T22:53:10+00:00
+
+=== Taking Users Snapshot ===
+Getting all Users, may take some time on a large Google Workspace Account...
+Got 1 User: admin@depth-agency.com - admin@depth-agency.com
+primaryEmail
+admin@depth-agency.com
+=== Taking Groups Snapshot ===
+Getting all Groups, may take some time on a large Google Workspace Account...
+Got 9 Groups: billing@depth-agency.com - support@depth-agency.com
+email
+billing@depth-agency.com
+hello@depth-agency.com
+invoices@depth-agency.com
+jobs@depth-agency.com
+legal@depth-agency.com
+press@depth-agency.com
+sales@depth-agency.com
+studio@depth-agency.com
+support@depth-agency.com
+=== Taking Group Members Snapshot ===
+Getting all Groups, may take some time on a large Google Workspace Account...
+Got 9 Groups: billing@depth-agency.com - support@depth-agency.com
+Getting all Members, Managers, Owners for billing@depth-agency.com (1/9)
+Got 1 Member, Manager, Owner for billing@depth-agency.com...
+Getting all Members, Managers, Owners for hello@depth-agency.com (2/9)
+Got 1 Member, Manager, Owner for hello@depth-agency.com...
+Getting all Members, Managers, Owners for invoices@depth-agency.com (3/9)
+Got 1 Member, Manager, Owner for invoices@depth-agency.com...
+Getting all Members, Managers, Owners for jobs@depth-agency.com (4/9)
+Got 1 Member, Manager, Owner for jobs@depth-agency.com...
+Getting all Members, Managers, Owners for legal@depth-agency.com (5/9)
+Got 1 Member, Manager, Owner for legal@depth-agency.com...
+Getting all Members, Managers, Owners for press@depth-agency.com (6/9)
+Got 1 Member, Manager, Owner for press@depth-agency.com...
+Getting all Members, Managers, Owners for sales@depth-agency.com (7/9)
+Got 1 Member, Manager, Owner for sales@depth-agency.com...
+Getting all Members, Managers, Owners for studio@depth-agency.com (8/9)
+Got 1 Member, Manager, Owner for studio@depth-agency.com...
+Getting all Members, Managers, Owners for support@depth-agency.com (9/9)
+Got 1 Member, Manager, Owner for support@depth-agency.com...
+group,type,role,id,status,email
+billing@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+hello@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+invoices@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+jobs@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+legal@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+press@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+sales@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+studio@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+support@depth-agency.com,USER,OWNER,101536350418964451601,ACTIVE,admin@depth-agency.com
+=== Taking Individual Group Settings Snapshots ===
+Getting info for hello@depth-agency.com...
+Getting info for sales@depth-agency.com...
+Getting info for support@depth-agency.com...
+Getting info for press@depth-agency.com...
+Getting info for billing@depth-agency.com...
+Getting info for invoices@depth-agency.com...
+Getting info for legal@depth-agency.com...
+Getting info for studio@depth-agency.com...
+Getting info for jobs@depth-agency.com...
+=== Phase 0 Verification ===
+Files created:
+total 96
+drwxr-xr-x@ 14 alijawdat  staff   448 Aug 10 21:54 .
+drwxr-xr-x@  4 alijawdat  staff   128 Aug 10 21:53 ..
+-rw-r--r--@  1 alijawdat  staff  2757 Aug 10 21:54 billing.info.txt
+-rw-r--r--@  1 alijawdat  staff  2161 Aug 10 21:53 group_members.tsv
+-rw-r--r--@  1 alijawdat  staff   366 Aug 10 21:53 groups.tsv
+-rw-r--r--@  1 alijawdat  staff  2718 Aug 10 21:53 hello.info.txt
+-rw-r--r--@  1 alijawdat  staff  2767 Aug 10 21:54 invoices.info.txt
+-rw-r--r--@  1 alijawdat  staff  2746 Aug 10 21:54 jobs.info.txt
+-rw-r--r--@  1 alijawdat  staff  2753 Aug 10 21:54 legal.info.txt
+-rw-r--r--@  1 alijawdat  staff  2762 Aug 10 21:53 press.info.txt
+-rw-r--r--@  1 alijawdat  staff  2751 Aug 10 21:53 sales.info.txt
+-rw-r--r--@  1 alijawdat  staff  2754 Aug 10 21:54 studio.info.txt
+-rw-r--r--@  1 alijawdat  staff  2758 Aug 10 21:53 support.info.txt
+-rw-r--r--@  1 alijawdat  staff   175 Aug 10 21:53 users.tsv
+
+Log file size:
+=== Sample Group Settings (hello@) ===
+    allowExternalMembers: true
+    replyTo: REPLY_TO_SENDER
+    whoCanPostMessage: ANYONE_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+
+=== Phase 0 Complete: Sun Aug 10 21:54:33 +03 2025 ===
+=== Phase 1 PRE-CHECK: Sun Aug 10 21:56:31 +03 2025 ===
+=== hello ===
+    allowExternalMembers: true
+    enableCollaborativeInbox: false
+    replyTo: REPLY_TO_SENDER
+    whoCanPostMessage: ANYONE_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== support ===
+    allowExternalMembers: true
+    enableCollaborativeInbox: false
+    replyTo: REPLY_TO_SENDER
+    whoCanPostMessage: ANYONE_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== Phase 1 EXECUTION: Sun Aug 10 21:56:45 +03 2025 ===
+Enabling Collaborative Inbox for hello@depth-agency.com...
+Trying correct syntax for hello@...
+Group: hello@depth-agency.com, Updated
+Enabling Collaborative Inbox for support@depth-agency.com...
+Group: support@depth-agency.com, Updated
+=== Phase 1 POST-CHECK: Sun Aug 10 21:57:12 +03 2025 ===
+    enableCollaborativeInbox: true
+    enableCollaborativeInbox: true
+Creating after-execution snapshots...
+=== Phase 1 COMPLETE: Sun Aug 10 21:57:34 +03 2025 ===
+=== Phase 2 PRE-CHECK: Sun Aug 10 22:00:34 +03 2025 ===
+=== billing (before) ===
+    allowExternalMembers: false
+    replyTo: REPLY_TO_IGNORE
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== invoices (before) ===
+    allowExternalMembers: false
+    replyTo: REPLY_TO_IGNORE
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== legal (before) ===
+    allowExternalMembers: false
+    replyTo: REPLY_TO_IGNORE
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== studio (before) ===
+    allowExternalMembers: false
+    replyTo: REPLY_TO_IGNORE
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== Phase 2 EXECUTION: Sun Aug 10 22:00:58 +03 2025 ===
+Updating replyTo for billing@depth-agency.com...
+Updating replyTo for billing@depth-agency.com...
+Group: billing@depth-agency.com, Updated
+Updating replyTo for invoices@depth-agency.com...
+Updating replyTo for invoices@depth-agency.com...
+Group: invoices@depth-agency.com, Updated
+Updating replyTo for legal@depth-agency.com...
+Updating replyTo for legal@depth-agency.com...
+Group: legal@depth-agency.com, Updated
+Updating replyTo for studio@depth-agency.com...
+Updating replyTo for studio@depth-agency.com...
+Group: studio@depth-agency.com, Updated
+=== Phase 2 POST-CHECK: Sun Aug 10 22:01:19 +03 2025 ===
+    allowExternalMembers: false
+    replyTo: REPLY_TO_MANAGERS
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+    allowExternalMembers: false
+    replyTo: REPLY_TO_MANAGERS
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+    allowExternalMembers: false
+    replyTo: REPLY_TO_MANAGERS
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+    allowExternalMembers: false
+    replyTo: REPLY_TO_MANAGERS
+    whoCanPostMessage: ALL_MEMBERS_CAN_POST
+      whoCanPostAnnouncements: OWNERS_AND_MANAGERS
+=== Phase 2 COMPLETE: Sun Aug 10 22:01:55 +03 2025 ===
+=== PRODUCTION LAUNCH PREFLIGHT: Sun Aug 10 22:07:23 +03 2025 ===
+=== Checking Phase 1 & 2 Status ===
+Phase 1 - Collaborative Inbox Status:
+    enableCollaborativeInbox: true
+    replyTo: REPLY_TO_SENDER
+    enableCollaborativeInbox: true
+    replyTo: REPLY_TO_SENDER
+Phase 2 - Internal Groups replyTo Status:
+billing@depth-agency.com:
+    replyTo: REPLY_TO_MANAGERS
+invoices@depth-agency.com:
+    replyTo: REPLY_TO_MANAGERS
+legal@depth-agency.com:
+    replyTo: REPLY_TO_MANAGERS
+studio@depth-agency.com:
+    replyTo: REPLY_TO_MANAGERS
+=== Current Code Analysis ===
+BLOCKER DETECTED: Smart routing not implemented yet
+Current /api/contact route:
+- Uses basic routing: EMAIL_TO + hello@depth-agency.com
+- Missing: Dropdown selection + intelligent routing
+- Missing: inquiryType parameter handling
+- RESEND_API_KEY: Required but implementation needs smart routing first
+=== PRODUCTION LAUNCH STATUS: BLOCKED ===
+BLOCKER: SMART_ROUTING_NOT_IMPLEMENTED
+Preflight completed at: Sun Aug 10 22:08:11 +03 2025
