@@ -68,7 +68,7 @@ export const TEAM: TeamMember[] = [
   },
   {
     id: "hasan",
-    name: "Hasan Hashim",
+    name: "Hasan Majid",
     roleAr: "Scheduler & Meta Platforms Coordinator",
     roleEn: "Scheduler & Meta Platforms Coordinator",
     quoteAr:
