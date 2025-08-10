@@ -211,3 +211,13 @@ body {
 .brand-logo:hover {
   transform: scale(1.02);
 }
+
+/* iOS Safari fallback لماركيه: تحريك باستخدام Keyframes عندما يتعطل rAF */
+.marquee-fallback {
+  animation: marqueeSlide var(--marquee-duration, 20s) linear infinite;
+  transform: translate3d(0,0,0);
+}
+@keyframes marqueeSlide {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(calc(-1 * var(--marquee-seam, 600px)), 0, 0); }
+}

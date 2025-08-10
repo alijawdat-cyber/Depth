@@ -21,20 +21,22 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
     const group = groupRef.current;
     if (!container || !track || !group) return;
 
-    // تحسين للموبايل وSafari - تقليل الحركة
+    // تحسين للموبايل وSafari - تقليل الحركة + كشف iOS لتفعيل Fallback CSS
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-    const isSafari = typeof window !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    const isSafari = /Safari/.test(ua) && !/Chrome|Chromium/.test(ua);
+    const isIOS =
+      /iP(hone|od|ad)/.test(ua) ||
+      (/(Macintosh).*Version\/.*Safari/.test(ua) &&
+        typeof window !== "undefined" &&
+        "ontouchend" in window);
     
-    if (
-      typeof window !== "undefined" &&
+    const prefersReduced = typeof window !== "undefined" &&
       window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return;
-    }
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // تقليل السرعة للموبايل وSafari لتحسين الأداء
-    const adjustedSpeed = isMobile || isSafari ? speed * 0.7 : speed;
+    const adjustedSpeed = (isMobile || isSafari) ? speed * 0.7 : speed;
 
     let x = 0;
     let last = 0;
@@ -59,7 +61,7 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
         x += cycles * seam; // التفاف دقيق
       }
 
-      track.style.transform = `translateX(${x}px)`;
+      track.style.transform = `translate3d(${x}px,0,0)`;
       rafRef.current = requestAnimationFrame(animate);
     };
 
@@ -114,6 +116,16 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
       }
       seamRef.current = seam;
 
+      // في Safari على iOS، نستخدم Fallback بالـ CSS Keyframes لأنه أحياناً يعطّل rAF
+      if (isSafari && isIOS) {
+        // إعداد متغيرات CSS للتحريك
+        track.classList.add("marquee-fallback");
+        const durationSec = Math.max(6, seam / Math.max(8, adjustedSpeed));
+        track.style.setProperty("--marquee-seam", `${seam}px`);
+        track.style.setProperty("--marquee-duration", `${durationSec}s`);
+        return; // لا نستخدم rAF في هذا الفرع
+      }
+
       // نسخ كافية لتغطية ≥ 3x من العرض
       const needed = Math.max(2, Math.ceil((container.offsetWidth * 3) / seam));
       for (let i = 1; i < needed; i++) {
@@ -121,6 +133,13 @@ export function Marquee({ children, speed = 60 }: MarqueeProps) {
         clone.setAttribute("aria-hidden", "true");
         clone.setAttribute("data-marquee-clone", "true");
         track.appendChild(clone);
+      }
+
+      // حتى مع تفعيل reduce سنحترم التفضيل بتقليل السرعة بدلاً من الإيقاف التام
+      if (prefersReduced) {
+        last = 0;
+        rafRef.current = requestAnimationFrame(animate);
+        return;
       }
 
       rafRef.current = requestAnimationFrame(animate);
