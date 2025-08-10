@@ -18,44 +18,33 @@ export function MarqueeSimple({
   direction = "left",
   pauseOnHover = true,
   className = "",
-  gap = "clamp(12px, 2.5vw, 48px)",
+  gap = "56px", // مسافة ثابتة بدلاً من clamp للحصول على نتيجة متسقة
 }: MarqueeSimpleProps) {
   const items = React.Children.toArray(children).filter(Boolean);
-  const styleVars = { "--marquee-gap": gap } as React.CSSProperties;
-
+  
   return (
     <Marquee
-      autoFill
-      loop={0}
+      autoFill={true} // مهم جداً - يملأ العرض تلقائياً بالعناصر
       speed={speed}
       direction={direction}
       pauseOnHover={pauseOnHover}
-      className={className}
       gradient={false}
-      style={{ margin: 0, padding: 0 }}
+      className={className}
     >
-      <div
-        style={{
-          ...styleVars,
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {items.map((node, i) => (
-          <span
-            key={i}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              flex: "0 0 auto",
-              marginInlineEnd: "var(--marquee-gap)",
-            }}
-          >
-            {node}
-          </span>
-        ))}
-      </div>
+      {/* مهم: لا نضع wrapper div - العناصر مباشرة */}
+      {items.map((node, i) => (
+        <div
+          key={i}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            paddingInlineEnd: gap,
+            flexShrink: 0, // يمنع انضغاط العناصر
+          }}
+        >
+          {node}
+        </div>
+      ))}
     </Marquee>
   );
 }

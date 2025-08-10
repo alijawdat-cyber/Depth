@@ -6,18 +6,25 @@ import { clients } from "@/data/clients";
 import Image from "next/image";
 
 export default function ClientsMarquee() {
+  // تكرار قائمة العملاء مرتين لضمان الاستمرارية السلسة
+  // إذا كان لديك 5 عملاء فقط، التكرار مرتين يعطي 10 عناصر
+  const duplicatedClients = [...clients, ...clients];
+  
   return (
     <section className="py-10">
       <Container>
         <MarqueeSimple
           speed={40}
           direction="left"
-          pauseOnHover
+          pauseOnHover={true}
           className="overflow-hidden"
-          gap="clamp(10px, 3vw, 56px)"
+          gap="60px" // مسافة ثابتة ومناسبة بين الشعارات
         >
-          {clients.map((c) => (
-            <span key={c.slug} className="flex items-center justify-center">
+          {duplicatedClients.map((c, index) => (
+            <div
+              key={`${c.slug}-${index}`}
+              className="flex items-center justify-center"
+            >
               <Image
                 src={c.logo}
                 alt={`${c.name} logo`}
@@ -26,8 +33,9 @@ export default function ClientsMarquee() {
                 sizes="(max-width:768px) 96px, 120px"
                 className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
                 loading="lazy"
+                priority={false}
               />
-            </span>
+            </div>
           ))}
         </MarqueeSimple>
       </Container>
