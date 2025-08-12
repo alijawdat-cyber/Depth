@@ -3,7 +3,7 @@ import {
 } from "@react-email/components";
 
 type Props = {
-  type: "general" | "pricing" | "support" | "press" | "jobs";
+  type: "general" | "pricing" | "support" | "social" | "jobs";
   name: string;
   brandUrl: string;
   requestId?: string;
@@ -13,7 +13,7 @@ const SLAs = {
   general: "خلال 24 ساعة", 
   pricing: "خلال 8 ساعات", 
   support: "خلال 6 ساعات", 
-  press: "خلال 24 ساعة", 
+  social: "خلال 12 ساعة", 
   jobs: "خلال 72 ساعة" 
 } as const;
 
@@ -21,7 +21,7 @@ const teamNames = {
   general: "خدمة العملاء",
   pricing: "فريق المبيعات",
   support: "فريق الدعم الفني",
-  press: "فريق العلاقات الإعلامية",
+  social: "فريق السوشيال ميديا",
   jobs: "فريق الموارد البشرية"
 };
 
@@ -29,7 +29,7 @@ const icons = {
   general: "💬",
   pricing: "💰", 
   support: "🔧",
-  press: "📰",
+  social: "📱",
   jobs: "👥"
 };
 
@@ -37,7 +37,7 @@ const preheaderText = {
   general: "استلمنا استفسارك—سنرد خلال 24 ساعة",
   pricing: "استلمنا طلب الأسعار—سنرد خلال 8 ساعات",
   support: "استلمنا طلب الدعم—سنرد خلال 6 ساعات", 
-  press: "استلمنا الاستفسار الإعلامي—سنرد خلال 24 ساعة",
+  social: "استلمنا طلب السوشيال ميديا—سنرد خلال 12 ساعة",
   jobs: "استلمنا طلب الوظيفة—سنرد خلال 72 ساعة"
 };
 
@@ -75,14 +75,14 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo - Absolute URL */}
-          <Section style={{textAlign: "center", marginBottom: "32px"}}>
+          {/* Header with Logo - Full Logo SVG */}
+          <Section style={{textAlign: "center", marginBottom: "32px", direction: "ltr"}}>
             <Img 
-              src={`${brandUrl}/brand/logo-512.png`} 
-              alt="Depth" 
-              width="96" 
-              height="96"
-              style={{borderRadius: "16px"}}
+              src={`${brandUrl}/brand/logo-full.svg`} 
+              alt="Depth Agency" 
+              width="180" 
+              height="40"
+              style={{margin: "0 auto"}}
             />
           </Section>
 
@@ -172,10 +172,10 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               color: "#4a5568"
             }}>
               📧 البريد الإلكتروني: <Link 
-                href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
+                href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
                 style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}
               >
-                {type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+                {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
               </Link>
             </Text>
             
@@ -193,7 +193,61 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
             margin: "24px 0"
           }}/>
 
-          {/* Footer - Unified Branding */}
+          {/* Team Signature Footer */}
+          <Section style={{
+            background: "#f8f9fa",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "16px",
+            textAlign: "right",
+            direction: "rtl"
+          }}>
+            <Text style={{
+              fontSize: "14px",
+              fontWeight: "600",
+              margin: "0 0 8px 0",
+              color: "#621cf0"
+            }}>
+              {teamName}
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#2d3748",
+              margin: "0 0 4px 0"
+            }}>
+              Depth Agency
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              📧 {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              🌐 depth-agency.com
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              📱 +964 771 995 6000
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0"
+            }}>
+              📍 بغداد، العراق
+            </Text>
+          </Section>
+
+          {/* Main Footer */}
           <Section style={{textAlign: "center"}}>
             <Text style={{
               fontSize: "16px",
@@ -223,14 +277,6 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
             >
               depth-agency.com
             </Link>
-            
-            <Text style={{
-              fontSize: "12px",
-              color: "#666",
-              margin: "8px 0 0 0"
-            }}>
-              واتساب: <em>سيتم إضافة الرقم لاحقاً</em>
-            </Text>
           </Section>
         </Container>
       </Body>
@@ -243,7 +289,7 @@ export function renderContactAutoReplyText(props: Props) {
   const { type, name, requestId } = props;
   const eta = SLAs[type] ?? SLAs.general;
   const teamName = teamNames[type];
-  const emailAddr = type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello";
+  const emailAddr = type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello";
 
   return `
 أهلاً وسهلاً ${name}!

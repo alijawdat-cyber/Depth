@@ -3,7 +3,7 @@ import {
 } from "@react-email/components";
 
 type Props = {
-  type: "general" | "pricing" | "support" | "press" | "jobs";
+  type: "general" | "pricing" | "support" | "social" | "jobs";
   name: string;
   fromEmail: string;
   message: string;
@@ -42,7 +42,7 @@ export default function ContactNotification({
     general: "استفسار عام",
     pricing: "طلب أسعار",
     support: "دعم فني", 
-    press: "استفسار إعلامي",
+    social: "سوشيال ميديا",
     jobs: "طلب وظيفة"
   };
 
@@ -50,7 +50,7 @@ export default function ContactNotification({
     general: "24 ساعة",
     pricing: "8 ساعات", 
     support: "6 ساعات",
-    press: "24 ساعة",
+    social: "12 ساعة",
     jobs: "72 ساعة"
   };
 
@@ -70,14 +70,14 @@ export default function ContactNotification({
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo - Absolute URL */}
-          <Section style={{textAlign: "center", marginBottom: "24px"}}>
+          {/* Header with Logo - Full Logo SVG */}
+          <Section style={{textAlign: "center", marginBottom: "24px", direction: "ltr"}}>
             <Img 
-              src={`${brandUrl}/brand/logo-512.png`} 
-              alt="Depth" 
-              width="96" 
-              height="96"
-              style={{borderRadius: "12px"}}
+              src={`${brandUrl}/brand/logo-full.svg`} 
+              alt="Depth Agency" 
+              width="180" 
+              height="40"
+              style={{margin: "0 auto"}}
             />
           </Section>
 
@@ -217,7 +217,7 @@ export function renderContactNotificationText(props: Props) {
     general: "استفسار عام",
     pricing: "طلب أسعار", 
     support: "دعم فني",
-    press: "استفسار إعلامي",
+    social: "سوشيال ميديا",
     jobs: "طلب وظيفة"
   };
 

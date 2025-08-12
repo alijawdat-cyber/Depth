@@ -7,12 +7,12 @@ import ContactNotification, { renderContactNotificationText } from "@/emails/Con
 import ContactAutoReply, { renderContactAutoReplyText } from "@/emails/ContactAutoReply";
 
 // Smart Routing Configuration
-type Inquiry = "pricing" | "support" | "press" | "jobs" | "general";
+type Inquiry = "pricing" | "support" | "social" | "jobs" | "general";
 
 const ROUTING_MAP: Record<Inquiry, string> = {
   pricing: "sales@depth-agency.com",
   support: "support@depth-agency.com", 
-  press: "press@depth-agency.com",
+  social: "social@depth-agency.com",
   jobs: "jobs@depth-agency.com",
   general: "hello@depth-agency.com"
 };
@@ -28,7 +28,7 @@ const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
   email: z.string().email("بريد إلكتروني غير صحيح"),
   message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف"),
-  type: z.enum(["general", "pricing", "support", "press", "jobs"]).default("general"),
+  type: z.enum(["general", "pricing", "support", "social", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
 });
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
       general: "[DEPTH] تأكيد استلام — سنعود إليك خلال 24 ساعة",
       pricing: "[DEPTH] طلب عرض أسعار — سنعود إليك خلال 8 ساعات", 
       support: "[DEPTH] طلب دعم فني — سنعود إليك خلال 6 ساعات",
-      press: "[DEPTH] استفسار إعلامي — سنعود إليك خلال 24 ساعة",
+      social: "[DEPTH] طلب سوشيال ميديا — سنعود إليك خلال 12 ساعة",
       jobs: "[DEPTH] طلب وظيفة — سنعود إليك خلال 72 ساعة"
     };
 
@@ -232,7 +232,7 @@ export async function POST(req: Request) {
         general: "24 ساعة",
         pricing: "8 ساعات",
         support: "6 ساعات", 
-        press: "24 ساعة",
+        social: "12 ساعة",
         jobs: "72 ساعة"
       }[type]
     });

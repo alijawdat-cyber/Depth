@@ -125,14 +125,14 @@ export default function ContactAutoReplyBilingual({ type, name, brandUrl, reques
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo */}
-          <Section style={{textAlign: "center", marginBottom: "32px"}}>
+          {/* Header with Logo - Full Logo SVG */}
+          <Section style={{textAlign: "center", marginBottom: "32px", direction: "ltr"}}>
             <Img 
-              src={`${brandUrl}/brand/logo-512.png`} 
-              alt="Depth" 
-              width="96" 
-              height="96"
-              style={{borderRadius: "16px"}}
+              src={`${brandUrl}/brand/logo-full.svg`} 
+              alt="Depth Agency" 
+              width="180" 
+              height="40"
+              style={{margin: "0 auto"}}
             />
           </Section>
 
@@ -242,6 +242,60 @@ export default function ContactAutoReplyBilingual({ type, name, brandUrl, reques
             borderColor: "#e9ecef", 
             margin: "24px 0"
           }}/>
+
+          {/* Team Signature Footer */}
+          <Section style={{
+            background: "#f8f9fa",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "16px",
+            textAlign: isArabic ? "right" : "left",
+            direction: isArabic ? "rtl" : "ltr"
+          }}>
+            <Text style={{
+              fontSize: "14px",
+              fontWeight: "600",
+              margin: "0 0 8px 0",
+              color: "#621cf0"
+            }}>
+              {teamName}
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#2d3748",
+              margin: "0 0 4px 0"
+            }}>
+              Depth Agency
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              📧 {type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              🌐 depth-agency.com
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0 0 2px 0"
+            }}>
+              📱 +964 771 995 6000
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#4a5568",
+              margin: "0"
+            }}>
+              📍 {isArabic ? "بغداد، العراق" : "Baghdad, Iraq"}
+            </Text>
+          </Section>
 
           {/* Footer - Unified Branding */}
           <Section style={{textAlign: "center"}}>
