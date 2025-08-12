@@ -17,7 +17,7 @@ const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين").max(100, "الاسم طويل جداً"),
   email: z.string().email("بريد إلكتروني غير صحيح").max(255, "البريد طويل جداً"),
   message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف").max(2000, "الرسالة طويلة جداً"),
-  type: z.enum(["general", "pricing", "support", "press", "jobs"]).default("general"),
+  type: z.enum(["general", "pricing", "support", "social", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
 });
@@ -28,7 +28,7 @@ const inquiryTypes = [
   { value: "general", label: "استفسار عام", icon: "💬", desc: "أسئلة عامة حول الخدمات", sla: "24 ساعة" },
   { value: "pricing", label: "عرض أسعار", icon: "💰", desc: "طلب عرض أسعار مخصص", sla: "8 ساعات" },
   { value: "support", label: "دعم فني", icon: "🔧", desc: "مساعدة تقنية ودعم", sla: "6 ساعات" },
-  { value: "press", label: "إعلام وصحافة", icon: "📰", desc: "استفسارات إعلامية", sla: "24 ساعة" },
+  { value: "social", label: "سوشيال ميديا", icon: "📱", desc: "إدارة منصات التواصل", sla: "12 ساعة" },
   { value: "jobs", label: "وظائف", icon: "👥", desc: "فرص العمل والتوظيف", sla: "72 ساعة" }
 ];
 
@@ -117,7 +117,7 @@ export default function ContactPage() {
 
   const handleTypeSelect = (type: string) => {
     setSelectedType(type);
-    setValue("type", type as "general" | "pricing" | "support" | "press" | "jobs");
+    setValue("type", type as "general" | "pricing" | "support" | "social" | "jobs");
   };
 
   const selectedInquiry = inquiryTypes.find(t => t.value === selectedType);

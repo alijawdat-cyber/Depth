@@ -21,7 +21,7 @@ export default function Footer() {
           <Link href="/legal" className="hover:underline">الشروط</Link>
         </nav>
         <div className="flex justify-end gap-4">
-          <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>
+          <a href="https://wa.me/9647779761547?text=مرحباً! أريد الاستفسار عن خدماتكم" target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>
           <a href="mailto:hello@depth-agency.com" className="hover:underline">Email</a>
           <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
           <a href="https://x.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">X</a>

@@ -184,7 +184,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0",
               color: "#4a5568"
             }}>
-              📱 واتساب: <strong>سيتم إضافة الرقم لاحقاً</strong>
+              📱 واتساب: <Link href="https://wa.me/9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>+964 777 976 1547</Link>
             </Text>
           </Section>
 
@@ -300,7 +300,7 @@ ${requestId ? `معرف الطلب: ${requestId}` : ''}
 
 للتواصل السريع:
 📧 ${emailAddr}@depth-agency.com
-📱 واتساب: سيتم إضافة الرقم لاحقاً
+📱 واتساب: +964 777 976 1547
 
 تحياتنا الحارة،
 فريق Depth
