@@ -30,7 +30,7 @@ export default function BookClient() {
             </p>
             <div className="flex gap-2 mt-2">
               <Link href="/" className={clsx(buttonStyles({ variant: "secondary" }))}>العودة للرئيسية</Link>
-              <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className={clsx(buttonStyles({ variant: "primary" }))}>تواصل واتساب</a>
+              <a href="https://wa.me/9647779761547?text=مرحباً! أريد حجز جلسة استشارية" target="_blank" rel="noopener noreferrer" className={clsx(buttonStyles({ variant: "primary" }))}>تواصل واتساب</a>
             </div>
           </div>
         ) : (

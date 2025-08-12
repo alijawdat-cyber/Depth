@@ -236,7 +236,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               color: "#4a5568",
               margin: "0 0 2px 0"
             }}>
-              📱 +964 771 995 6000
+              📱 +964 777 976 1547
             </Text>
             <Text style={{
               fontSize: "12px",

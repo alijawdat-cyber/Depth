@@ -3,7 +3,7 @@ import {
 } from "@react-email/components";
 
 type Props = {
-  type: "general" | "pricing" | "support" | "press" | "jobs";
+  type: "general" | "pricing" | "support" | "social" | "jobs";
   name: string;
   brandUrl: string;
   requestId?: string;
@@ -16,21 +16,21 @@ const content = {
       general: "استلمنا استفسارك—سنرد خلال 24 ساعة",
       pricing: "استلمنا طلب الأسعار—سنرد خلال 8 ساعات",
       support: "استلمنا طلب الدعم—سنرد خلال 6 ساعات", 
-      press: "استلمنا الاستفسار الإعلامي—سنرد خلال 24 ساعة",
+      social: "استلمنا طلب السوشيال ميديا—سنرد خلال 12 ساعة",
       jobs: "استلمنا طلب الوظيفة—سنرد خلال 72 ساعة"
     },
     sla: { 
       general: "خلال 24 ساعة", 
       pricing: "خلال 8 ساعات", 
       support: "خلال 6 ساعات", 
-      press: "خلال 24 ساعة", 
+      social: "خلال 12 ساعة", 
       jobs: "خلال 72 ساعة" 
     },
     teams: {
       general: "خدمة العملاء",
       pricing: "فريق المبيعات",
       support: "فريق الدعم الفني",
-      press: "فريق العلاقات الإعلامية",
+      social: "فريق السوشيال ميديا",
       jobs: "فريق الموارد البشرية"
     },
     greeting: "أهلاً وسهلاً",
@@ -39,7 +39,7 @@ const content = {
     expectedResponse: "وقت الاستجابة المتوقع",
     quickContact: "للتواصل السريع:",
     email: "البريد الإلكتروني:",
-    whatsapp: "واتساب: سيتم إضافة الرقم لاحقاً",
+    whatsapp: "واتساب: +964 777 976 1547",
     regards: "تحياتنا الحارة،",
     team: "فريق Depth",
     tagline: "نبني تجارب رقمية استثنائية",
@@ -50,21 +50,21 @@ const content = {
       general: "We received your inquiry—will reply within 24 hours",
       pricing: "We received your pricing request—will reply within 8 hours",
       support: "We received your support request—will reply within 6 hours", 
-      press: "We received your press inquiry—will reply within 24 hours",
+      social: "We received your social media request—will reply within 12 hours",
       jobs: "We received your job application—will reply within 72 hours"
     },
     sla: { 
       general: "within 24 hours", 
       pricing: "within 8 hours", 
       support: "within 6 hours", 
-      press: "within 24 hours", 
+      social: "within 12 hours", 
       jobs: "within 72 hours" 
     },
     teams: {
       general: "Customer Service Team",
       pricing: "Sales Team",
       support: "Technical Support Team",
-      press: "Media Relations Team",
+      social: "Social Media Team",
       jobs: "Human Resources Team"
     },
     greeting: "Hello",
@@ -73,7 +73,7 @@ const content = {
     expectedResponse: "Expected Response Time",
     quickContact: "For quick contact:",
     email: "Email:",
-    whatsapp: "WhatsApp: Number will be added later",
+    whatsapp: "WhatsApp: +964 777 976 1547",
     regards: "Warm regards,",
     team: "Depth Team",
     tagline: "Building exceptional digital experiences",
@@ -85,7 +85,7 @@ const icons = {
   general: "💬",
   pricing: "💰", 
   support: "🔧",
-  press: "📰",
+  social: "📱",
   jobs: "👥"
 };
 
@@ -222,10 +222,10 @@ export default function ContactAutoReplyBilingual({ type, name, brandUrl, reques
               color: "#4a5568"
             }}>
               📧 {t.email} <Link 
-                href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
+                href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
                 style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}
               >
-                {type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+                {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
               </Link>
             </Text>
             
@@ -234,7 +234,7 @@ export default function ContactAutoReplyBilingual({ type, name, brandUrl, reques
               margin: "0",
               color: "#4a5568"
             }}>
-              📱 {t.whatsapp}
+              📱 WhatsApp: <Link href="https://wa.me/9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>+964 777 976 1547</Link>
             </Text>
           </Section>
 
@@ -272,7 +272,7 @@ export default function ContactAutoReplyBilingual({ type, name, brandUrl, reques
               color: "#4a5568",
               margin: "0 0 2px 0"
             }}>
-              📧 {type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+              📧 {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
             </Text>
             <Text style={{
               fontSize: "12px",
@@ -360,7 +360,7 @@ export function renderContactAutoReplyBilingualText(props: Props) {
   const t = content[lang];
   const eta = t.sla[type];
   const teamName = t.teams[type];
-  const emailAddr = type === "pricing" ? "sales" : type === "support" ? "support" : type === "press" ? "press" : type === "jobs" ? "jobs" : "hello";
+  const emailAddr = type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello";
 
   return `
 ${t.greeting} ${name}!
