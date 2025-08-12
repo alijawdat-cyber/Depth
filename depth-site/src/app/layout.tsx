@@ -23,6 +23,15 @@ export const metadata: Metadata = {
     template: "%s | Depth",
   },
   description: "استوديو/وكالة Performance + Content: سرعة إنتاج، هامش مضبوط، وقياس واضح.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/depth-icon-500x500-viewbox375x375.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/brand/logo-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "ar_IQ",
@@ -30,6 +39,14 @@ export const metadata: Metadata = {
     title: "Depth — محتوى يحرّك النتائج",
     description: "استوديو/وكالة Performance + Content: سرعة إنتاج، هامش مضبوط، وقياس واضح.",
     url: siteUrl,
+    images: [
+      {
+        url: '/depth-icon-1563x1563-rgba.png',
+        width: 1563,
+        height: 1563,
+        alt: 'Depth Agency Logo',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
