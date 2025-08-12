@@ -22,7 +22,7 @@ const EMAIL_FROM = process.env.MAIL_FROM || "Depth <no-reply@depth-agency.com>";
 const EMAIL_CC_ADMIN = process.env.MAIL_CC_ADMIN || "admin@depth-agency.com";
 const BRAND_URL = process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com";
 // DRY_RUN disabled for production - emails will always be sent
-const DRY_RUN = false;
+// const DRY_RUN = false;
 
 const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
