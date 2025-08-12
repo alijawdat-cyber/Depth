@@ -23,8 +23,8 @@ export default function Footer() {
         <div className="flex justify-end gap-4">
           <a href="https://wa.me/9647779761547?text=مرحباً! أريد الاستفسار عن خدماتكم" target="_blank" rel="noopener noreferrer" className="hover:underline">WhatsApp</a>
           <a href="mailto:hello@depth-agency.com" className="hover:underline">Email</a>
-          <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
-          <a href="https://x.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">X</a>
+          <a href="https://www.instagram.com/depth_agency/" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
+          <a href="https://www.facebook.com/depthagency" target="_blank" rel="noopener noreferrer" className="hover:underline">Facebook</a>
         </div>
       </Container>
     </footer>
