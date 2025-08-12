@@ -2,8 +2,8 @@
 
 import SectionHeading from "@/components/ui/SectionHeading";
 import { Container } from "@/components/ui/Container";
-import { buttonStyles } from "@/components/ui/buttonStyles";
-import { clsx } from "clsx";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
+import { PACKAGES } from "@/lib/whatsapp";
 
 type Plan = {
   name: string;
@@ -30,9 +30,6 @@ const plans: Plan[] = [
 ];
 
 export default function Packages() {
-  const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER;
-  const WA_TEXT = process.env.NEXT_PUBLIC_WA_TEXT || "";
-  const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}` : "https://wa.me/";
   return (
     <section id="packages" className="py-16 md:py-24">
       <Container>
@@ -54,14 +51,18 @@ export default function Packages() {
                   <li key={i}>{b}</li>
                 ))}
               </ul>
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={clsx(buttonStyles({ variant: "primary", size: "md" }), "w-full text-center")}
+              <WhatsAppButton
+                messageOptions={{
+                  type: 'package',
+                  packageName: p.name === 'Basic' ? PACKAGES.basic.arabicName :
+                              p.name === 'Growth' ? PACKAGES.growth.arabicName :
+                              PACKAGES.pro.arabicName,
+                  details: `أود الاستفسار عن باقة ${p.name} بسعر ${p.price}. الخدمات المشمولة: ${p.bullets.join('، ')}`
+                }}
+                className="w-full"
               >
-                ابدأ الآن
-              </a>
+                اختر هذه الباقة
+              </WhatsAppButton>
             </div>
           ))}
         </div>

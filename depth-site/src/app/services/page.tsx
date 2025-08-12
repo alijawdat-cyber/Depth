@@ -233,7 +233,7 @@ export default function ServicesPage() {
                     type: 'pricing',
                     details: 'أود الحصول على عرض سعر مخصص لمجموعة الخدمات التي أحتاجها'
                   }}
-                  variant="outline"
+                  variant="ghost"
                   size="lg"
                 >
                   احصل على عرض سعر

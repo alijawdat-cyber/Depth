@@ -7,7 +7,7 @@ interface WhatsAppButtonProps {
   messageOptions: WhatsAppMessageOptions;
   children: React.ReactNode;
   className?: string;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   icon?: boolean;
 }

@@ -185,7 +185,7 @@ export default function PlansPage() {
                     type: 'pricing',
                     details: 'أود الحصول على جدول أسعار مفصل لجميع الخدمات والباقات'
                   }}
-                  variant="outline"
+                  variant="ghost"
                   size="lg"
                 >
                   جدول الأسعار الكامل
