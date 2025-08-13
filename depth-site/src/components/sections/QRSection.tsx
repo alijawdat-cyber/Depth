@@ -17,7 +17,7 @@ export default function QRSection() {
           
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
             {/* QR Code */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-[var(--card)] p-6 rounded-2xl shadow-lg">
               <Image
                 src="/depth_agency_qr.png"
                 alt="QR Code للوصول لحسابات Depth Agency"
@@ -37,7 +37,7 @@ export default function QRSection() {
                   href="https://www.instagram.com/depth_agency/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-center gap-3 bg-[var(--card)] p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                     <span className="text-white text-sm font-bold">IG</span>
@@ -52,7 +52,7 @@ export default function QRSection() {
                   href="https://www.facebook.com/depthagency" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-center gap-3 bg-[var(--card)] p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <span className="text-white text-sm font-bold">FB</span>

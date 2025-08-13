@@ -358,7 +358,7 @@ export default function LegalPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-white rounded border-l-4 border-[var(--primary)]">
+                <div className="mt-6 p-4 bg-[var(--card)] rounded border-l-4 border-[var(--primary)]">
                   <h4 className="font-semibold text-[var(--primary)]">تحديثات الوثيقة:</h4>
                   <p className="text-sm text-[var(--slate-600)] mt-1">
                     نحتفظ بالحق في تحديث هذه الشروط والأحكام. سيتم إشعارك بأي تغييرات جوهرية عبر البريد الإلكتروني أو إشعار على الموقع.

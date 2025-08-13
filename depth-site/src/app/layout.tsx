@@ -73,7 +73,13 @@ export default function RootLayout({
               name: 'Depth',
               url: siteUrl,
               logo: `${siteUrl}/depth-logo.svg`,
-              sameAs: ['https://www.instagram.com/depth_agency/', 'https://www.facebook.com/depthagency'],
+              sameAs: [
+                'https://www.instagram.com/depth_agency/', 
+                'https://www.facebook.com/depthagency',
+                'https://www.linkedin.com/company/depth-agency/',
+                'https://www.tiktok.com/@depth_agency',
+                'https://www.snapchat.com/add/depth_agency'
+              ],
             }),
           }}
         />

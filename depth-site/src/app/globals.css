@@ -169,8 +169,9 @@ html, body, #__next, main {
 [data-theme="dark"] .logo-enhanced, .dark .logo-enhanced { filter: brightness(0) invert(1); }
 [data-theme="light"] .logo-enhanced { filter: brightness(0) saturate(0) opacity(.85); }
 
-/* شعار البراند: يظل بألوانه الأصلية في الفاتح والداكن بدون أي فلاتر */
-.brand-logo { transition: transform 0.3s ease; filter: none !important; }
+/* شعار البراند: يتكيف مع الوضع الداكن والفاتح */
+.brand-logo { transition: transform 0.3s ease, filter 0.3s ease; }
+[data-theme="dark"] .brand-logo, .dark .brand-logo { filter: brightness(0) invert(1); }
 .brand-logo:hover { transform: scale(1.05); }
 
 /* Marquee spacing is handled by react-fast-marquee */

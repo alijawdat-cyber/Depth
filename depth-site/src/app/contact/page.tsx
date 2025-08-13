@@ -218,8 +218,8 @@ export default function ContactPage() {
                     className={clsx(
                       "w-full max-w-full p-3 sm:p-4 rounded-xl border-2 text-right transition-all duration-200 hover:scale-[1.01] touch-manipulation overflow-hidden",
                       selectedType === type.value
-                        ? "border-[#621cf0] bg-[#621cf0]/5 shadow-lg shadow-[#621cf0]/20"
-                        : "border-[var(--elev)] bg-[var(--card)] hover:border-[#621cf0]/50"
+                        ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-lg shadow-[var(--primary)]/20"
+                        : "border-[var(--elev)] bg-[var(--card)] hover:border-[var(--primary)]/50"
                     )}
                   >
                     <div className="flex items-start gap-2 sm:gap-3 w-full min-w-0">

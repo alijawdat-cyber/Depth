@@ -25,7 +25,7 @@ export default function PlansPage() {
             {/* Packages Grid */}
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               {/* Basic Package */}
-              <div className="bg-white rounded-2xl p-8 border-2 border-[var(--elev)] hover:border-[var(--primary)] transition-colors">
+              <div className="bg-[var(--card)] rounded-2xl p-8 border-2 border-[var(--elev)] hover:border-[var(--primary)] transition-colors">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold mb-2">{PACKAGES.basic.arabicName}</h3>
                   <div className="text-3xl font-bold text-[var(--primary)] mb-4">
@@ -62,7 +62,7 @@ export default function PlansPage() {
               </div>
 
               {/* Growth Package */}
-              <div className="bg-white rounded-2xl p-8 border-2 border-[var(--primary)] relative transform scale-105">
+              <div className="bg-[var(--card)] rounded-2xl p-8 border-2 border-[var(--primary)] relative transform scale-105">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <span className="bg-[var(--primary)] text-white px-4 py-2 rounded-full text-sm font-medium">
                     الأكثر شعبية
@@ -105,7 +105,7 @@ export default function PlansPage() {
               </div>
 
               {/* Pro Package */}
-              <div className="bg-white rounded-2xl p-8 border-2 border-[var(--elev)] hover:border-[var(--primary)] transition-colors">
+              <div className="bg-[var(--card)] rounded-2xl p-8 border-2 border-[var(--elev)] hover:border-[var(--primary)] transition-colors">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold mb-2">{PACKAGES.pro.arabicName}</h3>
                   <div className="text-3xl font-bold text-[var(--primary)] mb-4">

@@ -136,7 +136,7 @@ export default function ServicesPage() {
             {/* Services Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {services.map((service) => (
-                <div key={service.id} className="bg-white rounded-2xl p-8 border border-[var(--elev)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-lg">
+                <div key={service.id} className="bg-[var(--card)] rounded-2xl p-8 border border-[var(--elev)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-lg">
                   <div className="text-center mb-6">
                     <div className="text-4xl mb-4">{service.icon}</div>
                     <h3 className="text-xl font-bold mb-2">{service.title}</h3>

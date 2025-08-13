@@ -12,14 +12,14 @@ function SimpleAvatar({ name, size = 80 }: { name: string; size?: number }) {
     .toUpperCase()
     .slice(0, 2);
 
-  // ألوان بسيطة وهادئة
+  // ألوان متكيفة مع الوضع الداكن والفاتح
   const colors = [
     "bg-[var(--accent-500)]",
-    "bg-blue-500", 
-    "bg-emerald-500",
-    "bg-purple-500",
-    "bg-orange-500",
-    "bg-teal-500",
+    "bg-blue-500 dark:bg-blue-400", 
+    "bg-emerald-500 dark:bg-emerald-400",
+    "bg-purple-500 dark:bg-purple-400",
+    "bg-orange-500 dark:bg-orange-400",
+    "bg-teal-500 dark:bg-teal-400",
   ];
   
   const colorIndex = name.length % colors.length;
@@ -41,7 +41,7 @@ export default function TeamCard({ m, index }: { m: TeamMember; index: number })
 
   return (
     <motion.article
-      className="bg-white dark:bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+      className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
       initial={reduce ? undefined : { opacity: 0, y: 20 }}
       whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}

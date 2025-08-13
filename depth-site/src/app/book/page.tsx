@@ -74,7 +74,7 @@ export default function BookPage() {
             {/* Booking Options */}
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               {bookingOptions.map((option, index) => (
-                <div key={index} className={`relative bg-white rounded-2xl p-8 border-2 transition-all duration-300 hover:shadow-lg ${
+                <div key={index} className={`relative bg-[var(--card)] rounded-2xl p-8 border-2 transition-all duration-300 hover:shadow-lg ${
                   option.recommended 
                     ? 'border-[var(--primary)] transform scale-105' 
                     : 'border-[var(--elev)] hover:border-[var(--primary)]'
@@ -152,7 +152,7 @@ export default function BookPage() {
 
             {/* Contact Methods */}
             <div className="grid md:grid-cols-2 gap-8 mb-16">
-              <div className="bg-white rounded-2xl p-8 border border-[var(--elev)]">
+              <div className="bg-[var(--card)] rounded-2xl p-8 border border-[var(--elev)]">
                 <h3 className="text-xl font-bold mb-4">🎯 للحجز السريع</h3>
                 <p className="text-[var(--slate-600)] mb-6">
                   تواصل معنا مباشرة عبر الواتساب للحجز الفوري ومناقشة التفاصيل
@@ -175,7 +175,7 @@ export default function BookPage() {
                 </WhatsAppButton>
               </div>
               
-              <div className="bg-white rounded-2xl p-8 border border-[var(--elev)]">
+              <div className="bg-[var(--card)] rounded-2xl p-8 border border-[var(--elev)]">
                 <h3 className="text-xl font-bold mb-4">📧 للاستفسارات التفصيلية</h3>
                 <p className="text-[var(--slate-600)] mb-6">
                   أرسل لنا تفاصيل مشروعك عبر البريد الإلكتروني للحصول على رد مفصل
