@@ -47,7 +47,7 @@ export default function Header() {
             variant="secondary"
             onClick={toggleTheme}
             aria-label="toggle theme"
-            className="hidden sm:inline-flex"
+            className="inline-flex"
           >
             {mounted ? (resolvedTheme === "dark" ? <Sun size={16} /> : <Moon size={16} />) : null}
           </Button>

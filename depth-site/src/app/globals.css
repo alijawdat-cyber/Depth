@@ -30,13 +30,15 @@
 :root{
   --font-dubai: "Dubai", sans-serif;
   /* Ink/Neutral scale */
-  --ink-900:#0B0F14; --ink-800:#1A232C; --slate-600:#6A7D8F;
+  --ink-900:#0B0F14; --ink-800:#1A232C; 
+  --slate-50:#F8FAFC; --slate-600:#6A7D8F; --slate-700:#44515D;
   --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
   --neutral-300:#C2CDD8; --neutral-400:#A9B7C5; --neutral-500:#90A1B2; --neutral-600:#6A7D8F;
   --neutral-700:#44515D; --neutral-800:#28313A; --neutral-900:#0B0F14;
   /* Accent (Purple 2025 — default) */
   --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
   /* Aliases */
+  --primary: var(--accent-500);
   --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
   --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
   /* RGB values for fallback usage */
@@ -60,7 +62,21 @@
 
 /* Unified Dark Theme System */
 [data-theme="dark"], 
-.dark,
+.dark {
+    /* أساسيات الوضع الداكن */
+    --bg: var(--ink-900);
+    --text: #FFFFFF;
+    /* أسطح وبوردريات مناسبة للداكن */
+    --card: rgba(255, 255, 255, 0.08);
+    --elev: rgba(255, 255, 255, 0.24);
+    /* نص ثانوي محسن */
+    --slate-50: rgba(248, 250, 252, 0.1);
+    --slate-600: #C9D3DD;
+    --slate-700: #CBD5E1;
+    /* RGB values for dark mode */
+    --bg-rgb: 11,15,20;
+  }
+
 @media (prefers-color-scheme: dark) {
   :root {
     /* أساسيات الوضع الداكن */
@@ -70,7 +86,9 @@
     --card: rgba(255, 255, 255, 0.08);
     --elev: rgba(255, 255, 255, 0.24);
     /* نص ثانوي محسن */
+    --slate-50: rgba(248, 250, 252, 0.1);
     --slate-600: #C9D3DD;
+    --slate-700: #CBD5E1;
     /* RGB values for dark mode */
     --bg-rgb: 11,15,20;
   }
