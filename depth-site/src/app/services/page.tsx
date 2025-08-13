@@ -1,6 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import { SERVICES } from "@/lib/whatsapp";
+
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 
