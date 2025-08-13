@@ -17,6 +17,7 @@ const navLinks = [
   { href: "/about", label: "من نحن" },
   { href: "/blog", label: "المدونة" },
   { href: "/contact", label: "تواصل" },
+  { href: "/portal", label: "بوابة العميل" },
 ];
 
 // WhatsApp CTA is now replaced with internal /book route

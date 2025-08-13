@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
+import { SessionProvider } from "next-auth/react";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -34,15 +35,17 @@ export default function Providers({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <MotionConfig
-        transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.8 }}
-        reducedMotion="user"
-      >
-        {children}
-      </MotionConfig>
-      <Toaster richColors position="top-center" />
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <MotionConfig
+          transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.8 }}
+          reducedMotion="user"
+        >
+          {children}
+        </MotionConfig>
+        <Toaster richColors position="top-center" />
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
 

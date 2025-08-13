@@ -1,6 +1,6 @@
 "use client";
 import { Container } from "@/components/ui/Container";
-import PortalClient from "@/components/pages/PortalClient";
+import PortalClientReal from "@/components/pages/PortalClientReal";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ export default function PortalPage() {
             </div>
           </div>
           
-          <PortalClient />
+          <PortalClientReal />
         </Container>
       </main>
       <Footer />

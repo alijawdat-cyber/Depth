@@ -53,6 +53,9 @@ export default function Hero() {
             <Link href="#packages" className={clsx(buttonStyles({ variant: "secondary" }))}>
               اطلب عرض
             </Link>
+            <Link href="/portal/auth/signup" className={clsx(buttonStyles({ variant: "ghost" }))}>
+              انضم كعميل
+            </Link>
           </motion.div>
         </div>
       </Container>

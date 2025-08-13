@@ -1,0 +1,182 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import OnboardingTooltip from "./OnboardingTooltip";
+
+interface OnboardingStep {
+  id: string;
+  targetId: string;
+  title: string;
+  content: string;
+  position: 'top' | 'bottom' | 'left' | 'right';
+}
+
+interface InteractiveOnboardingProps {
+  isActive: boolean;
+  onComplete: () => void;
+  onSkip: () => void;
+}
+
+export default function InteractiveOnboarding({ isActive, onComplete, onSkip }: InteractiveOnboardingProps) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const steps: OnboardingStep[] = [
+    {
+      id: "header",
+      targetId: "portal-header",
+      title: "مرحباً بك في البوابة!",
+      content: "هذا هو مركز التحكم الخاص بك. من هنا يمكنك رؤية معلومات حسابك والتنقل بين الأقسام.",
+      position: "bottom"
+    },
+    {
+      id: "stats",
+      targetId: "quick-stats",
+      title: "إحصائياتك السريعة",
+      content: "هنا ترى ملخص سريع لمشاريعك: التقدم العام، الميزانية، والمهام المعلقة.",
+      position: "bottom"
+    },
+    {
+      id: "tabs",
+      targetId: "portal-tabs",
+      title: "تبويبات البوابة",
+      content: "استخدم هذه التبويبات للتنقل بين أقسام البوابة المختلفة.",
+      position: "bottom"
+    },
+    {
+      id: "actions",
+      targetId: "quick-actions",
+      title: "الإجراءات السريعة",
+      content: "أزرار مفيدة للتواصل مع الفريق وتحديث البيانات وإدارة حسابك.",
+      position: "top"
+    },
+    {
+      id: "notifications",
+      targetId: "notification-bell",
+      title: "الإشعارات",
+      content: "ستصلك هنا تنبيهات عن تحديثات مشاريعك وطلبات الموافقة.",
+      position: "bottom"
+    }
+  ];
+
+  useEffect(() => {
+    if (isActive) {
+      setIsVisible(true);
+      highlightElement(steps[currentStep].targetId);
+    } else {
+      setIsVisible(false);
+      removeAllHighlights();
+    }
+  }, [isActive, currentStep]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const highlightElement = (targetId: string) => {
+    // Remove previous highlights
+    removeAllHighlights();
+    
+    // Add highlight to current element
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.classList.add('onboarding-highlight');
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const removeAllHighlights = () => {
+    steps.forEach(step => {
+      const element = document.getElementById(step.targetId);
+      if (element) {
+        element.classList.remove('onboarding-highlight');
+      }
+    });
+  };
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleComplete();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleComplete = () => {
+    setIsVisible(false);
+    removeAllHighlights();
+    onComplete();
+  };
+
+  const handleSkip = () => {
+    setIsVisible(false);
+    removeAllHighlights();
+    onSkip();
+  };
+
+  if (!isActive || !isVisible) return null;
+
+  const currentStepData = steps[currentStep];
+  const targetElement = document.getElementById(currentStepData.targetId);
+
+  if (!targetElement) return null;
+
+  return (
+    <>
+      {/* CSS for highlighting */}
+      <style jsx global>{`
+        .onboarding-highlight {
+          position: relative;
+          z-index: 30;
+          box-shadow: 0 0 0 4px rgba(var(--accent-500-rgb, 59, 130, 246), 0.3), 
+                      0 0 0 8px rgba(var(--accent-500-rgb, 59, 130, 246), 0.1);
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+        
+        .onboarding-highlight::before {
+          content: '';
+          position: absolute;
+          inset: -4px;
+          border: 2px solid rgb(var(--accent-500-rgb, 59, 130, 246));
+          border-radius: 12px;
+          animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.8; }
+        }
+      `}</style>
+
+      {/* Skip Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={handleSkip}
+          className="bg-[var(--card)] border border-[var(--elev)] px-3 py-2 rounded-lg text-sm text-[var(--slate-600)] hover:text-[var(--text)] transition-colors"
+        >
+          تخطي الجولة
+        </button>
+      </div>
+
+      {/* Tooltip */}
+      <div className="relative">
+        <OnboardingTooltip
+          isVisible={true}
+          title={currentStepData.title}
+          content={currentStepData.content}
+          position={currentStepData.position}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          onClose={handleSkip}
+          isFirst={currentStep === 0}
+          isLast={currentStep === steps.length - 1}
+          currentStep={currentStep + 1}
+          totalSteps={steps.length}
+        />
+      </div>
+    </>
+  );
+}

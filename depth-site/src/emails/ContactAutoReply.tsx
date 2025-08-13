@@ -49,7 +49,10 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
   
   return (
     <Html dir="rtl" lang="ar">
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark" />
+      </Head>
       <Preview>{preheader}</Preview>
       <Body style={{
         background: "#ffffff", 
@@ -75,15 +78,18 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
           margin: "0 auto", 
           padding: "24px"
         }}>
-          {/* Header with Logo - Full Logo SVG */}
-          <Section style={{textAlign: "center", marginBottom: "32px", direction: "ltr"}}>
+          {/* Header with Logo - Full Logo SVG with fallback */}
+          <Section style={{textAlign: "center", marginBottom: "24px", direction: "ltr"}}>
             <Img 
               src={`${brandUrl}/brand/logo-full.svg`} 
-              alt="Depth Agency" 
+              alt="Depth Agency logo" 
               width="180" 
               height="40"
-              style={{margin: "0 auto"}}
+              style={{margin: "0 auto", display: "block"}}
             />
+            <Text style={{ fontSize: "12px", color: "#6b7280", margin: "8px 0 0 0" }}>
+              <span style={{direction: "ltr", unicodeBidi: "bidi-override"}}>Depth Agency</span>
+            </Text>
           </Section>
 
           {/* Main Content */}
@@ -125,7 +131,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
 
           {/* SLA Box */}
           <Section style={{
-            background: "linear-gradient(135deg, #621cf0 0%, #7c3aed 100%)",
+            background: "linear-gradient(135deg, #621cf0 0%, #6e42f0 100%)",
             padding: "20px",
             borderRadius: "12px",
             textAlign: "center",
@@ -175,7 +181,9 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
                 href={`mailto:${type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com`}
                 style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}
               >
-                {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+                <span style={{direction: "ltr", unicodeBidi: "bidi-override", whiteSpace: "nowrap"}}>
+                  {type === "pricing" ? "sales" : type === "support" ? "support" : type === "social" ? "social" : type === "jobs" ? "jobs" : "hello"}@depth-agency.com
+                </span>
               </Link>
             </Text>
             
@@ -184,7 +192,12 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0",
               color: "#4a5568"
             }}>
-              📱 واتساب: <Link href="https://wa.me/9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>+964 777 976 1547</Link>
+              📱 واتساب: <Link href="https://wa.me/9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>
+                <span style={{direction: "ltr", unicodeBidi: "bidi-override", whiteSpace: "nowrap"}}>+964 777 976 1547</span>
+              </Link>
+              {" "}| هاتف: <Link href="tel:+9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>
+                <span style={{direction: "ltr", unicodeBidi: "bidi-override", whiteSpace: "nowrap"}}>+964 777 976 1547</span>
+              </Link>
             </Text>
           </Section>
 

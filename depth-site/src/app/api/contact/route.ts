@@ -17,10 +17,21 @@ const ROUTING_MAP: Record<Inquiry, string> = {
   general: "hello@depth-agency.com"
 };
 
-// Environment Configuration
-const EMAIL_FROM = process.env.MAIL_FROM || "Depth <no-reply@depth-agency.com>";
-const EMAIL_CC_ADMIN = process.env.MAIL_CC_ADMIN || "admin@depth-agency.com";
-const BRAND_URL = process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com";
+// Environment Configuration (sanitized)
+const sanitizeEnv = (value?: string, fallback?: string) => {
+  return (value ?? fallback ?? "").replace(/\r?\n/g, "").trim();
+};
+
+// Accept both MAIL_FROM and EMAIL_FROM, trim any stray newlines/whitespace
+const EMAIL_FROM = sanitizeEnv(
+  process.env.MAIL_FROM || process.env.EMAIL_FROM,
+  "Depth <no-reply@depth-agency.com>"
+);
+const EMAIL_CC_ADMIN = sanitizeEnv(process.env.MAIL_CC_ADMIN, "admin@depth-agency.com");
+const BRAND_URL = sanitizeEnv(
+  process.env.BRAND_URL || process.env.NEXT_PUBLIC_SITE_URL,
+  "https://depth-agency.com"
+);
 // DRY_RUN disabled for production - emails will always be sent
 // const DRY_RUN = false;
 
