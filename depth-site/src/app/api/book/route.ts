@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { resend } from '@/lib/email/resend';
+import { ORG } from '@/lib/constants/org';
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
             ` : ''}
 
             <div style="text-align: center; margin-top: 30px;">
-              <a href="https://wa.me/9647779761547?text=مرحباً، بخصوص طلب الحجز من ${name} - ${sessionType}" 
+              <a href="https://wa.me/${ORG.phoneIntl.replace(/\D/g,'')}?text=مرحباً، بخصوص طلب الحجز من ${name} - ${sessionType}" 
                  style="background: #25d366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; display: inline-block;">
                 الرد عبر الواتساب
               </a>
@@ -112,7 +111,7 @@ export async function POST(req: NextRequest) {
 
             <div style="text-align: center; margin: 30px 0;">
               <p style="color: #64748b; margin-bottom: 15px;">للاستفسارات العاجلة:</p>
-              <a href="https://wa.me/9647779761547?text=مرحباً، لدي استفسار بخصوص الحجز" 
+              <a href="https://wa.me/${ORG.phoneIntl.replace(/\D/g,'')}?text=مرحباً، لدي استفسار بخصوص الحجز" 
                  style="background: #25d366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 0 10px;">
                 واتساب
               </a>

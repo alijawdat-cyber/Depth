@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Providers from "./providers";
 import "./globals.css";
+import { BRAND } from "@/lib/constants/brand";
+import { getSiteUrl } from "@/lib/constants/site";
 
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com").replace(/\/$/, "");
+const siteUrl = getSiteUrl();
 
 export const viewport = {
   width: 'device-width',
@@ -26,10 +28,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
-      { url: '/depth-icon-500x500-viewbox375x375.svg', type: 'image/svg+xml' },
+      { url: BRAND.icon, type: 'image/svg+xml' },
     ],
     apple: [
-      { url: '/brand/logo-512.png', sizes: '512x512', type: 'image/png' },
+      { url: BRAND.iconApple, sizes: '512x512', type: 'image/png' },
     ],
   },
   openGraph: {
@@ -72,7 +74,7 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'Depth',
               url: siteUrl,
-              logo: `${siteUrl}/depth-logo.svg`,
+              logo: `${siteUrl}${BRAND.logo}`,
               sameAs: [
                 'https://www.instagram.com/depth_agency/', 
                 'https://www.facebook.com/depthagency',

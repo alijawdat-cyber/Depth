@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import Image from "next/image";
+import { BRAND } from "@/lib/constants/brand";
 
 export default function QRSection() {
   return (
@@ -19,7 +20,7 @@ export default function QRSection() {
             {/* QR Code */}
             <div className="bg-[var(--card)] p-6 rounded-2xl shadow-lg">
               <Image
-                src="/depth_agency_qr.png"
+                src={BRAND.qr}
                 alt="QR Code للوصول لحسابات Depth Agency"
                 width={200}
                 height={200}

@@ -1,6 +1,6 @@
 "use client";
 import { Container } from "@/components/ui/Container";
-import PortalClientReal from "@/components/pages/PortalClientReal";
+import PortalClientReal from "@/components/features/portal/PortalClientReal";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";

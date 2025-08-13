@@ -1,6 +1,6 @@
 // Admin Client Management API
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb } from '@/lib/firebase/admin';
 
 // Simple admin authentication
 const isAdminAuthenticated = (request: NextRequest) => {

@@ -1,6 +1,9 @@
 import { 
   Html, Head, Preview, Body, Container, Section, Img, Text, Link, Hr 
 } from "@react-email/components";
+import { getSiteUrl } from "@/lib/constants/site";
+import { SLA_MAP } from "@/config/inquiry";
+import { ORG } from "@/lib/constants/org";
 
 type Props = {
   type: "general" | "pricing" | "support" | "social" | "jobs";
@@ -9,12 +12,12 @@ type Props = {
   requestId?: string;
 };
 
-const SLAs = { 
-  general: "خلال 24 ساعة", 
-  pricing: "خلال 8 ساعات", 
-  support: "خلال 6 ساعات", 
-  social: "خلال 12 ساعة", 
-  jobs: "خلال 72 ساعة" 
+const SLAs = {
+  general: `خلال ${SLA_MAP.general}`,
+  pricing: `خلال ${SLA_MAP.pricing}`,
+  support: `خلال ${SLA_MAP.support}`,
+  social: `خلال ${SLA_MAP.social}`,
+  jobs: `خلال ${SLA_MAP.jobs}`,
 } as const;
 
 const teamNames = {
@@ -81,7 +84,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
           {/* Header with Logo - Full Logo SVG with fallback */}
           <Section style={{textAlign: "center", marginBottom: "24px", direction: "ltr"}}>
             <Img 
-              src={`${brandUrl}/brand/logo-full.svg`} 
+              src={`${brandUrl || getSiteUrl()}/brand/logo-wordmark.svg`} 
               alt="Depth Agency logo" 
               width="180" 
               height="40"
@@ -192,7 +195,7 @@ export default function ContactAutoReply({ type, name, brandUrl, requestId }: Pr
               margin: "0",
               color: "#4a5568"
             }}>
-              📱 واتساب: <Link href="https://wa.me/9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>
+              📱 واتساب: <Link href={`https://wa.me/${ORG.phoneIntl.replace(/\D/g,'')}`} style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>
                 <span style={{direction: "ltr", unicodeBidi: "bidi-override", whiteSpace: "nowrap"}}>+964 777 976 1547</span>
               </Link>
               {" "}| هاتف: <Link href="tel:+9647779761547" style={{color: "#621cf0", textDecoration: "none", fontWeight: "600"}}>

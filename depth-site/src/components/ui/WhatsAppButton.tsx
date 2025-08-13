@@ -1,6 +1,6 @@
 'use client';
 
-import { openWhatsApp, WhatsAppMessageOptions } from "@/lib/whatsapp";
+import { openWhatsApp, WhatsAppMessageOptions } from "@/lib/integrations/whatsapp";
 import { Button } from "@/components/ui/Button";
 
 interface WhatsAppButtonProps {

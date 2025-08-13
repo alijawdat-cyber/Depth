@@ -1,6 +1,8 @@
 import {
   Html, Head, Preview, Body, Container, Section, Img, Hr, Text, Link
 } from "@react-email/components";
+import { getSiteUrl } from "@/lib/constants/site";
+import { TYPE_LABELS, SLA_MAP } from "@/config/inquiry";
 
 type Props = {
   type: "general" | "pricing" | "support" | "social" | "jobs";
@@ -38,21 +40,8 @@ export default function ContactNotification({
     whiteSpace: "pre-wrap" as const
   };
 
-  const typeLabels = {
-    general: "استفسار عام",
-    pricing: "طلب أسعار",
-    support: "دعم فني", 
-    social: "سوشيال ميديا",
-    jobs: "طلب وظيفة"
-  };
-
-  const slaMap = {
-    general: "24 ساعة",
-    pricing: "8 ساعات", 
-    support: "6 ساعات",
-    social: "12 ساعة",
-    jobs: "72 ساعة"
-  };
+  const typeLabels = TYPE_LABELS;
+  const slaMap = SLA_MAP;
 
   return (
     <Html dir="rtl" lang="ar">
@@ -73,7 +62,7 @@ export default function ContactNotification({
           {/* Header with Logo - Full Logo SVG */}
           <Section style={{textAlign: "center", marginBottom: "24px", direction: "ltr"}}>
             <Img 
-              src={`${brandUrl}/brand/logo-full.svg`} 
+              src={`${brandUrl || getSiteUrl()}/brand/logo-wordmark.svg`} 
               alt="Depth Agency" 
               width="180" 
               height="40"

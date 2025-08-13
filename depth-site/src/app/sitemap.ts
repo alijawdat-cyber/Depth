@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 export const dynamic = "force-static";
+import { getSiteUrl } from "@/lib/constants/site";
+import { blogPosts } from "@/data/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com").replace(/\/$/, "");
+  const base = getSiteUrl();
   
-  return [
+  const baseEntries: MetadataRoute.Sitemap = [
     {
       url: `${base}/`,
       lastModified: new Date(),
@@ -60,6 +62,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
   ];
+
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${base}/blog/${post.slug}`,
+    lastModified: new Date(post.publishedAt),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  return [...baseEntries, ...blogEntries];
 }
 
 

@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 export const dynamic = "force-static";
+import { getSiteUrl } from "@/lib/constants/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://depth-agency.com").replace(/\/$/, "");
+  const base = getSiteUrl();
   return {
     rules: {
       userAgent: "*",

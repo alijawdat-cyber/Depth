@@ -30,8 +30,20 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files - NEVER COMMIT THESE
 .env*
+.env.local
+.env.production
+.env.development
+*.env
+
+# Firebase service account files
+*firebase-adminsdk*.json
+service-account-key.json
+
+# Security keys
+private-key.pem
+*.key
 
 # vercel
 .vercel
@@ -39,3 +51,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Additional cleanup rules
+*.log
+*.backup
+*.bak
+*~
+lhr-*.json
+/audits/
+/email-signatures/

@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { BRAND } from "@/lib/constants/brand";
+import { TYPE_LABELS, SLA_MAP } from "@/config/inquiry";
 
 const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين").max(100, "الاسم طويل جداً"),
@@ -26,11 +28,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const inquiryTypes = [
-  { value: "general", label: "استفسار عام", icon: "💬", desc: "أسئلة عامة حول الخدمات", sla: "24 ساعة" },
-  { value: "pricing", label: "عرض أسعار", icon: "💰", desc: "طلب عرض أسعار مخصص", sla: "8 ساعات" },
-  { value: "support", label: "دعم فني", icon: "🔧", desc: "مساعدة تقنية ودعم", sla: "6 ساعات" },
-  { value: "social", label: "سوشيال ميديا", icon: "📱", desc: "إدارة منصات التواصل", sla: "12 ساعة" },
-  { value: "jobs", label: "وظائف", icon: "👥", desc: "فرص العمل والتوظيف", sla: "72 ساعة" }
+  { value: "general", label: TYPE_LABELS.general, icon: "💬", desc: "أسئلة عامة حول الخدمات", sla: SLA_MAP.general },
+  { value: "pricing", label: TYPE_LABELS.pricing, icon: "💰", desc: "طلب عرض أسعار مخصص", sla: SLA_MAP.pricing },
+  { value: "support", label: TYPE_LABELS.support, icon: "🔧", desc: "مساعدة تقنية ودعم", sla: SLA_MAP.support },
+  { value: "social", label: TYPE_LABELS.social, icon: "📱", desc: "إدارة منصات التواصل", sla: SLA_MAP.social },
+  { value: "jobs", label: TYPE_LABELS.jobs, icon: "👥", desc: "فرص العمل والتوظيف", sla: SLA_MAP.jobs }
 ];
 
 export default function ContactPage() {
@@ -172,7 +174,7 @@ export default function ContactPage() {
               className="hover:scale-105 transition-transform duration-200 touch-manipulation"
             >
               <Image 
-                src="/brand/logo-full.svg"
+                src={BRAND.wordmark}
                 alt="Depth"
                 width={180}
                 height={40}

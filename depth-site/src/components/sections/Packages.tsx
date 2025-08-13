@@ -3,7 +3,7 @@
 import SectionHeading from "@/components/ui/SectionHeading";
 import { Container } from "@/components/ui/Container";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import { PACKAGES } from "@/lib/whatsapp";
+import { PACKAGES } from "@/lib/integrations/whatsapp";
 
 type Plan = {
   name: string;

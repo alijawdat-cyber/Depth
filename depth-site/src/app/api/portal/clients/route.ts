@@ -1,6 +1,6 @@
 // Client Registration API
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb } from '@/lib/firebase/admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 

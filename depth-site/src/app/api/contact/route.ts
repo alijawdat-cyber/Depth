@@ -1,21 +1,13 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { resend } from "@/lib/email/resend";
 import { z } from "zod";
 import { render } from "@react-email/render";
 import { v4 as uuidv4 } from "uuid";
 import ContactNotification, { renderContactNotificationText } from "@/emails/ContactNotification";
 import ContactAutoReply, { renderContactAutoReplyText } from "@/emails/ContactAutoReply";
+import { ROUTING_MAP, AUTOREPLY_SUBJECTS, SLA_MAP } from "@/config/inquiry";
 
-// Smart Routing Configuration
-type Inquiry = "pricing" | "support" | "social" | "jobs" | "general";
-
-const ROUTING_MAP: Record<Inquiry, string> = {
-  pricing: "sales@depth-agency.com",
-  support: "support@depth-agency.com", 
-  social: "social@depth-agency.com",
-  jobs: "jobs@depth-agency.com",
-  general: "hello@depth-agency.com"
-};
+// Smart Routing Configuration centralized in src/config/inquiry.ts
 
 // Environment Configuration (sanitized)
 const sanitizeEnv = (value?: string, fallback?: string) => {
@@ -143,13 +135,7 @@ export async function POST(req: Request) {
     });
 
     // Auto-reply subject lines with prefix
-    const autoreplySubjects = {
-      general: "[DEPTH] تأكيد استلام — سنعود إليك خلال 24 ساعة",
-      pricing: "[DEPTH] طلب عرض أسعار — سنعود إليك خلال 8 ساعات", 
-      support: "[DEPTH] طلب دعم فني — سنعود إليك خلال 6 ساعات",
-      social: "[DEPTH] طلب سوشيال ميديا — سنعود إليك خلال 12 ساعة",
-      jobs: "[DEPTH] طلب وظيفة — سنعود إليك خلال 72 ساعة"
-    };
+    // subjects are now centralized in config
 
     // Enhanced logging
     const logData = {
@@ -161,7 +147,7 @@ export async function POST(req: Request) {
       cc: EMAIL_CC_ADMIN,
       from: EMAIL_FROM,
       subject,
-      autoreplySubject: autoreplySubjects[type],
+       autoreplySubject: AUTOREPLY_SUBJECTS[type],
       brandUrl: BRAND_URL,
       timestamp: new Date().toISOString(),
       mode: "PRODUCTION_EMAILS_ENABLED"
@@ -171,13 +157,10 @@ export async function POST(req: Request) {
     console.log("📧 SENDING REAL EMAILS - Production Mode:", logData);
 
     // Production Mode: Send actual emails
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
+    if (!process.env.RESEND_API_KEY) {
       console.error("contact route: missing RESEND_API_KEY env");
       return NextResponse.json({ ok: false, error: "missing_api_key" }, { status: 500 });
     }
-    
-    const resend = new Resend(apiKey);
 
     // Custom headers for tracking and analytics
     const customHeaders = {
@@ -210,7 +193,7 @@ export async function POST(req: Request) {
     const autoreplyResult = await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
-      subject: autoreplySubjects[type],
+      subject: AUTOREPLY_SUBJECTS[type],
       html: autoreplyHtml,
       text: autoreplyText,
       headers: {
@@ -239,13 +222,7 @@ export async function POST(req: Request) {
       ok: true, 
       sent: true, 
       requestId,
-      estimatedResponse: {
-        general: "24 ساعة",
-        pricing: "8 ساعات",
-        support: "6 ساعات", 
-        social: "12 ساعة",
-        jobs: "72 ساعة"
-      }[type]
+      estimatedResponse: SLA_MAP[type]
     });
     
   } catch (e) {

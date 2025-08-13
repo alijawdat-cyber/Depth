@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
+import { ORG } from "@/lib/constants/org";
 
 export default function Footer() {
   return (
@@ -22,7 +23,7 @@ export default function Footer() {
         <div className="flex justify-center items-center gap-6 mb-8">
           {/* Instagram */}
           <a 
-            href="https://www.instagram.com/depth_agency/" 
+            href={ORG.socials.instagram}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"
@@ -35,7 +36,7 @@ export default function Footer() {
 
           {/* Facebook */}
           <a 
-            href="https://www.facebook.com/depthagency" 
+            href={ORG.socials.facebook}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"
@@ -48,7 +49,7 @@ export default function Footer() {
 
           {/* LinkedIn */}
           <a 
-            href="https://www.linkedin.com/company/depth-agency/" 
+            href={ORG.socials.linkedin}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"
@@ -61,7 +62,7 @@ export default function Footer() {
 
           {/* TikTok */}
           <a 
-            href="https://www.tiktok.com/@depth_agency" 
+            href={ORG.socials.tiktok}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"
@@ -74,7 +75,7 @@ export default function Footer() {
 
           {/* Snapchat */}
           <a 
-            href="https://www.snapchat.com/add/depth_agency" 
+            href={ORG.socials.snapchat}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"
@@ -87,7 +88,7 @@ export default function Footer() {
 
           {/* WhatsApp */}
           <a 
-            href="https://wa.me/9647779761547?text=مرحباً! أريد الاستفسار عن خدماتكم" 
+            href={`https://wa.me/${ORG.phoneIntl.replace(/\D/g,'')}?text=${encodeURIComponent('مرحباً! أريد الاستفسار عن خدماتكم')}`} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-[var(--slate-600)] hover:text-[var(--primary)] transition-colors duration-200"

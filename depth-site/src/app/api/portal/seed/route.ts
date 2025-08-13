@@ -1,6 +1,6 @@
 // Seed Demo Data for Client Portal
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb } from '@/lib/firebase/admin';
 
 export async function POST(req: NextRequest) {
   try {
