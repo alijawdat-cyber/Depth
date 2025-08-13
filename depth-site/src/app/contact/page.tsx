@@ -169,16 +169,15 @@ export default function ContactPage() {
           <div className="flex justify-center">
             <Link 
               href="/"
-              className="flex items-center gap-3 hover:scale-105 transition-transform duration-200 touch-manipulation"
+              className="hover:scale-105 transition-transform duration-200 touch-manipulation"
             >
               <Image 
-                src="/brand/logo.svg"
+                src="/brand/logo-full.svg"
                 alt="Depth"
-                width={32}
-                height={32}
-                className="rounded-lg"
+                width={180}
+                height={40}
+                className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-[var(--text)]">Depth</span>
             </Link>
           </div>
         </div>

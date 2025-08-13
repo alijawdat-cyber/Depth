@@ -11,8 +11,7 @@ import { Container } from "@/components/ui/Container";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import Link from "next/link";
-import { blogPosts, getFeaturedPosts, getAllCategories } from "@/data/blogPosts";
-import type { BlogPost } from "@/data/blogPosts";
+import { blogPosts, getFeaturedPosts, getAllCategories, type BlogPost } from "@/data/blogPosts";
 
 function BlogCard({ post }: { post: BlogPost }) {
   return (
