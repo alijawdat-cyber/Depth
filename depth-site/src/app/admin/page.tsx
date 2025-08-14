@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
 import ImageUploader from "@/components/features/portal/files/ImageUploader";
 import VideoUploader from "@/components/features/portal/files/VideoUploader";
@@ -43,19 +42,7 @@ export default function AdminDashboard() {
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
 
-  // Trigger initial fetch when user becomes authenticated admin
-  useEffect(() => {
-    if (status !== 'authenticated' || !isAdmin) return;
-    const key = '__admin_clients_fetched__';
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, '1');
-      // Start loading and fetch
-      fetchClients();
-      fetchProjects();
-    }
-  }, [status, isAdmin]);
-
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/portal/admin/clients');
@@ -72,7 +59,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+
+
+
 
   const updateClientStatus = async (clientId: string, status: 'approved' | 'rejected') => {
     try {
@@ -136,7 +127,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setProjectsLoading(true);
       setProjectsError(null);
@@ -164,7 +155,7 @@ export default function AdminDashboard() {
     } finally {
       setProjectsLoading(false);
     }
-  };
+  }, []);
 
   const createProject = async () => {
     try {
@@ -185,12 +176,21 @@ export default function AdminDashboard() {
     }
   };
 
+
+
+  // Trigger initial fetch when user becomes authenticated admin
+  useEffect(() => {
+    if (status !== 'authenticated' || !isAdmin) return;
+    // Always fetch on mount for admin - remove sessionStorage caching
+    fetchClients();
+    fetchProjects();
+  }, [status, isAdmin, fetchClients, fetchProjects]);
+
   // Enforce Google sign-in for admin
   if (status !== 'authenticated') {
     return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <Header />
-        <main className="py-12 md:py-20">
+      <PageLayout>
+        <div className="py-12 md:py-20">
           <Container>
             <div className="max-w-md mx-auto">
               <div className="bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)]">
@@ -209,15 +209,14 @@ export default function AdminDashboard() {
               </div>
             </div>
           </Container>
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <Header />
-        <main className="py-12 md:py-20">
+      <PageLayout>
+        <div className="py-12 md:py-20">
           <Container>
             <div className="max-w-xl mx-auto bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)] text-center">
               <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
@@ -228,16 +227,14 @@ export default function AdminDashboard() {
               </div>
             </div>
           </Container>
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
-      
-      <main className="py-12 md:py-20">
+    <PageLayout>
+      <div className="py-12 md:py-20">
         <Container>
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
@@ -479,21 +476,55 @@ export default function AdminDashboard() {
             </div>
 
             {/* Create Project */}
-            <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-4 grid gap-2 md:grid-cols-3">
-              <input value={newProjectTitle} onChange={e => setNewProjectTitle(e.target.value)} placeholder="عنوان المشروع" className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
-              <select value={newProjectClientEmail} onChange={e => setNewProjectClientEmail(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
-                <option value="">اختر بريد العميل</option>
-                {clients.map(c => (
-                  <option key={c.id} value={c.email}>{c.email}</option>
-                ))}
-              </select>
-              <div className="flex gap-2">
-                <select value={newProjectStatus} onChange={e => setNewProjectStatus(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
-                  <option value="active">نشط</option>
-                  <option value="pending">انتظار</option>
-                  <option value="completed">مكتمل</option>
-                </select>
-                <Button onClick={createProject}>إنشاء مشروع</Button>
+            <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
+              <h3 className="text-lg font-semibold text-[var(--text)] mb-4">إنشاء مشروع جديد</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">عنوان المشروع</label>
+                    <input 
+                      value={newProjectTitle} 
+                      onChange={e => setNewProjectTitle(e.target.value)} 
+                      placeholder="مثل: حملة تسويقية شتوية" 
+                      className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">العميل</label>
+                    <select 
+                      value={newProjectClientEmail} 
+                      onChange={e => setNewProjectClientEmail(e.target.value)} 
+                      className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                    >
+                      <option value="">اختر العميل</option>
+                      {clients.filter(c => c.status === 'approved').map(c => (
+                        <option key={c.id} value={c.email}>{c.name} - {c.company}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-[var(--slate-600)] mt-1">فقط العملاء المعتمدون يظهرون هنا</p>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">حالة المشروع</label>
+                    <select 
+                      value={newProjectStatus} 
+                      onChange={e => setNewProjectStatus(e.target.value)} 
+                      className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                    >
+                      <option value="active">نشط</option>
+                      <option value="pending">انتظار</option>
+                      <option value="completed">مكتمل</option>
+                    </select>
+                  </div>
+                  <Button 
+                    onClick={createProject}
+                    disabled={!newProjectTitle.trim() || !newProjectClientEmail.trim()}
+                    className="px-6 py-2"
+                  >
+                    إنشاء المشروع
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -537,30 +568,58 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Admin Uploads Section (reuse client uploaders) */}
+          {/* Admin File Upload Section */}
           <div className="mt-10">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-[var(--text)] mb-1">رفع الملفات (للأدمن)</h2>
-              <p className="text-[var(--slate-600)]">اختر مشروعاً ثم ارفع صور/فيديو/وثائق بالنيابة عن العميل</p>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-[var(--text)] mb-2">رفع الملفات</h2>
+              <p className="text-[var(--slate-600)]">ارفع الملفات للمشاريع بالنيابة عن العملاء</p>
             </div>
-            <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-4 grid gap-3 md:grid-cols-3">
-              <select value={selectedProjectIdForUpload} onChange={e => setSelectedProjectIdForUpload(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
-                <option value="">اختر مشروعاً للرفع</option>
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>{p.title} — {p.clientEmail}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <ImageUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
-              <VideoUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
-              <DocumentUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
+            
+            <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
+                <select 
+                  value={selectedProjectIdForUpload} 
+                  onChange={e => setSelectedProjectIdForUpload(e.target.value)} 
+                  className="w-full max-w-md px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                >
+                  <option value="">اختر المشروع للرفع</option>
+                  {projects.map(p => (
+                    <option key={p.id} value={p.id}>{p.title} - {p.clientEmail}</option>
+                  ))}
+                </select>
+                {!selectedProjectIdForUpload && (
+                  <p className="text-xs text-amber-600 mt-1">⚠️ يجب اختيار مشروع أولاً</p>
+                )}
+              </div>
+              
+              <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${!selectedProjectIdForUpload ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-[var(--text)]">الصور</h3>
+                  <ImageUploader 
+                    projectId={selectedProjectIdForUpload || 'demo'} 
+                    onUploaded={() => { fetchProjects(); }} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-[var(--text)]">الفيديو</h3>
+                  <VideoUploader 
+                    projectId={selectedProjectIdForUpload || 'demo'} 
+                    onUploaded={() => { fetchProjects(); }} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-[var(--text)]">المستندات</h3>
+                  <DocumentUploader 
+                    projectId={selectedProjectIdForUpload || 'demo'} 
+                    onUploaded={() => { fetchProjects(); }} 
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </Container>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+    </PageLayout>
   );
 }

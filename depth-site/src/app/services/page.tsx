@@ -1,8 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 
 const services = [
   {
@@ -117,10 +115,8 @@ const services = [
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Header />
-      
-      <main className="py-16">
+    <PageLayout>
+      <div className="py-16">
         <Container>
           <div className="max-w-6xl mx-auto">
             {/* Header */}

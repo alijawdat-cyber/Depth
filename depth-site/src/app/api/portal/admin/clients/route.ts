@@ -19,40 +19,58 @@ export async function GET() {
     const session = await requireAdmin();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Get all clients
-    const clientsSnapshot = await adminDb
-      .collection('clients')
-      .orderBy('createdAt', 'desc')
-      .get();
+    // Try ordered query first
+    let clients: Array<{ id: string; name: string; email: string; company: string; phone: string; status: string; createdAt: string }> = [];
+    try {
+      const ordered = await adminDb
+        .collection('clients')
+        .orderBy('createdAt', 'desc')
+        .get();
+      clients = ordered.docs.map(doc => {
+        const data = doc.data();
+        let createdAtIso: string;
+        try {
+          if (data.createdAt?.toDate) createdAtIso = data.createdAt.toDate().toISOString();
+          else if (data.createdAt instanceof Date) createdAtIso = data.createdAt.toISOString();
+          else if (typeof data.createdAt === 'string') createdAtIso = data.createdAt;
+          else createdAtIso = new Date().toISOString();
+        } catch { createdAtIso = new Date().toISOString(); }
+        return {
+          id: doc.id,
+          name: data.name,
+          email: data.email,
+          company: data.company,
+          phone: data.phone,
+          status: data.status,
+          createdAt: createdAtIso,
+        };
+      });
+    } catch {
+      clients = [];
+    }
 
-    const clients = clientsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      // Normalize Firestore Timestamp/Date/string to ISO string safely
-      let createdAtIso: string;
-      try {
-        if (data.createdAt?.toDate) {
-          createdAtIso = data.createdAt.toDate().toISOString();
-        } else if (data.createdAt instanceof Date) {
-          createdAtIso = data.createdAt.toISOString();
-        } else if (typeof data.createdAt === 'string') {
-          createdAtIso = data.createdAt;
-        } else {
-          createdAtIso = new Date().toISOString();
-        }
-      } catch {
-        createdAtIso = new Date().toISOString();
-      }
-
-      return {
-        id: doc.id,
-        name: data.name,
-        email: data.email,
-        company: data.company,
-        phone: data.phone,
-        status: data.status,
-        createdAt: createdAtIso,
-      };
-    });
+    // Fallback: include any client docs missing createdAt by doing an un-ordered scan
+    if (clients.length === 0) {
+      const scan = await adminDb.collection('clients').get();
+      clients = scan.docs.map(doc => {
+        const data = doc.data();
+        let createdAtIso: string | undefined;
+        try {
+          if (data.createdAt?.toDate) createdAtIso = data.createdAt.toDate().toISOString();
+          else if (data.createdAt instanceof Date) createdAtIso = data.createdAt.toISOString();
+          else if (typeof data.createdAt === 'string') createdAtIso = data.createdAt;
+        } catch { createdAtIso = undefined; }
+        return {
+          id: doc.id,
+          name: data.name,
+          email: data.email,
+          company: data.company,
+          phone: data.phone,
+          status: data.status || 'pending',
+          createdAt: createdAtIso || new Date(0).toISOString(), // put legacy first
+        };
+      }).sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+    }
 
     return NextResponse.json({
       success: true,
@@ -157,6 +175,21 @@ export async function POST(req: NextRequest) {
         html: `<p>مرحباً،</p><p>اضغط هنا لتسجيل الدخول والبدء: <a href="${process.env.NEXTAUTH_URL}/portal/auth/signin">تسجيل الدخول</a></p>`
       });
       return NextResponse.json({ success: true, message: 'Invitation sent' });
+    }
+
+    if (action === 'backfill-createdAt') {
+      // Fallback migration: add createdAt to clients missing it
+      const snap = await adminDb.collection('clients').get();
+      let updated = 0;
+      for (const doc of snap.docs) {
+        const data = doc.data();
+        const hasField = !!data.createdAt;
+        if (!hasField) {
+          await doc.ref.update({ createdAt: new Date(), updatedAt: new Date() });
+          updated++;
+        }
+      }
+      return NextResponse.json({ success: true, updated });
     }
 
     return NextResponse.json(
