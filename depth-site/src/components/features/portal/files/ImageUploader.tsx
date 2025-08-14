@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cloudflareImageUrl } from "@/lib/cloudflare";
+import { cloudflareImageUrl } from "@/lib/cloudflare-public";
 
 export default function ImageUploader({ projectId, onUploaded }: { projectId: string; onUploaded: () => void }) {
   const [busy, setBusy] = useState(false);

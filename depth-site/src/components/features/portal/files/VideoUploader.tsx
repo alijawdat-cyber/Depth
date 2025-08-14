@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cloudflareStreamIframeUrl } from "@/lib/cloudflare";
+import { cloudflareStreamIframeUrl } from "@/lib/cloudflare-public";
 
 export default function VideoUploader({ projectId, onUploaded }: { projectId: string; onUploaded: () => void }) {
   const [busy, setBusy] = useState(false);
