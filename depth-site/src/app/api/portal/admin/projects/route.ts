@@ -41,13 +41,31 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { title, clientEmail, status = 'active', milestones = [] } = body || {};
+    const { title, clientEmail, status = 'active', milestones = [], budget, progress, description } = body || {};
     if (!title || !clientEmail) {
       return NextResponse.json({ error: 'title and clientEmail are required' }, { status: 400 });
     }
 
+    // Validate client exists and is approved
+    const clientSnap = await adminDb
+      .collection('clients')
+      .where('email', '==', String(clientEmail).toLowerCase())
+      .limit(1)
+      .get();
+    if (clientSnap.empty) {
+      return NextResponse.json({ error: 'Client does not exist' }, { status: 400 });
+    }
+    const clientData = clientSnap.docs[0].data() as { status?: string };
+    if (clientData.status !== 'approved') {
+      return NextResponse.json({ error: 'Client is not approved' }, { status: 400 });
+    }
+
+    // Normalize to unified schema used by client UI
     const doc = {
-      title,
+      name: title,
+      description: typeof description === 'string' ? description : '',
+      budget: typeof budget === 'number' ? budget : 0,
+      progress: typeof progress === 'number' ? progress : 0,
       clientEmail: String(clientEmail).toLowerCase(),
       status,
       milestones,

@@ -15,17 +15,47 @@ export async function GET() {
 
     // Get client projects from Firestore
     const projectsRef = adminDb.collection('projects');
+    // Firestore limitation: avoid '!=' without matching orderBy; use inclusive statuses instead
+    const allowedStatuses = ['active', 'pending', 'completed'];
     const snapshot = await projectsRef
       .where('clientEmail', '==', session.user.email)
-      .where('status', '!=', 'deleted')
+      .where('status', 'in', allowedStatuses)
       .get();
 
-    const projects = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
-      updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
-    }));
+    const projects = snapshot.docs.map(doc => {
+      const data = doc.data() as Record<string, unknown>;
+      // Normalize schema: admin creates {title}, client UI expects {name, description, budget, progress}
+      const name = (data.name as string) || (data.title as string) || '';
+      const description = (data.description as string) || '';
+      const budget = typeof data.budget === 'number' ? (data.budget as number) : 0;
+      const progress = typeof data.progress === 'number' ? (data.progress as number) : 0;
+      const status = (data.status as string) || 'active';
+      const createdAt =
+        data.createdAt &&
+        typeof data.createdAt === 'object' &&
+        'toDate' in (data.createdAt as Record<string, unknown>) &&
+        typeof (data.createdAt as { toDate: () => Date }).toDate === 'function'
+          ? (data.createdAt as { toDate: () => Date }).toDate().toISOString()
+          : null;
+      const updatedAt =
+        data.updatedAt &&
+        typeof data.updatedAt === 'object' &&
+        'toDate' in (data.updatedAt as Record<string, unknown>) &&
+        typeof (data.updatedAt as { toDate: () => Date }).toDate === 'function'
+          ? (data.updatedAt as { toDate: () => Date }).toDate().toISOString()
+          : null;
+      return {
+        id: doc.id,
+        name,
+        description,
+        budget,
+        progress,
+        status,
+        clientEmail: data.clientEmail as string,
+        createdAt,
+        updatedAt,
+      };
+    });
 
     return NextResponse.json({ 
       success: true, 

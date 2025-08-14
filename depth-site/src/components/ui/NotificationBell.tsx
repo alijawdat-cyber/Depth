@@ -21,6 +21,9 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
+    const onVis = () => { if (!document.hidden) fetchNotifications(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
   }, []);
 
   const fetchNotifications = async () => {
@@ -130,6 +133,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors"
+        aria-label="الإشعارات"
       >
         <Bell size={20} className="text-[var(--slate-600)]" />
         {unreadCount > 0 && (
@@ -155,6 +159,13 @@ export default function NotificationBell() {
                   {loading ? 'جاري...' : 'تعليم الكل كمقروء'}
                 </button>
               )}
+              <button
+                onClick={fetchNotifications}
+                className="text-xs text-[var(--accent-500)] hover:underline"
+                title="تحديث"
+              >
+                تحديث
+              </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-[var(--bg-secondary)] rounded"

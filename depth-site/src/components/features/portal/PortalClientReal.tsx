@@ -2,65 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase, Copy } from "lucide-react";
-import ImageUploader from "./files/ImageUploader";
-import VideoUploader from "./files/VideoUploader";
-import DocumentUploader from "./files/DocumentUploader";
+import UnifiedUploader from "./files/UnifiedUploader";
 import { Button } from "@/components/ui/Button";
+// Types are centralized in src/types; local state not used for these now
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import NotificationBell from "@/components/ui/NotificationBell";
 import PendingApprovalScreen from "./PendingApprovalScreen";
 import WelcomeOnboarding from "./WelcomeOnboarding";
 import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
 import { StateLoading, StateError, StateEmpty } from "@/components/ui/States";
+import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  progress: number;
-  budget: number;
-  spent?: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ProjectFile {
-  id: string;
-  name: string;
-  type: string;
-  size: string;
-  status: string;
-  createdAt: string;
-  url: string;
-}
-
-interface Approval {
-  id: string;
-  title: string;
-  type: string;
-  deadline: string;
-  priority: string;
-  status: string;
-  description?: string;
-}
+  // Using SWR hooks for data; no local interfaces needed here
 
 export default function PortalClientReal() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("summary");
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [files, setFiles] = useState<ProjectFile[]>([]);
-  const [approvals, setApprovals] = useState<Approval[]>([]);
-  const [projectsList, setProjectsList] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { projects = [], refresh: refreshProjects } = useProjects();
+  const activeProjectId = projects?.[0]?.id;
+  const { files = [], refresh: refreshFiles } = useFiles(activeProjectId);
+  const { approvals = [], refresh: refreshApprovals } = useApprovals(activeProjectId);
+  // skeleton state not needed now; SWR provides isLoading if needed
   const [clientStatus, setClientStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const tabs = [
     { id: "summary", label: "ملخص", icon: BarChart3 },
@@ -69,82 +41,39 @@ export default function PortalClientReal() {
     { id: "reports", label: "التقارير", icon: Calendar }
   ] as const;
 
-  // Fetch data on component mount
+  // Onboarding flags on first load
   useEffect(() => {
-    if (status === 'authenticated') {
-      fetchData();
-      
-      // Check if user has seen onboarding
-      const hasSeenOnboarding = localStorage.getItem(`onboarding-${session?.user?.email}`);
-      if (!hasSeenOnboarding && projects.length > 0) {
-        setTimeout(() => setShowOnboarding(true), 2000); // Show after 2 seconds
-      }
-    } else if (status === 'unauthenticated') {
-      // Ensure we don't keep showing the spinner when user is not signed in
-      setLoading(false);
+    if (status !== 'authenticated') return;
+    const hasSeenOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`onboarding-${session?.user?.email}`) : '1';
+    if (!hasSeenOnboarding && (projects?.length || 0) > 0) {
+      setTimeout(() => setShowOnboarding(true), 2000);
     }
-  }, [status, projects.length, session?.user?.email]);
+    const welcomeDone = typeof window !== 'undefined' ? localStorage.getItem(`welcome-done-${session?.user?.email}`) : '1';
+    if (welcomeDone) setShowWelcome(false);
+  }, [status, session?.user?.email, projects?.length]);
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       setError(null);
-
-      // First, check client status
       const clientResponse = await fetch('/api/portal/clients');
       if (clientResponse.ok) {
         const clientData = await clientResponse.json();
         const client = clientData.client;
         setClientStatus(client?.status || 'pending');
-        
-        // If client is not approved, don't fetch project data
-        if (client?.status !== 'approved') {
-          setLoading(false);
-          return;
-        }
+        if (client?.status !== 'approved') return;
+        await Promise.all([
+          refreshProjects(),
+          activeProjectId ? refreshFiles() : Promise.resolve(),
+          activeProjectId ? refreshApprovals() : Promise.resolve(),
+        ]);
       } else {
-        // Client not found, probably pending
         setClientStatus('pending');
-        setLoading(false);
-        return;
-      }
-
-      // Fetch projects only if client is approved
-      const projectsResponse = await fetch('/api/portal/projects');
-      if (projectsResponse.ok) {
-        const projectsData = await projectsResponse.json();
-        setProjects(projectsData.projects || []);
-
-        // If we have projects, fetch files and approvals for the first project
-        if (projectsData.projects?.length > 0) {
-          const firstProjectId = projectsData.projects[0].id;
-          
-          // Fetch files
-          const filesResponse = await fetch(`/api/portal/files?projectId=${firstProjectId}`);
-          if (filesResponse.ok) {
-            const filesData = await filesResponse.json();
-            setFiles(filesData.files || []);
-          }
-
-          // Fetch approvals
-          const approvalsResponse = await fetch(`/api/portal/approvals?projectId=${firstProjectId}`);
-          if (approvalsResponse.ok) {
-            const approvalsData = await approvalsResponse.json();
-            setApprovals(approvalsData.approvals || []);
-          }
-        }
-        // Fetch all projects for quick reference
-        const allProjectsRes = await fetch('/api/portal/projects');
-        if (allProjectsRes.ok) {
-          const allProjectsData = await allProjectsRes.json();
-          setProjectsList(allProjectsData.projects || []);
-        }
       }
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('فشل في تحميل البيانات. يرجى المحاولة مرة أخرى.');
     } finally {
-      setLoading(false);
+      // noop
     }
   };
 
@@ -200,8 +129,9 @@ export default function PortalClientReal() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA');
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return '-';
+    try { return new Date(dateString).toLocaleDateString('ar-SA'); } catch { return '-'; }
   };
 
   const handleOnboardingComplete = () => {
@@ -221,8 +151,8 @@ export default function PortalClientReal() {
     localStorage.setItem(`onboarding-${session?.user?.email}`, 'skipped');
   };
 
-  // Show loading state
-  if (status === 'loading' || loading) {
+  // Show loading state للمصادقة فقط؛ أثناء تحميل البيانات نعرض Skeletons داخل الصفحة
+  if (status === 'loading') {
     return <StateLoading text="جاري تحميل البيانات..." className="min-h-[300px]"/>;
   }
 
@@ -255,18 +185,25 @@ export default function PortalClientReal() {
   }
 
   // Show welcome onboarding for approved clients with no projects
-  if (clientStatus === 'approved' && projects.length === 0) {
+  if (clientStatus === 'approved' && projects.length === 0 && showWelcome) {
     return (
       <WelcomeOnboarding 
         userName={session?.user?.name || ''} 
         userEmail={session?.user?.email || ''}
-        onRefresh={fetchData}
+        onRefresh={() => {
+          // Mark welcome as completed and move user into the portal UI
+          localStorage.setItem(`welcome-done-${session?.user?.email}`,'1');
+          setShowWelcome(false);
+          setTab('files');
+          // Optionally refresh data
+          fetchData();
+        }}
       />
     );
   }
 
   // Calculate summary stats
-  const activeProject = projects[0];
+  const activeProject = projects?.[0];
   const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const averageProgress = projects.length > 0 
     ? projects.reduce((sum, p) => sum + p.progress, 0) / projects.length 
@@ -277,6 +214,8 @@ export default function PortalClientReal() {
       {/* Interactive Onboarding */}
       <InteractiveOnboarding
         isActive={showOnboarding}
+        currentTab={tab}
+        setTab={(t)=>setTab(t as Tab)}
         onComplete={handleOnboardingComplete}
         onSkip={handleOnboardingSkip}
       />
@@ -333,6 +272,7 @@ export default function PortalClientReal() {
       {tab === "summary" && (
         <div id="quick-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" />
             <div className="absolute top-2 right-2 opacity-20">
               <TrendingUp size={40} />
             </div>
@@ -347,6 +287,7 @@ export default function PortalClientReal() {
           </div>
           
           <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" />
             <div className="absolute top-2 right-2 opacity-20">
               <DollarSign size={40} />
             </div>
@@ -361,6 +302,7 @@ export default function PortalClientReal() {
           </div>
           
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" />
             <div className="absolute top-2 right-2 opacity-20">
               <Briefcase size={40} />
             </div>
@@ -375,6 +317,7 @@ export default function PortalClientReal() {
           </div>
           
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" />
             <div className="absolute top-2 right-2 opacity-20">
               <Target size={40} />
             </div>
@@ -501,14 +444,24 @@ export default function PortalClientReal() {
                     تحديث البيانات
                   </Button>
 
-                  <Button 
-                    variant="ghost" 
-                    className="flex items-center justify-center gap-2 p-4 rounded-[var(--radius-lg)] font-medium transition-all hover:scale-105 bg-purple-50 hover:bg-purple-100 text-purple-700"
-                    onClick={() => router.push('/portal/profile')}
-                  >
-                    <Settings size={20} />
-                    إعدادات الحساب
-                  </Button>
+                  {activeProject ? (
+                    <Button 
+                      variant="primary" 
+                      className="flex items-center justify-center gap-2 p-4 rounded-[var(--radius-lg)] font-medium transition-all hover:scale-105"
+                      onClick={() => { setTab('files'); setTimeout(() => document.getElementById('uploaders')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }}
+                    >
+                      رفع أول ملف
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="ghost" 
+                      className="flex items-center justify-center gap-2 p-4 rounded-[var(--radius-lg)] font-medium transition-all hover:scale-105 bg-purple-50 hover:bg-purple-100 text-purple-700"
+                      onClick={() => router.push('/portal/profile')}
+                    >
+                      <Settings size={20} />
+                      حدّث بيانات حسابك
+                    </Button>
+                  )}
                   
                   <Button 
                     variant="ghost" 
@@ -538,12 +491,13 @@ export default function PortalClientReal() {
                 </div>
               </div>
 
-              {/* Uploaders */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <ImageUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
-                <VideoUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
-                <DocumentUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
+              {/* Unified Uploader */}
+              <div id="uploaders" className={`${!activeProject ? 'opacity-50 pointer-events-none' : ''}`}>
+                <UnifiedUploader projectId={activeProject?.id || ''} onUploaded={fetchData} />
               </div>
+              {!activeProject && (
+                <div className="text-xs text-amber-600">⚠️ لا يمكن الرفع دون وجود مشروع نشط. يرجى الانتظار حتى يتم إنشاء مشروع لك.</div>
+              )}
 
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
                 {files.length > 0 ? files.map((file) => (
@@ -558,7 +512,9 @@ export default function PortalClientReal() {
 
                       {/* Preview area */}
                       {file.type === 'image' ? (
-                        <img src={file.url} alt={file.name} className="w-full h-40 object-cover rounded-md border border-[var(--elev)]" />
+                        <div className="relative w-full h-40 rounded-md overflow-hidden border border-[var(--elev)]">
+                          <Image src={file.url} alt={file.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                        </div>
                       ) : file.type === 'video' ? (
                         <div className="aspect-video w-full rounded-md overflow-hidden border border-[var(--elev)]">
                           <iframe src={file.url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
@@ -657,16 +613,38 @@ export default function PortalClientReal() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleApprovalUpdate(approval.id, 'needs_revision', 'يحتاج مراجعة')}
+                          onClick={async () => {
+                            const feedback = window.prompt('أدخل ملاحظة المراجعة (اختياري):', '');
+                            if (feedback === null) return; // cancel
+                            const confirmMsg = 'تأكيد إرسال الحالة إلى "يحتاج مراجعة"؟';
+                            if (!window.confirm(confirmMsg)) return;
+                            await handleApprovalUpdate(approval.id, 'needs_revision', feedback || '');
+                          }}
                         >
                           مراجعة
                         </Button>
                         <Button 
-                          variant="primary" 
+                          variant="ghost" 
                           size="sm"
-                          onClick={() => handleApprovalUpdate(approval.id, 'approved', 'موافق عليه')}
+                          onClick={async () => {
+                            const feedback = window.prompt('أدخل ملاحظة (اختياري):', '');
+                            if (!window.confirm('تأكيد الموافقة النهائية؟')) return;
+                            await handleApprovalUpdate(approval.id, 'approved', feedback || '');
+                          }}
                         >
                           موافقة
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={async () => {
+                            const feedback = window.prompt('سبب الرفض (اختياري):', '');
+                            if (!window.confirm('هل أنت متأكد من الرفض؟')) return;
+                            await handleApprovalUpdate(approval.id, 'rejected', feedback || '');
+                          }}
+                          className="text-red-600 hover:bg-red-50"
+                        >
+                          رفض
                         </Button>
                       </div>
                     </div>

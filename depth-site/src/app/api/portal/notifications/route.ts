@@ -4,13 +4,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { searchParams } = new URL(req.url);
+    const limitParam = Math.min(Number(searchParams.get('limit') || '20'), 50);
+    const cursor = searchParams.get('cursor');
 
     // Note: Future feature - filter notifications by project
     // const projectsSnapshot = await adminDb
@@ -19,31 +23,62 @@ export async function GET() {
     //   .get();
     // const projectIds = projectsSnapshot.docs.map(doc => doc.id);
 
-    // Get notifications for client's projects
-    const notificationsQuery = adminDb
+    // Get notifications for client's projects (paged)
+    let notificationsQuery = adminDb
       .collection('notifications')
       .where('clientEmail', '==', session.user.email)
       .orderBy('createdAt', 'desc')
-      .limit(20);
+      .limit(limitParam);
+    if (cursor) {
+      try {
+        const cursorDate = new Date(cursor);
+        if (!isNaN(cursorDate.getTime())) {
+          notificationsQuery = notificationsQuery.startAfter(cursorDate);
+        }
+      } catch {}
+    }
 
     const notificationsSnapshot = await notificationsQuery.get();
+    // Type guard for Firestore Timestamp-like objects
+    const isTimestampLike = (v: unknown): v is { toDate: () => Date } => {
+      return !!v && typeof v === 'object' && 'toDate' in (v as Record<string, unknown>) && typeof (v as { toDate?: unknown }).toDate === 'function';
+    };
+
     const notifications = notificationsSnapshot.docs.map(doc => {
-      const data = doc.data();
+      const data = doc.data() as Record<string, unknown>;
+      const createdRaw = data.createdAt;
+      let createdIso: string;
+      try {
+        if (isTimestampLike(createdRaw)) createdIso = createdRaw.toDate().toISOString();
+        else if (createdRaw instanceof Date) createdIso = createdRaw.toISOString();
+        else createdIso = new Date().toISOString();
+      } catch {
+        createdIso = new Date().toISOString();
+      }
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toISOString() || new Date().toISOString(),
+        createdAt: createdIso,
       };
     });
 
     // Get unread count
     const unreadCount = notifications.filter((n: Record<string, unknown>) => !n.read).length;
 
-    return NextResponse.json({
-      success: true,
-      notifications,
-      unreadCount,
-    });
+    const last = notificationsSnapshot.docs[notificationsSnapshot.docs.length - 1];
+    let nextCursor: string | null = null;
+    if (last) {
+      const raw = last.data().createdAt;
+      try {
+        const d = (raw?.toDate?.() as Date) || (raw as Date);
+        nextCursor = d?.toISOString?.() || null;
+      } catch { nextCursor = null; }
+    }
+
+    return new NextResponse(
+      JSON.stringify({ success: true, notifications, unreadCount, nextCursor }),
+      { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
+    );
 
   } catch (error) {
     console.error('Get notifications error:', error);

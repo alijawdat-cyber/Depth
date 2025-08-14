@@ -89,13 +89,21 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.userId = user.id;
         const emailFirst = (user.email || '').toLowerCase();
-        // Always derive role from the CURRENT user's email to avoid leaking previous sessions' roles
-        token.role = emailFirst === 'admin@depth-agency.com' ? 'admin' : 'client';
+        // Derive role from env ADMIN_EMAILS (comma-separated), fallback to default admin
+        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
+          .split(',')
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean);
+        token.role = adminList.includes(emailFirst) ? 'admin' : 'client';
       }
       // Ensure role is derived even when `user` is undefined (subsequent JWT calls)
       if (!token.role && token.email) {
         const emailFallback = String(token.email).toLowerCase();
-        token.role = emailFallback === 'admin@depth-agency.com' ? 'admin' : 'client';
+        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
+          .split(',')
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean);
+        token.role = adminList.includes(emailFallback) ? 'admin' : 'client';
       }
       // allow role update from client if needed
       if (trigger === 'update' && session?.role) {
@@ -116,16 +124,19 @@ export const authOptions: NextAuthOptions = {
         const provider = account?.provider || 'unknown';
         console.log('[auth.signIn] start', { email, provider });
         if (!email) return true;
-        if (email === 'admin@depth-agency.com') return true;
-        // Auto-provision client profile on first Google/Magic sign-in if missing
+        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
+          .split(',')
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean);
+        if (adminList.includes(email)) return true;
+        // Ensure client exists (single source of truth)
         const snap = await adminDb
           .collection('clients')
           .where('email', '==', email)
           .limit(1)
           .get();
-        console.log('[auth.signIn] existingClient?', !snap.empty);
         if (snap.empty) {
-          const created = await adminDb.collection('clients').add({
+          await adminDb.collection('clients').add({
             email,
             name: user?.name || '',
             phone: '',
@@ -135,11 +146,9 @@ export const authOptions: NextAuthOptions = {
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          console.log('[auth.signIn] clientCreated', created.id);
         }
       } catch (e) {
         console.error('[auth.signIn] provisioning error', e);
-        // non-fatal; allow sign-in to proceed
       }
       return true;
     },
@@ -158,36 +167,5 @@ export const authOptions: NextAuthOptions = {
       }
     }
   },
-  events: {
-    async signIn({ user, account }) {
-      try {
-        const email = String(user?.email || '').toLowerCase();
-        const provider = account?.provider || 'unknown';
-        console.log('[auth.events.signIn] start', { email, provider });
-        if (!email || email === 'admin@depth-agency.com') return;
-        const snap = await adminDb
-          .collection('clients')
-          .where('email', '==', email)
-          .limit(1)
-          .get();
-        if (snap.empty) {
-          const created = await adminDb.collection('clients').add({
-            email,
-            name: user?.name || '',
-            phone: '',
-            company: '',
-            status: 'pending',
-            role: 'client',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-          console.log('[auth.events.signIn] clientCreated', created.id);
-        } else {
-          console.log('[auth.events.signIn] clientExists');
-        }
-      } catch (e) {
-        console.error('[auth.events.signIn] error', e);
-      }
-    },
-  },
+  events: {},
 };

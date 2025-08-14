@@ -5,9 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import PageLayout from "@/components/layout/PageLayout";
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
-import ImageUploader from "@/components/features/portal/files/ImageUploader";
-import VideoUploader from "@/components/features/portal/files/VideoUploader";
-import DocumentUploader from "@/components/features/portal/files/DocumentUploader";
+import UnifiedUploader from "@/components/features/portal/files/UnifiedUploader";
 import { signIn, useSession } from "next-auth/react";
 import Dropdown from "@/components/ui/Dropdown";
 
@@ -39,6 +37,9 @@ export default function AdminDashboard() {
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const [newProjectClientEmail, setNewProjectClientEmail] = useState('');
   const [newProjectStatus, setNewProjectStatus] = useState('active');
+  const [newProjectBudget, setNewProjectBudget] = useState<number>(0);
+  const [newProjectProgress, setNewProjectProgress] = useState<number>(0);
+  const [newProjectDescription, setNewProjectDescription] = useState<string>('');
   const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
   const [fileFilter, setFileFilter] = useState<'all'|'image'|'video'|'document'>('all');
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
@@ -152,12 +153,22 @@ export default function AdminDashboard() {
       const res = await fetch('/api/portal/admin/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newProjectTitle.trim(), clientEmail: newProjectClientEmail.trim(), status: newProjectStatus })
+        body: JSON.stringify({
+          title: newProjectTitle.trim(),
+          clientEmail: newProjectClientEmail.trim(),
+          status: newProjectStatus,
+          budget: Number.isFinite(newProjectBudget) ? newProjectBudget : 0,
+          progress: Math.min(100, Math.max(0, newProjectProgress)),
+          description: newProjectDescription.trim(),
+        })
       });
       if (!res.ok) throw new Error('failed');
       setNewProjectTitle('');
       setNewProjectClientEmail('');
       setNewProjectStatus('active');
+      setNewProjectBudget(0);
+      setNewProjectProgress(0);
+      setNewProjectDescription('');
       await fetchProjects();
       setFlash({ type: 'success', message: 'تم إنشاء المشروع' });
     } catch {
@@ -492,26 +503,30 @@ export default function AdminDashboard() {
                     <p className="text-xs text-[var(--slate-600)] mt-1">فقط العملاء المعتمدون يظهرون هنا</p>
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-[var(--text)] mb-2">حالة المشروع</label>
                     <Dropdown
                       value={newProjectStatus as 'active' | 'pending' | 'completed'}
                       onChange={(v) => setNewProjectStatus(String(v))}
-                      options={[
-                        { value: 'active', label: 'نشط' },
-                        { value: 'pending', label: 'انتظار' },
-                        { value: 'completed', label: 'مكتمل' },
-                      ]}
+                      options={[{ value: 'active', label: 'نشط' }, { value: 'pending', label: 'انتظار' }, { value: 'completed', label: 'مكتمل' }]}
                     />
                   </div>
-                  <Button 
-                    onClick={createProject}
-                    disabled={!newProjectTitle.trim() || !newProjectClientEmail.trim()}
-                    className="px-6 py-2"
-                  >
-                    إنشاء المشروع
-                  </Button>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">الميزانية (USD)</label>
+                    <input type="number" min={0} value={newProjectBudget} onChange={e => setNewProjectBudget(Number(e.target.value))} className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">نسبة التقدم %</label>
+                    <input type="number" min={0} max={100} value={newProjectProgress} onChange={e => setNewProjectProgress(Number(e.target.value))} className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">وصف المشروع</label>
+                  <textarea value={newProjectDescription} onChange={e => setNewProjectDescription(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" placeholder="نبذة عن المشروع" />
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={createProject} disabled={!newProjectTitle.trim() || !newProjectClientEmail.trim()} className="px-6 py-2">إنشاء المشروع</Button>
                 </div>
               </div>
             </div>
@@ -570,7 +585,7 @@ export default function AdminDashboard() {
                   <Dropdown
                     value={selectedProjectIdForUpload || ''}
                     onChange={(v) => setSelectedProjectIdForUpload(String(v))}
-                    options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
+                    options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${(p as unknown as { name?: string; title?: string }).name || (p as unknown as { title?: string }).title || 'بدون عنوان'} - ${p.clientEmail}` }))]}
                     className="w-full max-w-md"
                   />
                   {!selectedProjectIdForUpload && (
@@ -593,29 +608,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               
-              <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${!selectedProjectIdForUpload ? 'opacity-50 pointer-events-none' : ''}`}>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-[var(--text)]">الصور</h3>
-                  <ImageUploader 
-                    projectId={selectedProjectIdForUpload || 'demo'} 
-                    onUploaded={() => { fetchProjects(); }} 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-[var(--text)]">الفيديو</h3>
-                  <VideoUploader 
-                    projectId={selectedProjectIdForUpload || 'demo'} 
-                    onUploaded={() => { fetchProjects(); }} 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-[var(--text)]">المستندات</h3>
-                  <DocumentUploader 
-                    projectId={selectedProjectIdForUpload || 'demo'} 
-                    onUploaded={() => { fetchProjects(); }} 
-                  />
-                </div>
-              </div>
+              <UnifiedUploader projectId={selectedProjectIdForUpload || ''} onUploaded={() => { fetchProjects(); }} />
             </div>
           </div>
         </Container>

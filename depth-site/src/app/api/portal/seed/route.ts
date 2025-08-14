@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     const demoFiles = [
       {
         name: 'تصاميم الحملة الشتوية',
-        type: 'Design',
+        type: 'document',
         size: '2.4 MB',
         status: 'reviewing',
         url: 'https://example.com/file1.pdf',
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       },
       {
         name: 'فيديو ريلز - العروض الأسبوعية',
-        type: 'Video',
+        type: 'video',
         size: '45.2 MB',
         status: 'approved',
         url: 'https://example.com/video1.mp4',
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       },
       {
         name: 'استراتيجية المحتوى - ديسمبر',
-        type: 'Strategy',
+        type: 'document',
         size: '1.1 MB',
         status: 'approved',
         url: 'https://example.com/strategy.pdf',

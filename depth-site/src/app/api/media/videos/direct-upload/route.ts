@@ -2,16 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createCloudflareStreamDirectUpload } from '@/lib/cloudflare';
+import { adminDb } from '@/lib/firebase/admin';
 
 // POST /api/media/videos/direct-upload
 // Returns: { uploadURL, videoId }
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+    // Optional: verify project ownership passed via body
+    try {
+      const { projectId } = await req.json();
+      if (projectId) {
+        const projectDoc = await adminDb.collection('projects').doc(projectId).get();
+        const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
+        if (!projectDoc.exists) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+        if (!isAdmin && (projectDoc.data() as { clientEmail?: string })?.clientEmail !== session.user.email) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+    } catch {
+      // ignore body parse; projectId optional
+    }
+
     // Check if Cloudflare Stream credentials are configured
     try {
       const { uploadURL, videoId } = await createCloudflareStreamDirectUpload();

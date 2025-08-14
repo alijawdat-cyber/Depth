@@ -9,17 +9,22 @@ interface OnboardingStep {
   title: string;
   content: string;
   position: 'top' | 'bottom' | 'left' | 'right';
+  requiredTab?: 'summary' | 'files' | 'approvals' | 'reports';
 }
 
 interface InteractiveOnboardingProps {
   isActive: boolean;
   onComplete: () => void;
   onSkip: () => void;
+  currentTab?: string; // لزامنة الجولة مع التبويبات
+  setTab?: (t: 'summary' | 'files' | 'approvals' | 'reports') => void;
 }
 
-export default function InteractiveOnboarding({ isActive, onComplete, onSkip }: InteractiveOnboardingProps) {
+export default function InteractiveOnboarding({ isActive, onComplete, onSkip, currentTab, setTab }: InteractiveOnboardingProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [liveMessage, setLiveMessage] = useState<string>("");
+  const [trapActive, setTrapActive] = useState(false);
 
   const steps: OnboardingStep[] = [
     {
@@ -60,14 +65,41 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip }: 
   ];
 
   useEffect(() => {
-    if (isActive) {
-      setIsVisible(true);
-      highlightElement(steps[currentStep].targetId);
-    } else {
+    if (!isActive) {
       setIsVisible(false);
       removeAllHighlights();
+      return;
     }
-  }, [isActive, currentStep]); // eslint-disable-line react-hooks/exhaustive-deps
+    setIsVisible(true);
+    const step = steps[currentStep];
+    if (step.requiredTab && currentTab && step.requiredTab !== currentTab) {
+      setTab?.(step.requiredTab);
+    }
+    // إعادة التموضع والمتابعة عند تغير الحجم أو التمرير
+    const target = document.getElementById(step.targetId);
+    if (!target) {
+      // إذا لم يوجد الهدف تخطَّ الخطوة
+      setTimeout(() => handleNext(), 0);
+      return;
+    }
+    highlightElement(step.targetId);
+    setLiveMessage(step.title);
+    setTrapActive(true);
+    const ro = new ResizeObserver(() => highlightElement(step.targetId));
+    ro.observe(target);
+    const onScroll = () => highlightElement(step.targetId);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleSkip(); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('keydown', onKey);
+      setTrapActive(false);
+    };
+  }, [isActive, currentStep, currentTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const highlightElement = (targetId: string) => {
     // Remove previous highlights
@@ -125,6 +157,11 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip }: 
 
   return (
     <>
+      {/* Live region for screen readers */}
+      <div aria-live="polite" className="sr-only">{liveMessage}</div>
+
+      {/* Backdrop mask */}
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40" onClick={handleSkip} />
       {/* CSS for highlighting */}
       <style jsx global>{`
         .onboarding-highlight {
@@ -161,8 +198,8 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip }: 
         </button>
       </div>
 
-      {/* Tooltip */}
-      <div className="relative">
+      {/* Tooltip (focus trap container) */}
+      <div className="relative z-50" role="dialog" aria-modal="true">
         <OnboardingTooltip
           isVisible={true}
           title={currentStepData.title}

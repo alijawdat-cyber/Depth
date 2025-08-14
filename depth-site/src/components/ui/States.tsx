@@ -37,3 +37,12 @@ export function StateError({ text, className, children }: BaseProps) {
 }
 
 
+export const StatCardSkeleton = () => (
+  <div className="h-28 bg-[var(--elev)] rounded-[var(--radius-lg)] animate-pulse" />
+);
+
+export const FileCardSkeleton = () => (
+  <div className="h-40 bg-[var(--elev)] rounded-[var(--radius-lg)] animate-pulse" />
+);
+
+

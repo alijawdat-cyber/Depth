@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createCloudflareDirectUpload } from '@/lib/cloudflare';
+import { adminDb } from '@/lib/firebase/admin';
 
 // POST /api/media/images/direct-upload
 // Returns: { uploadURL, id }
@@ -21,6 +22,18 @@ export async function POST(req: NextRequest) {
     }
     if (size && Number(size) > 50 * 1024 * 1024) {
       return NextResponse.json({ error: 'الحجم أكبر من 50MB' }, { status: 400 });
+    }
+
+    // Verify project ownership (optional hardening)
+    if (projectId) {
+      const projectDoc = await adminDb.collection('projects').doc(projectId).get();
+      const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
+      if (!projectDoc.exists) {
+        return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      }
+      if (!isAdmin && (projectDoc.data() as { clientEmail?: string })?.clientEmail !== session.user.email) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
     }
 
     // Check if Cloudflare credentials are configured

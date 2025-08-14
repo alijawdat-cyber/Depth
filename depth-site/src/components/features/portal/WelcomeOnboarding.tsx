@@ -276,7 +276,12 @@ export default function WelcomeOnboarding({ userName, userEmail, onRefresh }: We
             {currentStep === steps.length - 1 ? (
               <Button
                 variant="primary"
-                onClick={onRefresh}
+                onClick={() => {
+                  try {
+                    if (userEmail) localStorage.setItem(`welcome-done-${userEmail}`, '1');
+                  } catch {}
+                  onRefresh?.();
+                }}
                 className="flex items-center gap-2"
               >
                 ابدأ الاستخدام

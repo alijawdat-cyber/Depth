@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { adminDb } from '@/lib/firebase/admin';
 import crypto from 'crypto';
 import { env } from '@/lib/env';
 
@@ -89,6 +90,30 @@ export async function GET(req: NextRequest) {
     const key = searchParams.get('key');
     const expires = searchParams.get('expires') || '300';
     if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
+
+    // Verify ownership: find file by key (stored as url for documents), then check project ownership
+    const fileSnap = await adminDb
+      .collection('files')
+      .where('url', '==', key)
+      .limit(1)
+      .get();
+    if (fileSnap.empty) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
+    }
+    const fileData = fileSnap.docs[0].data() as { projectId?: string };
+    const projectId = fileData?.projectId;
+    if (!projectId) {
+      return NextResponse.json({ error: 'Invalid file' }, { status: 400 });
+    }
+    const projectDoc = await adminDb.collection('projects').doc(projectId).get();
+    if (!projectDoc.exists) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+    const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
+    const projectOwner = (projectDoc.data() as { clientEmail?: string })?.clientEmail;
+    if (!isAdmin && projectOwner !== session.user.email) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     if (!env.R2_ACCOUNT_ID || !env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY || !env.R2_BUCKET) {
       return NextResponse.json({ error: 'R2 not configured' }, { status: 500 });

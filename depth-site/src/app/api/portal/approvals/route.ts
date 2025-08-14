@@ -4,6 +4,33 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Helpers to work safely with Firestore Timestamps without using `any`
+function toEpochMs(value: unknown): number {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'toDate' in (value as Record<string, unknown>) &&
+    typeof (value as { toDate: () => Date }).toDate === 'function'
+  ) {
+    const d = (value as { toDate: () => Date }).toDate();
+    return typeof d.getTime === 'function' ? d.getTime() : 0;
+  }
+  return 0;
+}
+
+function toIsoString(value: unknown): string | null {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'toDate' in (value as Record<string, unknown>) &&
+    typeof (value as { toDate: () => Date }).toDate === 'function'
+  ) {
+    const d = (value as { toDate: () => Date }).toDate();
+    return typeof d.toISOString === 'function' ? d.toISOString() : null;
+  }
+  return null;
+}
+
 // GET: Fetch pending approvals
 export async function GET(req: NextRequest) {
   try {
@@ -33,25 +60,45 @@ export async function GET(req: NextRequest) {
     }
 
     // Build query for approvals
-    let approvalsQuery = adminDb.collection('approvals')
-      .where('status', 'in', ['pending', 'reviewing']);
+    const baseQuery = adminDb.collection('approvals')
+      .where('status', 'in', ['pending', 'reviewing', 'needs_revision']);
 
+    let docs: Array<
+      FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+    > = [];
     if (projectId && clientProjectIds.includes(projectId)) {
-      approvalsQuery = approvalsQuery.where('projectId', '==', projectId);
+      const snapshot = await baseQuery
+        .where('projectId', '==', projectId)
+        .orderBy('deadline', 'asc')
+        .get();
+      docs = snapshot.docs;
     } else {
-      approvalsQuery = approvalsQuery.where('projectId', 'in', clientProjectIds);
+      // Firestore 'in' has limit 10 values; chunk project ids
+      const chunkSize = 10;
+      for (let i = 0; i < clientProjectIds.length; i += chunkSize) {
+        const chunk = clientProjectIds.slice(i, i + chunkSize);
+        const snapshot = await baseQuery
+          .where('projectId', 'in', chunk)
+          .orderBy('deadline', 'asc')
+          .get();
+        docs = docs.concat(snapshot.docs);
+      }
+      // De-duplicate by doc id if overlaps
+      const map = new Map<
+        string,
+        FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+      >(docs.map(d => [d.id, d]));
+      docs = Array.from(map.values());
+      // Sort by deadline ascending
+      docs.sort((a, b) => toEpochMs(a.data().deadline) - toEpochMs(b.data().deadline));
     }
 
-    const snapshot = await approvalsQuery
-      .orderBy('deadline', 'asc')
-      .get();
-
-    const approvals = snapshot.docs.map(doc => ({
+    const approvals = docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
-      updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
-      deadline: doc.data().deadline?.toDate?.()?.toISOString() || null,
+      createdAt: toIsoString(doc.data().createdAt),
+      updatedAt: toIsoString(doc.data().updatedAt),
+      deadline: toIsoString(doc.data().deadline),
     }));
 
     return NextResponse.json({ 
