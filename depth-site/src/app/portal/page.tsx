@@ -1,16 +1,36 @@
 "use client";
 import { Container } from "@/components/ui/Container";
 import PortalClientReal from "@/components/features/portal/PortalClientReal";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export default function PortalPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // If admin hits /portal, redirect to /admin
+  useEffect(() => {
+    const role = (session?.user && (session.user as { role?: string })?.role) || 'client';
+    if (status === 'authenticated' && role === 'admin') {
+      router.replace('/admin');
+    }
+  }, [status, session?.user, router]);
   
+  // Show light loader while redirecting admins
+  if (status === 'authenticated' && ((session?.user as { role?: string } | undefined)?.role === 'admin')) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--accent-500)] mx-auto mb-4"></div>
+          <p className="text-[var(--slate-600)]">إعادة التوجيه إلى لوحة الإدارة...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       <main className="py-8 md:py-12">
         <Container>
           {/* Header Section */}
@@ -41,7 +61,6 @@ export default function PortalPage() {
           <PortalClientReal />
         </Container>
       </main>
-      <Footer />
     </div>
   );
 }

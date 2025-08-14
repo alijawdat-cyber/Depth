@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
 import { ORG } from "@/lib/constants/org";
+import { NAV_ITEMS } from "@/lib/constants/nav";
 
 export default function Footer() {
   return (
@@ -8,14 +9,10 @@ export default function Footer() {
       <Container>
         {/* Navigation Links */}
         <nav className="flex flex-wrap justify-center gap-5 mb-8">
-          <Link href="/plans" className="hover:text-[var(--text)] transition-colors">الخطط</Link>
-          <Link href="/services" className="hover:text-[var(--text)] transition-colors">الخدمات</Link>
-          <Link href="/work" className="hover:text-[var(--text)] transition-colors">الأعمال</Link>
-          <Link href="/about" className="hover:text-[var(--text)] transition-colors">من نحن</Link>
-          <Link href="/blog" className="hover:text-[var(--text)] transition-colors">المدونة</Link>
-          <Link href="/contact" className="hover:text-[var(--text)] transition-colors">تواصل</Link>
+          {NAV_ITEMS.map((i) => (
+            <Link key={i.href} href={i.href} className="hover:text-[var(--text)] transition-colors">{i.label}</Link>
+          ))}
           <Link href="/book" className="hover:text-[var(--text)] transition-colors">حجز</Link>
-          <Link href="/portal" className="hover:text-[var(--text)] transition-colors">بوابة العميل</Link>
           <Link href="/legal" className="hover:text-[var(--text)] transition-colors">الشروط</Link>
         </nav>
 

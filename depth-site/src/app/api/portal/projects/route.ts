@@ -51,6 +51,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Restrict project creation to admins only
+    const role = (session.user as unknown as { role?: string }).role;
+    if (role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can create projects' }, { status: 403 });
+    }
+
     const { name, description, budget, clientEmail } = await req.json();
 
     // Validation

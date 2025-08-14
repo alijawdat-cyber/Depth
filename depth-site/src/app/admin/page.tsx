@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 
 interface Client {
   id: string;
@@ -18,32 +19,19 @@ interface Client {
 }
 
 export default function AdminDashboard() {
+  const { data: session, status } = useSession();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
+  const isAdmin = userRole === 'admin';
 
-  // Simple authentication check
-  const handleLogin = () => {
-    if (password === "depth-admin-2024") {
-      setIsAuthenticated(true);
-      fetchClients();
-    } else {
-      alert("كلمة مرور خاطئة");
-    }
-  };
+  // Note: we will trigger initial fetch from a button to avoid use-before-define lints.
 
   const fetchClients = async () => {
     try {
       setLoading(true);
-      // Note: This would need a proper admin API endpoint
-      // For now, we'll use the existing endpoint with admin privileges
-      const response = await fetch('/api/portal/admin/clients', {
-        headers: {
-          'Authorization': 'Bearer depth-admin-2024',
-        },
-      });
+      const response = await fetch('/api/portal/admin/clients');
       
       if (response.ok) {
         const data = await response.json();
@@ -65,7 +53,6 @@ export default function AdminDashboard() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer depth-admin-2024',
         },
         body: JSON.stringify({
           clientId,
@@ -90,8 +77,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Show login form if not authenticated
-  if (!isAuthenticated) {
+  // Enforce Google sign-in for admin
+  if (status !== 'authenticated' || !isAdmin) {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <Header />
@@ -102,27 +89,19 @@ export default function AdminDashboard() {
                 <div className="text-center mb-8">
                   <Users size={48} className="mx-auto mb-4 text-[var(--accent-500)]" />
                   <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لوحة إدارة العملاء</h1>
-                  <p className="text-[var(--slate-600)]">أدخل كلمة المرور للوصول</p>
+                  <p className="text-[var(--slate-600)]">سجّل الدخول عبر Google باستخدام حساب الأدمن <span className="font-mono text-[var(--text)]">admin@depth-agency.com</span></p>
                 </div>
                 
                 <div className="space-y-4">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="كلمة المرور"
-                    className="w-full px-4 py-3 border border-[var(--elev)] rounded-lg bg-[var(--input)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
-                    onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                  />
-                  <Button onClick={handleLogin} className="w-full">
-                    دخول
+                  <Button onClick={() => signIn('google', { callbackUrl: '/admin' })} className="w-full">
+                    تسجيل الدخول عبر Google
                   </Button>
+                  <p className="text-xs text-center text-[var(--slate-600)]">بعد تسجيل الدخول الناجح، ستظهر لك لوحة الإدارة بدلاً من صفحة انتظار العميل.</p>
                 </div>
               </div>
             </div>
           </Container>
         </main>
-        <Footer />
       </div>
     );
   }

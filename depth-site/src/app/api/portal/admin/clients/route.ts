@@ -1,19 +1,23 @@
 // Admin Client Management API
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
+import { resend } from '@/lib/email/resend';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
-// Simple admin authentication
-const isAdminAuthenticated = (request: NextRequest) => {
-  const authHeader = request.headers.get('authorization');
-  return authHeader === 'Bearer depth-admin-2024';
-};
+async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || (session.user as unknown as { role?: string }).role !== 'admin') {
+    return null;
+  }
+  return session;
+}
 
 // GET: Fetch all clients for admin
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    if (!isAdminAuthenticated(req)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Get all clients
     const clientsSnapshot = await adminDb
@@ -51,9 +55,8 @@ export async function GET(req: NextRequest) {
 // PUT: Update client status
 export async function PUT(req: NextRequest) {
   try {
-    if (!isAdminAuthenticated(req)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { clientId, status } = await req.json();
 
@@ -100,11 +103,10 @@ export async function PUT(req: NextRequest) {
 // POST: Create demo client (for testing)
 export async function POST(req: NextRequest) {
   try {
-    if (!isAdminAuthenticated(req)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { action } = await req.json();
+    const { action, email } = await req.json();
 
     if (action === 'create-demo-client') {
       // Create a demo client for testing
@@ -126,6 +128,19 @@ export async function POST(req: NextRequest) {
         message: 'Demo client created successfully',
         clientId: docRef.id,
       });
+    }
+
+    if (action === 'invite') {
+      if (!email) {
+        return NextResponse.json({ error: 'email is required' }, { status: 400 });
+      }
+      await resend.emails.send({
+        from: 'Depth <hello@depth-agency.com>',
+        to: [email],
+        subject: 'دعوة للانضمام إلى بوابة Depth',
+        html: `<p>مرحباً،</p><p>اضغط هنا لتسجيل الدخول والبدء: <a href="${process.env.NEXTAUTH_URL}/portal/auth/signin">تسجيل الدخول</a></p>`
+      });
+      return NextResponse.json({ success: true, message: 'Invitation sent' });
     }
 
     return NextResponse.json(

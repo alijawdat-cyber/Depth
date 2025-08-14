@@ -10,6 +10,7 @@ import NotificationBell from "@/components/ui/NotificationBell";
 import PendingApprovalScreen from "./PendingApprovalScreen";
 import WelcomeOnboarding from "./WelcomeOnboarding";
 import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
+import { StateLoading, StateError, StateEmpty } from "@/components/ui/States";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
 
@@ -205,41 +206,24 @@ export default function PortalClientReal() {
 
   // Show loading state
   if (status === 'loading' || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-500)] mx-auto mb-4"></div>
-          <p className="text-[var(--slate-600)]">جاري تحميل البيانات...</p>
-        </div>
-      </div>
-    );
+    return <StateLoading text="جاري تحميل البيانات..." className="min-h-[300px]"/>;
   }
 
   // Show authentication required
   if (status === 'unauthenticated') {
     return (
-      <div className="text-center py-12">
-        <AlertCircle size={48} className="mx-auto mb-4 text-[var(--slate-400)]" />
-        <h3 className="text-xl font-semibold text-[var(--text)] mb-2">تسجيل الدخول مطلوب</h3>
-        <p className="text-[var(--slate-600)] mb-6">يرجى تسجيل الدخول للوصول إلى بوابة العميل</p>
-        <Button onClick={() => router.push('/portal/auth/signin')}>
-          تسجيل الدخول
-        </Button>
-      </div>
+      <StateEmpty text="تسجيل الدخول مطلوب للوصول إلى بوابتك">
+        <Button onClick={() => router.push('/portal/auth/signin')}>تسجيل الدخول</Button>
+      </StateEmpty>
     );
   }
 
   // Show error state
   if (error) {
     return (
-      <div className="text-center py-12">
-        <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
-        <h3 className="text-xl font-semibold text-[var(--text)] mb-2">حدث خطأ</h3>
-        <p className="text-[var(--slate-600)] mb-6">{error}</p>
-        <Button onClick={fetchData}>
-          إعادة المحاولة
-        </Button>
-      </div>
+      <StateError text={error}>
+        <Button onClick={fetchData}>إعادة المحاولة</Button>
+      </StateError>
     );
   }
 
