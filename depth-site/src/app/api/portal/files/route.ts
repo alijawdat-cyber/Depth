@@ -23,11 +23,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Verify client has access to this project
+    // Verify access: allow owner client or admin to upload metadata
     const projectDoc = await adminDb.collection('projects').doc(projectId).get();
-    
-    if (!projectDoc.exists || projectDoc.data()?.clientEmail !== session.user.email) {
+    const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
+    if (!projectDoc.exists) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+    if (!isAdmin && projectDoc.data()?.clientEmail !== session.user.email) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Get project files

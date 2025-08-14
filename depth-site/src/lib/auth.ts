@@ -5,6 +5,7 @@ import EmailProvider from 'next-auth/providers/email';
 import { FirestoreAdapter } from '@auth/firebase-adapter';
 import { cert } from 'firebase-admin/app';
 import { resend } from '@/lib/email/resend';
+import { adminDb } from '@/lib/firebase/admin';
 
 export const authOptions: NextAuthOptions = {
   adapter: FirestoreAdapter({
@@ -106,8 +107,32 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async signIn({ user, account, profile, email, credentials }) {
-      // Always allow sign-in; redirect logic handled in redirect callback
+    async signIn({ user }) {
+      try {
+        const email = String(user?.email || '').toLowerCase();
+        if (!email) return true;
+        if (email === 'admin@depth-agency.com') return true;
+        // Auto-provision client profile on first Google/Magic sign-in if missing
+        const snap = await adminDb
+          .collection('clients')
+          .where('email', '==', email)
+          .limit(1)
+          .get();
+        if (snap.empty) {
+          await adminDb.collection('clients').add({
+            email,
+            name: user?.name || '',
+            phone: '',
+            company: '',
+            status: 'pending',
+            role: 'client',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+      } catch {
+        // non-fatal; allow sign-in to proceed
+      }
       return true;
     },
     async redirect({ url, baseUrl }) {

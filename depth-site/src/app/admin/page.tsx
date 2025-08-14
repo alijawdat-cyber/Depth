@@ -62,6 +62,11 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  const refreshAll = useCallback(async () => {
+    setFlash(null);
+    await Promise.all([fetchClients(), fetchProjects()]);
+  }, [fetchClients, fetchProjects]);
+
 
 
 
@@ -109,22 +114,6 @@ export default function AdminDashboard() {
       setFlash({ type: 'success', message: 'تم إرسال الدعوة بالبريد الإلكتروني' });
     } catch {
       setFlash({ type: 'error', message: 'فشل إرسال الدعوة' });
-    }
-  };
-
-  const createDemoClient = async () => {
-    try {
-      setFlash(null);
-      const res = await fetch('/api/portal/admin/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'create-demo-client' })
-      });
-      if (!res.ok) throw new Error('create demo failed');
-      await fetchClients();
-      setFlash({ type: 'success', message: 'تم إنشاء عميل تجريبي' });
-    } catch {
-      setFlash({ type: 'error', message: 'فشل إنشاء العميل التجريبي' });
     }
   };
 
@@ -241,9 +230,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-[var(--text)] mb-2">لوحة إدارة العملاء</h1>
-              <p className="text-[var(--slate-600)]">إدارة طلبات العضوية والموافقات</p>
+              <p className="text-[var(--slate-600)]">إدارة طلبات العضوية والمشاريع والملفات</p>
             </div>
-            <Button onClick={fetchClients} className="flex items-center gap-2">
+            <Button onClick={refreshAll} className="flex items-center gap-2">
               <RefreshCw size={16} />
               تحديث البيانات
             </Button>
@@ -325,7 +314,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Controls: search / filters / invite / create demo */}
+          {/* Controls: search / filters / invite */}
           <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-6 grid gap-3 md:grid-cols-2">
             <div className="flex gap-2">
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم/البريد/الهاتف" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
@@ -342,9 +331,19 @@ export default function AdminDashboard() {
               />
             </div>
             <div className="flex gap-2">
-              <input value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="دعوة عميل عبر البريد" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
-              <Button onClick={inviteClient}>إرسال دعوة</Button>
-              <Button variant="secondary" onClick={createDemoClient}>عميل تجريبي</Button>
+              <input 
+                value={inviteEmail} 
+                onChange={e => setInviteEmail(e.target.value)} 
+                placeholder="دعوة عميل عبر البريد" 
+                className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" 
+              />
+              <Button 
+                onClick={inviteClient} 
+                disabled={!/^\S+@\S+\.\S+$/.test(inviteEmail)}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                إرسال دعوة
+              </Button>
             </div>
           </div>
 
@@ -569,30 +568,40 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Admin File Upload Section */}
+          {/* Admin File Upload Section - Advanced UI */}
           <div className="mt-10">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-[var(--text)] mb-2">رفع الملفات</h2>
-              <p className="text-[var(--slate-600)]">ارفع الملفات للمشاريع بالنيابة عن العملاء</p>
+              <h2 className="text-2xl font-bold text-[var(--text)] mb-2">رفع الملفات (ووركفلو احترافي)</h2>
+              <p className="text-[var(--slate-600)]">اختر مشروعاً، ثم ارفع صور/فيديو/مستندات. يدعم Cloudflare Images/Stream وR2.</p>
             </div>
             
             <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
-                <Dropdown
-                  value={selectedProjectIdForUpload || ''}
-                  onChange={(v) => setSelectedProjectIdForUpload(String(v))}
-                  options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
-                  className="w-full max-w-md"
-                />
-                {!selectedProjectIdForUpload && (
-                  <p className="text-xs text-amber-600 mt-1">⚠️ يجب اختيار مشروع أولاً</p>
-                )}
+              {/* Stepper */}
+              <div className="flex items-center gap-3 mb-4 text-sm">
+                <div className={`px-2 py-1 rounded-md ${selectedProjectIdForUpload ? 'bg-green-100 text-green-800' : 'bg-[var(--bg)] text-[var(--slate-600)]'}`}>1) اختيار المشروع</div>
+                <div className={`px-2 py-1 rounded-md ${selectedProjectIdForUpload ? 'bg-[var(--bg)] text-[var(--slate-800)]' : 'bg-[var(--bg)] text-[var(--slate-600)]'}`}>2) الرفع</div>
+                <div className="px-2 py-1 rounded-md bg-[var(--bg)] text-[var(--slate-600)]">3) الحفظ والمزامنة</div>
               </div>
-              
+
+              <div className="mb-4 grid md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
+                  <Dropdown
+                    value={selectedProjectIdForUpload || ''}
+                    onChange={(v) => setSelectedProjectIdForUpload(String(v))}
+                    options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
+                    className="w-full max-w-md"
+                  />
+                </div>
+                <div className="text-xs text-[var(--slate-600)] self-end">
+                  يدعم: صور JPEG/PNG/WEBP، فيديو عبر Cloudflare Stream، ومستندات عبر R2.
+                </div>
+              </div>
+
               <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${!selectedProjectIdForUpload ? 'opacity-50 pointer-events-none' : ''}`}>
                 <div className="space-y-2">
                   <h3 className="font-medium text-[var(--text)]">الصور</h3>
+                  <p className="text-xs text-[var(--slate-600)]">رفع مباشر إلى Cloudflare Images مع حفظ ميتاداتا تلقائي.</p>
                   <ImageUploader 
                     projectId={selectedProjectIdForUpload || 'demo'} 
                     onUploaded={() => { fetchProjects(); }} 
@@ -600,6 +609,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-medium text-[var(--text)]">الفيديو</h3>
+                  <p className="text-xs text-[var(--slate-600)]">رفع إلى Cloudflare Stream مع رابط مشاهدة مباشر.</p>
                   <VideoUploader 
                     projectId={selectedProjectIdForUpload || 'demo'} 
                     onUploaded={() => { fetchProjects(); }} 
@@ -607,6 +617,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-medium text-[var(--text)]">المستندات</h3>
+                  <p className="text-xs text-[var(--slate-600)]">رفع إلى R2 مع حفظ المفتاح كعنوان ملف.</p>
                   <DocumentUploader 
                     projectId={selectedProjectIdForUpload || 'demo'} 
                     onUploaded={() => { fetchProjects(); }} 

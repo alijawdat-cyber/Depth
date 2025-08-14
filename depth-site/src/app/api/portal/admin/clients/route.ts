@@ -142,37 +142,19 @@ export async function POST(req: NextRequest) {
 
     const { action, email } = await req.json();
 
-    if (action === 'create-demo-client') {
-      // Create a demo client for testing
-      const demoClient = {
-        name: 'عميل تجريبي',
-        email: 'demo@test.com',
-        company: 'شركة تجريبية',
-        phone: '+964 770 123 4567',
-        status: 'pending',
-        role: 'client',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      const docRef = await adminDb.collection('clients').add(demoClient);
-
-      return NextResponse.json({
-        success: true,
-        message: 'Demo client created successfully',
-        clientId: docRef.id,
-      });
-    }
+    // Production: لا نسمح بإنشاء عميل تجريبي عبر الـ API
 
     if (action === 'invite') {
       if (!email) {
         return NextResponse.json({ error: 'email is required' }, { status: 400 });
       }
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://depth-agency.com';
+      const signinUrl = `${baseUrl.replace(/\/$/, '')}/portal/auth/signin`;
       await resend.emails.send({
         from: 'Depth <hello@depth-agency.com>',
         to: [email],
         subject: 'دعوة للانضمام إلى بوابة Depth',
-        html: `<p>مرحباً،</p><p>اضغط هنا لتسجيل الدخول والبدء: <a href="${process.env.NEXTAUTH_URL}/portal/auth/signin">تسجيل الدخول</a></p>`
+        html: `<p>مرحباً،</p><p>اضغط هنا لتسجيل الدخول والبدء: <a href="${signinUrl}">تسجيل الدخول</a></p>`
       });
       return NextResponse.json({ success: true, message: 'Invitation sent' });
     }
