@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, AlertCircle, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase } from "lucide-react";
+import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase } from "lucide-react";
+import ImageUploader from "./files/ImageUploader";
+import VideoUploader from "./files/VideoUploader";
+import DocumentUploader from "./files/DocumentUploader";
 import { Button } from "@/components/ui/Button";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import NotificationBell from "@/components/ui/NotificationBell";
@@ -513,10 +516,19 @@ export default function PortalClientReal() {
                   <h3 className="text-lg font-semibold text-[var(--text)]">ملفات المشروع</h3>
                   <p className="text-sm text-[var(--slate-600)]">جميع الملفات والمرفقات الخاصة بمشاريعك</p>
                 </div>
-                <Button variant="primary" onClick={fetchData} className="flex items-center gap-2">
-                  <RefreshCw size={16} />
-                  تحديث القائمة
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="primary" onClick={fetchData} className="flex items-center gap-2">
+                    <RefreshCw size={16} />
+                    تحديث القائمة
+                  </Button>
+                </div>
+              </div>
+
+              {/* Uploaders */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <ImageUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
+                <VideoUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
+                <DocumentUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
               </div>
 
               <div className="grid gap-4">
@@ -554,11 +566,24 @@ export default function PortalClientReal() {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          onClick={() => {
-                            const link = document.createElement('a');
-                            link.href = file.url;
-                            link.download = file.name;
-                            link.click();
+                          onClick={async () => {
+                            try {
+                              if (file.url.startsWith('http')) {
+                                const a = document.createElement('a');
+                                a.href = file.url;
+                                a.download = file.name;
+                                a.click();
+                                return;
+                              }
+                              const getRes = await fetch(`/api/portal/files/presign?key=${encodeURIComponent(file.url)}`);
+                              const getJson = await getRes.json();
+                              if (getRes.ok && getJson.url) {
+                                const a = document.createElement('a');
+                                a.href = getJson.url;
+                                a.download = file.name;
+                                a.click();
+                              }
+                            } catch {}
                           }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
                         >

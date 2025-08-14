@@ -42,9 +42,9 @@ export default function ClientsMarquee() {
             ["--duration" as unknown as string]: `${durationSec}s`,
           }}
         >
-          <div
-            className="flex w-max gap-[clamp(12px,4vw,32px)] will-change-transform transform-gpu animate-[marquee_var(--duration)_linear_infinite]"
-          >
+            <div
+              className="flex w-max gap-[clamp(12px,4vw,32px)] will-change-transform transform-gpu animate-[marquee_var(--duration)_linear_infinite]"
+            >
             {/* Group A */}
             <div ref={groupRef} className="flex w-max gap-[clamp(12px,4vw,32px)]">
               {logos.map((c) => (
@@ -55,7 +55,7 @@ export default function ClientsMarquee() {
                     width={120}
                     height={60}
                     sizes="(max-width:768px) 84px, (max-width:1024px) 96px, 120px"
-                    className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300 dark:invert dark:brightness-200 dark:contrast-125 dark:opacity-95"
+                    className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300 dark:invert dark:brightness-200 dark:contrast-125 dark:[filter:grayscale(100%)] dark:[--logo-color:#F2F4F7]"
                     loading="lazy"
                     priority={false}
                   />
@@ -72,7 +72,7 @@ export default function ClientsMarquee() {
                     width={120}
                     height={60}
                     sizes="(max-width:768px) 84px, (max-width:1024px) 96px, 120px"
-                    className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300 dark:invert dark:brightness-200 dark:contrast-125 dark:opacity-95"
+                    className="h-12 md:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300 dark:invert dark:brightness-200 dark:contrast-125 dark:[filter:grayscale(100%)] dark:[--logo-color:#F2F4F7]"
                     loading="lazy"
                     priority={false}
                   />
@@ -93,6 +93,7 @@ export default function ClientsMarquee() {
             transform: none !important;
           }
         }
+        :global(html.dark) .brand-logo, :global(html.dark) img { filter: grayscale(100%) brightness(2) contrast(1.25); }
       `}</style>
     </section>
   );

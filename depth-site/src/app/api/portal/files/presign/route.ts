@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
 
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
     const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-    const payloadHashHex = sha256('', 'hex');
+    // Use UNSIGNED-PAYLOAD for browser-based uploads without computing body hash
+    const payloadHashHex = 'UNSIGNED-PAYLOAD';
 
     const canonicalRequest = [
       'PUT',
@@ -77,4 +78,64 @@ export async function POST(req: NextRequest) {
   }
 }
 
+
+// GET: Presign a GET URL for downloading a key
+export async function GET(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const key = searchParams.get('key');
+    const expires = searchParams.get('expires') || '300';
+    if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
+
+    if (!env.R2_ACCOUNT_ID || !env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY || !env.R2_BUCKET) {
+      return NextResponse.json({ error: 'R2 not configured' }, { status: 500 });
+    }
+
+    const host = `${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
+    const urlPath = `/${env.R2_BUCKET}/${key}`;
+
+    const region = 'auto';
+    const service = 's3';
+    const algorithm = 'AWS4-HMAC-SHA256';
+    const iso = new Date().toISOString();
+    const amzDate = iso.replace(/[:\-]/g, '').replace(/\..+Z$/, 'Z');
+    const dateStamp = amzDate.slice(0, 8);
+
+    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+    const signedHeaders = 'host';
+
+    const canonicalRequest = [
+      'GET',
+      urlPath,
+      '',
+      `host:${host}`,
+      '',
+      signedHeaders,
+      'UNSIGNED-PAYLOAD',
+    ].join('\n');
+
+    const canonicalRequestHash = sha256(canonicalRequest, 'hex');
+    const stringToSign = [algorithm, amzDate, credentialScope, canonicalRequestHash].join('\n');
+    const kDate = hmac(`AWS4${env.R2_SECRET_ACCESS_KEY}`, dateStamp);
+    const kRegion = hmac(kDate, region);
+    const kService = hmac(kRegion, service);
+    const kSigning = hmac(kService, 'aws4_request');
+    const signature = hmac(kSigning, stringToSign, 'hex');
+
+    const signedUrl = new URL(`https://${host}${urlPath}`);
+    signedUrl.searchParams.set('X-Amz-Algorithm', algorithm);
+    signedUrl.searchParams.set('X-Amz-Credential', `${env.R2_ACCESS_KEY_ID}/${credentialScope}`);
+    signedUrl.searchParams.set('X-Amz-Date', amzDate);
+    signedUrl.searchParams.set('X-Amz-Expires', String(expires));
+    signedUrl.searchParams.set('X-Amz-SignedHeaders', 'host');
+    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+
+    return NextResponse.json({ url: signedUrl.toString() });
+  } catch {
+    return NextResponse.json({ error: 'Failed to presign (GET)' }, { status: 500 });
+  }
+}
 
