@@ -112,6 +112,12 @@ html, body {
   min-height: 100%;
 }
 
+/* Safe area padding for iOS notch within sticky headers if needed */
+.safe-area-inline {
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
+}
+
 /* تحسين الأداء للموبايل وSafari */
 * {
   -webkit-tap-highlight-color: transparent;

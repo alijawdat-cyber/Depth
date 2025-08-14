@@ -14,14 +14,19 @@ export function Accordion({ items }: { items: AccordionItem[] }) {
         return (
           <div key={it.id}>
             <button
-              className="w-full text-start px-5 py-4 font-medium"
+              className="w-full text-start px-5 py-4 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]"
               onClick={() => setOpen(isOpen ? null : it.id)}
               aria-expanded={isOpen}
+              aria-controls={`panel-${it.id}`}
+              id={`accordion-${it.id}`}
             >
               {it.question}
             </button>
             <div className={clsx("px-5 overflow-hidden transition-all", isOpen ? "max-h-96 pb-4" : "max-h-0")}
                  aria-hidden={!isOpen}
+                 id={`panel-${it.id}`}
+                 role="region"
+                 aria-labelledby={`accordion-${it.id}`}
             >
               <p className="text-sm text-[var(--slate-600)]">{it.answer}</p>
             </div>

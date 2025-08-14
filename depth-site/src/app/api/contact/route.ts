@@ -28,9 +28,9 @@ const BRAND_URL = sanitizeEnv(
 // const DRY_RUN = false;
 
 const schema = z.object({
-  name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
-  email: z.string().email("بريد إلكتروني غير صحيح"),
-  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف"),
+  name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين").max(100, "الاسم طويل جداً"),
+  email: z.string().email("بريد إلكتروني غير صحيح").max(255, "البريد طويل جداً"),
+  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف").max(1500, "الرسالة طويلة جداً"),
   type: z.enum(["general", "pricing", "support", "social", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
@@ -67,6 +67,7 @@ export async function POST(req: Request) {
     if (!checkRateLimit(clientIP)) {
       return NextResponse.json({ 
         ok: false, 
+        code: "RATE_LIMITED",
         error: "rate_limit", 
         message: "تم إرسال عدد كبير من الطلبات. حاول مرة أخرى خلال 10 دقائق" 
       }, { status: 429 });
@@ -78,7 +79,9 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json({ 
         ok: false, 
+        code: "VALIDATION_ERROR",
         error: "validation", 
+        message: "بيانات غير صحيحة",
         details: parsed.error.issues 
       }, { status: 400 });
     }
@@ -88,7 +91,7 @@ export async function POST(req: Request) {
     // Honeypot anti-spam check
     if (honeypot?.trim()) {
       console.log("Spam detected via honeypot, ignoring request");
-      return NextResponse.json({ ok: true }); // Return success to not alert bots
+      return NextResponse.json({ ok: true, code: "IGNORED_SPAM", message: "تم الاستلام" }); // Return success to not alert bots
     }
 
     // Generate unique request ID for tracking
@@ -159,7 +162,7 @@ export async function POST(req: Request) {
     // Production Mode: Send actual emails
     if (!process.env.RESEND_API_KEY) {
       console.error("contact route: missing RESEND_API_KEY env");
-      return NextResponse.json({ ok: false, error: "missing_api_key" }, { status: 500 });
+      return NextResponse.json({ ok: false, code: "MISSING_API_KEY", error: "missing_api_key", message: "الخدمة غير متاحة حالياً" }, { status: 500 });
     }
 
     // Custom headers for tracking and analytics
@@ -220,6 +223,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       ok: true, 
+      code: "SENT",
+      message: "تم الإرسال",
       sent: true, 
       requestId,
       estimatedResponse: SLA_MAP[type]
@@ -229,6 +234,7 @@ export async function POST(req: Request) {
     console.error("contact route error", e);
     return NextResponse.json({ 
       ok: false, 
+      code: "SERVER_ERROR",
       error: "server_error",
       message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى"
     }, { status: 500 });

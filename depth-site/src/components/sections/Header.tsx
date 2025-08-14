@@ -28,7 +28,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)]">
-      <Container className="flex items-center justify-between h-14">
+      <Container className="flex items-center justify-between min-h-14 h-14">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
           <Image src={BRAND.wordmark} alt="Depth" width={135} height={30} className="h-7 md:h-8 lg:h-9 w-auto min-w-28 brand-logo" priority />
         </Link>
@@ -46,7 +46,7 @@ export default function Header() {
             aria-label="toggle theme"
             className="inline-flex"
           >
-            {mounted ? (resolvedTheme === "dark" ? <Sun size={16} /> : <Moon size={16} />) : null}
+            {mounted ? (resolvedTheme === "dark" ? <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> : <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />) : null}
           </Button>
           {status === 'authenticated' ? (
             <div className="relative hidden sm:flex">
@@ -71,24 +71,24 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <Link href={CTA_ITEMS.signin.href} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'hidden sm:inline-flex')}>
+              <Link href={CTA_ITEMS.signin.href} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')}>
                 {CTA_ITEMS.signin.label}
               </Link>
-              <Link href={CTA_ITEMS.book.href} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'hidden sm:inline-flex')}>
+              <Link href={CTA_ITEMS.book.href} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')}>
                 {CTA_ITEMS.book.label}
               </Link>
             </>
           )}
-          <button aria-label={open ? "إغلاق القائمة" : "فتح القائمة"} className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--elev)]" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-menu">
+          <button aria-label={open ? "إغلاق القائمة" : "فتح القائمة"} className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-menu">
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </Container>
       {open ? (
         <div id="mobile-menu" className="md:hidden border-t border-[var(--elev)] bg-[var(--bg)]/95 backdrop-blur px-4 py-3">
-          <nav className="grid gap-2 text-sm">
+          <nav className="grid gap-2 text-base">
             {NAV_ITEMS.map((l) => (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="py-2 rounded-[var(--radius-sm)] hover:bg-[var(--neutral-50)]">
+              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="py-3.5 rounded-[var(--radius-sm)] hover:bg-[var(--neutral-50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]">
                 {l.label}
               </Link>
             ))}

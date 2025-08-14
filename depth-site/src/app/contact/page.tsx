@@ -19,7 +19,7 @@ import { TYPE_LABELS, SLA_MAP } from "@/config/inquiry";
 const schema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين").max(100, "الاسم طويل جداً"),
   email: z.string().email("بريد إلكتروني غير صحيح").max(255, "البريد طويل جداً"),
-  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف").max(2000, "الرسالة طويلة جداً"),
+  message: z.string().min(10, "الرسالة يجب أن تكون أكثر من 10 أحرف").max(1500, "الرسالة طويلة جداً"),
   type: z.enum(["general", "pricing", "support", "social", "jobs"]).default("general"),
   source: z.string().optional(),
   honeypot: z.string().optional(),
@@ -245,7 +245,7 @@ export default function ContactPage() {
 
             {/* Name Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label className="block text-base font-medium text-[var(--text)]">
+              <label htmlFor="name" className="block text-base font-medium text-[var(--text)]">
                 الاسم <span className="text-red-500">*</span>
                 {watchName && watchName.length >= 2 && (
                   <span className="text-green-600 text-sm ml-2">✓</span>
@@ -258,9 +258,13 @@ export default function ContactPage() {
                   watchName && watchName.length >= 2 ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="أدخل اسمك الكامل"
+                id="name"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                required
                 {...register("name")} 
               />
-              {errors.name && <p className="text-red-500 text-sm break-words">{errors.name.message}</p>}
+              {errors.name && <p id="name-error" role="alert" className="text-red-500 text-sm break-words">{errors.name.message}</p>}
               <p className="text-xs text-[var(--slate-600)]">
                 {watchName ? `${watchName.length}/100` : "2-100 حرف"}
               </p>
@@ -268,7 +272,7 @@ export default function ContactPage() {
 
             {/* Email Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label className="block text-base font-medium text-[var(--text)]">
+              <label htmlFor="email" className="block text-base font-medium text-[var(--text)]">
                 البريد الإلكتروني <span className="text-red-500">*</span>
                 {watchEmail && isValidEmail(watchEmail) && (
                   <span className="text-green-600 text-sm ml-2">✓</span>
@@ -282,14 +286,18 @@ export default function ContactPage() {
                   watchEmail && isValidEmail(watchEmail) ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="example@domain.com"
+                id="email"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "email-error" : undefined}
+                required
                 {...register("email")} 
               />
-              {errors.email && <p className="text-red-500 text-sm break-words">{errors.email.message}</p>}
+              {errors.email && <p id="email-error" role="alert" className="text-red-500 text-sm break-words">{errors.email.message}</p>}
             </div>
 
             {/* Message Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label className="block text-base font-medium text-[var(--text)]">
+              <label htmlFor="message" className="block text-base font-medium text-[var(--text)]">
                 رسالتك <span className="text-red-500">*</span>
                 {watchMessage && watchMessage.length >= 10 && (
                   <span className="text-green-600 text-sm ml-2">✓</span>
@@ -303,16 +311,21 @@ export default function ContactPage() {
                   watchMessage && watchMessage.length >= 10 ? "border-green-500" : "border-[var(--elev)]"
                 )}
                 placeholder="اكتب رسالتك بالتفصيل..."
+                id="message"
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? "message-error" : undefined}
+                required
                 {...register("message")} 
               />
-              {errors.message && <p className="text-red-500 text-sm break-words">{errors.message.message}</p>}
+              {errors.message && <p id="message-error" role="alert" className="text-red-500 text-sm break-words">{errors.message.message}</p>}
               <p className="text-xs text-[var(--slate-600)]">
-                {watchMessage ? `${watchMessage.length}/2000` : "10-2000 حرف"}
+                {watchMessage ? `${watchMessage.length}/1500` : "10-1500 حرف"}
               </p>
             </div>
 
             {/* Submit Button - Mobile Optimized */}
             <button 
+              type="submit"
               disabled={isSubmitting || !isOnline} 
               className={clsx(
                 buttonStyles({ variant: "primary" }), 
