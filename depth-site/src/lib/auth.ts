@@ -75,6 +75,9 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
+    // إبقاء الجلسة فعّالة لفترة أطول لتجنب طلب تسجيل الدخول المتكرر
+    maxAge: 60 * 60 * 24 * 60, // 60 يوماً
+    updateAge: 60 * 60 * 24,   // حدّث التوكن كل 24 ساعة أثناء الاستخدام
   },
   pages: {
     signIn: '/portal/auth/signin',
@@ -107,9 +110,11 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async signIn({ user }) {
+    async signIn({ user, account }) {
       try {
         const email = String(user?.email || '').toLowerCase();
+        const provider = account?.provider || 'unknown';
+        console.log('[auth.signIn] start', { email, provider });
         if (!email) return true;
         if (email === 'admin@depth-agency.com') return true;
         // Auto-provision client profile on first Google/Magic sign-in if missing
@@ -118,8 +123,9 @@ export const authOptions: NextAuthOptions = {
           .where('email', '==', email)
           .limit(1)
           .get();
+        console.log('[auth.signIn] existingClient?', !snap.empty);
         if (snap.empty) {
-          await adminDb.collection('clients').add({
+          const created = await adminDb.collection('clients').add({
             email,
             name: user?.name || '',
             phone: '',
@@ -129,8 +135,10 @@ export const authOptions: NextAuthOptions = {
             createdAt: new Date(),
             updatedAt: new Date(),
           });
+          console.log('[auth.signIn] clientCreated', created.id);
         }
-      } catch {
+      } catch (e) {
+        console.error('[auth.signIn] provisioning error', e);
         // non-fatal; allow sign-in to proceed
       }
       return true;
@@ -149,5 +157,37 @@ export const authOptions: NextAuthOptions = {
         return `${baseUrl}/portal`;
       }
     }
+  },
+  events: {
+    async signIn({ user, account }) {
+      try {
+        const email = String(user?.email || '').toLowerCase();
+        const provider = account?.provider || 'unknown';
+        console.log('[auth.events.signIn] start', { email, provider });
+        if (!email || email === 'admin@depth-agency.com') return;
+        const snap = await adminDb
+          .collection('clients')
+          .where('email', '==', email)
+          .limit(1)
+          .get();
+        if (snap.empty) {
+          const created = await adminDb.collection('clients').add({
+            email,
+            name: user?.name || '',
+            phone: '',
+            company: '',
+            status: 'pending',
+            role: 'client',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          console.log('[auth.events.signIn] clientCreated', created.id);
+        } else {
+          console.log('[auth.events.signIn] clientExists');
+        }
+      } catch (e) {
+        console.error('[auth.events.signIn] error', e);
+      }
+    },
   },
 };

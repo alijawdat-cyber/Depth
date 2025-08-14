@@ -40,16 +40,20 @@ export default function AdminDashboard() {
   const [newProjectClientEmail, setNewProjectClientEmail] = useState('');
   const [newProjectStatus, setNewProjectStatus] = useState('active');
   const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
+  const [fileFilter, setFileFilter] = useState<'all'|'image'|'video'|'document'>('all');
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
 
   const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/portal/admin/clients');
+      const url = `/api/portal/admin/clients?_=${Date.now()}`;
+      console.log('[admin.ui] fetching clients', url);
+      const response = await fetch(url, { cache: 'no-store' });
       
       if (response.ok) {
         const data = await response.json();
+        console.log('[admin.ui] clients payload', { count: (data?.clients||[]).length });
         setClients(data.clients || []);
       } else {
         throw new Error('Failed to fetch clients');
@@ -560,17 +564,33 @@ export default function AdminDashboard() {
             </div>
             
             <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
-                <Dropdown
-                  value={selectedProjectIdForUpload || ''}
-                  onChange={(v) => setSelectedProjectIdForUpload(String(v))}
-                  options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
-                  className="w-full max-w-md"
-                />
-                {!selectedProjectIdForUpload && (
-                  <p className="text-xs text-amber-600 mt-1">⚠️ يجب اختيار مشروع أولاً</p>
-                )}
+              <div className="mb-4 grid gap-3 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
+                  <Dropdown
+                    value={selectedProjectIdForUpload || ''}
+                    onChange={(v) => setSelectedProjectIdForUpload(String(v))}
+                    options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
+                    className="w-full max-w-md"
+                  />
+                  {!selectedProjectIdForUpload && (
+                    <p className="text-xs text-amber-600 mt-1">⚠️ يجب اختيار مشروع أولاً</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">فلترة الملفات</label>
+                  <Dropdown
+                    value={fileFilter}
+                    onChange={(v)=> setFileFilter(v as typeof fileFilter)}
+                    options={[
+                      { value: 'all', label: 'الكل' },
+                      { value: 'image', label: 'صور' },
+                      { value: 'video', label: 'فيديو' },
+                      { value: 'document', label: 'مستندات' },
+                    ]}
+                    className="w-full max-w-md"
+                  />
+                </div>
               </div>
               
               <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${!selectedProjectIdForUpload ? 'opacity-50 pointer-events-none' : ''}`}>

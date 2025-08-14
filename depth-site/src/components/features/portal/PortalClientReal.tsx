@@ -207,6 +207,13 @@ export default function PortalClientReal() {
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     localStorage.setItem(`onboarding-${session?.user?.email}`, 'completed');
+    // بعد إنهاء الجولة، انقل المستخدم إلى التبويب الرئيسي "الملفات" إذا لم يكن لديه مشاريع معتمدة، وإلا اتركه بالملخص
+    const hasProjects = projects && projects.length > 0;
+    if (hasProjects) {
+      setTab('summary');
+    } else {
+      setTab('files');
+    }
   };
 
   const handleOnboardingSkip = () => {

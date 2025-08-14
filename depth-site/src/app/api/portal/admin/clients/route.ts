@@ -82,10 +82,19 @@ export async function GET() {
     }
     console.log('[admin/clients] mergedAdded=', merged, 'total=', clients.length);
 
-    return NextResponse.json({
-      success: true,
-      clients,
-    });
+    return new NextResponse(
+      JSON.stringify({ success: true, clients }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+          'Surrogate-Control': 'no-store',
+        },
+      },
+    );
 
   } catch (error) {
     console.error('Admin get clients error:', error);
@@ -169,7 +178,10 @@ export async function POST(req: NextRequest) {
         html,
         text,
       });
-      return NextResponse.json({ success: true, message: 'Invitation sent' });
+    return new NextResponse(
+      JSON.stringify({ success: true, message: 'Invitation sent' }),
+      { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
+    );
     }
 
     if (action === 'backfill-createdAt') {
@@ -184,7 +196,10 @@ export async function POST(req: NextRequest) {
           updated++;
         }
       }
-      return NextResponse.json({ success: true, updated });
+      return new NextResponse(
+        JSON.stringify({ success: true, updated }),
+        { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
+      );
     }
 
     return NextResponse.json(
@@ -200,3 +215,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
