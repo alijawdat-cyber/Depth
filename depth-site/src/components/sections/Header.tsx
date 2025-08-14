@@ -44,6 +44,11 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open, acctOpen]);
 
+  // Build nav items; append admin panel link only for admins
+  const navItems = role === 'admin'
+    ? [...NAV_ITEMS, { href: '/admin', label: 'لوحة الأدمن' }]
+    : NAV_ITEMS;
+
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)]">
       <Container className="flex items-center justify-between min-h-14 h-14">
@@ -51,7 +56,7 @@ export default function Header() {
           <Image src={BRAND.wordmark} alt="Depth" width={135} height={30} className="h-7 md:h-8 lg:h-9 w-auto min-w-28 brand-logo" priority />
         </Link>
         <nav className="hidden md:flex items-center gap-5 text-sm">
-          {NAV_ITEMS.map((l) => {
+          {navItems.map((l) => {
             const active = pathname === l.href || (l.href !== '/' && pathname?.startsWith(l.href));
             return (
               <Link
@@ -116,7 +121,7 @@ export default function Header() {
       {open ? (
         <div id="mobile-menu" className="md:hidden border-t border-[var(--elev)] bg-[var(--bg)]/95 backdrop-blur px-4 py-3">
           <nav className="grid gap-2 text-base">
-            {NAV_ITEMS.map((l) => {
+            {navItems.map((l) => {
               const active = pathname === l.href || (l.href !== '/' && pathname?.startsWith(l.href));
               return (
                 <Link

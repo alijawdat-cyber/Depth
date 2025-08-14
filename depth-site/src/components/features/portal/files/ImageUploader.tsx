@@ -25,6 +25,22 @@ export default function ImageUploader({ projectId, onUploaded }: { projectId: st
       const up = await fetch(uploadURL, { method: 'POST', body: file });
       if (!up.ok) throw new Error('failed to upload');
       setPreviewId(id);
+
+      // Save metadata so it appears in Files list
+      const url = cloudflareImageUrl(id, 'preview');
+      await fetch('/api/portal/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: file.name,
+          type: 'image',
+          size: file.size,
+          projectId,
+          url,
+          description: ''
+        })
+      });
+
       onUploaded();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'failed';

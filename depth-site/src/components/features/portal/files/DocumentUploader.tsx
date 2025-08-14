@@ -24,6 +24,21 @@ export default function DocumentUploader({ projectId, onUploaded }: { projectId:
       const put = await fetch(url, { method: 'PUT', headers: { 'x-amz-content-sha256': 'UNSIGNED-PAYLOAD', 'Content-Type': contentType }, body: file });
       if (!put.ok) throw new Error('failed to upload');
       setDocKey(key);
+
+      // Save metadata for files list
+      await fetch('/api/portal/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: file.name,
+          type: 'document',
+          size: file.size,
+          projectId,
+          url: key,
+          description: ''
+        })
+      });
+
       onUploaded();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'failed';

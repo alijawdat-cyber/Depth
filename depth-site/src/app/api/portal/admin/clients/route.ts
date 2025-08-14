@@ -27,6 +27,22 @@ export async function GET() {
 
     const clients = clientsSnapshot.docs.map(doc => {
       const data = doc.data();
+      // Normalize Firestore Timestamp/Date/string to ISO string safely
+      let createdAtIso: string;
+      try {
+        if (data.createdAt?.toDate) {
+          createdAtIso = data.createdAt.toDate().toISOString();
+        } else if (data.createdAt instanceof Date) {
+          createdAtIso = data.createdAt.toISOString();
+        } else if (typeof data.createdAt === 'string') {
+          createdAtIso = data.createdAt;
+        } else {
+          createdAtIso = new Date().toISOString();
+        }
+      } catch {
+        createdAtIso = new Date().toISOString();
+      }
+
       return {
         id: doc.id,
         name: data.name,
@@ -34,7 +50,7 @@ export async function GET() {
         company: data.company,
         phone: data.phone,
         status: data.status,
-        createdAt: data.createdAt?.toISOString() || new Date().toISOString(),
+        createdAt: createdAtIso,
       };
     });
 

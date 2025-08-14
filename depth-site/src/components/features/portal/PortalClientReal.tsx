@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase } from "lucide-react";
+import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase, Copy } from "lucide-react";
 import ImageUploader from "./files/ImageUploader";
 import VideoUploader from "./files/VideoUploader";
 import DocumentUploader from "./files/DocumentUploader";
@@ -56,6 +56,7 @@ export default function PortalClientReal() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [clientStatus, setClientStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +132,12 @@ export default function PortalClientReal() {
             const approvalsData = await approvalsResponse.json();
             setApprovals(approvalsData.approvals || []);
           }
+        }
+        // Fetch all projects for quick reference
+        const allProjectsRes = await fetch('/api/portal/projects');
+        if (allProjectsRes.ok) {
+          const allProjectsData = await allProjectsRes.json();
+          setProjectsList(allProjectsData.projects || []);
         }
       }
     } catch (err) {
@@ -531,65 +538,77 @@ export default function PortalClientReal() {
                 <DocumentUploader projectId={activeProject?.id || 'demo'} onUploaded={fetchData} />
               </div>
 
-              <div className="grid gap-4">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
                 {files.length > 0 ? files.map((file) => (
-                  <div key={file.id} className="group bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)] hover:shadow-lg transition-all duration-200 hover:border-[var(--accent-500)]/20">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-[var(--accent-500)]/10 p-3 rounded-full group-hover:bg-[var(--accent-500)]/20 transition-colors">
-                          <FileText size={24} className="text-[var(--accent-500)]" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[var(--text)] mb-1">{file.name}</div>
-                          <div className="flex items-center gap-2 text-sm text-[var(--slate-600)]">
-                            <span className="bg-[var(--bg)] px-2 py-1 rounded">{file.type}</span>
-                            <span>•</span>
-                            <span>{file.size}</span>
-                            <span>•</span>
-                            <span>{formatDate(file.createdAt)}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(file.status)}`}>
+                  <div key={file.id} className="group bg-[var(--card)] p-4 rounded-[var(--radius-lg)] border border-[var(--elev)] hover:shadow-lg transition-all duration-200 hover:border-[var(--accent-500)]/20">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="font-semibold text-[var(--text)] truncate" title={file.name}>{file.name}</div>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(file.status)}`}>
                           {file.status === 'uploaded' ? 'مرفوع' : file.status === 'processing' ? 'قيد المعالجة' : file.status}
                         </span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => window.open(file.url, '_blank')}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Eye size={16} className="mr-2" />
-                          عرض
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={async () => {
-                            try {
-                              if (file.url.startsWith('http')) {
-                                const a = document.createElement('a');
-                                a.href = file.url;
-                                a.download = file.name;
-                                a.click();
-                                return;
-                              }
-                              const getRes = await fetch(`/api/portal/files/presign?key=${encodeURIComponent(file.url)}`);
-                              const getJson = await getRes.json();
-                              if (getRes.ok && getJson.url) {
-                                const a = document.createElement('a');
-                                a.href = getJson.url;
-                                a.download = file.name;
-                                a.click();
-                              }
-                            } catch {}
-                          }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Download size={16} className="mr-2" />
-                          تحميل
-                        </Button>
+                      </div>
+
+                      {/* Preview area */}
+                      {file.type === 'image' ? (
+                        <img src={file.url} alt={file.name} className="w-full h-40 object-cover rounded-md border border-[var(--elev)]" />
+                      ) : file.type === 'video' ? (
+                        <div className="aspect-video w-full rounded-md overflow-hidden border border-[var(--elev)]">
+                          <iframe src={file.url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                        </div>
+                      ) : (
+                        <div className="text-sm text-[var(--slate-600)]">وثيقة</div>
+                      )}
+
+                      <div className="flex items-center justify-between text-xs text-[var(--slate-600)]">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-[var(--bg)] px-2 py-1 rounded">{file.type}</span>
+                          <span>•</span>
+                          <span>{file.size}</span>
+                          <span>•</span>
+                          <span>{formatDate(file.createdAt)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(file.url);
+                              } catch {}
+                            }}
+                          >
+                            <Copy size={14} className="mr-1" />نسخ
+                          </Button>
+                          {file.type === 'document' ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  const getRes = await fetch(`/api/portal/files/presign?key=${encodeURIComponent(file.url)}`);
+                                  const getJson = await getRes.json();
+                                  if (getRes.ok && getJson.url) {
+                                    const a = document.createElement('a');
+                                    a.href = getJson.url;
+                                    a.download = file.name;
+                                    a.click();
+                                  }
+                                } catch {}
+                              }}
+                            >
+                              <Download size={14} className="mr-1" />تنزيل
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(file.url, '_blank')}
+                            >
+                              <Eye size={14} className="mr-1" />عرض
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

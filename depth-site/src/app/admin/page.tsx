@@ -23,6 +23,19 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [flash, setFlash] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [inviteEmail, setInviteEmail] = useState('');
+
+  // Projects
+  type ProjectRow = { id: string; title: string; clientEmail: string; status: string; createdAt?: string };
+  const [projects, setProjects] = useState<ProjectRow[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsError, setProjectsError] = useState<string | null>(null);
+  const [newProjectTitle, setNewProjectTitle] = useState('');
+  const [newProjectClientEmail, setNewProjectClientEmail] = useState('');
+  const [newProjectStatus, setNewProjectStatus] = useState('active');
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
 
@@ -34,6 +47,7 @@ export default function AdminDashboard() {
       sessionStorage.setItem(key, '1');
       // Start loading and fetch
       fetchClients();
+      fetchProjects();
     }
   }, [status, isAdmin]);
 
@@ -76,18 +90,99 @@ export default function AdminDashboard() {
             ? { ...client, status }
             : client
         ));
-        alert(`تم ${status === 'approved' ? 'قبول' : 'رفض'} العميل بنجاح`);
+        setFlash({ type: 'success', message: `تم ${status === 'approved' ? 'قبول' : 'رفض'} العميل بنجاح` });
       } else {
         throw new Error('Failed to update client');
       }
     } catch (err) {
-      alert('حدث خطأ في تحديث حالة العميل');
+      setFlash({ type: 'error', message: 'حدث خطأ في تحديث حالة العميل' });
       console.error('Update error:', err);
     }
   };
 
+  const inviteClient = async () => {
+    try {
+      setFlash(null);
+      const res = await fetch('/api/portal/admin/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'invite', email: inviteEmail.trim() })
+      });
+      if (!res.ok) throw new Error('invite failed');
+      setInviteEmail('');
+      setFlash({ type: 'success', message: 'تم إرسال الدعوة بالبريد الإلكتروني' });
+    } catch {
+      setFlash({ type: 'error', message: 'فشل إرسال الدعوة' });
+    }
+  };
+
+  const createDemoClient = async () => {
+    try {
+      setFlash(null);
+      const res = await fetch('/api/portal/admin/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create-demo-client' })
+      });
+      if (!res.ok) throw new Error('create demo failed');
+      await fetchClients();
+      setFlash({ type: 'success', message: 'تم إنشاء عميل تجريبي' });
+    } catch {
+      setFlash({ type: 'error', message: 'فشل إنشاء العميل التجريبي' });
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      setProjectsLoading(true);
+      setProjectsError(null);
+      const res = await fetch('/api/portal/admin/projects');
+      if (!res.ok) throw new Error('failed');
+      type FirestoreTimestampLike = { toDate?: () => Date } | string | null | undefined;
+      type ProjectsPayload = { projects?: Array<{ id: string; title: string; clientEmail: string; status: string; createdAt?: FirestoreTimestampLike }> };
+      const data: ProjectsPayload = await res.json();
+      const toIso = (v: FirestoreTimestampLike): string | undefined => {
+        if (!v) return undefined;
+        if (typeof v === 'string') return v;
+        const d = typeof v.toDate === 'function' ? v.toDate() : undefined;
+        return d ? d.toISOString() : undefined;
+      };
+      const mapped: ProjectRow[] = (data.projects || []).map((p) => ({
+        id: p.id,
+        title: p.title,
+        clientEmail: p.clientEmail,
+        status: p.status,
+        createdAt: toIso(p.createdAt),
+      }));
+      setProjects(mapped);
+    } catch {
+      setProjectsError('فشل في تحميل المشاريع');
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const createProject = async () => {
+    try {
+      setFlash(null);
+      const res = await fetch('/api/portal/admin/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newProjectTitle.trim(), clientEmail: newProjectClientEmail.trim(), status: newProjectStatus })
+      });
+      if (!res.ok) throw new Error('failed');
+      setNewProjectTitle('');
+      setNewProjectClientEmail('');
+      setNewProjectStatus('active');
+      await fetchProjects();
+      setFlash({ type: 'success', message: 'تم إنشاء المشروع' });
+    } catch {
+      setFlash({ type: 'error', message: 'فشل إنشاء المشروع' });
+    }
+  };
+
   // Enforce Google sign-in for admin
-  if (status !== 'authenticated' || !isAdmin) {
+  if (status !== 'authenticated') {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <Header />
@@ -114,6 +209,25 @@ export default function AdminDashboard() {
       </div>
     );
   }
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)]">
+        <Header />
+        <main className="py-12 md:py-20">
+          <Container>
+            <div className="max-w-xl mx-auto bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)] text-center">
+              <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
+              <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لا تملك صلاحية الوصول</h1>
+              <p className="text-[var(--slate-600)] mb-6">هذه الصفحة خاصة بمدراء النظام. استخدم بوابتك لمتابعة مشاريعك.</p>
+              <div className="flex justify-center gap-2">
+                <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
+              </div>
+            </div>
+          </Container>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
@@ -132,6 +246,13 @@ export default function AdminDashboard() {
               تحديث البيانات
             </Button>
           </div>
+
+          {/* Flash messages */}
+          {flash && (
+            <div className={`mb-6 p-3 rounded-md border ${flash.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+              {flash.message}
+            </div>
+          )}
 
           {/* Stats Cards */}
           <div className="grid md:grid-cols-4 gap-4 mb-8">
@@ -202,6 +323,24 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* Controls: search / filters / invite / create demo */}
+          <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-6 grid gap-3 md:grid-cols-2">
+            <div className="flex gap-2">
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم/البريد/الهاتف" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as 'all' | 'pending' | 'approved' | 'rejected')} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
+                <option value="all">الكل</option>
+                <option value="pending">في الانتظار</option>
+                <option value="approved">معتمد</option>
+                <option value="rejected">مرفوض</option>
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <input value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="دعوة عميل عبر البريد" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
+              <Button onClick={inviteClient}>إرسال دعوة</Button>
+              <Button variant="secondary" onClick={createDemoClient}>عميل تجريبي</Button>
+            </div>
+          </div>
+
           {/* Clients Table */}
           {!loading && !error && (
             <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
@@ -218,7 +357,19 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {clients.map((client) => (
+                    {clients
+                      .filter(c => statusFilter === 'all' ? true : c.status === statusFilter)
+                      .filter(c => {
+                        const q = search.trim().toLowerCase();
+                        if (!q) return true;
+                        return (
+                          c.name?.toLowerCase().includes(q) ||
+                          c.email?.toLowerCase().includes(q) ||
+                          c.company?.toLowerCase().includes(q) ||
+                          c.phone?.toLowerCase().includes(q)
+                        );
+                      })
+                      .map((client) => (
                       <tr key={client.id} className="border-b border-[var(--elev)] hover:bg-[var(--bg)]">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -312,6 +463,75 @@ export default function AdminDashboard() {
               )}
             </div>
           )}
+
+          {/* Projects Section */}
+          <div className="mt-10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-[var(--text)] mb-1">المشاريع</h2>
+                <p className="text-[var(--slate-600)]">قائمة المشاريع المرتبطة بالعملاء</p>
+              </div>
+              <Button onClick={fetchProjects} className="flex items-center gap-2"><RefreshCw size={16}/>تحديث</Button>
+            </div>
+
+            {/* Create Project */}
+            <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-4 grid gap-2 md:grid-cols-3">
+              <input value={newProjectTitle} onChange={e => setNewProjectTitle(e.target.value)} placeholder="عنوان المشروع" className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
+              <select value={newProjectClientEmail} onChange={e => setNewProjectClientEmail(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
+                <option value="">اختر بريد العميل</option>
+                {clients.map(c => (
+                  <option key={c.id} value={c.email}>{c.email}</option>
+                ))}
+              </select>
+              <div className="flex gap-2">
+                <select value={newProjectStatus} onChange={e => setNewProjectStatus(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
+                  <option value="active">نشط</option>
+                  <option value="pending">انتظار</option>
+                  <option value="completed">مكتمل</option>
+                </select>
+                <Button onClick={createProject}>إنشاء مشروع</Button>
+              </div>
+            </div>
+
+            {/* Projects Table / States */}
+            {projectsLoading && (
+              <div className="text-center py-8 text-[var(--slate-600)]">جاري تحميل المشاريع…</div>
+            )}
+            {projectsError && (
+              <div className="text-center py-8 text-red-600">{projectsError}</div>
+            )}
+            {!projectsLoading && !projectsError && (
+              <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
+                      <tr>
+                        <th className="text-right p-4 font-semibold text-[var(--text)]">العنوان</th>
+                        <th className="text-right p-4 font-semibold text-[var(--text)]">البريد المرتبط</th>
+                        <th className="text-right p-4 font-semibold text-[var(--text)]">الحالة</th>
+                        <th className="text-right p-4 font-semibold text-[var(--text)]">تاريخ الإنشاء</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {projects.map(p => (
+                        <tr key={p.id} className="border-b border-[var(--elev)] hover:bg-[var(--bg)]">
+                          <td className="p-4">{p.title}</td>
+                          <td className="p-4 text-sm text-[var(--slate-700)]">{p.clientEmail}</td>
+                          <td className="p-4 text-sm">
+                            <span className="px-2 py-1 rounded-full bg-[var(--bg)]">{p.status}</span>
+                          </td>
+                          <td className="p-4 text-sm text-[var(--slate-600)]">{p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-SA') : '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {projects.length === 0 && (
+                  <div className="text-center py-8 text-[var(--slate-600)]">لا توجد مشاريع حتى الآن</div>
+                )}
+              </div>
+            )}
+          </div>
         </Container>
       </main>
       
