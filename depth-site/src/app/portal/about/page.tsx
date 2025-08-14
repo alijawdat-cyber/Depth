@@ -90,32 +90,32 @@ export default function PortalAboutPage() {
             
             <div className="grid md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="bg-[var(--accent-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-[var(--accent-500)]">1</span>
+                <div className="bg-[var(--brand-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-[var(--brand-500)]">1</span>
                 </div>
                 <h3 className="font-semibold text-[var(--text)] mb-2">سجل حسابك</h3>
                 <p className="text-sm text-[var(--slate-600)]">أدخل بياناتك الأساسية وانتظر تفعيل الحساب</p>
               </div>
 
               <div className="text-center">
-                <div className="bg-[var(--accent-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-[var(--accent-500)]">2</span>
+                <div className="bg-[var(--brand-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-[var(--brand-500)]">2</span>
                 </div>
                 <h3 className="font-semibold text-[var(--text)] mb-2">استلم مشروعك</h3>
                 <p className="text-sm text-[var(--slate-600)]">فريقنا ينشئ مشروعك ويضيف التفاصيل</p>
               </div>
 
               <div className="text-center">
-                <div className="bg-[var(--accent-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-[var(--accent-500)]">3</span>
+                <div className="bg-[var(--brand-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-[var(--brand-500)]">3</span>
                 </div>
                 <h3 className="font-semibold text-[var(--text)] mb-2">تابع التقدم</h3>
                 <p className="text-sm text-[var(--slate-600)]">شاهد الملفات والتحديثات أولاً بأول</p>
               </div>
 
               <div className="text-center">
-                <div className="bg-[var(--accent-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-[var(--accent-500)]">4</span>
+                <div className="bg-[var(--brand-500)]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-[var(--brand-500)]">4</span>
                 </div>
                 <h3 className="font-semibold text-[var(--text)] mb-2">تفاعل ووافق</h3>
                 <p className="text-sm text-[var(--slate-600)]">راجع التصاميم ووافق عليها فوراً</p>
@@ -130,8 +130,8 @@ export default function PortalAboutPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-[var(--accent-500)]/10 rounded-full flex items-center justify-center">
-                    <Users size={24} className="text-[var(--accent-500)]" />
+                  <div className="w-12 h-12 bg-[var(--brand-500)]/10 rounded-full flex items-center justify-center">
+                    <Users size={24} className="text-[var(--brand-500)]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-[var(--text)]">مطعم In Off</h3>
@@ -145,8 +145,8 @@ export default function PortalAboutPage() {
 
               <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-[var(--accent-500)]/10 rounded-full flex items-center justify-center">
-                    <Users size={24} className="text-[var(--accent-500)]" />
+                  <div className="w-12 h-12 bg-[var(--brand-500)]/10 rounded-full flex items-center justify-center">
+                    <Users size={24} className="text-[var(--brand-500)]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-[var(--text)]">عيادة Clinica A</h3>
@@ -161,7 +161,7 @@ export default function PortalAboutPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="text-center bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-8 md:p-12 rounded-[var(--radius-lg)] text-white">
+          <div className="text-center bg-[var(--brand-500)] p-8 md:p-12 rounded-[var(--radius-lg)] text-white">
             <h2 className="text-3xl font-bold mb-4">جاهز لتجربة البوابة؟</h2>
             <p className="text-xl mb-8 text-white/90">
               انضم إلى عملائنا واستمتع بتجربة إدارة مشاريع لا مثيل لها
@@ -169,7 +169,7 @@ export default function PortalAboutPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/portal/auth/signup">
-                <Button variant="secondary" className="bg-white text-[var(--accent-500)] hover:bg-gray-100 px-8 py-3">
+                <Button variant="secondary" className="bg-white text-[var(--brand-500)] hover:bg-gray-100 px-8 py-3">
                   ابدأ التسجيل الآن
                 </Button>
               </Link>

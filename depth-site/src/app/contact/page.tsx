@@ -140,9 +140,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)] overflow-x-hidden touch-pan-y">
+    <div className="min-h-screen w-full bg-[var(--bg)] overflow-x-hidden touch-pan-y">
       <main className="py-8 md:py-16">
-      <Container className="overflow-x-hidden">
+      <Container className="w-full overflow-x-hidden">
         {/* Fixed Header with Centered Logo */}
         <div className="mb-8 md:mb-12">
           {/* Back Button Row */}
@@ -201,7 +201,19 @@ export default function ContactPage() {
               tabIndex={-1}
               autoComplete="off"
               aria-hidden="true"
-              style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+              style={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                padding: 0,
+                margin: -1,
+                border: 0,
+                opacity: 0,
+                clip: "rect(0 0 0 0)",
+                clipPath: "inset(50%)",
+                whiteSpace: "nowrap",
+                overflow: "hidden"
+              }}
               {...register("honeypot")}
             />
             {/* source marker */}
@@ -254,7 +266,7 @@ export default function ContactPage() {
               </label>
               <input 
                 className={clsx(
-                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border",
+                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base",
                   errors.name ? "border-red-500" : 
                   watchName && watchName.length >= 2 ? "border-green-500" : "border-[var(--elev)]"
                 )}
@@ -282,7 +294,7 @@ export default function ContactPage() {
               <input 
                 type="email" 
                 className={clsx(
-                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border",
+                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base",
                   errors.email ? "border-red-500" : 
                   watchEmail && isValidEmail(watchEmail) ? "border-green-500" : "border-[var(--elev)]"
                 )}
@@ -307,7 +319,7 @@ export default function ContactPage() {
               <textarea 
                 rows={6} 
                 className={clsx(
-                  "w-full max-w-full px-4 py-3 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] resize-none box-border",
+                  "w-full max-w-full px-4 py-3 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] resize-none box-border text-base",
                   errors.message ? "border-red-500" : 
                   watchMessage && watchMessage.length >= 10 ? "border-green-500" : "border-[var(--elev)]"
                 )}

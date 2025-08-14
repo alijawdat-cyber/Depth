@@ -35,6 +35,8 @@ export interface ProjectFile {
   createdAt: string | null;
   url: string; // for documents: R2 key; for images/videos: public url/iframe url
   projectId?: string;
+  imageId?: string;
+  videoId?: string;
 }
 
 export interface Approval {

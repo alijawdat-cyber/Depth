@@ -40,7 +40,7 @@ export default function QRSection() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 bg-[var(--card)] p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center">
                     <span className="text-white text-sm font-bold">IG</span>
                   </div>
                   <div className="text-right">

@@ -97,7 +97,7 @@ function MarkdownRenderer({ content }: { content: string }) {
     .replace(/\*(.+?)\*/g, '<em class="italic">$1</em>')
     
     // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[var(--primary)] hover:text-[var(--accent-700)] underline transition-colors">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[var(--primary)] hover:text-[var(--brand-700)] underline transition-colors">$1</a>')
     
     // Code blocks
     .replace(/```([^`]+)```/g, '<pre class="bg-[var(--bg)] border border-[var(--elev)] rounded p-4 my-4 overflow-x-auto"><code class="text-sm font-mono">$1</code></pre>')
@@ -234,7 +234,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
 
               {/* CTA Section */}
-              <div className="mt-12 p-8 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--accent-500)]/10 rounded-[var(--radius-lg)] border border-[var(--primary)]/20">
+              <div className="mt-12 p-8 bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)]">
                 <h3 className="text-2xl font-bold text-[var(--text)] mb-4">
                   هل أعجبك هذا المقال؟
                 </h3>

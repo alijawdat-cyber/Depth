@@ -3,6 +3,30 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import { cloudflareImageUrl } from "@/lib/cloudflare-public";
+
+const CF_HASH = process.env.NEXT_PUBLIC_CF_IMAGES_ACCOUNT_HASH || '';
+const CF_PREVIEW = process.env.NEXT_PUBLIC_CF_IMAGES_VARIANT_PREVIEW || 'public';
+
+function normalizeCfUrl(url?: string, imageId?: string) {
+  if (!url && imageId && CF_HASH) return cloudflareImageUrl(imageId, 'preview');
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'imagedelivery.net') {
+      // path: /<hash>/<id>/<variant>
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts.length === 3) {
+        const [hash, id] = parts;
+        if (hash === CF_HASH) {
+          u.pathname = `/${hash}/${id}/${CF_PREVIEW}`;
+          return u.toString();
+        }
+      }
+    }
+  } catch {}
+  return url;
+}
 import { useRouter } from "next/navigation";
 import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase, Copy } from "lucide-react";
 import UnifiedUploader from "./files/UnifiedUploader";
@@ -23,7 +47,7 @@ export default function PortalClientReal() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("summary");
-  const { projects = [], refresh: refreshProjects } = useProjects();
+  const { projects = [], isLoading: isLoadingProjects, refresh: refreshProjects } = useProjects();
   const activeProjectId = projects?.[0]?.id;
   const { files = [], isLoading: isLoadingFiles, refresh: refreshFiles } = useFiles(activeProjectId);
   const { approvals = [], isLoading: isLoadingApprovals, refresh: refreshApprovals } = useApprovals(activeProjectId);
@@ -121,15 +145,15 @@ export default function PortalClientReal() {
       case "approved": 
       case "completed": 
       case "active": 
-        return "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20";
+        return "text-[var(--success-fg)] bg-[var(--success-bg)]";
       case "reviewing": 
       case "pending": 
-        return "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20";
+        return "text-[var(--warning-fg)] bg-[var(--warning-bg)]";
       case "rejected":
       case "high":
-        return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20";
+        return "text-[var(--danger-fg)] bg-[var(--danger-bg)]";
       case "medium":
-        return "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20";
+        return "text-[var(--slate-600)] bg-[var(--bg)]";
       default: 
         return "text-[var(--slate-600)] bg-[var(--card)]";
     }
@@ -242,7 +266,7 @@ export default function PortalClientReal() {
       />
       
       {/* Enhanced Portal Header */}
-      <div id="portal-header" className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
+      <div id="portal-header" className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-4 left-4 w-20 h-20 border border-white/20 rounded-full"></div>
@@ -252,16 +276,16 @@ export default function PortalClientReal() {
         
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white/10 p-3 rounded-full">
-              <User size={24} className="text-white" />
+            <div className="bg-[var(--neutral-0)]/10 p-3 rounded-full">
+              <User size={24} className="text-[var(--text-dark)]" />
             </div>
             <div>
               <h2 className="text-2xl font-bold mb-1">
                 أهلاً وسهلاً {session?.user?.name || 'بك'}! 👋
               </h2>
-              <p className="text-white/80 flex items-center gap-2">
+              <p className="text-[var(--text-dark)]/80 flex items-center gap-2">
                 <span>{session?.user?.email}</span>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded-full">عميل مفعل</span>
+                <span className="text-xs bg-[var(--neutral-0)]/20 px-2 py-1 rounded-full">عميل مفعل</span>
               </p>
             </div>
           </div>
@@ -270,7 +294,7 @@ export default function PortalClientReal() {
             <Button 
               variant="ghost" 
               onClick={() => router.push('/portal/profile')}
-              className="text-white hover:bg-white/10 border-white/20"
+              className="text-[var(--text-dark)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
             >
               <Settings size={16} className="mr-2" />
               الحساب
@@ -278,7 +302,7 @@ export default function PortalClientReal() {
             <Button 
               variant="ghost" 
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-white hover:bg-white/10 border-white/20"
+              className="text-[var(--text-dark)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
             >
               <LogOut size={16} className="mr-2" />
               خروج
@@ -290,65 +314,71 @@ export default function PortalClientReal() {
       {/* Enhanced Quick Stats */}
       {tab === "summary" && (
         <div id="quick-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-2 right-2 opacity-20">
-              <TrendingUp size={40} />
-            </div>
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp size={20} />
-                <span className="text-sm font-medium text-blue-100">التقدم العام</span>
+          {isLoadingProjects ? (
+            Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
+          ) : (
+            <>
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute top-2 right-2 opacity-20">
+                  <TrendingUp size={40} />
+                </div>
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp size={20} />
+                    <span className="text-sm font-medium text-blue-100">التقدم العام</span>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{Math.round(averageProgress)}%</div>
+                  <div className="text-xs text-blue-100">متوسط جميع المشاريع</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold mb-1">{Math.round(averageProgress)}%</div>
-              <div className="text-xs text-blue-100">متوسط جميع المشاريع</div>
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-2 right-2 opacity-20">
-              <DollarSign size={40} />
-            </div>
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-3">
-                <DollarSign size={20} />
-                <span className="text-sm font-medium text-green-100">إجمالي الميزانية</span>
+              
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute top-2 right-2 opacity-20">
+                  <DollarSign size={40} />
+                </div>
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign size={20} />
+                    <span className="text-sm font-medium text-green-100">إجمالي الميزانية</span>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{formatCurrency(totalBudget)}</div>
+                  <div className="text-xs text-green-100">جميع المشاريع النشطة</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold mb-1">{formatCurrency(totalBudget)}</div>
-              <div className="text-xs text-green-100">جميع المشاريع النشطة</div>
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-2 right-2 opacity-20">
-              <Briefcase size={40} />
-            </div>
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-3">
-                <Briefcase size={20} />
-                <span className="text-sm font-medium text-purple-100">المشاريع النشطة</span>
+              
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute top-2 right-2 opacity-20">
+                  <Briefcase size={40} />
+                </div>
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Briefcase size={20} />
+                    <span className="text-sm font-medium text-purple-100">المشاريع النشطة</span>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{projects.length}</div>
+                  <div className="text-xs text-purple-100">{projects.filter(p => p.status === 'active').length} قيد التنفيذ</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold mb-1">{projects.length}</div>
-              <div className="text-xs text-purple-100">{projects.filter(p => p.status === 'active').length} قيد التنفيذ</div>
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-6 rounded-[var(--radius-lg)] text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-2 right-2 opacity-20">
-              <Target size={40} />
-            </div>
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-3">
-                <Target size={20} />
-                <span className="text-sm font-medium text-orange-100">المهام المعلقة</span>
+              
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute top-2 right-2 opacity-20">
+                  <Target size={40} />
+                </div>
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target size={20} />
+                    <span className="text-sm font-medium text-orange-100">المهام المعلقة</span>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{approvals.filter(a => a.status === 'pending').length}</div>
+                  <div className="text-xs text-orange-100">من أصل {approvals.length} موافقة</div>
+                </div>
               </div>
-              <div className="text-3xl font-bold mb-1">{approvals.filter(a => a.status === 'pending').length}</div>
-              <div className="text-xs text-orange-100">من أصل {approvals.length} موافقة</div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       )}
 
@@ -365,7 +395,7 @@ export default function PortalClientReal() {
                   onClick={() => setTab(t.id as Tab)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-[var(--radius-sm)] text-sm font-medium transition-colors ${
                     tab === t.id 
-                      ? "bg-[var(--accent-500)] text-white" 
+                      ? "bg-[var(--brand-500)] text-[var(--text-dark)]" 
                       : "text-[var(--slate-600)] hover:bg-[var(--elev)] hover:text-[var(--text)]"
                   }`}
                 >
@@ -426,7 +456,7 @@ export default function PortalClientReal() {
                     </div>
                     <div className="w-full bg-[var(--elev)] rounded-full h-2">
                       <div 
-                        className="bg-[var(--accent-500)] h-2 rounded-full transition-all duration-300"
+                        className="bg-[var(--brand-500)] h-2 rounded-full transition-all duration-300"
                         style={{ width: `${activeProject.progress}%` }}
                       ></div>
                     </div>
@@ -522,7 +552,7 @@ export default function PortalClientReal() {
                 {isLoadingFiles ? (
                   Array.from({ length: 4 }).map((_, i) => <FileCardSkeleton key={i} />)
                 ) : files.length > 0 ? files.map((file) => (
-                  <div key={file.id} className="group bg-[var(--card)] p-4 rounded-[var(--radius-lg)] border border-[var(--elev)] hover:shadow-lg transition-all duration-200 hover:border-[var(--accent-500)]/20">
+                  <div key={file.id} className="group bg-[var(--card)] p-4 rounded-[var(--radius-lg)] border border-[var(--elev)] hover:shadow-lg transition-all duration-200 hover:border-[var(--brand-500)]/20">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="font-semibold text-[var(--text)] truncate" title={file.name}>{file.name}</div>
@@ -534,7 +564,7 @@ export default function PortalClientReal() {
                       {/* Preview area */}
                       {file.type === 'image' ? (
                         <div className="relative w-full h-40 rounded-md overflow-hidden border border-[var(--elev)]">
-                          <Image src={file.url} alt={file.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                          <Image src={normalizeCfUrl(file.url, (file as unknown as { imageId?: string }).imageId)} alt={file.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                         </div>
                       ) : file.type === 'video' ? (
                         <div className="aspect-video w-full rounded-md overflow-hidden border border-[var(--elev)]">

@@ -32,6 +32,10 @@ const EnvSchema = z.object({
   CF_ACCOUNT_ID: z.string().optional(),
   CF_IMAGES_ACCOUNT_HASH: z.string().optional(),
   CF_API_TOKEN: z.string().optional(),
+  // Cloudflare Images variants (optional; defaults applied if missing)
+  CF_IMAGES_VARIANT_THUMB: z.string().optional(),
+  CF_IMAGES_VARIANT_PREVIEW: z.string().optional(),
+  CF_IMAGES_VARIANT_HERO: z.string().optional(),
   // Cloudflare Stream
   CF_STREAM_API_TOKEN: z.string().optional(),
   CF_STREAM_CUSTOMER_SUBDOMAIN: z.string().optional(),
@@ -70,6 +74,9 @@ export const env = EnvSchema.parse({
   CF_ACCOUNT_ID: sanitize(process.env.CF_ACCOUNT_ID),
   CF_IMAGES_ACCOUNT_HASH: sanitize(process.env.CF_IMAGES_ACCOUNT_HASH),
   CF_API_TOKEN: sanitize(process.env.CF_API_TOKEN),
+  CF_IMAGES_VARIANT_THUMB: sanitize(process.env.CF_IMAGES_VARIANT_THUMB),
+  CF_IMAGES_VARIANT_PREVIEW: sanitize(process.env.CF_IMAGES_VARIANT_PREVIEW),
+  CF_IMAGES_VARIANT_HERO: sanitize(process.env.CF_IMAGES_VARIANT_HERO),
   CF_STREAM_API_TOKEN: sanitize(process.env.CF_STREAM_API_TOKEN),
   CF_STREAM_CUSTOMER_SUBDOMAIN: sanitize(process.env.CF_STREAM_CUSTOMER_SUBDOMAIN),
   R2_ACCOUNT_ID: sanitize(process.env.R2_ACCOUNT_ID),

@@ -17,7 +17,7 @@ export default function FounderSpotlight() {
         className="w-full h-72 md:h-80 object-cover rounded-[var(--radius)]"
         priority
       />
-      <div className="pointer-events-none absolute inset-0 rounded-[var(--radius)] bg-gradient-to-b from-transparent to-black/10" />
+      <div className="pointer-events-none absolute inset-0 rounded-[var(--radius)] bg-black/10" />
     </div>
   );
 

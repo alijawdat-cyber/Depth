@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as tus from "tus-js-client";
 import { Button } from "@/components/ui/Button";
 import { cloudflareImageUrl, cloudflareStreamIframeUrl } from "@/lib/cloudflare-public";
 
@@ -38,6 +39,7 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   const lastTickById = useRef(new Map<string, { time: number; loaded: number }>());
   const queueRef = useRef<QueueItem[]>([]);
   useEffect(() => { queueRef.current = queue; }, [queue]);
+  const tusById = useRef(new Map<string, tus.Upload>());
 
   const acceptAttr = useMemo(() => {
     if (kind === 'image') return 'image/*';
@@ -100,7 +102,8 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             if (!res.ok) throw new Error('failed to get upload url');
             const { uploadURL, id, warning } = await res.json();
             if (warning) setIsMock(true);
-            await xhrUpload('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
+            // Cloudflare Images v2 requires multipart/form-data with field name "file"
+            await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
             const url = cloudflareImageUrl(id, 'preview');
             await saveMeta(q.file.name, 'image', q.file.size, projectId, url, { imageId: id, contentType: ct });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: url } : it));
@@ -113,7 +116,27 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             if (!res.ok) throw new Error('failed to get upload url');
             const { uploadURL, videoId, warning } = await res.json();
             if (warning) setIsMock(true);
-            await xhrUpload('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
+            await new Promise<void>((resolve, reject) => {
+              const upload = new tus.Upload(q.file, {
+                uploadUrl: uploadURL,
+                metadata: {
+                  filename: q.file.name,
+                  filetype: q.file.type || 'video/mp4',
+                },
+                retryDelays: [0, 1000, 3000, 5000],
+                onError: (err) => {
+                  reject(err);
+                },
+                onProgress: (bytesUploaded, bytesTotal) => {
+                  tick(qid, bytesUploaded, bytesTotal);
+                },
+                onSuccess: () => {
+                  resolve();
+                },
+              });
+              tusById.current.set(qid, upload);
+              upload.start();
+            });
             const url = cloudflareStreamIframeUrl(videoId);
             await saveMeta(q.file.name, 'video', q.file.size, projectId, url, { videoId, contentType: q.file.type || 'video/mp4' });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: url } : it));
@@ -137,6 +160,8 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
         } finally {
           xhrById.current.delete(qid);
           lastTickById.current.delete(qid);
+          const up = tusById.current.get(qid);
+          if (up) tusById.current.delete(qid);
         }
       };
 
@@ -173,6 +198,26 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
     setQueue(prev => prev.map(it => it.id === qid ? { ...it, progress: pct, speedBps, etaSec } : it));
   };
 
+  const xhrUploadForm = (method: 'POST'|'PUT', url: string, qid: string, file: File, onProgress: (loaded: number, total: number)=>void) => {
+    return new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhrById.current.set(qid, xhr);
+      xhr.open(method, url, true);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) onProgress(e.loaded, e.total);
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve();
+        else reject(new Error('upload error'));
+      };
+      xhr.onerror = () => reject(new Error('network error'));
+      xhr.onabort = () => reject(new Error('canceled'));
+      const form = new FormData();
+      form.append('file', file, file.name);
+      xhr.send(form);
+    });
+  };
+
   const xhrUpload = (method: 'POST'|'PUT', url: string, qid: string, file: File, onProgress: (loaded: number, total: number)=>void, headers?: Record<string, string>) => {
     return new Promise<void>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -197,10 +242,22 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   const saveMeta = async (name: string, type: UploadKind, size: number, projectId: string, url: string, extra?: Record<string, unknown>) => {
     const res = await fetch('/api/portal/files', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'credentials': 'include'
+      },
+      credentials: 'include',
       body: JSON.stringify({ name, type, size, projectId, url, description: '', ...(extra||{}) })
     });
-    if (!res.ok) throw new Error('failed to save metadata');
+    if (!res.ok) {
+      let errorMsg = 'failed to save metadata';
+      try {
+        const errorData = await res.json();
+        if (errorData?.error) errorMsg = errorData.error;
+      } catch {}
+      console.error('saveMeta error:', errorMsg, 'Status:', res.status);
+      throw new Error(errorMsg);
+    }
   };
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => addFilesToQueue(e.target.files);
@@ -211,6 +268,8 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   const cancelItem = (id: string) => {
     const xhr = xhrById.current.get(id);
     if (xhr) xhr.abort();
+    const up = tusById.current.get(id);
+    if (up) up.abort();
     setQueue(prev => prev.map(it => it.id === id ? { ...it, status: 'error', error: 'أُلغي من قبل المستخدم' } : it));
   };
 
@@ -230,9 +289,9 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   return (
     <div className={`bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius-lg)] p-4 ${className}`}>
       <div className="flex items-center gap-2 mb-3">
-        <button onClick={() => setKind('image')} className={`px-3 py-1 rounded text-sm ${kind==='image'?'bg-[var(--accent-500)] text-white':'bg-[var(--bg)] border border-[var(--elev)]'}`}>صور</button>
-        <button onClick={() => setKind('video')} className={`px-3 py-1 rounded text-sm ${kind==='video'?'bg-[var(--accent-500)] text-white':'bg-[var(--bg)] border border-[var(--elev)]'}`}>فيديو</button>
-        <button onClick={() => setKind('document')} className={`px-3 py-1 rounded text-sm ${kind==='document'?'bg-[var(--accent-500)] text-white':'bg-[var(--bg)] border border-[var(--elev)]'}`}>مستندات</button>
+        <button onClick={() => setKind('image')} className={`px-3 py-1 rounded text-sm ${kind==='image'?'bg-[var(--accent-500)] text-[var(--text-dark)]':'bg-[var(--bg)] border border-[var(--elev)]'}`}>صور</button>
+        <button onClick={() => setKind('video')} className={`px-3 py-1 rounded text-sm ${kind==='video'?'bg-[var(--accent-500)] text-[var(--text-dark)]':'bg-[var(--bg)] border border-[var(--elev)]'}`}>فيديو</button>
+        <button onClick={() => setKind('document')} className={`px-3 py-1 rounded text-sm ${kind==='document'?'bg-[var(--accent-500)] text-[var(--text-dark)]':'bg-[var(--bg)] border border-[var(--elev)]'}`}>مستندات</button>
         <div className="ml-auto text-xs text-[var(--slate-600)]">اسحب الملفات أو اخترها، ثم اضغط ابدأ</div>
       </div>
 

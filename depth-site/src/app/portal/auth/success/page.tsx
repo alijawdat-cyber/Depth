@@ -84,7 +84,7 @@ export default function SignUpSuccessPage() {
             </div>
 
             {/* Contact Info */}
-            <div className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-6 rounded-[var(--radius-lg)] text-white mb-8">
+            <div className="bg-[var(--accent-500)] p-6 rounded-[var(--radius-lg)] text-white mb-8">
               <h3 className="text-xl font-semibold mb-4">محتاج مساعدة أو عندك استعجال؟</h3>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a

@@ -53,8 +53,8 @@ export default function Header() {
     : NAV_ITEMS;
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)]">
-      <Container className="flex items-center justify-between min-h-14 h-14">
+    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden">
+      <Container className="flex items-center justify-between min-h-14 h-14 overflow-x-hidden">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
           <Image src={BRAND.wordmark} alt="Depth" width={135} height={30} className="h-7 md:h-8 lg:h-9 w-auto min-w-28 brand-logo" priority />
         </Link>
@@ -101,15 +101,15 @@ export default function Header() {
                 <span className="text-sm">حسابي</span>
               </button>
               {acctOpen && (
-                <div className="absolute top-full mt-2 right-0 w-44 bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius-sm)] shadow-lg p-1 text-sm">
+                <div className="absolute top-full mt-2 right-0 w-44 bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius-sm)] shadow-lg ring-1 ring-[var(--elev)] p-1 text-sm">
                   {role !== 'admin' && (
-                    <Link href="/portal" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>بوابتي</Link>
+                    <Link href="/portal" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>بوابتي</Link>
                   )}
-                  <Link href="/portal/profile" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
+                  <Link href="/portal/profile" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
                   {role === 'admin' && (
-                    <Link href="/admin" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>لوحة الأدمن</Link>
+                    <Link href="/admin" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>لوحة الأدمن</Link>
                   )}
-                  <button className="w-full text-right px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => { setAcctOpen(false); signOut({ callbackUrl: '/' }); }}>خروج</button>
+                  <button className="w-full text-right px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => { setAcctOpen(false); signOut({ callbackUrl: '/' }); }}>خروج</button>
                 </div>
               )}
             </div>
@@ -140,8 +140,8 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                   aria-current={active ? 'page' : undefined}
                   className={clsx(
-                    "py-3.5 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]",
-                    active ? "bg-[var(--neutral-50)]" : "hover:bg-[var(--neutral-50)]"
+                    "py-3.5 rounded-[var(--radius-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-500)]",
+                    active ? "bg-[var(--elev)]" : "hover:bg-[var(--elev)]"
                   )}
                 >
                   {l.label}

@@ -1,31 +1,28 @@
 "use client";
 
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import { ReactNode } from "react";
 
 interface PageLayoutProps {
   children: ReactNode;
   className?: string;
-  showHeader?: boolean;
-  showFooter?: boolean;
+  showHeader?: boolean; // deprecated: Header is rendered by `SiteFrame`
+  showFooter?: boolean; // deprecated: Footer is rendered by `SiteFrame`
   containerized?: boolean;
 }
 
 export default function PageLayout({ 
   children, 
   className = "",
-  showHeader = true,
-  showFooter = true,
+  // Prevent header/footer duplication under RootLayout → SiteFrame
+  showHeader = false,
+  showFooter = false,
   containerized = false
 }: PageLayoutProps) {
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)] ${className}`}>
-      {showHeader && <Header />}
+    <div className={`min-h-screen bg-[var(--bg)] ${className}`}>
       <main className={containerized ? "container mx-auto px-4 py-8" : ""}>
         {children}
       </main>
-      {showFooter && <Footer />}
     </div>
   );
 }

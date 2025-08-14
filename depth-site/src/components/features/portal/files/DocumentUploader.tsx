@@ -22,58 +22,132 @@ export default function DocumentUploader({ projectId, onUploaded }: Props) {
     setSuccess(false);
     setProgress(0);
     try {
-      const contentType = file.type || 'application/octet-stream';
-      const res = await fetch('/api/portal/files/presign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, contentType, size: file.size, projectId })
-      });
-      if (!res.ok) throw new Error('failed to presign');
-      const { url, key } = await res.json();
-
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', url, true);
-        xhr.setRequestHeader('x-amz-content-sha256', 'UNSIGNED-PAYLOAD');
-        xhr.setRequestHeader('Content-Type', contentType);
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
-        };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error('failed to upload'));
-        };
-        xhr.onerror = () => reject(new Error('upload error'));
-        xhr.send(file);
-      });
-
-      setDocKey(key);
-
-      // Save metadata for files list with retry/backoff
-      const saveMeta = async (attempt = 1): Promise<void> => {
-        const resp = await fetch('/api/portal/files', {
+      const contentType = file.type || 'application/pdf';
+      // Choose simple PUT for small files, multipart for large
+      if (file.size < 32 * 1024 * 1024) {
+        const res = await fetch('/api/portal/files/presign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: file.name,
-            type: 'document',
-            size: file.size,
-            projectId,
-            url: key,
-            description: ''
-          })
+          body: JSON.stringify({ filename: file.name, contentType, size: file.size, projectId })
         });
-        if (!resp.ok) {
-          if (attempt < 3) {
-            await new Promise(r => setTimeout(r, 300 * Math.pow(2, attempt - 1)));
-            return saveMeta(attempt + 1);
+        if (!res.ok) throw new Error('failed to presign');
+        const { url, key } = await res.json();
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', url, true);
+          xhr.setRequestHeader('x-amz-content-sha256', 'UNSIGNED-PAYLOAD');
+          xhr.setRequestHeader('Content-Type', contentType);
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
+          };
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) resolve();
+            else reject(new Error('failed to upload'));
+          };
+          xhr.onerror = () => reject(new Error('upload error'));
+          xhr.send(file);
+        });
+        setDocKey(key);
+        // Save metadata
+        const saveMeta = async (attempt = 1): Promise<void> => {
+          const resp = await fetch('/api/portal/files', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: file.name,
+              type: 'document',
+              size: file.size,
+              projectId,
+              url: key,
+              description: '',
+              contentType,
+            })
+          });
+          if (!resp.ok) {
+            if (attempt < 3) {
+              await new Promise(r => setTimeout(r, 300 * Math.pow(2, attempt - 1)));
+              return saveMeta(attempt + 1);
+            }
+            let reason = 'failed to save metadata';
+            try { const j = await resp.json(); if (j?.error) reason = j.error; } catch {}
+            throw new Error(reason);
           }
-          let reason = 'failed to save metadata';
-          try { const j = await resp.json(); if (j?.error) reason = j.error; } catch {}
-          throw new Error(reason);
+        };
+        await saveMeta();
+      } else {
+        // Multipart flow
+        const initRes = await fetch('/api/portal/files/multipart/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, contentType, size: file.size, projectId })
+        });
+        if (!initRes.ok) throw new Error('failed to init multipart');
+        const { key, uploadId } = await initRes.json();
+        const partSize = 8 * 1024 * 1024; // 8MB
+        const parts: { PartNumber: number; ETag: string }[] = [];
+        let partNumber = 1;
+        for (let offset = 0; offset < file.size; offset += partSize) {
+          const chunk = file.slice(offset, Math.min(offset + partSize, file.size));
+          const signRes = await fetch('/api/portal/files/multipart/part', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, uploadId, partNumber })
+          });
+          if (!signRes.ok) throw new Error('failed to sign part');
+          const { url } = await signRes.json();
+          const etag = await new Promise<string>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', url, true);
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
+            };
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                const et = xhr.getResponseHeader('ETag') || '';
+                resolve(et.replaceAll('"', ''));
+              } else reject(new Error('failed to upload part'));
+            };
+            xhr.onerror = () => reject(new Error('upload error'));
+            xhr.send(chunk);
+          });
+          parts.push({ PartNumber: partNumber, ETag: etag });
+          partNumber++;
         }
-      };
-      await saveMeta();
+        const completeRes = await fetch('/api/portal/files/multipart/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, uploadId, parts })
+        });
+        if (!completeRes.ok) throw new Error('failed to complete multipart');
+        setDocKey(key);
+        // Save metadata
+        const saveMeta = async (attempt = 1): Promise<void> => {
+          const resp = await fetch('/api/portal/files', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: file.name,
+              type: 'document',
+              size: file.size,
+              projectId,
+              url: key,
+              description: '',
+              contentType,
+            })
+          });
+          if (!resp.ok) {
+            if (attempt < 3) {
+              await new Promise(r => setTimeout(r, 300 * Math.pow(2, attempt - 1)));
+              return saveMeta(attempt + 1);
+            }
+            let reason = 'failed to save metadata';
+            try { const j = await resp.json(); if (j?.error) reason = j.error; } catch {}
+            throw new Error(reason);
+          }
+        };
+        await saveMeta();
+      }
+      
 
       setSuccess(true);
       onUploaded();

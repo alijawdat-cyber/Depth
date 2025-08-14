@@ -96,10 +96,10 @@ export default function NotificationBell({ highlight = false }: { highlight?: bo
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50';
-      case 'medium': return 'text-yellow-600 bg-yellow-50';
-      case 'low': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'high': return 'text-[var(--danger-fg)] bg-[var(--danger-bg)]';
+      case 'medium': return 'text-[var(--warning-fg)] bg-[var(--warning-bg)]';
+      case 'low': return 'text-[var(--success-fg)] bg-[var(--success-bg)]';
+      default: return 'text-[var(--slate-600)] bg-[var(--bg)]';
     }
   };
 
@@ -132,13 +132,13 @@ export default function NotificationBell({ highlight = false }: { highlight?: bo
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 rounded-lg transition-colors hover:bg-[var(--bg-secondary)] ${highlight ? 'ring-2 ring-[var(--accent-500)]' : ''}`}
+        className={`relative p-2 rounded-lg transition-colors hover:bg-[var(--bg-secondary)] ${highlight ? 'ring-2 ring-[var(--brand-500)]' : ''}`}
         aria-label="الإشعارات"
         aria-current={highlight ? 'true' : undefined}
       >
         <Bell size={20} className="text-[var(--slate-600)]" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-[var(--danger-fg)] text-[var(--text-dark)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -146,7 +146,7 @@ export default function NotificationBell({ highlight = false }: { highlight?: bo
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-96 overflow-hidden" role="menu" aria-label="قائمة الإشعارات">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-lg ring-1 ring-[var(--elev)] z-50 max-h-96 overflow-hidden" role="menu" aria-label="قائمة الإشعارات">
           {/* Header */}
           <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
             <h3 className="font-semibold text-[var(--text)]">الإشعارات</h3>
@@ -187,7 +187,7 @@ export default function NotificationBell({ highlight = false }: { highlight?: bo
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-[var(--border)] hover:bg-[var(--bg-secondary)] transition-colors ${
+                  className={`p-4 border-b border-[var(--border)] hover:bg-[var(--elev)] transition-colors ${
                     !notification.read ? 'bg-blue-50/50' : ''
                   }`}
                   role="menuitem"

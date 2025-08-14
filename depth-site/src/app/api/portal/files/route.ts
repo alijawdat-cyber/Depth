@@ -100,7 +100,8 @@ export async function POST(req: NextRequest) {
     let finalUrl: string | undefined = url;
     if (!finalUrl) {
       if (type === 'image' && imageId && env.CF_IMAGES_ACCOUNT_HASH) {
-        finalUrl = `https://imagedelivery.net/${env.CF_IMAGES_ACCOUNT_HASH}/${imageId}/preview`;
+        const variant = env.CF_IMAGES_VARIANT_PREVIEW || 'public';
+        finalUrl = `https://imagedelivery.net/${env.CF_IMAGES_ACCOUNT_HASH}/${imageId}/${variant}`;
       } else if (type === 'video' && videoId) {
         finalUrl = `https://iframe.videodelivery.net/${videoId}`;
       }
@@ -148,6 +149,8 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date(),
       contentType: typeof contentType === 'string' ? contentType : undefined,
       checksum: typeof checksum === 'string' ? checksum : undefined,
+      imageId: typeof imageId === 'string' ? imageId : undefined,
+      videoId: typeof videoId === 'string' ? videoId : undefined,
     };
 
     const docRef = await adminDb.collection('files').add(fileData);

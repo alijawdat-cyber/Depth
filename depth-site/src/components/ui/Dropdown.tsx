@@ -64,7 +64,7 @@ export default function Dropdown<T extends string | number = string>({
         ref={btnRef}
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        className={`w-full inline-flex items-center justify-between gap-2 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] hover:bg-[var(--bg-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)] disabled:opacity-50 ${buttonClassName}`}
+        className={`w-full inline-flex items-center justify-between gap-2 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--card)] text-[var(--text)] hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-500)] disabled:opacity-50 ${buttonClassName}`}
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -82,7 +82,7 @@ export default function Dropdown<T extends string | number = string>({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-2 w-full rounded-md border border-[var(--elev)] bg-[var(--card)] shadow-lg p-1 ${menuClassName}`}
+          className={`absolute z-50 mt-2 w-full rounded-md border border-[var(--border)] bg-[var(--card)] shadow-lg ring-1 ring-[var(--elev)] p-1 ${menuClassName}`}
         >
           {options.map((opt) => (
             <button
@@ -96,7 +96,7 @@ export default function Dropdown<T extends string | number = string>({
               className={`w-full text-right px-3 py-2 rounded-[var(--radius-sm)] text-sm transition-colors ${
                 opt.value === value
                   ? "bg-[var(--elev)] text-[var(--text)]"
-                  : "text-[var(--slate-700)] hover:bg-[var(--bg)]"
+                  : "text-[var(--slate-600)] hover:bg-[var(--elev)]"
               }`}
             >
               {opt.label}

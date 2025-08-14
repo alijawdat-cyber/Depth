@@ -15,19 +15,14 @@ export async function createCloudflareDirectUpload(metadata?: Record<string, unk
   if (!env.CF_ACCOUNT_ID || !env.CF_API_TOKEN) {
     throw new Error('Cloudflare credentials are missing');
   }
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/images/v2/direct_upload`;
-  const body = new URLSearchParams();
-  body.set('requireSignedURLs', 'false');
-  if (metadata) {
-    body.set('metadata', JSON.stringify(metadata));
-  }
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/images/v1/direct_upload`;
+  
+  // v1 API works with simple POST request, no form-data needed for direct upload URL creation
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.CF_API_TOKEN}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body,
     cache: 'no-store',
   });
   const data = (await res.json()) as CFDirectUploadResponse;

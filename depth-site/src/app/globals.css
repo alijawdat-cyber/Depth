@@ -31,21 +31,44 @@
   --font-dubai: "Dubai", sans-serif;
   /* Ink/Neutral scale */
   --ink-900:#0B0F14; --ink-800:#1A232C; 
-  --slate-50:#F8FAFC; --slate-600:#6A7D8F; --slate-700:#44515D;
+  --slate-50:#E9EEF5; --slate-600:#6A7D8F; --slate-700:#44515D;
   --neutral-0:#FFFFFF; --neutral-50:#F6F8FA; --neutral-100:#EDF2F6; --neutral-200:#D9E1E9;
   --neutral-300:#C2CDD8; --neutral-400:#A9B7C5; --neutral-500:#90A1B2; --neutral-600:#6A7D8F;
   --neutral-700:#44515D; --neutral-800:#28313A; --neutral-900:#0B0F14;
   /* Accent (Purple 2025 — default) */
   --accent-200:#D7C7FF; --accent-300:#B79AFF; --accent-400:#8E5BFF; --accent-500:#6C2BFF; --accent-700:#4A1FC9;
+  /* Brand aliases (central brand tokens) */
+  --brand-200: var(--accent-200);
+  --brand-300: var(--accent-300);
+  --brand-400: var(--accent-400);
+  --brand-500: var(--accent-500);
+  --brand-600: var(--accent-600);
+  --brand-700: var(--accent-700);
+  --brand: var(--brand-500);
   /* Aliases */
-  --primary: var(--accent-500);
-  --bg:var(--neutral-0); --text:var(--ink-900); --card:var(--neutral-50); --elev:var(--neutral-100);
+  --primary: var(--brand-500);
+  --bg:var(--neutral-0); 
+  --text:var(--ink-900);
+  --card:var(--neutral-50); 
+  --elev:var(--neutral-100);
+  /* unified tokens used across components */
+  --border: var(--elev);
+  --bg-secondary: var(--neutral-100);
+  /* unified panels (no gradients) */
+  --panel: var(--card); /* default panel */
+  --panel-strong: var(--neutral-200); /* stronger panel for headers/callouts */
+  /* status tokens (light defaults) */
+  --success-bg:#ECFDF5; --success-fg:#065F46; --success-border:#A7F3D0;
+  --warning-bg:#FFFBEB; --warning-fg:#92400E; --warning-border:#FDE68A;
+  --danger-bg:#FEF2F2; --danger-fg:#991B1B; --danger-border:#FECACA;
   --bg-light:var(--bg); --text-light:var(--text); --bg-dark:var(--ink-900); --text-dark:#FFFFFF;
+  /* text muted token */
+  --muted: var(--slate-600);
   /* RGB values for fallback usage */
   --bg-rgb: 255,255,255;
   /* Radii/Shadows/Focus */
   --radius:14px; --radius-sm:10px; --shadow:0 8px 30px rgba(0,0,0,.08);
-  --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--accent-400);
+  --focus:0 0 0 3px var(--neutral-0), 0 0 0 6px var(--brand-400);
 }
 
 /* Optional preview: switch to Indigo 2025 palette */
@@ -69,10 +92,19 @@
     /* أسطح وبوردريات مناسبة للداكن */
     --card: rgba(255, 255, 255, 0.08);
     --elev: rgba(255, 255, 255, 0.24);
+    --border: var(--elev);
+    --bg-secondary: rgba(255, 255, 255, 0.12);
+    --panel: rgba(255, 255, 255, 0.08);
+    --panel-strong: rgba(255, 255, 255, 0.16);
+    /* status tokens for dark */
+    --success-bg: rgba(16,185,129,0.12); --success-fg:#86EFAC; --success-border: rgba(16,185,129,0.3);
+    --warning-bg: rgba(245,158,11,0.12); --warning-fg:#FCD34D; --warning-border: rgba(245,158,11,0.3);
+    --danger-bg: rgba(239,68,68,0.12); --danger-fg:#FCA5A5; --danger-border: rgba(239,68,68,0.3);
     /* نص ثانوي محسن */
-    --slate-50: rgba(248, 250, 252, 0.1);
+    --slate-50: rgba(233, 238, 245, 0.16);
     --slate-600: #C9D3DD;
     --slate-700: #CBD5E1;
+    --muted: var(--slate-600);
     /* RGB values for dark mode */
     --bg-rgb: 11,15,20;
   }
@@ -85,6 +117,10 @@
     /* أسطح وبوردريات مناسبة للداكن */
     --card: rgba(255, 255, 255, 0.08);
     --elev: rgba(255, 255, 255, 0.24);
+    --border: var(--elev);
+    --bg-secondary: rgba(255, 255, 255, 0.12);
+    --panel: rgba(255, 255, 255, 0.08);
+    --panel-strong: rgba(255, 255, 255, 0.16);
     /* نص ثانوي محسن */
     --slate-50: rgba(248, 250, 252, 0.1);
     --slate-600: #C9D3DD;
@@ -103,13 +139,25 @@
   --text: var(--ink-900);
   --card: var(--neutral-50);
   --elev: var(--neutral-100);
+  --border: var(--elev);
+  --bg-secondary: var(--neutral-100);
+  --panel: var(--neutral-50);
+  --panel-strong: var(--neutral-200);
   --slate-600: #6A7D8F;
+  --muted: var(--slate-600);
+  /* status tokens for light */
+  --success-bg:#ECFDF5; --success-fg:#065F46; --success-border:#A7F3D0;
+  --warning-bg:#FFFBEB; --warning-fg:#92400E; --warning-border:#FDE68A;
+  --danger-bg:#FEF2F2; --danger-fg:#991B1B; --danger-border:#FECACA;
 }
 
 html, body {
   background: var(--bg);
   color: var(--text);
   min-height: 100%;
+  max-width: 100%;
+  width: 100%;
+  touch-action: pan-y pinch-zoom;
 }
 
 /* Safe area padding for iOS notch within sticky headers if needed */
@@ -128,6 +176,7 @@ html {
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overscroll-behavior-x: none;
 }
 
 /* تحسين الموبايل */
@@ -140,9 +189,22 @@ body {
 
 /* منع التمرير الأفقي في جميع العناصر الرئيسية */
 html, body, #__next, main {
-  max-width: 100vw;
+  max-width: 100%;
   overflow-x: hidden;
+  width: 100%;
 }
+
+@supports (overflow: clip) {
+  html, body, #__next, main {
+    overflow-x: clip;
+  }
+}
+
+/* Media elements should never overflow horizontally */
+img,svg,video,canvas { max-width: 100%; height: auto; }
+
+/* Ensure border-box sizing to prevent width accumulation */
+*, *::before, *::after { box-sizing: border-box; }
 
 /* ملاحظة مهمة: لا نقلص زمن الـ animation عالمياً حتى لا نفسد ماركيه/موشن 
    خصوصاً على Safari iOS. بدلاً من ذلك نترك المدد كما هي */
@@ -159,11 +221,11 @@ html, body, #__next, main {
   transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 .btn-cta {
-  background: var(--accent-500);
+  background: var(--brand-500);
   color: var(--text-dark);
 }
-.btn-cta:hover { background: var(--accent-700); }
-.btn-cta:disabled { background: var(--accent-300); opacity: .8; }
+.btn-cta:hover { background: var(--brand-700); }
+.btn-cta:disabled { background: var(--brand-300); opacity: .8; }
 .btn:focus-visible { outline: none; box-shadow: var(--focus); }
 
 /* تحسين عرض الشعارات */

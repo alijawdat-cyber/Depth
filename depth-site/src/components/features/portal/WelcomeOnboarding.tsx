@@ -213,14 +213,14 @@ export default function WelcomeOnboarding({ userName, userEmail, onRefresh }: We
           </span>
           <button
             onClick={skipToEnd}
-            className="text-sm text-[var(--accent-500)] hover:underline"
+            className="text-sm text-[var(--brand-500)] hover:underline"
           >
             تخطي للنهاية
           </button>
         </div>
         <div className="w-full bg-[var(--elev)] rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] h-2 rounded-full transition-all duration-500"
+            className="bg-[var(--brand-500)] h-2 rounded-full transition-all duration-500"
             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           ></div>
         </div>
@@ -229,7 +229,7 @@ export default function WelcomeOnboarding({ userName, userEmail, onRefresh }: We
       {/* Current Step */}
       <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-8 text-white text-center">
+        <div className="bg-[var(--brand-500)] p-8 text-white text-center">
           <div className="mb-4">
             {steps[currentStep].icon}
           </div>
@@ -264,7 +264,7 @@ export default function WelcomeOnboarding({ userName, userEmail, onRefresh }: We
                   key={index}
                   className={`w-3 h-3 rounded-full transition-colors ${
                     index === currentStep
-                      ? 'bg-[var(--accent-500)]'
+                      ? 'bg-[var(--brand-500)]'
                       : index < currentStep
                       ? 'bg-green-500'
                       : 'bg-[var(--elev)]'
@@ -304,7 +304,7 @@ export default function WelcomeOnboarding({ userName, userEmail, onRefresh }: We
       {/* Quick Stats */}
       <div className="mt-8 grid md:grid-cols-3 gap-4">
         <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] text-center">
-          <div className="text-2xl font-bold text-[var(--accent-500)] mb-1">500+</div>
+          <div className="text-2xl font-bold text-[var(--brand-500)] mb-1">500+</div>
           <div className="text-sm text-[var(--slate-600)]">مشروع مكتمل</div>
         </div>
         <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] text-center">

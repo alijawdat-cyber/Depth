@@ -250,7 +250,7 @@ export default function AdminDashboard() {
 
           {/* Flash messages */}
           {flash && (
-            <div className={`mb-6 p-3 rounded-md border ${flash.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+            <div className={`mb-6 p-3 rounded-md border ${flash.type === 'success' ? 'bg-[var(--success-bg)] border-[var(--success-border)] text-[var(--success-fg)]' : 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-fg)]'}`}>
               {flash.message}
             </div>
           )}
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
           {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-500)] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand-500)] mx-auto mb-4"></div>
               <p className="text-[var(--slate-600)]">جاري تحميل البيانات...</p>
             </div>
           )}
@@ -412,10 +412,10 @@ export default function AdminDashboard() {
                         <td className="p-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             client.status === 'approved' 
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-[var(--success-bg)] text-[var(--success-fg)]'
                               : client.status === 'rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-orange-100 text-orange-800'
+                              ? 'bg-[var(--danger-bg)] text-[var(--danger-fg)]'
+                              : 'bg-[var(--warning-bg)] text-[var(--warning-fg)]'
                           }`}>
                             {client.status === 'approved' ? 'معتمد' : 
                              client.status === 'rejected' ? 'مرفوض' : 'في الانتظار'}
@@ -431,7 +431,7 @@ export default function AdminDashboard() {
                                 size="sm"
                                 variant="primary"
                                 onClick={() => updateClientStatus(client.id, 'approved')}
-                                className="bg-green-500 hover:bg-green-600"
+                                className="bg-[var(--success-fg)]/90 hover:bg-[var(--success-fg)] text-[var(--text-dark)]"
                               >
                                 <CheckCircle size={14} className="mr-1" />
                                 قبول
@@ -440,7 +440,7 @@ export default function AdminDashboard() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => updateClientStatus(client.id, 'rejected')}
-                                className="text-red-600 hover:bg-red-50"
+                                className="text-[var(--danger-fg)] hover:bg-[var(--danger-bg)]"
                               >
                                 <XCircle size={14} className="mr-1" />
                                 رفض

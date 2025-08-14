@@ -79,7 +79,7 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
             </div>
 
             {/* Contact Section */}
-            <div className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-6 rounded-[var(--radius-lg)] text-white mb-8">
+            <div className="bg-[var(--accent-500)] p-6 rounded-[var(--radius-lg)] text-white mb-8">
               <h3 className="text-xl font-semibold mb-4">هل تحتاج مساعدة أو لديك استعجال؟</h3>
               <p className="text-white/90 mb-6 text-sm">
                 فريقنا جاهز لمساعدتك! عادة نكمل المراجعة خلال 24 ساعة كحد أقصى

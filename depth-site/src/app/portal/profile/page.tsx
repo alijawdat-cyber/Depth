@@ -133,8 +133,8 @@ export default function ProfilePage() {
             {message && (
               <div className={`p-4 rounded-lg mb-6 text-sm ${
                 message.includes('بنجاح') 
-                  ? 'bg-green-50 text-green-800 border border-green-200' 
-                  : 'bg-red-50 text-red-800 border border-red-200'
+                  ? 'bg-[var(--success-bg)] text-[var(--success-fg)] border border-[var(--success-border)]' 
+                  : 'bg-[var(--danger-bg)] text-[var(--danger-fg)] border border-[var(--danger-border)]'
               }`}>
                 {message}
               </div>
@@ -146,10 +146,10 @@ export default function ProfilePage() {
                 <div className="mb-6">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                     profile.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-[var(--success-bg)] text-[var(--success-fg)]' 
                       : profile.status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
+                      ? 'bg-[var(--warning-bg)] text-[var(--warning-fg)]'
+                      : 'bg-[var(--danger-bg)] text-[var(--danger-fg)]'
                   }`}>
                     {profile.status === 'active' && '✓ حساب مفعل'}
                     {profile.status === 'pending' && '⏳ في انتظار التفعيل'}
@@ -186,7 +186,7 @@ export default function ProfilePage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--brand-500)] focus:border-transparent"
                     placeholder="أدخل اسمك الكامل"
                   />
                 </div>
@@ -202,7 +202,7 @@ export default function ProfilePage() {
                     value={formData.company}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--brand-500)] focus:border-transparent"
                     placeholder="أدخل اسم شركتك أو مشروعك"
                   />
                 </div>
@@ -218,7 +218,7 @@ export default function ProfilePage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:ring-2 focus:ring-[var(--brand-500)] focus:border-transparent"
                     placeholder="+964 XXX XXX XXXX"
                   />
                 </div>
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex-1 bg-[var(--accent-500)] text-[var(--text-dark)] py-3 px-4 rounded-lg font-medium hover:bg-[var(--accent-700)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex-1 bg-[var(--brand-500)] text-[var(--text-dark)] py-3 px-4 rounded-lg font-medium hover:bg-[var(--brand-700)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
                   </button>
