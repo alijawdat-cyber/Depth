@@ -1,8 +1,6 @@
 export const dynamic = "force-static";
 
 import Hero from "@/components/sections/Hero";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import Packages from "@/components/sections/Packages";
 import Testimonials from "@/components/sections/Testimonials";
 import ClientsMarquee from "@/components/sections/ClientsMarquee";
@@ -18,7 +16,6 @@ export const revalidate = 3600;
 export default function Home() {
   return (
     <div className="font-sans min-h-screen w-full overflow-x-hidden">
-      <Header />
       <Hero />
       <div className="my-4 sm:my-6" />
       <TrustSection />
@@ -33,7 +30,6 @@ export default function Home() {
       <Testimonials />
       <FAQ />
       <QRSection />
-      <Footer />
     </div>
   );
 }

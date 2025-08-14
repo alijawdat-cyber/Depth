@@ -5,8 +5,6 @@ export const dynamic = "force-dynamic";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Container } from "@/components/ui/Container";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
@@ -143,7 +141,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)] overflow-x-hidden touch-pan-y">
-      <Header />
       <main className="py-8 md:py-16">
       <Container className="overflow-x-hidden">
         {/* Fixed Header with Centered Logo */}
@@ -379,7 +376,6 @@ export default function ContactPage() {
         </div>
       </Container>
       </main>
-      <Footer />
     </div>
   );
 }

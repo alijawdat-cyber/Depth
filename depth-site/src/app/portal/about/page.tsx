@@ -2,15 +2,12 @@
 
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import Link from "next/link";
 import { CheckCircle, BarChart3, FileText, Bell, Shield, Clock, Zap, Users } from "lucide-react";
 
 export default function PortalAboutPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       
       <main className="py-12 md:py-20">
         <Container>
@@ -190,8 +187,6 @@ export default function PortalAboutPage() {
           </div>
         </Container>
       </main>
-      
-      <Footer />
     </div>
   );
 }

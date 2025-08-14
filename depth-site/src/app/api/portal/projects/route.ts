@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { PROJECT_STATUSES } from '@/types/entities';
 
 // GET: Fetch client projects
 export async function GET() {
@@ -16,7 +17,7 @@ export async function GET() {
     // Get client projects from Firestore
     const projectsRef = adminDb.collection('projects');
     // Firestore limitation: avoid '!=' without matching orderBy; use inclusive statuses instead
-    const allowedStatuses = ['active', 'pending', 'completed'];
+    const allowedStatuses = PROJECT_STATUSES.filter(s => s !== 'deleted');
     const snapshot = await projectsRef
       .where('clientEmail', '==', session.user.email)
       .where('status', 'in', allowedStatuses)

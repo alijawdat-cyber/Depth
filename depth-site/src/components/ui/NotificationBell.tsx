@@ -13,7 +13,7 @@ interface Notification {
   createdAt: string;
 }
 
-export default function NotificationBell() {
+export default function NotificationBell({ highlight = false }: { highlight?: boolean }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -132,8 +132,9 @@ export default function NotificationBell() {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors"
+        className={`relative p-2 rounded-lg transition-colors hover:bg-[var(--bg-secondary)] ${highlight ? 'ring-2 ring-[var(--accent-500)]' : ''}`}
         aria-label="الإشعارات"
+        aria-current={highlight ? 'true' : undefined}
       >
         <Bell size={20} className="text-[var(--slate-600)]" />
         {unreadCount > 0 && (
@@ -145,7 +146,7 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-96 overflow-hidden" role="menu" aria-label="قائمة الإشعارات">
           {/* Header */}
           <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
             <h3 className="font-semibold text-[var(--text)]">الإشعارات</h3>
@@ -176,7 +177,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto" role="none">
             {notifications.length === 0 ? (
               <div className="p-6 text-center text-[var(--slate-600)]">
                 <Bell size={32} className="mx-auto mb-2 text-[var(--slate-400)]" />
@@ -189,6 +190,7 @@ export default function NotificationBell() {
                   className={`p-4 border-b border-[var(--border)] hover:bg-[var(--bg-secondary)] transition-colors ${
                     !notification.read ? 'bg-blue-50/50' : ''
                   }`}
+                  role="menuitem"
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-lg flex-shrink-0 mt-0.5">

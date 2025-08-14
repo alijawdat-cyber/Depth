@@ -4,7 +4,15 @@ export type ProjectStatus = 'active' | 'pending' | 'completed' | 'deleted';
 export type FileType = 'image' | 'video' | 'document';
 export type FileStatus = 'uploaded' | 'processing' | 'approved' | 'reviewing' | 'deleted';
 export type ApprovalStatus = 'pending' | 'reviewing' | 'approved' | 'rejected' | 'needs_revision';
-export type NotificationType = 'file_upload' | 'approval_update' | 'task_completed' | 'message';
+export type NotificationType = 'file_upload' | 'approval_update' | 'approval_required' | 'task_completed' | 'message';
+
+// Runtime-safe constant lists for API validation
+export const PROJECT_STATUSES = ['active', 'pending', 'completed', 'deleted'] as const;
+export const FILE_TYPES = ['image', 'video', 'document'] as const;
+export const FILE_STATUSES = ['uploaded', 'processing', 'approved', 'reviewing', 'deleted'] as const;
+export const APPROVAL_STATUSES = ['pending', 'reviewing', 'approved', 'rejected', 'needs_revision'] as const;
+export const PRIORITIES = ['high', 'medium', 'low'] as const;
+export const NOTIFICATION_TYPES = ['file_upload', 'approval_update', 'approval_required', 'task_completed', 'message'] as const;
 
 export interface Project {
   id: string;
@@ -38,6 +46,21 @@ export interface Approval {
   status: ApprovalStatus;
   description?: string;
   projectId?: string;
+  comments?: ApprovalComment[];
+  attachments?: ApprovalAttachment[];
+}
+
+export interface ApprovalAttachment {
+  url: string;
+  label?: string;
+  type?: 'link' | 'image' | 'video' | 'document';
+  size?: number;
+}
+
+export interface ApprovalComment {
+  author: string;
+  message: string;
+  createdAt: string;
 }
 
 export interface NotificationItem {

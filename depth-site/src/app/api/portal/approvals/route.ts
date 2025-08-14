@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { APPROVAL_STATUSES } from '@/types/entities';
+import { FieldValue } from 'firebase-admin/firestore';
 
 // Helpers to work safely with Firestore Timestamps without using `any`
 function toEpochMs(value: unknown): number {
@@ -125,21 +127,18 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { approvalId, status, feedback } = await req.json();
+    const { approvalId, status, feedback, comment, attachments } = await req.json();
 
     // Validation
-    if (!approvalId || !status) {
+    if (!approvalId || (!status && !comment && !attachments)) {
       return NextResponse.json(
-        { error: 'Approval ID and status are required' }, 
+        { error: 'Approval ID and (status or comment/attachments) are required' }, 
         { status: 400 }
       );
     }
 
-    if (!['approved', 'rejected', 'needs_revision'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status' }, 
-        { status: 400 }
-      );
+    if (status && !APPROVAL_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
     // Get approval document
@@ -157,16 +156,58 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
-    // Update approval
-    const updateData = {
-      status,
-      feedback: feedback || '',
-      reviewedBy: session.user.email,
-      reviewedAt: new Date(),
+    // Build update
+    const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
     };
+    if (status) {
+      updateData.status = status;
+      updateData.feedback = feedback || '';
+      updateData.reviewedBy = session.user.email;
+      updateData.reviewedAt = new Date();
+    }
+    if (comment && typeof comment === 'string' && comment.trim()) {
+      const commentObj = {
+        author: session.user.email,
+        message: comment.trim(),
+        createdAt: new Date().toISOString(),
+      };
+      updateData.comments = FieldValue.arrayUnion(commentObj);
+    }
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      type InAttachment = { url?: unknown; label?: unknown; type?: unknown; size?: unknown };
+      const safe = (attachments as InAttachment[])
+        .filter((a) => a && typeof a.url === 'string')
+        .map((a) => ({
+          url: a.url as string,
+          label: typeof a.label === 'string' ? (a.label as string) : undefined,
+          type: typeof a.type === 'string' && ['link', 'image', 'video', 'document'].includes(a.type as string) ? (a.type as 'link'|'image'|'video'|'document') : 'link',
+          size: typeof a.size === 'number' ? (a.size as number) : undefined,
+        }));
+      if (safe.length > 0) {
+        updateData.attachments = FieldValue.arrayUnion(...safe);
+      }
+    }
 
     await adminDb.collection('approvals').doc(approvalId).update(updateData);
+
+    // Create a notification about the approval update (best-effort)
+    try {
+      const approvalData = approvalDoc.data() as Record<string, unknown>;
+      const notifTitle = 'تم تحديث حالة الموافقة';
+      const statusLabel = typeof status === 'string' ? status : (approvalData?.status as string);
+      const notifMessage = `${(approvalData?.title as string) || 'موافقة'} — الحالة: ${statusLabel || 'محدّثة'}`;
+      await adminDb.collection('notifications').add({
+        title: notifTitle,
+        message: notifMessage,
+        type: 'approval_update',
+        priority: 'medium',
+        clientEmail: projectDoc.data()?.clientEmail || session.user.email,
+        projectId,
+        read: false,
+        createdAt: new Date(),
+      });
+    } catch {}
 
     return NextResponse.json({ 
       success: true, 

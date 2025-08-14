@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
-import Header from '@/components/sections/Header';
-import Footer from '@/components/sections/Footer';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -77,7 +75,6 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       <main className="py-12 md:py-20">
         <Container>
           <div className="max-w-md mx-auto">
@@ -219,7 +216,6 @@ export default function SignUpPage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </div>
   );
 }

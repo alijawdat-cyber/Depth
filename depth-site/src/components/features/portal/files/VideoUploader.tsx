@@ -117,7 +117,7 @@ export default function VideoUploader({ projectId, onUploaded }: Props) {
       >
         <div className="text-xs text-[var(--slate-600)]">اسحب وأسقط الفيديو هنا أو اختر من جهازك</div>
         <label className="inline-flex items-center gap-2 text-[var(--accent-600)] underline cursor-pointer">
-          <input type="file" accept="video/mp4" onChange={onPick} disabled={busy || !projectId} className="hidden" />
+          <input type="file" accept="video/*" onChange={onPick} disabled={busy || !projectId} className="hidden" />
           اختر ملفًا
         </label>
       </div>

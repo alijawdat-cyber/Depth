@@ -30,7 +30,8 @@ export function useFiles(projectId?: string) {
 }
 
 export function useApprovals(projectId?: string) {
-  const key = projectId ? `/api/portal/approvals?projectId=${projectId}` : '/api/portal/approvals';
+  // Make approvals truly lazy: do not fetch until a concrete projectId is available
+  const key = projectId ? `/api/portal/approvals?projectId=${projectId}` : null;
   const { data, error, isLoading, mutate } = useSWR(key, fetcher);
   return {
     approvals: data?.approvals as Approval[] | undefined,

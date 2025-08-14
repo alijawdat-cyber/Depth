@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
-import Header from '@/components/sections/Header';
-import Footer from '@/components/sections/Footer';
 
 interface ClientProfile {
   id: string;
@@ -105,7 +103,6 @@ export default function ProfilePage() {
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
-        <Header />
         <main className="py-12 md:py-20">
           <Container>
             <div className="flex justify-center items-center h-64">
@@ -113,7 +110,6 @@ export default function ProfilePage() {
             </div>
           </Container>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -124,7 +120,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       <main className="py-12 md:py-20">
         <Container>
           <div className="max-w-2xl mx-auto">
@@ -276,7 +271,6 @@ export default function ProfilePage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </div>
   );
 }

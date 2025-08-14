@@ -63,14 +63,33 @@ export async function GET(req: NextRequest) {
     });
 
     // Get unread count
-    const unreadCount = notifications.filter((n: Record<string, unknown>) => !n.read).length;
+    // Attempt to compute a total unread count across all notifications for the client
+    // Fallback to page-only count if index is missing or query fails
+    let unreadCount = notifications.filter((n: Record<string, unknown>) => !n.read).length;
+    try {
+      const unreadSnap = await adminDb
+        .collection('notifications')
+        .where('clientEmail', '==', session.user.email)
+        .where('read', '==', false)
+        .get();
+      unreadCount = unreadSnap.size;
+    } catch {}
 
     const last = notificationsSnapshot.docs[notificationsSnapshot.docs.length - 1];
     let nextCursor: string | null = null;
     if (last) {
-      const raw = last.data().createdAt;
+      const raw = last.data().createdAt as unknown;
       try {
-        const d = (raw?.toDate?.() as Date) || (raw as Date);
+        // Prefer createdAt; if absent or invalid, fallback to Firestore createTime
+        let d: Date | null = null;
+        if (raw && typeof raw === 'object' && 'toDate' in (raw as Record<string, unknown>)) {
+          d = (raw as { toDate: () => Date }).toDate();
+        } else if (raw instanceof Date) {
+          d = raw as Date;
+        }
+        if (!d && typeof last.createTime?.toDate === 'function') {
+          d = last.createTime.toDate();
+        }
         nextCursor = d?.toISOString?.() || null;
       } catch { nextCursor = null; }
     }

@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { env } from '@/lib/env';
+import { FILE_STATUSES, FILE_TYPES } from '@/types/entities';
 
 // Helpers to safely handle Firestore Timestamp values without `any`
 function toIsoString(value: unknown): string | null {
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest) {
     // Get project files
     const filesRef = adminDb.collection('files');
     // Avoid inequality on status; filter inclusive statuses instead
-    const allowedStatuses = ['uploaded', 'processing', 'approved', 'reviewing'];
+    const allowedStatuses = FILE_STATUSES.filter(s => s !== 'deleted');
     const snapshot = await filesRef
       .where('projectId', '==', projectId)
       .where('status', 'in', allowedStatuses)
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, type, size, projectId, url, description, imageId, videoId } = await req.json();
+    const { name, type, size, projectId, url, description, imageId, videoId, contentType, checksum } = await req.json();
 
     // Derive final URL when not provided for media types
     let finalUrl: string | undefined = url;
@@ -111,6 +112,9 @@ export async function POST(req: NextRequest) {
         { error: 'Name, type, and project ID are required' },
         { status: 400 }
       );
+    }
+    if (!FILE_TYPES.includes(type)) {
+      return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });
     }
     // For documents we must have a direct URL/key
     if (type === 'document' && !url) {
@@ -142,6 +146,8 @@ export async function POST(req: NextRequest) {
       uploadedBy: session.user.email,
       createdAt: new Date(),
       updatedAt: new Date(),
+      contentType: typeof contentType === 'string' ? contentType : undefined,
+      checksum: typeof checksum === 'string' ? checksum : undefined,
     };
 
     const docRef = await adminDb.collection('files').add(fileData);

@@ -2,8 +2,6 @@
 
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";
 import { Clock, Mail, Phone, CheckCircle, AlertCircle } from "lucide-react";
 
@@ -19,7 +17,6 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       
       <main className="py-12 md:py-20">
         <Container>
@@ -154,8 +151,6 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
           </div>
         </Container>
       </main>
-      
-      <Footer />
     </div>
   );
 }

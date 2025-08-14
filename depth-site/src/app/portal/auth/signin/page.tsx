@@ -5,8 +5,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import { Mail, ArrowLeft } from "lucide-react";
 
 export default function SignInPage() {
@@ -53,7 +51,6 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       <main className="py-12">
         <Container>
           <div className="max-w-md mx-auto">
@@ -165,7 +162,6 @@ export default function SignInPage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </div>
   );
 }

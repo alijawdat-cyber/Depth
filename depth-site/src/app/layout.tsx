@@ -3,6 +3,7 @@ import Providers from "./providers";
 import "./globals.css";
 import { BRAND } from "@/lib/constants/brand";
 import { getSiteUrl } from "@/lib/constants/site";
+import SiteFrame from "@/components/layout/SiteFrame";
 
 
 const siteUrl = getSiteUrl();
@@ -100,7 +101,9 @@ export default function RootLayout({
       <body className="antialiased">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-[var(--accent-500)] text-[var(--text-dark)] px-3 py-2 rounded-[var(--radius-sm)]">تخطّ إلى المحتوى</a>
         <Providers>
-          <main id="main-content">{children}</main>
+          <div id="main-content">
+            <SiteFrame>{children}</SiteFrame>
+          </div>
         </Providers>
       </body>
     </html>

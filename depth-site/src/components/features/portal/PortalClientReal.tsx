@@ -9,11 +9,10 @@ import UnifiedUploader from "./files/UnifiedUploader";
 import { Button } from "@/components/ui/Button";
 // Types are centralized in src/types; local state not used for these now
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import NotificationBell from "@/components/ui/NotificationBell";
 import PendingApprovalScreen from "./PendingApprovalScreen";
 import WelcomeOnboarding from "./WelcomeOnboarding";
 import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
-import { StateLoading, StateError, StateEmpty } from "@/components/ui/States";
+import { StateLoading, StateError, StateEmpty, StatCardSkeleton, FileCardSkeleton } from "@/components/ui/States";
 import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
@@ -26,8 +25,10 @@ export default function PortalClientReal() {
   const [tab, setTab] = useState<Tab>("summary");
   const { projects = [], refresh: refreshProjects } = useProjects();
   const activeProjectId = projects?.[0]?.id;
-  const { files = [], refresh: refreshFiles } = useFiles(activeProjectId);
-  const { approvals = [], refresh: refreshApprovals } = useApprovals(activeProjectId);
+  const { files = [], isLoading: isLoadingFiles, refresh: refreshFiles } = useFiles(activeProjectId);
+  const { approvals = [], isLoading: isLoadingApprovals, refresh: refreshApprovals } = useApprovals(activeProjectId);
+  const [commentById, setCommentById] = useState<Record<string, string>>({});
+  const [attachUrlById, setAttachUrlById] = useState<Record<string, string>>({});
   // skeleton state not needed now; SWR provides isLoading if needed
   const [clientStatus, setClientStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export default function PortalClientReal() {
     }
   };
 
-  const handleApprovalUpdate = async (approvalId: string, status: string, feedback?: string) => {
+  const handleApprovalUpdate = async (approvalId: string, status?: string, feedback?: string, comment?: string, attachmentUrl?: string) => {
     try {
       const response = await fetch('/api/portal/approvals', {
         method: 'PUT',
@@ -88,12 +89,24 @@ export default function PortalClientReal() {
           approvalId,
           status,
           feedback: feedback || '',
+          comment: comment || '',
+          attachments: (() => {
+            const input = (attachmentUrl || '').trim();
+            if (!input) return undefined;
+            const parts = input.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+            const valid = parts.filter(p => /^https?:\/\//i.test(p));
+            if (valid.length === 0) return undefined;
+            return valid.map(u => ({ url: u, type: 'link' as const }));
+          })(),
         }),
       });
 
       if (response.ok) {
         // Refresh approvals
         fetchData();
+        // reset inputs for this approval
+        setCommentById(prev => ({ ...prev, [approvalId]: '' }));
+        setAttachUrlById(prev => ({ ...prev, [approvalId]: '' }));
       } else {
         setError('فشل في تحديث الموافقة');
       }
@@ -132,6 +145,14 @@ export default function PortalClientReal() {
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return '-';
     try { return new Date(dateString).toLocaleDateString('ar-SA'); } catch { return '-'; }
+  };
+
+  const formatBytes = (bytes?: number) => {
+    if (!bytes || bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let i = 0; let v = bytes;
+    while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+    return `${v.toFixed(1)} ${units[i]}`;
   };
 
   const handleOnboardingComplete = () => {
@@ -245,9 +266,7 @@ export default function PortalClientReal() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div id="notification-bell" className="relative">
-              <NotificationBell />
-            </div>
+            {/* Notification bell moved to global Header for portal routes */}
             <Button 
               variant="ghost" 
               onClick={() => router.push('/portal/profile')}
@@ -500,7 +519,9 @@ export default function PortalClientReal() {
               )}
 
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
-                {files.length > 0 ? files.map((file) => (
+                {isLoadingFiles ? (
+                  Array.from({ length: 4 }).map((_, i) => <FileCardSkeleton key={i} />)
+                ) : files.length > 0 ? files.map((file) => (
                   <div key={file.id} className="group bg-[var(--card)] p-4 rounded-[var(--radius-lg)] border border-[var(--elev)] hover:shadow-lg transition-all duration-200 hover:border-[var(--accent-500)]/20">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -517,7 +538,7 @@ export default function PortalClientReal() {
                         </div>
                       ) : file.type === 'video' ? (
                         <div className="aspect-video w-full rounded-md overflow-hidden border border-[var(--elev)]">
-                          <iframe src={file.url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                          <iframe title={file.name} src={file.url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                         </div>
                       ) : (
                         <div className="text-sm text-[var(--slate-600)]">وثيقة</div>
@@ -527,7 +548,7 @@ export default function PortalClientReal() {
                         <div className="flex items-center gap-2">
                           <span className="bg-[var(--bg)] px-2 py-1 rounded">{file.type}</span>
                           <span>•</span>
-                          <span>{file.size}</span>
+                          <span>{formatBytes(file.size)}</span>
                           <span>•</span>
                           <span>{formatDate(file.createdAt)}</span>
                         </div>
@@ -549,7 +570,7 @@ export default function PortalClientReal() {
                               size="sm"
                               onClick={async () => {
                                 try {
-                                  const getRes = await fetch(`/api/portal/files/presign?key=${encodeURIComponent(file.url)}`);
+                                  const getRes = await fetch(`/api/portal/files/presign?key=${encodeURIComponent(file.url)}&filename=${encodeURIComponent(file.name)}`);
                                   const getJson = await getRes.json();
                                   if (getRes.ok && getJson.url) {
                                     const a = document.createElement('a');
@@ -596,7 +617,9 @@ export default function PortalClientReal() {
               <h3 className="text-lg font-semibold text-[var(--text)]">الموافقات المطلوبة</h3>
               
               <div className="space-y-3">
-                {approvals.length > 0 ? approvals.map((approval) => (
+                {isLoadingApprovals ? (
+                  Array.from({ length: 3 }).map((_, i) => <StatCardSkeleton key={i} />)
+                ) : approvals.length > 0 ? approvals.map((approval) => (
                   <div key={approval.id} className="p-4 bg-[var(--bg)] rounded-[var(--radius)] border border-[var(--elev)]">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-[var(--text)]">{approval.title}</h4>
@@ -609,7 +632,10 @@ export default function PortalClientReal() {
                         <Clock size={14} />
                         <span>الموعد النهائي: {formatDate(approval.deadline)}</span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(approval.status)}`}>
+                          {approval.status === 'pending' ? 'قيد الانتظار' : approval.status === 'reviewing' ? 'قيد المراجعة' : approval.status === 'approved' ? 'معتمد' : approval.status === 'rejected' ? 'مرفوض' : approval.status}
+                        </span>
                         <Button 
                           variant="ghost" 
                           size="sm"
@@ -648,6 +674,42 @@ export default function PortalClientReal() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* Comments composer */}
+                    <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto] items-start">
+                      <input
+                        value={commentById[approval.id] || ''}
+                        onChange={(e) => setCommentById(prev => ({ ...prev, [approval.id]: e.target.value }))}
+                        placeholder="أضف تعليقًا..."
+                        className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--card)] text-[var(--text)]"
+                      />
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleApprovalUpdate(approval.id, undefined, '', commentById[approval.id] || '', attachUrlById[approval.id])}
+                      >
+                        نشر التعليق
+                      </Button>
+                      <input
+                        value={attachUrlById[approval.id] || ''}
+                        onChange={(e) => setAttachUrlById(prev => ({ ...prev, [approval.id]: e.target.value }))}
+                        placeholder="رابط مرفق (اختياري)"
+                        className="md:col-span-2 w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--card)] text-[var(--text)]"
+                      />
+                    </div>
+
+                    {/* Comments list */}
+                    {Array.isArray((approval as unknown as { comments?: Array<{ author: string; message: string; createdAt: string }> }).comments) && (approval as unknown as { comments?: Array<{ author: string; message: string; createdAt: string }> }).comments!.length > 0 && (
+                      <div className="mt-3 border-t border-[var(--elev)] pt-3 space-y-2">
+                        {((approval as unknown as { comments: Array<{ author: string; message: string; createdAt: string }> }).comments).map((c, idx) => (
+                          <div key={idx} className="text-sm">
+                            <span className="font-medium text-[var(--text)]">{c.author}</span>
+                            <span className="mx-1 text-[var(--slate-500)]">•</span>
+                            <span className="text-[var(--slate-600)]">{formatDate(c.createdAt)}</span>
+                            <div className="text-[var(--slate-700)]">{c.message}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )) : (
                   <div className="text-center py-8 text-[var(--slate-600)]">

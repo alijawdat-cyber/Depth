@@ -1,6 +1,140 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Bell, Check, RefreshCw } from "lucide-react";
+
+type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  priority: "high" | "medium" | "low" | string;
+  read: boolean;
+  createdAt: string;
+};
+
+export default function NotificationsPage() {
+  const [items, setItems] = useState<Notification[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [marking, setMarking] = useState(false);
+
+  const fetchPage = async (cursor?: string | null) => {
+    setLoading(true);
+    try {
+      const url = new URL('/api/portal/notifications', window.location.origin);
+      url.searchParams.set('limit', '20');
+      if (cursor) url.searchParams.set('cursor', cursor);
+      const res = await fetch(url.toString(), { cache: 'no-store' });
+      const j = await res.json();
+      if (res.ok && j?.success) {
+        if (cursor) setItems(prev => prev.concat(j.notifications || []));
+        else setItems(j.notifications || []);
+        setNextCursor(j.nextCursor || null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPage(); }, []);
+
+  const markRead = async (id: string) => {
+    try {
+      setMarking(true);
+      await fetch('/api/portal/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'markRead', notificationId: id })
+      });
+      setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    } finally { setMarking(false); }
+  };
+
+  const markAll = async () => {
+    try {
+      setMarking(true);
+      await fetch('/api/portal/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'markAllRead' })
+      });
+      setItems(prev => prev.map(n => ({ ...n, read: true })));
+    } finally { setMarking(false); }
+  };
+
+  const getPriorityColor = (p: string) => p === 'high' ? 'text-red-600 bg-red-50' : p === 'medium' ? 'text-yellow-600 bg-yellow-50' : 'text-green-600 bg-green-50';
+
+  const formatTimeAgo = (iso: string) => {
+    const now = Date.now();
+    const d = new Date(iso).getTime();
+    const diff = now - d;
+    const m = Math.floor(diff / 60000);
+    if (m < 60) return `منذ ${m} دقيقة`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `منذ ${h} ساعة`;
+    return `منذ ${Math.floor(h / 24)} يوم`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-[var(--text)] flex items-center gap-2"><Bell size={18} /> الإشعارات</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={() => fetchPage()} className="flex items-center gap-2">
+            <RefreshCw size={14} /> تحديث
+          </Button>
+          <Button variant="ghost" onClick={markAll} disabled={marking}>
+            تعليم الكل كمقروء
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)]">
+        {items.length === 0 && !loading && (
+          <div className="p-8 text-center text-[var(--slate-600)]">
+            لا توجد إشعارات حالياً
+          </div>
+        )}
+
+        {items.map(n => (
+          <div key={n.id} className={`p-4 border-b border-[var(--elev)] ${!n.read ? 'bg-blue-50/50' : ''}`}>
+            <div className="flex items-start gap-3">
+              <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(n.priority)}`}>{n.priority === 'high' ? 'عالي' : n.priority === 'medium' ? 'متوسط' : 'منخفض'}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-medium text-[var(--text)]">{n.title}</div>
+                    <div className="text-sm text-[var(--slate-600)] mt-1">{n.message}</div>
+                  </div>
+                  {!n.read && (
+                    <button onClick={() => markRead(n.id)} className="p-1 hover:bg-[var(--bg)] rounded" title="تعليم كمقروء">
+                      <Check size={14} className="text-[var(--accent-500)]" />
+                    </button>
+                  )}
+                </div>
+                <div className="text-[var(--slate-500)] text-xs mt-2">{formatTimeAgo(n.createdAt)}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {nextCursor && (
+          <div className="p-4 text-center">
+            <Button onClick={() => fetchPage(nextCursor)} disabled={loading}>
+              {loading ? 'جاري التحميل...' : 'تحميل المزيد'}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+"use client";
+
+import { useEffect, useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";

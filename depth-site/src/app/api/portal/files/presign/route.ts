@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { filename, contentType, size, projectId } = await req.json();
-    const allowed = ['application/pdf', 'application/zip', 'image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
+    const allowed = ['application/pdf', 'application/zip'];
     if (!allowed.includes(contentType)) return NextResponse.json({ error: 'نوع الملف غير مدعوم' }, { status: 400 });
     if (Number(size) > 50 * 1024 * 1024) return NextResponse.json({ error: 'الحجم أكبر من 50MB' }, { status: 400 });
 
@@ -65,6 +65,8 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
+    // Note: For PUT presign with headers, some platforms accept signature without canonical query.
+    // We keep current pattern to avoid breaking clients.
     const signedUrl = new URL(`https://${host}${urlPath}`);
     signedUrl.searchParams.set('X-Amz-Algorithm', algorithm);
     signedUrl.searchParams.set('X-Amz-Credential', `${env.R2_ACCESS_KEY_ID}/${credentialScope}`);
@@ -89,6 +91,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const key = searchParams.get('key');
     const expires = searchParams.get('expires') || '300';
+    const filename = searchParams.get('filename') || undefined;
     if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
 
     // Verify ownership: find file by key (stored as url for documents), then check project ownership
@@ -132,10 +135,28 @@ export async function GET(req: NextRequest) {
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
     const signedHeaders = 'host';
 
+    // Build canonical query with response-content-disposition if filename provided
+    const disposition = filename
+      ? `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`
+      : undefined;
+    const baseQuery: Record<string, string> = {
+      'X-Amz-Algorithm': algorithm,
+      'X-Amz-Credential': `${env.R2_ACCESS_KEY_ID}/${credentialScope}`,
+      'X-Amz-Date': amzDate,
+      'X-Amz-Expires': String(expires),
+      'X-Amz-SignedHeaders': 'host',
+    };
+    if (disposition) baseQuery['response-content-disposition'] = disposition;
+
+    const canonicalQuery = Object.keys(baseQuery)
+      .sort()
+      .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(baseQuery[k])}`)
+      .join('&');
+
     const canonicalRequest = [
       'GET',
       urlPath,
-      '',
+      canonicalQuery,
       `host:${host}`,
       '',
       signedHeaders,
@@ -151,11 +172,11 @@ export async function GET(req: NextRequest) {
     const signature = hmac(kSigning, stringToSign, 'hex');
 
     const signedUrl = new URL(`https://${host}${urlPath}`);
-    signedUrl.searchParams.set('X-Amz-Algorithm', algorithm);
-    signedUrl.searchParams.set('X-Amz-Credential', `${env.R2_ACCESS_KEY_ID}/${credentialScope}`);
-    signedUrl.searchParams.set('X-Amz-Date', amzDate);
-    signedUrl.searchParams.set('X-Amz-Expires', String(expires));
-    signedUrl.searchParams.set('X-Amz-SignedHeaders', 'host');
+    // Append canonical query and signature
+    canonicalQuery.split('&').forEach(kv => {
+      const [k, v] = kv.split('=');
+      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
+    });
     signedUrl.searchParams.set('X-Amz-Signature', signature as string);
 
     return NextResponse.json({ url: signedUrl.toString() });

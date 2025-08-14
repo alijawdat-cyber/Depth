@@ -2,8 +2,6 @@
 import TeamSection from "@/components/about/TeamSection";
 import AboutHero from "@/components/sections/AboutHero";
 import AboutStory from "@/components/sections/AboutStory";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";
 
 export default function AboutPage() {
@@ -11,7 +9,6 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen" dir="rtl">
-      <Header />
       <main>
       {/* زر الرجوع */}
       <div className="pt-4">
@@ -32,7 +29,6 @@ export default function AboutPage() {
       <AboutStory />
       <TeamSection />
       </main>
-      <Footer />
     </div>
   );
 }

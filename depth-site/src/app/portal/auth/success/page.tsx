@@ -2,8 +2,6 @@
 
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
 import Link from "next/link";
 import { CheckCircle, Mail, Clock, Phone, ArrowRight, Users } from "lucide-react";
 
@@ -13,7 +11,6 @@ export default function SignUpSuccessPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <Header />
       
       <main className="py-12 md:py-20">
         <Container>
@@ -144,8 +141,6 @@ export default function SignUpSuccessPage() {
           </div>
         </Container>
       </main>
-      
-      <Footer />
     </div>
   );
 }

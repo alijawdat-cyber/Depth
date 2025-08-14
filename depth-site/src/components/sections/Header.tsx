@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { NAV_ITEMS, CTA_ITEMS } from "@/lib/constants/nav";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // WhatsApp CTA is now replaced with internal /book route
 
@@ -76,6 +77,11 @@ export default function Header() {
           })}
         </nav>
         <div className="flex items-center gap-2">
+          {status === 'authenticated' && pathname?.startsWith('/portal') ? (
+            <div className="hidden sm:block">
+              <NotificationBell highlight={pathname === '/portal' || pathname?.startsWith('/portal/notifications')} />
+            </div>
+          ) : null}
           <Button
             variant="secondary"
             onClick={toggleTheme}
