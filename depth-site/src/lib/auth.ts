@@ -85,7 +85,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.userId = user.id;
         const emailFirst = (user.email || '').toLowerCase();
-        token.role = emailFirst === 'admin@depth-agency.com' ? 'admin' : (token.role || 'client');
+        // Always derive role from the CURRENT user's email to avoid leaking previous sessions' roles
+        token.role = emailFirst === 'admin@depth-agency.com' ? 'admin' : 'client';
       }
       // Ensure role is derived even when `user` is undefined (subsequent JWT calls)
       if (!token.role && token.email) {

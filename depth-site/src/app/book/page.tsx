@@ -226,7 +226,7 @@ export default function BookPage() {
           </div>
         </Container>
       </div>
-      <WhatsAppButton messageOptions="أريد حجز جلسة استشارية">احجز الآن</WhatsAppButton>
+      <WhatsAppButton messageOptions={{ type: 'booking', details: 'أريد حجز جلسة استشارية مجانية' }}>احجز الآن</WhatsAppButton>
     </PageLayout>
   );
 }

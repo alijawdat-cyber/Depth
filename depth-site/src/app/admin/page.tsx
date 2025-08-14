@@ -9,6 +9,7 @@ import ImageUploader from "@/components/features/portal/files/ImageUploader";
 import VideoUploader from "@/components/features/portal/files/VideoUploader";
 import DocumentUploader from "@/components/features/portal/files/DocumentUploader";
 import { signIn, useSession } from "next-auth/react";
+import Dropdown from "@/components/ui/Dropdown";
 
 interface Client {
   id: string;
@@ -328,12 +329,17 @@ export default function AdminDashboard() {
           <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-6 grid gap-3 md:grid-cols-2">
             <div className="flex gap-2">
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم/البريد/الهاتف" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as 'all' | 'pending' | 'approved' | 'rejected')} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
-                <option value="all">الكل</option>
-                <option value="pending">في الانتظار</option>
-                <option value="approved">معتمد</option>
-                <option value="rejected">مرفوض</option>
-              </select>
+              <Dropdown
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v as typeof statusFilter)}
+                options={[
+                  { value: 'all', label: 'الكل' },
+                  { value: 'pending', label: 'في الانتظار' },
+                  { value: 'approved', label: 'معتمد' },
+                  { value: 'rejected', label: 'مرفوض' },
+                ]}
+                className="min-w-40"
+              />
             </div>
             <div className="flex gap-2">
               <input value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="دعوة عميل عبر البريد" className="flex-1 px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]" />
@@ -491,31 +497,26 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[var(--text)] mb-2">العميل</label>
-                    <select 
-                      value={newProjectClientEmail} 
-                      onChange={e => setNewProjectClientEmail(e.target.value)} 
-                      className="w-full px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
-                    >
-                      <option value="">اختر العميل</option>
-                      {clients.filter(c => c.status === 'approved').map(c => (
-                        <option key={c.id} value={c.email}>{c.name} - {c.company}</option>
-                      ))}
-                    </select>
+                    <Dropdown
+                      value={newProjectClientEmail || ''}
+                      onChange={(v) => setNewProjectClientEmail(String(v))}
+                      options={[{ value: '', label: 'اختر العميل' }, ...clients.filter(c => c.status === 'approved').map(c => ({ value: c.email, label: `${c.name} - ${c.company}` }))]}
+                    />
                     <p className="text-xs text-[var(--slate-600)] mt-1">فقط العملاء المعتمدون يظهرون هنا</p>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <div>
                     <label className="block text-sm font-medium text-[var(--text)] mb-2">حالة المشروع</label>
-                    <select 
-                      value={newProjectStatus} 
-                      onChange={e => setNewProjectStatus(e.target.value)} 
-                      className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
-                    >
-                      <option value="active">نشط</option>
-                      <option value="pending">انتظار</option>
-                      <option value="completed">مكتمل</option>
-                    </select>
+                    <Dropdown
+                      value={newProjectStatus as 'active' | 'pending' | 'completed'}
+                      onChange={(v) => setNewProjectStatus(String(v))}
+                      options={[
+                        { value: 'active', label: 'نشط' },
+                        { value: 'pending', label: 'انتظار' },
+                        { value: 'completed', label: 'مكتمل' },
+                      ]}
+                    />
                   </div>
                   <Button 
                     onClick={createProject}
@@ -578,16 +579,12 @@ export default function AdminDashboard() {
             <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-[var(--text)] mb-2">اختر المشروع</label>
-                <select 
-                  value={selectedProjectIdForUpload} 
-                  onChange={e => setSelectedProjectIdForUpload(e.target.value)} 
-                  className="w-full max-w-md px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
-                >
-                  <option value="">اختر المشروع للرفع</option>
-                  {projects.map(p => (
-                    <option key={p.id} value={p.id}>{p.title} - {p.clientEmail}</option>
-                  ))}
-                </select>
+                <Dropdown
+                  value={selectedProjectIdForUpload || ''}
+                  onChange={(v) => setSelectedProjectIdForUpload(String(v))}
+                  options={[{ value: '', label: 'اختر المشروع للرفع' }, ...projects.map(p => ({ value: p.id, label: `${p.title} - ${p.clientEmail}` }))]}
+                  className="w-full max-w-md"
+                />
                 {!selectedProjectIdForUpload && (
                   <p className="text-xs text-amber-600 mt-1">⚠️ يجب اختيار مشروع أولاً</p>
                 )}
