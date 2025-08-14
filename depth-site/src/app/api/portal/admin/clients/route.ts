@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { resend } from '@/lib/email/resend';
+import { render } from '@react-email/render';
+import ClientInvite, { renderClientInviteText } from '@/emails/ClientInvite';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -45,32 +47,40 @@ export async function GET() {
           createdAt: createdAtIso,
         };
       });
-    } catch {
+      console.log('[admin/clients] orderedCount=', clients.length);
+    } catch (e) {
+      console.warn('[admin/clients] ordered query failed', e);
       clients = [];
     }
 
-    // Fallback: include any client docs missing createdAt by doing an un-ordered scan
-    if (clients.length === 0) {
-      const scan = await adminDb.collection('clients').get();
-      clients = scan.docs.map(doc => {
-        const data = doc.data();
-        let createdAtIso: string | undefined;
-        try {
-          if (data.createdAt?.toDate) createdAtIso = data.createdAt.toDate().toISOString();
-          else if (data.createdAt instanceof Date) createdAtIso = data.createdAt.toISOString();
-          else if (typeof data.createdAt === 'string') createdAtIso = data.createdAt;
-        } catch { createdAtIso = undefined; }
-        return {
-          id: doc.id,
-          name: data.name,
-          email: data.email,
-          company: data.company,
-          phone: data.phone,
-          status: data.status || 'pending',
-          createdAt: createdAtIso || new Date(0).toISOString(), // put legacy first
-        };
-      }).sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+    // Merge-in any docs missing createdAt or excluded from ordered query
+    const scan = await adminDb.collection('clients').get();
+    const byId = new Map(clients.map(c => [c.id, true] as const));
+    let merged = 0;
+    scan.docs.forEach(doc => {
+      if (byId.has(doc.id)) return;
+      const data = doc.data();
+      let createdAtIso: string | undefined;
+      try {
+        if (data.createdAt?.toDate) createdAtIso = data.createdAt.toDate().toISOString();
+        else if (data.createdAt instanceof Date) createdAtIso = data.createdAt.toISOString();
+        else if (typeof data.createdAt === 'string') createdAtIso = data.createdAt;
+      } catch { createdAtIso = undefined; }
+      clients.push({
+        id: doc.id,
+        name: data.name,
+        email: data.email,
+        company: data.company,
+        phone: data.phone,
+        status: data.status || 'pending',
+        createdAt: createdAtIso || new Date(0).toISOString(),
+      });
+      merged++;
+    });
+    if (merged) {
+      clients.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
     }
+    console.log('[admin/clients] mergedAdded=', merged, 'total=', clients.length);
 
     return NextResponse.json({
       success: true,
@@ -150,11 +160,14 @@ export async function POST(req: NextRequest) {
       }
       const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://depth-agency.com';
       const signinUrl = `${baseUrl.replace(/\/$/, '')}/portal/auth/signin`;
+      const html = await render(ClientInvite({ recipientName: email.split('@')[0], inviteUrl: signinUrl, brandUrl: baseUrl }));
+      const text = renderClientInviteText({ recipientName: email.split('@')[0], inviteUrl: signinUrl });
       await resend.emails.send({
         from: 'Depth <hello@depth-agency.com>',
         to: [email],
         subject: 'دعوة للانضمام إلى بوابة Depth',
-        html: `<p>مرحباً،</p><p>اضغط هنا لتسجيل الدخول والبدء: <a href="${signinUrl}">تسجيل الدخول</a></p>`
+        html,
+        text,
       });
       return NextResponse.json({ success: true, message: 'Invitation sent' });
     }
