@@ -2,8 +2,7 @@
 import { Container } from "@/components/ui/Container";
 
 import ClientsGrid from "@/components/sections/ClientsGrid";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 import { useState } from "react";
 
 type CaseStudy = {
@@ -282,10 +281,8 @@ function StatsSection() {
 
 export default function WorkPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Header />
-      
-      <main className="py-16">
+    <PageLayout>
+      <div className="py-16">
         <Container>
           {/* Hero Section */}
           <div className="text-center mb-16">
@@ -312,11 +309,9 @@ export default function WorkPage() {
         {/* Clients Grid */}
         <Container className="mt-16">
           <ClientsGrid />
-        </Container>
-      </main>
-
-      <Footer />
-    </div>
+                </Container>
+      </div>
+    </PageLayout>
   );
 }
 

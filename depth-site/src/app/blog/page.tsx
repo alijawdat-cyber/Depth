@@ -8,8 +8,7 @@ export const dynamic = "force-static";
 
 import { Container } from "@/components/ui/Container";
 
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { blogPosts, getFeaturedPosts, getAllCategories, type BlogPost } from "@/data/blog";
 
@@ -86,10 +85,8 @@ export default function BlogPage() {
 
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Header />
-      
-      <main className="py-16">
+    <PageLayout>
+      <div className="py-16">
         <Container>
           {/* Hero Section */}
           <div className="text-center mb-16">
@@ -174,10 +171,8 @@ export default function BlogPage() {
             </Link>
           </div>
         </Container>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </PageLayout>
   );
 }
 

@@ -1,7 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 
 const bookingOptions = [
   {
@@ -55,10 +54,8 @@ const availableTimes = [
 
 export default function BookPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Header />
-      
-      <main className="py-16">
+    <PageLayout>
+      <div className="py-16">
         <Container>
           <div className="max-w-6xl mx-auto">
             {/* Header */}
@@ -228,10 +225,9 @@ export default function BookPage() {
             </div>
           </div>
         </Container>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+      <WhatsAppButton messageOptions="أريد حجز جلسة استشارية">احجز الآن</WhatsAppButton>
+    </PageLayout>
   );
 }
 

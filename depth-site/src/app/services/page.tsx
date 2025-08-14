@@ -238,10 +238,9 @@ export default function ServicesPage() {
             </div>
           </div>
         </Container>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+      <WhatsAppButton messageOptions={{ type: 'service', serviceName: 'خدمات متكاملة', details: 'أريد عرض سعر مخصص للخدمات' }}>احصل على عرض سعر</WhatsAppButton>
+    </PageLayout>
   );
 }
 

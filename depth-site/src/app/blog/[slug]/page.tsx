@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Container } from "@/components/ui/Container";
-import Header from "@/components/sections/Header";
-import Footer from "@/components/sections/Footer";
+import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { blogPosts, getPostBySlug, getRecentPosts, type BlogPost } from "@/data/blog";
 import type { Metadata } from 'next';
@@ -161,10 +160,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <Header />
-      
-      <main className="py-16">
+    <PageLayout>
+      <div className="py-16">
         <Container>
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-2 text-sm text-[var(--slate-600)] mb-8">
@@ -315,10 +312,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
             </div>
           </div>
-        </Container>
-      </main>
-
-      <Footer />
-    </div>
+                </Container>
+      </div>
+    </PageLayout>
   );
 }
