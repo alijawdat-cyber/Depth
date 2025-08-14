@@ -44,9 +44,11 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open, acctOpen]);
 
-  // Build nav items; append admin panel link only for admins
+  // Build nav items; for admins replace "بوابة العميل" برابط لوحة الأدمن بدل تكراره
   const navItems = role === 'admin'
-    ? [...NAV_ITEMS, { href: '/admin', label: 'لوحة الأدمن' }]
+    ? NAV_ITEMS.map((item) => item.href === '/portal' 
+        ? { href: '/admin', label: 'لوحة الأدمن' } 
+        : item)
     : NAV_ITEMS;
 
   return (
@@ -94,7 +96,9 @@ export default function Header() {
               </button>
               {acctOpen && (
                 <div className="absolute top-full mt-2 right-0 w-44 bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius-sm)] shadow-lg p-1 text-sm">
-                  <Link href="/portal" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>بوابتي</Link>
+                  {role !== 'admin' && (
+                    <Link href="/portal" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>بوابتي</Link>
+                  )}
                   <Link href="/portal/profile" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
                   {role === 'admin' && (
                     <Link href="/admin" className="block px-3 py-2 rounded hover:bg-[var(--elev)]" onClick={() => setAcctOpen(false)}>لوحة الأدمن</Link>

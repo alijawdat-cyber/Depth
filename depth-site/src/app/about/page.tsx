@@ -2,13 +2,17 @@
 import TeamSection from "@/components/about/TeamSection";
 import AboutHero from "@/components/sections/AboutHero";
 import AboutStory from "@/components/sections/AboutStory";
+import Header from "@/components/sections/Header";
+import Footer from "@/components/sections/Footer";
 import { useRouter } from "next/navigation";
 
 export default function AboutPage() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
+      <Header />
+      <main>
       {/* زر الرجوع */}
       <div className="pt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +31,9 @@ export default function AboutPage() {
       <AboutHero />
       <AboutStory />
       <TeamSection />
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 }
 

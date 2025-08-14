@@ -5,6 +5,8 @@ export const dynamic = "force-dynamic";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Container } from "@/components/ui/Container";
+import Header from "@/components/sections/Header";
+import Footer from "@/components/sections/Footer";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
@@ -140,7 +142,9 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="py-8 md:py-16 min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)] overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] to-[var(--elev)] overflow-x-hidden touch-pan-y">
+      <Header />
+      <main className="py-8 md:py-16">
       <Container className="overflow-x-hidden">
         {/* Fixed Header with Centered Logo */}
         <div className="mb-8 md:mb-12">
@@ -168,17 +172,17 @@ export default function ContactPage() {
           </div>
 
           {/* Centered Logo */}
-          <div className="flex justify-center">
+           <div className="flex justify-center select-none">
             <Link 
               href="/"
               className="hover:scale-105 transition-transform duration-200 touch-manipulation"
             >
-              <Image 
+               <Image 
                 src={BRAND.wordmark}
                 alt="Depth"
                 width={180}
                 height={40}
-                className="h-8 w-auto"
+                 className="h-8 w-auto pointer-events-none"
               />
             </Link>
           </div>
@@ -374,6 +378,8 @@ export default function ContactPage() {
           </form>
         </div>
       </Container>
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 }

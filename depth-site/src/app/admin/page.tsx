@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/Button";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
+import ImageUploader from "@/components/features/portal/files/ImageUploader";
+import VideoUploader from "@/components/features/portal/files/VideoUploader";
+import DocumentUploader from "@/components/features/portal/files/DocumentUploader";
 import { signIn, useSession } from "next-auth/react";
 
 interface Client {
@@ -36,6 +39,7 @@ export default function AdminDashboard() {
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const [newProjectClientEmail, setNewProjectClientEmail] = useState('');
   const [newProjectStatus, setNewProjectStatus] = useState('active');
+  const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
 
@@ -531,6 +535,27 @@ export default function AdminDashboard() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Admin Uploads Section (reuse client uploaders) */}
+          <div className="mt-10">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-[var(--text)] mb-1">رفع الملفات (للأدمن)</h2>
+              <p className="text-[var(--slate-600)]">اختر مشروعاً ثم ارفع صور/فيديو/وثائق بالنيابة عن العميل</p>
+            </div>
+            <div className="bg-[var(--card)] p-4 rounded-lg border border-[var(--elev)] mb-4 grid gap-3 md:grid-cols-3">
+              <select value={selectedProjectIdForUpload} onChange={e => setSelectedProjectIdForUpload(e.target.value)} className="px-3 py-2 rounded-md border border-[var(--elev)] bg-[var(--bg)]">
+                <option value="">اختر مشروعاً للرفع</option>
+                {projects.map(p => (
+                  <option key={p.id} value={p.id}>{p.title} — {p.clientEmail}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <ImageUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
+              <VideoUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
+              <DocumentUploader projectId={selectedProjectIdForUpload || 'demo'} onUploaded={() => { fetchProjects(); }} />
+            </div>
           </div>
         </Container>
       </main>

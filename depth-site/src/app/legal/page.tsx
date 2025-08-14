@@ -1,9 +1,13 @@
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
+import Header from "@/components/sections/Header";
+import Footer from "@/components/sections/Footer";
 
 export default function LegalPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] py-12">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      <Header />
+      <main className="py-12">
       <Container>
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
@@ -400,6 +404,8 @@ export default function LegalPage() {
           </div>
         </div>
       </Container>
+      </main>
+      <Footer />
     </div>
   );
 }
