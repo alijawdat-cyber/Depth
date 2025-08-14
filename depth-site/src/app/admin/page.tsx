@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import Header from "@/components/sections/Header";
@@ -21,12 +21,21 @@ interface Client {
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
 
-  // Note: we will trigger initial fetch from a button to avoid use-before-define lints.
+  // Trigger initial fetch when user becomes authenticated admin
+  useEffect(() => {
+    if (status !== 'authenticated' || !isAdmin) return;
+    const key = '__admin_clients_fetched__';
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, '1');
+      // Start loading and fetch
+      fetchClients();
+    }
+  }, [status, isAdmin]);
 
   const fetchClients = async () => {
     try {
