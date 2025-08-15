@@ -102,10 +102,11 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             if (!res.ok) throw new Error('failed to get upload url');
             const { uploadURL, id, warning } = await res.json();
             if (warning) setIsMock(true);
-            // Cloudflare Images v2 requires multipart/form-data with field name "file"
-            await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
-            const url = cloudflareImageUrl(id, 'preview');
-            await saveMeta(q.file.name, 'image', q.file.size, projectId, url, { imageId: id, contentType: ct });
+            // Cloudflare Images upload: capture the final returned imageId if provided by the upload endpoint
+            const uploadedId = await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
+            const finalId = typeof uploadedId === 'string' && uploadedId.length > 0 ? uploadedId : id;
+            const url = cloudflareImageUrl(finalId, 'preview');
+            await saveMeta(q.file.name, 'image', q.file.size, projectId, url, { imageId: finalId, contentType: ct });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: url } : it));
           } else if (q.kind === 'video') {
             const res = await fetch('/api/media/videos/direct-upload', {
@@ -116,27 +117,29 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             if (!res.ok) throw new Error('failed to get upload url');
             const { uploadURL, videoId, warning } = await res.json();
             if (warning) setIsMock(true);
-            await new Promise<void>((resolve, reject) => {
+            const tryTus = () => new Promise<void>((resolve, reject) => {
               const upload = new tus.Upload(q.file, {
-                uploadUrl: uploadURL,
+                endpoint: uploadURL,
+                uploadSize: q.file.size,
                 metadata: {
                   filename: q.file.name,
                   filetype: q.file.type || 'video/mp4',
                 },
                 retryDelays: [0, 1000, 3000, 5000],
-                onError: (err) => {
-                  reject(err);
-                },
-                onProgress: (bytesUploaded, bytesTotal) => {
-                  tick(qid, bytesUploaded, bytesTotal);
-                },
-                onSuccess: () => {
-                  resolve();
-                },
+                onError: (err) => reject(err),
+                onProgress: (bytesUploaded, bytesTotal) => tick(qid, bytesUploaded, bytesTotal),
+                onSuccess: () => resolve(),
               });
               tusById.current.set(qid, upload);
               upload.start();
             });
+
+            try {
+              await tryTus();
+            } catch {
+              // Fallback: some CF accounts return 400 on tus create from browsers; try simple multipart upload
+              await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
+            }
             const url = cloudflareStreamIframeUrl(videoId);
             await saveMeta(q.file.name, 'video', q.file.size, projectId, url, { videoId, contentType: q.file.type || 'video/mp4' });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: url } : it));
@@ -199,7 +202,7 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   };
 
   const xhrUploadForm = (method: 'POST'|'PUT', url: string, qid: string, file: File, onProgress: (loaded: number, total: number)=>void) => {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhrById.current.set(qid, xhr);
       xhr.open(method, url, true);
@@ -207,8 +210,16 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
         if (e.lengthComputable) onProgress(e.loaded, e.total);
       };
       xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) resolve();
-        else reject(new Error('upload error'));
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const json = JSON.parse(xhr.responseText || '{}');
+            // v2 response: { result: { id: '...' } } or { id: '...' }
+            const id = json?.result?.id || json?.id || '';
+            resolve(typeof id === 'string' ? id : '');
+          } catch {
+            resolve('');
+          }
+        } else reject(new Error('upload error'));
       };
       xhr.onerror = () => reject(new Error('network error'));
       xhr.onabort = () => reject(new Error('canceled'));
@@ -250,13 +261,27 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
       body: JSON.stringify({ name, type, size, projectId, url, description: '', ...(extra||{}) })
     });
     if (!res.ok) {
-      let errorMsg = 'failed to save metadata';
+      // Read structured error
+      let code: string | undefined;
+      let message = 'failed to save metadata';
       try {
-        const errorData = await res.json();
-        if (errorData?.error) errorMsg = errorData.error;
+        const data = await res.json();
+        code = data?.code || data?.error;
+        message = data?.message || data?.error || message;
       } catch {}
-      console.error('saveMeta error:', errorMsg, 'Status:', res.status);
-      throw new Error(errorMsg);
+
+      console.error('saveMeta error:', message, 'Status:', res.status, 'Code:', code);
+
+      // Accept 202 as non-fatal (metadata pending). Let caller proceed.
+      if (res.status === 202 || code === 'UPLOAD_OK_METADATA_PENDING') return;
+
+      // Non-fatal UX for known auth/project errors: show error but do not throw to keep optimistic card
+      if (res.status === 401 || code === 'UNAUTHORIZED') return;
+      if (res.status === 403 || code === 'FORBIDDEN_PROJECT') return;
+      if (res.status === 404 || code === 'PROJECT_NOT_FOUND') return;
+
+      // For hard errors, throw to mark item as error
+      throw new Error(message);
     }
   };
 

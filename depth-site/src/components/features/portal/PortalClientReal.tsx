@@ -266,7 +266,7 @@ export default function PortalClientReal() {
       />
       
       {/* Enhanced Portal Header */}
-      <div id="portal-header" className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+      <div id="portal-header" className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text)] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-4 left-4 w-20 h-20 border border-white/20 rounded-full"></div>
@@ -277,13 +277,13 @@ export default function PortalClientReal() {
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="bg-[var(--neutral-0)]/10 p-3 rounded-full">
-              <User size={24} className="text-[var(--text-dark)]" />
+              <User size={24} className="text-[var(--text)]" />
             </div>
             <div>
               <h2 className="text-2xl font-bold mb-1">
                 أهلاً وسهلاً {session?.user?.name || 'بك'}! 👋
               </h2>
-              <p className="text-[var(--text-dark)]/80 flex items-center gap-2">
+              <p className="text-[var(--text)]/80 flex items-center gap-2">
                 <span>{session?.user?.email}</span>
                 <span className="text-xs bg-[var(--neutral-0)]/20 px-2 py-1 rounded-full">عميل مفعل</span>
               </p>
@@ -294,7 +294,7 @@ export default function PortalClientReal() {
             <Button 
               variant="ghost" 
               onClick={() => router.push('/portal/profile')}
-              className="text-[var(--text-dark)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
+              className="text-[var(--text)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
             >
               <Settings size={16} className="mr-2" />
               الحساب
@@ -302,7 +302,7 @@ export default function PortalClientReal() {
             <Button 
               variant="ghost" 
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-[var(--text-dark)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
+              className="text-[var(--text)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
             >
               <LogOut size={16} className="mr-2" />
               خروج
@@ -318,7 +318,7 @@ export default function PortalClientReal() {
             Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
           ) : (
             <>
-              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute top-2 right-2 opacity-20">
                   <TrendingUp size={40} />
@@ -333,7 +333,7 @@ export default function PortalClientReal() {
                 </div>
               </div>
               
-              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute top-2 right-2 opacity-20">
                   <DollarSign size={40} />
@@ -348,7 +348,7 @@ export default function PortalClientReal() {
                 </div>
               </div>
               
-              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute top-2 right-2 opacity-20">
                   <Briefcase size={40} />
@@ -363,7 +363,7 @@ export default function PortalClientReal() {
                 </div>
               </div>
               
-              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text-dark)] relative overflow-hidden">
+              <div className="bg-[var(--panel-strong)] p-6 rounded-[var(--radius-lg)] text-[var(--text)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute top-2 right-2 opacity-20">
                   <Target size={40} />
@@ -395,7 +395,7 @@ export default function PortalClientReal() {
                   onClick={() => setTab(t.id as Tab)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-[var(--radius-sm)] text-sm font-medium transition-colors ${
                     tab === t.id 
-                      ? "bg-[var(--brand-500)] text-[var(--text-dark)]" 
+                      ? "bg-[var(--brand-500)] text-[var(--text)]" 
                       : "text-[var(--slate-600)] hover:bg-[var(--elev)] hover:text-[var(--text)]"
                   }`}
                 >

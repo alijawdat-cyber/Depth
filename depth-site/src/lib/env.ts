@@ -22,8 +22,8 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
-  // Resend
-  RESEND_API_KEY: z.string().min(1),
+  // Resend (optional in development)
+  RESEND_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM: z.string().optional(),
   // Google OAuth
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -67,7 +67,7 @@ export const env = EnvSchema.parse({
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: sanitize(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET),
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: sanitize(process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID),
   NEXT_PUBLIC_FIREBASE_APP_ID: sanitize(process.env.NEXT_PUBLIC_FIREBASE_APP_ID),
-  RESEND_API_KEY: sanitize(process.env.RESEND_API_KEY),
+  RESEND_API_KEY: sanitize(process.env.RESEND_API_KEY) || undefined,
   EMAIL_FROM: sanitize(process.env.EMAIL_FROM),
   GOOGLE_CLIENT_ID: sanitize(process.env.GOOGLE_CLIENT_ID),
   GOOGLE_CLIENT_SECRET: sanitize(process.env.GOOGLE_CLIENT_SECRET),

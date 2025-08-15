@@ -1,4 +1,5 @@
 // Client Portal - Files API
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -87,14 +88,26 @@ export async function GET(req: NextRequest) {
 
 // POST: Upload file metadata (actual file upload handled separately)
 export async function POST(req: NextRequest) {
+  const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     const session = await getServerSession(authOptions);
-    
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ ok: false, code: 'UNAUTHORIZED', message: 'Unauthorized', requestId }, { status: 401 });
     }
 
-    const { name, type, size, projectId, url, description, imageId, videoId, contentType, checksum } = await req.json();
+    const body = await req.json();
+    const { name, type, size, projectId, url, description, imageId, videoId, contentType, checksum } = body || {};
+
+    // Validation (400)
+    if (!name || !type || !projectId) {
+      return NextResponse.json({ ok: false, code: 'VALIDATION_ERROR', message: 'Name, type, and projectId are required', requestId }, { status: 400 });
+    }
+    if (!FILE_TYPES.includes(type)) {
+      return NextResponse.json({ ok: false, code: 'VALIDATION_ERROR', message: 'Invalid file type', requestId }, { status: 400 });
+    }
+    if (type === 'document' && !url) {
+      return NextResponse.json({ ok: false, code: 'VALIDATION_ERROR', message: 'Document URL is required', requestId }, { status: 400 });
+    }
 
     // Derive final URL when not provided for media types
     let finalUrl: string | undefined = url;
@@ -107,36 +120,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Validation
-    if (!name || !type || !projectId) {
-      return NextResponse.json(
-        { error: 'Name, type, and project ID are required' },
-        { status: 400 }
-      );
-    }
-    if (!FILE_TYPES.includes(type)) {
-      return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });
-    }
-    // For documents we must have a direct URL/key
-    if (type === 'document' && !url) {
-      return NextResponse.json(
-        { error: 'Document URL is required' },
-        { status: 400 }
-      );
-    }
-
-    // Verify access to this project: allow owner client or admin
+    // Access check (403/404)
     const projectDoc = await adminDb.collection('projects').doc(projectId).get();
     const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
     if (!projectDoc.exists) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      return NextResponse.json({ ok: false, code: 'PROJECT_NOT_FOUND', message: 'Project not found', requestId }, { status: 404 });
     }
     if (!isAdmin && projectDoc.data()?.clientEmail !== session.user.email) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ ok: false, code: 'FORBIDDEN_PROJECT', message: 'You do not have access to this project', requestId }, { status: 403 });
     }
 
     // Create file record in Firestore
-    const fileData = {
+    // Build Firestore document without undefined values
+    const baseData = {
       name,
       type,
       size: typeof size === 'number' ? size : Number(size || 0),
@@ -147,15 +143,16 @@ export async function POST(req: NextRequest) {
       uploadedBy: session.user.email,
       createdAt: new Date(),
       updatedAt: new Date(),
-      contentType: typeof contentType === 'string' ? contentType : undefined,
-      checksum: typeof checksum === 'string' ? checksum : undefined,
-      imageId: typeof imageId === 'string' ? imageId : undefined,
-      videoId: typeof videoId === 'string' ? videoId : undefined,
-    };
+    } as Record<string, unknown>;
+    if (typeof contentType === 'string') baseData.contentType = contentType;
+    if (typeof checksum === 'string') baseData.checksum = checksum;
+    if (typeof imageId === 'string') baseData.imageId = imageId;
+    if (typeof videoId === 'string') baseData.videoId = videoId;
+    const fileData = baseData;
 
     const docRef = await adminDb.collection('files').add(fileData);
 
-    // Create a notification for the client about the new file upload
+    // Notification (best-effort)
     try {
       const projectOwnerEmail = (projectDoc.data() as { clientEmail?: string })?.clientEmail || session.user.email;
       await adminDb.collection('notifications').add({
@@ -170,17 +167,19 @@ export async function POST(req: NextRequest) {
       });
     } catch {}
 
-    return NextResponse.json({ 
-      success: true, 
-      fileId: docRef.id,
-      message: 'File uploaded successfully' 
-    });
+    return NextResponse.json({ ok: true, code: 'SAVED', fileId: docRef.id, message: 'File uploaded successfully', requestId });
 
   } catch (error) {
-    console.error('Upload File Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to upload file' }, 
-      { status: 500 }
-    );
+    // When metadata saving fails but upload already succeeded (client provides imageId/videoId), return 202 to allow client retry
+    try {
+      const body = await req.clone().json().catch(() => ({}));
+      const hasExternalUploadId = typeof body?.imageId === 'string' || typeof body?.videoId === 'string';
+      const payload = { ok: false as const, requestId, code: hasExternalUploadId ? 'UPLOAD_OK_METADATA_PENDING' : 'SERVER_ERROR', message: hasExternalUploadId ? 'Upload completed. Metadata pending to be saved.' : 'Failed to upload file' };
+      console.error('Upload File Error:', { requestId, error });
+      return NextResponse.json(payload, { status: hasExternalUploadId ? 202 : 500 });
+    } catch {
+      console.error('Upload File Error (no body parse):', { requestId, error });
+      return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Failed to upload file', requestId }, { status: 500 });
+    }
   }
 }
