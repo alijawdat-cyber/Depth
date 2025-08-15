@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
     const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
     return NextResponse.json({ url: signedUrl });
-  } catch (e) {
+  } catch (error) {
+    console.error('multipart sign part error', error);
     return NextResponse.json({ error: 'Failed to sign part' }, { status: 500 });
   }
 }

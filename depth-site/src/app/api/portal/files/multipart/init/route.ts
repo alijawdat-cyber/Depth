@@ -87,7 +87,8 @@ export async function POST(req: NextRequest) {
     if (!uploadId) return NextResponse.json({ error: 'No UploadId returned' }, { status: 500 });
 
     return NextResponse.json({ key, uploadId });
-  } catch (e) {
+  } catch (error) {
+    console.error('multipart init error', error);
     return NextResponse.json({ error: 'Failed to init multipart' }, { status: 500 });
   }
 }
