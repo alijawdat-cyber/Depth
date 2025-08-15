@@ -72,7 +72,10 @@ export async function POST(req: NextRequest) {
     // Preserve byte-for-byte canonical query in final URL
     const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
-    return NextResponse.json({ url: signedUrl });
+    const debugEnabled = env.DEBUG_PRESIGN === '1' || process.env.VERCEL_ENV === 'preview';
+    const debug = debugEnabled ? { signedHeaders, canonicalQuery, url: signedUrl } : undefined;
+
+    return NextResponse.json({ url: signedUrl, ...(debug ? { debug } : {}) });
   } catch (error) {
     console.error('multipart sign part error', error);
     return NextResponse.json({ error: 'Failed to sign part' }, { status: 500 });

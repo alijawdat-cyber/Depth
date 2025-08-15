@@ -86,7 +86,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to complete multipart', details: t }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    const debugEnabled = env.DEBUG_PRESIGN === '1' || process.env.VERCEL_ENV === 'preview';
+    const debug = debugEnabled ? { signedHeaders, canonicalQuery, url: signedUrl } : undefined;
+    return NextResponse.json({ success: true, ...(debug ? { debug } : {}) });
   } catch (error) {
     console.error('complete multipart error', error);
     return NextResponse.json({ error: 'Failed to complete multipart' }, { status: 500 });

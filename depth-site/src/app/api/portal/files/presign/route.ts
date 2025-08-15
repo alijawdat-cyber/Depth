@@ -79,7 +79,10 @@ export async function POST(req: NextRequest) {
     // Preserve byte-for-byte canonical query in final URL
     const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
-    return NextResponse.json({ url: signedUrl, key });
+    const debugEnabled = env.DEBUG_PRESIGN === '1' || process.env.VERCEL_ENV === 'preview';
+    const debug = debugEnabled ? { signedHeaders, canonicalQuery, url: signedUrl } : undefined;
+
+    return NextResponse.json({ url: signedUrl, key, ...(debug ? { debug } : {}) });
   } catch {
     return NextResponse.json({ error: 'Failed to presign' }, { status: 500 });
   }

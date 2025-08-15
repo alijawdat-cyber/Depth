@@ -44,6 +44,8 @@ const EnvSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET: z.string().optional(),
+  // Debug
+  DEBUG_PRESIGN: z.string().optional(),
   // Upstash Redis (Rate limiting)
   UPSTASH_REDIS_REST_URL: z.string().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
@@ -83,6 +85,7 @@ export const env = EnvSchema.parse({
   R2_ACCESS_KEY_ID: sanitize(process.env.R2_ACCESS_KEY_ID),
   R2_SECRET_ACCESS_KEY: sanitize(process.env.R2_SECRET_ACCESS_KEY),
   R2_BUCKET: sanitize(process.env.R2_BUCKET),
+  DEBUG_PRESIGN: sanitize(process.env.DEBUG_PRESIGN),
   UPSTASH_REDIS_REST_URL: sanitize(process.env.UPSTASH_REDIS_REST_URL),
   UPSTASH_REDIS_REST_TOKEN: sanitize(process.env.UPSTASH_REDIS_REST_TOKEN),
   EMAIL_SERVER_HOST: sanitize(process.env.EMAIL_SERVER_HOST),

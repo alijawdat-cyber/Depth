@@ -283,12 +283,11 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
   };
 
   useEffect(() => {
+    // capture stable snapshot for cleanup
+    const xhrMapSnapshot = xhrById.current;
     return () => {
-      // Abort any in-flight XHRs on unmount using a stable snapshot
-      const xhrMap = xhrById.current;
-      xhrMap.forEach(x => x.abort());
+      xhrMapSnapshot.forEach(x => x.abort());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

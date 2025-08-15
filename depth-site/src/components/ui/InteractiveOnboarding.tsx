@@ -24,6 +24,7 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip, cu
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [liveMessage, setLiveMessage] = useState<string>("");
+  // focus trap state (reserved). We expose it via data-attribute for future styling hooks.
   const [trapActive, setTrapActive] = useState(false);
 
   const steps: OnboardingStep[] = [
@@ -71,6 +72,7 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip, cu
       return;
     }
     setIsVisible(true);
+    setTrapActive(true);
     const step = steps[currentStep];
     if (step.requiredTab && currentTab && step.requiredTab !== currentTab) {
       setTab?.(step.requiredTab);
@@ -199,7 +201,7 @@ export default function InteractiveOnboarding({ isActive, onComplete, onSkip, cu
       </div>
 
       {/* Tooltip (focus trap container) */}
-      <div className="relative z-50" role="dialog" aria-modal="true">
+      <div className="relative z-50" role="dialog" aria-modal="true" data-trap-active={trapActive ? '1' : '0'}>
         <OnboardingTooltip
           isVisible={true}
           title={currentStepData.title}

@@ -86,7 +86,9 @@ export async function POST(req: NextRequest) {
     const uploadId = match?.[1];
     if (!uploadId) return NextResponse.json({ error: 'No UploadId returned' }, { status: 500 });
 
-    return NextResponse.json({ key, uploadId });
+    const debugEnabled = env.DEBUG_PRESIGN === '1' || process.env.VERCEL_ENV === 'preview';
+    const debug = debugEnabled ? { signedHeaders, canonicalQuery, url: signedUrl } : undefined;
+    return NextResponse.json({ key, uploadId, ...(debug ? { debug } : {}) });
   } catch (error) {
     console.error('multipart init error', error);
     return NextResponse.json({ error: 'Failed to init multipart' }, { status: 500 });

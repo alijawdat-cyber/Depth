@@ -32,6 +32,15 @@ export default function DocumentUploader({ projectId, onUploaded }: Props) {
         });
         if (!res.ok) throw new Error('failed to presign');
         const { url, key } = await res.json();
+        const extractDebug = (signedUrl: string) => {
+          try {
+            const u = new URL(signedUrl);
+            const qp = u.searchParams;
+            const sh = qp.get('X-Amz-SignedHeaders') || '';
+            const dt = qp.get('X-Amz-Date') || '';
+            return `SignedHeaders=${sh} X-Amz-Date=${dt}`;
+          } catch { return '' }
+        };
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('PUT', url, true);
@@ -42,7 +51,10 @@ export default function DocumentUploader({ projectId, onUploaded }: Props) {
           };
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) resolve();
-            else reject(new Error('failed to upload'));
+            else {
+              const dbg = extractDebug(url);
+              reject(new Error(`فشل رفع PUT (${xhr.status}). ${dbg}`));
+            }
           };
           xhr.onerror = () => reject(new Error('upload error'));
           xhr.send(file);
@@ -105,7 +117,17 @@ export default function DocumentUploader({ projectId, onUploaded }: Props) {
               if (xhr.status >= 200 && xhr.status < 300) {
                 const et = xhr.getResponseHeader('ETag') || '';
                 resolve(et.replaceAll('"', ''));
-              } else reject(new Error('failed to upload part'));
+              } else {
+                try {
+                  const u = new URL(url);
+                  const qp = u.searchParams;
+                  const sh = qp.get('X-Amz-SignedHeaders') || '';
+                  const dt = qp.get('X-Amz-Date') || '';
+                  reject(new Error(`فشل رفع جزء (${xhr.status}). SignedHeaders=${sh} X-Amz-Date=${dt}`));
+                } catch {
+                  reject(new Error('failed to upload part'));
+                }
+              }
             };
             xhr.onerror = () => reject(new Error('upload error'));
             xhr.send(chunk);
