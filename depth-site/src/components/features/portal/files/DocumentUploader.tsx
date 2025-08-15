@@ -35,7 +35,7 @@ export default function DocumentUploader({ projectId, onUploaded }: Props) {
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('PUT', url, true);
-          xhr.setRequestHeader('x-amz-content-sha256', 'UNSIGNED-PAYLOAD');
+          // Minimal headers: do not send x-amz-content-sha256 to match SignedHeaders=host
           xhr.setRequestHeader('Content-Type', contentType);
           xhr.upload.onprogress = (e) => {
             if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));

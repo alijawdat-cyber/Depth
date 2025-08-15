@@ -131,7 +131,8 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             });
             if (!res.ok) throw new Error('failed to presign');
             const { url, key } = await res.json();
-            await xhrUpload('PUT', url, qid, q.file, (loaded, total) => tick(qid, loaded, total), { 'x-amz-content-sha256': 'UNSIGNED-PAYLOAD', 'Content-Type': contentType });
+            // Keep headers minimal: do not send x-amz-content-sha256 to avoid header/signature mismatch.
+            await xhrUpload('PUT', url, qid, q.file, (loaded, total) => tick(qid, loaded, total), { 'Content-Type': contentType });
             await saveMeta(q.file.name, 'document', q.file.size, projectId, key, { contentType });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: key } : it));
           }

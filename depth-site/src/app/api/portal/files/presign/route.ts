@@ -41,10 +41,8 @@ export async function POST(req: NextRequest) {
     const dateStamp = amzDate.slice(0, 8);
 
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    // Important: Do NOT include x-amz-date in signed headers for presigned browser PUT.
-    // We pass X-Amz-Date via query string, not as a request header.
-    const signedHeaders = 'host;x-amz-content-sha256';
-    // Use UNSIGNED-PAYLOAD for browser-based uploads without computing body hash
+    // Keep presign minimal: sign only the host header. Payload hash stays UNSIGNED-PAYLOAD
+    const signedHeaders = 'host';
     const payloadHashHex = 'UNSIGNED-PAYLOAD';
 
     // Build canonical query for presigned PUT
@@ -65,7 +63,6 @@ export async function POST(req: NextRequest) {
       urlPath,
       canonicalQuery,
       `host:${host}`,
-      `x-amz-content-sha256:${payloadHashHex}`,
       '',
       signedHeaders,
       payloadHashHex,
