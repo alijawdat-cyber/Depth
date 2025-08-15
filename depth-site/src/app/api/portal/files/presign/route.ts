@@ -41,17 +41,31 @@ export async function POST(req: NextRequest) {
     const dateStamp = amzDate.slice(0, 8);
 
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+    // Important: Do NOT include x-amz-date in signed headers for presigned browser PUT.
+    // We pass X-Amz-Date via query string, not as a request header.
+    const signedHeaders = 'host;x-amz-content-sha256';
     // Use UNSIGNED-PAYLOAD for browser-based uploads without computing body hash
     const payloadHashHex = 'UNSIGNED-PAYLOAD';
+
+    // Build canonical query for presigned PUT
+    const baseQuery: Record<string, string> = {
+      'X-Amz-Algorithm': algorithm,
+      'X-Amz-Credential': `${env.R2_ACCESS_KEY_ID}/${credentialScope}`,
+      'X-Amz-Date': amzDate,
+      'X-Amz-Expires': '300',
+      'X-Amz-SignedHeaders': signedHeaders,
+    };
+    const canonicalQuery = Object.keys(baseQuery)
+      .sort()
+      .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(baseQuery[k])}`)
+      .join('&');
 
     const canonicalRequest = [
       'PUT',
       urlPath,
-      '',
+      canonicalQuery,
       `host:${host}`,
       `x-amz-content-sha256:${payloadHashHex}`,
-      `x-amz-date:${amzDate}`,
       '',
       signedHeaders,
       payloadHashHex,
@@ -65,14 +79,12 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    // Note: For PUT presign with headers, some platforms accept signature without canonical query.
-    // We keep current pattern to avoid breaking clients.
     const signedUrl = new URL(`https://${host}${urlPath}`);
-    signedUrl.searchParams.set('X-Amz-Algorithm', algorithm);
-    signedUrl.searchParams.set('X-Amz-Credential', `${env.R2_ACCESS_KEY_ID}/${credentialScope}`);
-    signedUrl.searchParams.set('X-Amz-Date', amzDate);
-    signedUrl.searchParams.set('X-Amz-Expires', '300');
-    signedUrl.searchParams.set('X-Amz-SignedHeaders', 'host;x-amz-content-sha256;x-amz-date');
+    // Append canonical query (must match exactly what was signed)
+    canonicalQuery.split('&').forEach(kv => {
+      const [k, v] = kv.split('=');
+      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
+    });
     signedUrl.searchParams.set('X-Amz-Signature', signature as string);
 
     return NextResponse.json({ url: signedUrl.toString(), key });

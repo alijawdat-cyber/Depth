@@ -117,29 +117,8 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
             if (!res.ok) throw new Error('failed to get upload url');
             const { uploadURL, videoId, warning } = await res.json();
             if (warning) setIsMock(true);
-            const tryTus = () => new Promise<void>((resolve, reject) => {
-              const upload = new tus.Upload(q.file, {
-                endpoint: uploadURL,
-                uploadSize: q.file.size,
-                metadata: {
-                  filename: q.file.name,
-                  filetype: q.file.type || 'video/mp4',
-                },
-                retryDelays: [0, 1000, 3000, 5000],
-                onError: (err) => reject(err),
-                onProgress: (bytesUploaded, bytesTotal) => tick(qid, bytesUploaded, bytesTotal),
-                onSuccess: () => resolve(),
-              });
-              tusById.current.set(qid, upload);
-              upload.start();
-            });
-
-            try {
-              await tryTus();
-            } catch {
-              // Fallback: some CF accounts return 400 on tus create from browsers; try simple multipart upload
-              await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
-            }
+            // Cloudflare Stream Direct Creator Upload: multipart/form-data with field name "file"
+            await xhrUploadForm('POST', uploadURL, qid, q.file, (loaded, total) => tick(qid, loaded, total));
             const url = cloudflareStreamIframeUrl(videoId);
             await saveMeta(q.file.name, 'video', q.file.size, projectId, url, { videoId, contentType: q.file.type || 'video/mp4' });
             setQueue(prev => prev.map(it => it.id === qid ? { ...it, status: 'done', progress: 100, metaUrl: url } : it));
