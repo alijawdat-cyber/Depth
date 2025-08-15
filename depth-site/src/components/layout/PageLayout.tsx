@@ -5,17 +5,12 @@ import { ReactNode } from "react";
 interface PageLayoutProps {
   children: ReactNode;
   className?: string;
-  showHeader?: boolean; // deprecated: Header is rendered by `SiteFrame`
-  showFooter?: boolean; // deprecated: Footer is rendered by `SiteFrame`
   containerized?: boolean;
 }
 
 export default function PageLayout({ 
   children, 
   className = "",
-  // Prevent header/footer duplication under RootLayout → SiteFrame
-  showHeader = false,
-  showFooter = false,
   containerized = false
 }: PageLayoutProps) {
   return (

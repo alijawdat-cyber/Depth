@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as tus from "tus-js-client";
 import { Button } from "@/components/ui/Button";
+import Image from "next/image";
 import { cloudflareImageUrl, cloudflareStreamIframeUrl } from "@/lib/cloudflare-public";
 
 type UploadKind = 'image' | 'video' | 'document';
@@ -153,8 +154,7 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
       for (let i = 0; i < concurrency; i++) {
         workers.push((async () => {
           // Continuously process until no queued items remain
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
+          for (;;) {
             const hasQueued = queueRef.current.some(it => it.status === 'queued');
             if (!hasQueued) break;
             // Run one
@@ -166,7 +166,7 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
     } finally {
       setBusy(false);
     }
-  }, [projectId, busy, queue, onUploaded]);
+  }, [projectId, busy, onUploaded]);
 
   const tick = (qid: string, loaded: number, total: number) => {
     const now = performance.now();
@@ -284,9 +284,9 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
 
   useEffect(() => {
     return () => {
-      // Revoke previews on unmount
-      queue.forEach(q => { if (q.previewUrl) URL.revokeObjectURL(q.previewUrl); });
-      xhrById.current.forEach(x => x.abort());
+      // Abort any in-flight XHRs on unmount using a stable snapshot
+      const xhrMap = xhrById.current;
+      xhrMap.forEach(x => x.abort());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -331,7 +331,7 @@ export default function UnifiedUploader({ projectId, onUploaded, className = "" 
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 truncate text-sm text-[var(--text)]">
                   {item.previewUrl && (
-                    <img src={item.previewUrl} alt="preview" className="w-8 h-8 rounded object-cover border border-[var(--elev)]" />
+                    <Image src={item.previewUrl} alt="preview" width={32} height={32} className="w-8 h-8 rounded object-cover border border-[var(--elev)]" unoptimized />
                   )}
                   <span className="truncate" title={item.file.name}>{item.file.name}</span>
                   <span className="text-[var(--slate-500)]">({item.kind})</span>

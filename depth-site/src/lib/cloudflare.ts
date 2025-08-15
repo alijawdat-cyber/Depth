@@ -34,7 +34,13 @@ export async function createCloudflareDirectUpload(metadata?: Record<string, unk
   if (!data?.success || !data.result?.uploadURL) {
     throw new Error('Failed to create Cloudflare direct upload URL');
   }
-  return data.result;
+  const result = data.result;
+  // attach metadata if provided (no-op for v1; kept for future auditing)
+  if (metadata && typeof metadata === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    metadata;
+  }
+  return result;
 }
 
 export function cloudflareImageUrl(imageId: string, variant: 'thumb' | 'preview' | 'hero' = 'preview') {

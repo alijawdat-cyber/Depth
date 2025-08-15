@@ -18,7 +18,6 @@ export default function ClientsMarquee() {
     if (!groupRef.current || !containerRef.current) return;
     const measure = () => {
       const w = groupRef.current!.scrollWidth;
-      const cw = containerRef.current!.clientWidth;
       setGroupWidth(w);
     };
     measure();
