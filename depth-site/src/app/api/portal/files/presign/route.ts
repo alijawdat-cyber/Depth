@@ -76,15 +76,10 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    const signedUrl = new URL(`https://${host}${urlPath}`);
-    // Append canonical query (must match exactly what was signed)
-    canonicalQuery.split('&').forEach(kv => {
-      const [k, v] = kv.split('=');
-      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
-    });
-    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+    // Preserve byte-for-byte canonical query in final URL
+    const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
-    return NextResponse.json({ url: signedUrl.toString(), key });
+    return NextResponse.json({ url: signedUrl, key });
   } catch {
     return NextResponse.json({ error: 'Failed to presign' }, { status: 500 });
   }
@@ -180,15 +175,10 @@ export async function GET(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    const signedUrl = new URL(`https://${host}${urlPath}`);
-    // Append canonical query and signature
-    canonicalQuery.split('&').forEach(kv => {
-      const [k, v] = kv.split('=');
-      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
-    });
-    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+    // Preserve byte-for-byte canonical query in final URL
+    const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
-    return NextResponse.json({ url: signedUrl.toString() });
+    return NextResponse.json({ url: signedUrl });
   } catch {
     return NextResponse.json({ error: 'Failed to presign (GET)' }, { status: 500 });
   }

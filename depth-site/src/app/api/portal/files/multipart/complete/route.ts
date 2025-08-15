@@ -68,19 +68,15 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    const signedUrl = new URL(`https://${host}${urlPath}`);
-    canonicalQuery.split('&').forEach(kv => {
-      const [k, v] = kv.split('=');
-      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
-    });
-    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+    // Preserve byte-for-byte canonical query in final URL
+    const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
     // Build XML body for CompleteMultipartUpload
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<CompleteMultipartUpload>` +
       parts.map((p: { PartNumber: number; ETag: string }) => `<Part><PartNumber>${p.PartNumber}</PartNumber><ETag>${p.ETag}</ETag></Part>`).join('') +
       `</CompleteMultipartUpload>`;
 
-    const completeResp = await fetch(signedUrl.toString(), {
+    const completeResp = await fetch(signedUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/xml' },
       body: xml,
@@ -91,7 +87,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (e) {
+  } catch (error) {
+    console.error('complete multipart error', error);
     return NextResponse.json({ error: 'Failed to complete multipart' }, { status: 500 });
   }
 }

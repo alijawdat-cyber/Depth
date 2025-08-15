@@ -69,14 +69,10 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    const signedUrl = new URL(`https://${host}${urlPath}`);
-    canonicalQuery.split('&').forEach(kv => {
-      const [k, v] = kv.split('=');
-      signedUrl.searchParams.set(decodeURIComponent(k), decodeURIComponent(v));
-    });
-    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+    // Preserve byte-for-byte canonical query in final URL
+    const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
-    return NextResponse.json({ url: signedUrl.toString() });
+    return NextResponse.json({ url: signedUrl });
   } catch (e) {
     return NextResponse.json({ error: 'Failed to sign part' }, { status: 500 });
   }

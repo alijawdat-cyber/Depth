@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     };
     const canonicalQuery = Object.keys(baseQuery)
       .sort()
-      .map(k => (baseQuery[k] === '' ? encodeURIComponent(k) : `${encodeURIComponent(k)}=${encodeURIComponent(baseQuery[k])}`))
+      .map(k => (baseQuery[k] === '' ? `${encodeURIComponent(k)}=` : `${encodeURIComponent(k)}=${encodeURIComponent(baseQuery[k])}`))
       .join('&');
 
     const canonicalRequest = [
@@ -72,15 +72,11 @@ export async function POST(req: NextRequest) {
     const kSigning = hmac(kService, 'aws4_request');
     const signature = hmac(kSigning, stringToSign, 'hex');
 
-    const signedUrl = new URL(`https://${host}${urlPath}`);
-    canonicalQuery.split('&').forEach(kv => {
-      const [k, v] = kv.split('=');
-      signedUrl.searchParams.set(decodeURIComponent(k), v ? decodeURIComponent(v) : '');
-    });
-    signedUrl.searchParams.set('X-Amz-Signature', signature as string);
+    // Preserve byte-for-byte canonical query in final URL (uploads must include trailing '=')
+    const signedUrl = `https://${host}${urlPath}?${canonicalQuery}&X-Amz-Signature=${signature}`;
 
     // Call initiate URL to get UploadId (XML)
-    const initResp = await fetch(signedUrl.toString(), { method: 'POST' });
+    const initResp = await fetch(signedUrl, { method: 'POST' });
     if (!initResp.ok) {
       const t = await initResp.text();
       return NextResponse.json({ error: 'Failed to initiate multipart', details: t }, { status: 500 });
