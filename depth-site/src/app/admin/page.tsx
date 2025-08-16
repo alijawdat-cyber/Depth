@@ -516,7 +516,7 @@ export default function AdminDashboard() {
           {/* Clients Table */}
           {!loading && !error && (
             <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
-              <div className="overflow-x-auto">
+              <div className="data-scroll scroll-x">
                 <table className="w-full">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
                     <tr>
@@ -722,7 +722,7 @@ export default function AdminDashboard() {
             )}
             {!projectsLoading && !projectsError && (
               <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="data-scroll scroll-x">
                   <table className="w-full">
                     <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
                       <tr>
