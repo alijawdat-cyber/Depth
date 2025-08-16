@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 import { Button } from "@/components/ui/Button";
-import AdminLayout from "@/components/admin/AdminLayout";
+// ملاحظة: تم الاستغناء عن مكوّن AdminLayout القديم لصالح الغلاف الموحد في app/admin/layout.tsx
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
 import UnifiedUploader from "@/components/features/portal/files/UnifiedUploader";
 import { signIn, useSession } from "next-auth/react";
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
   // Enforce Google sign-in for admin
   if (status !== 'authenticated') {
     return (
-      <AdminLayout>
+      <div>
         <div className="max-w-md mx-auto">
           <div className="bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)]">
             <div className="text-center mb-8">
@@ -207,12 +207,12 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
   if (!isAdmin) {
     return (
-      <AdminLayout>
+      <div>
         <div className="max-w-xl mx-auto bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)] text-center">
           <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
           <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لا تملك صلاحية الوصول</h1>
@@ -221,21 +221,12 @@ export default function AdminDashboard() {
             <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout 
-      title="لوحة الإدارة"
-      description="إدارة العملاء والمشاريع والملفات"
-      actions={
-        <Button onClick={fetchClients} disabled={loading}>
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          تحديث
-        </Button>
-      }
-    >
+    <div>
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -563,6 +554,7 @@ export default function AdminDashboard() {
                         <th className="text-right p-4 font-semibold text-[var(--text)]">البريد المرتبط</th>
                         <th className="text-right p-4 font-semibold text-[var(--text)]">الحالة</th>
                         <th className="text-right p-4 font-semibold text-[var(--text)]">تاريخ الإنشاء</th>
+                        <th className="text-right p-4 font-semibold text-[var(--text)]">إجراءات</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -574,6 +566,23 @@ export default function AdminDashboard() {
                             <span className="px-2 py-1 rounded-full bg-[var(--bg)]">{p.status}</span>
                           </td>
                           <td className="p-4 text-sm text-[var(--slate-600)]">{p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-SA') : '-'}</td>
+                          <td className="p-4 text-sm">
+                            {/* ربط قديم → جديد: زر سريع لإنشاء عرض مرتبط بالمشروع المحدد */}
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  openCreate: '1',
+                                  clientEmail: p.clientEmail,
+                                  projectId: p.id
+                                });
+                                location.assign(`/admin/quotes?${params.toString()}`);
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1"
+                            >
+                              إنشاء عرض
+                            </Button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -626,6 +635,6 @@ export default function AdminDashboard() {
               <UnifiedUploader projectId={selectedProjectIdForUpload || ''} onUploaded={() => { fetchProjects(); }} />
             </div>
           </div>
-    </AdminLayout>
+    </div>
   );
 }

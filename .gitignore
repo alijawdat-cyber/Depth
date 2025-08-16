@@ -1,7 +1,0 @@
-# depth ignores
-.DS_Store
-*.log
-*.pem
-*firebase-adminsdk*.json
-out/
-.next/

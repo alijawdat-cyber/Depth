@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
-import AdminLayout from '@/components/admin/AdminLayout';
+// ملاحظة: نستغني عن AdminLayout القديم لأن الغلاف الموحد موجود في app/admin/layout.tsx
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
@@ -268,21 +268,18 @@ export default function AdminQuotesPage() {
   }
 
   return (
-    <AdminLayout
-      title="إدارة العروض"
-      description="إنشاء وإدارة عروض الأسعار للعملاء"
-      actions={
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={loadData} disabled={loading}>
-            تحديث
-          </Button>
-          <Button onClick={() => setShowCreateForm(true)}>
-            عرض جديد
-          </Button>
+    <div className="max-w-7xl mx-auto px-4">
+      {/* رأس الصفحة الإداري (بديل خفيف لـ AdminLayout) */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">إدارة العروض</h1>
+          <p className="text-[var(--slate-600)]">إنشاء وإدارة عروض الأسعار للعملاء</p>
         </div>
-      }
-    >
-      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={loadData} disabled={loading}>تحديث</Button>
+          <Button onClick={() => setShowCreateForm(true)}>عرض جديد</Button>
+        </div>
+      </div>
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -607,7 +604,6 @@ export default function AdminQuotesPage() {
               </div>
             )}
           </div>
-      </div>
-    </AdminLayout>
+    </div>
   );
 }
