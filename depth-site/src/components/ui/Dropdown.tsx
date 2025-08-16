@@ -70,7 +70,7 @@ export default function Dropdown<T extends string | number = string>({
       >
         <span className="truncate text-sm">
           {selected ? selected.label : (
-            <span className="text-[var(--slate-600)]">{placeholder}</span>
+            <span className="text-[var(--muted)]">{placeholder}</span>
           )}
         </span>
         <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -96,7 +96,7 @@ export default function Dropdown<T extends string | number = string>({
               className={`w-full text-right px-3 py-2 rounded-[var(--radius-sm)] text-sm transition-colors ${
                 opt.value === value
                   ? "bg-[var(--elev)] text-[var(--text)]"
-                  : "text-[var(--slate-600)] hover:bg-[var(--elev)]"
+                  : "text-[var(--muted)] hover:bg-[var(--elev)]"
               }`}
             >
               {opt.label}

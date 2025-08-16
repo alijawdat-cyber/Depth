@@ -216,6 +216,32 @@ export default function AdminPricingPage() {
     );
   }
 
+  // Helpers for dynamic labels without using 'any'
+  const rawOnlyPctLabel = (() => {
+    const raw = rateCard?.processingLevels?.['raw_only'];
+    const pct = typeof raw === 'number' ? Math.round(raw * 100) : -10;
+    return `${pct}%`;
+  })();
+
+  const fullRetouchPctLabel = (() => {
+    const fr = rateCard?.processingLevels?.['full_retouch'];
+    if (Array.isArray(fr)) {
+      const avg = Math.round(((fr[0] + fr[1]) / 2) * 100);
+      return `~${avg}%`;
+    }
+    const pct = typeof fr === 'number' ? Math.round(fr * 100) : 35;
+    return `+${pct}%`;
+  })();
+
+  const rushPctLabel = `+${Math.round(((rateCard?.modifiers?.rushPct ?? 0.35) * 100))}%`;
+
+  const tierPctLabel = (tier: 'T1'|'T2'|'T3') => {
+    const pctMap = rateCard?.modifiers?.creatorTierPct || {};
+    const pct = Math.round(((pctMap[tier] ?? (tier === 'T2' ? 0.10 : tier === 'T3' ? 0.20 : 0)) * 100));
+    const sign = pct > 0 ? '+' : '';
+    return `${sign}${pct}%`;
+  };
+
   return (
     <AdminLayout
       title="محرك التسعير"
@@ -307,9 +333,9 @@ export default function AdminPricingPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
-                    <option value="raw_only">Raw Only (-10%)</option>
+                    <option value="raw_only">{`Raw Only (${rawOnlyPctLabel})`}</option>
                     <option value="raw_basic">Raw + Basic (0%)</option>
-                    <option value="full_retouch">Full Retouch (+35%)</option>
+                    <option value="full_retouch">{`Full Retouch (${fullRetouchPctLabel})`}</option>
                   </select>
                 </div>
 
@@ -330,8 +356,30 @@ export default function AdminPricingPage() {
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <label htmlFor="rush" className="ml-2 text-sm text-gray-700">
-                      Rush (+25%)
+                      {`Rush (${rushPctLabel})`}
                     </label>
+                  </div>
+
+                  {/* Location Zone */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      منطقة الموقع (Location Zone)
+                    </label>
+                    <select
+                      value={formData.conditions?.locationZone || ''}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        conditions: { ...prev.conditions, locationZone: e.target.value }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">بدون رسوم موقع</option>
+                      {rateCard?.locationZonesIQD && Object.entries(rateCard.locationZonesIQD).map(([key, amount]) => (
+                        <option key={key} value={key}>
+                          {key} (+{formatCurrency(amount, 'IQD')})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Creator Tier */}
@@ -345,9 +393,9 @@ export default function AdminPricingPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">بدون تخصص</option>
-                      <option value="T1">T1 - مبتدئ</option>
-                      <option value="T2">T2 - متوسط (+15%)</option>
-                      <option value="T3">T3 - خبير (+30%)</option>
+                      <option value="T1">{`T1 - مبتدئ (${tierPctLabel('T1')})`}</option>
+                      <option value="T2">{`T2 - متوسط (${tierPctLabel('T2')})`}</option>
+                      <option value="T3">{`T3 - خبير (${tierPctLabel('T3')})`}</option>
                     </select>
                   </div>
 

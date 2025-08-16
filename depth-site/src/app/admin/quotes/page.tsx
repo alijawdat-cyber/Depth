@@ -451,6 +451,69 @@ export default function AdminQuotesPage() {
                   </div>
                 </div>
 
+                {/* إعدادات متقدمة للسطر */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  {/* نوع المعالجة */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      نوع المعالجة
+                    </label>
+                    <select
+                      value={newQuote.lines?.[0]?.processing || 'raw_basic'}
+                      onChange={(e) => setNewQuote(prev => ({
+                        ...prev,
+                        lines: [{
+                          ...prev.lines![0],
+                          processing: e.target.value as 'raw_only' | 'raw_basic' | 'full_retouch'
+                        }]
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="raw_only">Raw Only</option>
+                      <option value="raw_basic">Raw + Basic</option>
+                      <option value="full_retouch">Full Retouch</option>
+                    </select>
+                  </div>
+
+                  {/* Rush */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Rush</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={newQuote.lines?.[0]?.conditions?.rush || false}
+                        onChange={(e) => setNewQuote(prev => ({
+                          ...prev,
+                          lines: [{
+                            ...prev.lines![0],
+                            conditions: { ...(prev.lines![0].conditions || {}), rush: e.target.checked }
+                          }]
+                        }))}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700">تسليم عاجل</span>
+                    </div>
+                  </div>
+
+                  {/* Location Zone */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">منطقة الموقع</label>
+                    <input
+                      type="text"
+                      value={newQuote.lines?.[0]?.conditions?.locationZone || ''}
+                      onChange={(e) => setNewQuote(prev => ({
+                        ...prev,
+                        lines: [{
+                          ...prev.lines![0],
+                          conditions: { ...(prev.lines![0].conditions || {}), locationZone: e.target.value }
+                        }]
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="مثال: baghdad_center"
+                    />
+                  </div>
+                </div>
+
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     ملاحظات إضافية

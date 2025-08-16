@@ -30,6 +30,12 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     description: 'نظرة عامة على النشاط والإحصائيات'
   },
   {
+    href: '/admin/catalog',
+    label: 'الكتالوج',
+    icon: Users, // سنستخدم Users مؤقتاً حتى نضيف Grid3x3
+    description: 'إدارة الفئات والمحاور والتصنيفات'
+  },
+  {
     href: '/admin/pricing',
     label: 'التسعير',
     icon: Calculator,
