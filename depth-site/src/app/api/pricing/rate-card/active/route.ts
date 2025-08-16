@@ -16,7 +16,7 @@ export async function GET() {
     const activeSnapshot = await adminDb
       .collection('rate_cards')
       .where('status', '==', 'active')
-      .orderBy('createdAt', 'desc')
+      // إزالة orderBy لتفادي الحاجة إلى فهرس مركّب؛ نفترض وجود وثيقة نشطة واحدة
       .limit(1)
       .get();
 

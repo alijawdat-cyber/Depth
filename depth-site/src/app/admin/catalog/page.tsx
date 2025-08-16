@@ -396,9 +396,9 @@ export default function AdminCatalogPage() {
           
           {state.viewMode === 'verticals' && (
             <Button onClick={() => openCreateForm('vertical')}>
-              <Plus size={16} />
+            <Plus size={16} />
               إضافة محور
-            </Button>
+          </Button>
           )}
         </div>
       </div>
@@ -491,14 +491,14 @@ export default function AdminCatalogPage() {
                 <p className="text-[var(--muted)] mt-1">الفئات الأساسية للخدمات</p>
               </div>
               <div className="overflow-auto max-h-[70vh] lg:max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
-                <table className="w-full">
+                <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم الإنجليزي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">عدد الفئات الفرعية</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الإجراءات</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">المعرف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم العربي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم الإنجليزي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden sm:table-cell">عدد الفئات الفرعية</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -509,12 +509,12 @@ export default function AdminCatalogPage() {
                       
                       return (
                         <tr key={category.id} className="border-b border-[var(--elev)] hover:bg-[var(--bg)]">
-                          <td className="p-4 text-sm text-[var(--text)] font-mono">{category.id}</td>
-                          <td className="p-4 text-sm text-[var(--text)] font-medium">{category.nameAr}</td>
-                          <td className="p-4 text-sm text-[var(--muted)]">{category.nameEn}</td>
-                          <td className="p-4 text-sm text-[var(--text)]">{subcategoryCount}</td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
+                          <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-mono truncate max-w-[60px] md:max-w-none">{category.id}</td>
+                          <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-medium truncate max-w-[80px] md:max-w-none">{category.nameAr}</td>
+                          <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] truncate max-w-[80px] md:max-w-none">{category.nameEn}</td>
+                          <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] hidden sm:table-cell">{subcategoryCount}</td>
+                          <td className="p-4 md:p-4 sm:p-2">
+                            <div className="flex items-center gap-1 md:gap-2">
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -523,9 +523,11 @@ export default function AdminCatalogPage() {
                                   viewMode: 'subcategories',
                                   selectedCategory: category.id 
                                 }))}
+                                className="text-xs md:text-sm p-1 md:p-2"
                               >
-                                <Eye size={14} />
-                                عرض الفئات الفرعية
+                                <Eye size={12} className="md:w-4 md:h-4" />
+                                <span className="hidden sm:inline">عرض الفئات الفرعية</span>
+                                <span className="sm:hidden">عرض</span>
                               </Button>
                             </div>
                           </td>
@@ -569,47 +571,48 @@ export default function AdminCatalogPage() {
                 </div>
               </div>
               <div className="overflow-auto max-h-[70vh] lg:max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
-                <table className="w-full">
+                <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم الإنجليزي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الفئة الرئيسية</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الوصف</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الإجراءات</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">المعرف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم العربي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم الإنجليزي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden md:table-cell">الفئة الرئيسية</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden md:table-cell">الوصف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredSubcategories.map((subcategory) => (
                       <tr key={subcategory.id} className="border-b border-[var(--elev)] hover:bg-[var(--bg)]">
-                        <td className="p-4 text-sm text-[var(--text)] font-mono">{subcategory.id}</td>
-                        <td className="p-4 text-sm text-[var(--text)] font-medium">{subcategory.nameAr}</td>
-                        <td className="p-4 text-sm text-[var(--muted)]">{subcategory.nameEn}</td>
-                        <td className="p-4 text-sm text-[var(--text)]">
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-mono truncate max-w-[60px] md:max-w-none">{subcategory.id}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-medium truncate max-w-[80px] md:max-w-none">{subcategory.nameAr}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] truncate max-w-[80px] md:max-w-none">{subcategory.nameEn}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] hidden md:table-cell">
                           {state.categories.find(c => c.id === subcategory.categoryId)?.nameAr}
                         </td>
-                        <td className="p-4 text-sm text-[var(--muted)] max-w-xs truncate">
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] max-w-xs truncate hidden md:table-cell">
                           {subcategory.desc || '-'}
                         </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-2">
+                        <td className="p-4 md:p-4 sm:p-2">
+                          <div className="flex items-center gap-1 md:gap-2">
                             <Button 
                               size="sm" 
                               variant="ghost"
                               onClick={() => openEditForm(subcategory, 'subcategory')}
+                              className="text-xs md:text-sm p-1 md:p-2"
                             >
-                              <Edit3 size={14} />
-                              تعديل
+                              <Edit3 size={12} className="md:w-4 md:h-4" />
+                              <span className="hidden sm:inline">تعديل</span>
                             </Button>
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)]"
+                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)] text-xs md:text-sm p-1 md:p-2"
                               onClick={() => openDeleteConfirm(subcategory, 'subcategory')}
                             >
-                              <Trash2 size={14} />
-                              حذف
+                              <Trash2 size={12} className="md:w-4 md:h-4" />
+                              <span className="hidden sm:inline">حذف</span>
                             </Button>
                           </div>
                         </td>
@@ -629,43 +632,44 @@ export default function AdminCatalogPage() {
                 <p className="text-[var(--muted)] mt-1">القطاعات والأسواق المستهدفة</p>
               </div>
               <div className="overflow-auto max-h-[70vh] lg:max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
-                <table className="w-full">
+                <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الاسم الإنجليزي</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">معامل التسعير</th>
-                      <th className="text-right p-4 font-medium text-[var(--text)]">الإجراءات</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">المعرف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم العربي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم الإنجليزي</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden sm:table-cell">معامل التسعير</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
                     {state.verticals.map((vertical) => (
                       <tr key={vertical.id} className="border-b border-[var(--elev)] hover:bg-[var(--bg)]">
-                        <td className="p-4 text-sm text-[var(--text)] font-mono">{vertical.id}</td>
-                        <td className="p-4 text-sm text-[var(--text)] font-medium">{vertical.nameAr}</td>
-                        <td className="p-4 text-sm text-[var(--muted)]">{vertical.nameEn}</td>
-                        <td className="p-4 text-sm text-[var(--text)]">
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-mono truncate max-w-[60px] md:max-w-none">{vertical.id}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] font-medium truncate max-w-[80px] md:max-w-none">{vertical.nameAr}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] truncate max-w-[80px] md:max-w-none">{vertical.nameEn}</td>
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] hidden sm:table-cell">
                           {vertical.modifierPct ? `${(vertical.modifierPct * 100).toFixed(1)}%` : '-'}
                         </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-2">
+                        <td className="p-4 md:p-4 sm:p-2">
+                          <div className="flex items-center gap-1 md:gap-2">
                             <Button 
                               size="sm" 
                               variant="ghost"
                               onClick={() => openEditForm(vertical, 'vertical')}
+                              className="text-xs md:text-sm p-1 md:p-2"
                             >
-                              <Edit3 size={14} />
-                              تعديل
+                              <Edit3 size={12} className="md:w-4 md:h-4" />
+                              <span className="hidden sm:inline">تعديل</span>
                             </Button>
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)]"
+                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)] text-xs md:text-sm p-1 md:p-2"
                               onClick={() => openDeleteConfirm(vertical, 'vertical')}
                             >
-                              <Trash2 size={14} />
-                              حذف
+                              <Trash2 size={12} className="md:w-4 md:h-4" />
+                              <span className="hidden sm:inline">حذف</span>
                             </Button>
                           </div>
                         </td>
@@ -1022,7 +1026,7 @@ export default function AdminCatalogPage() {
               >
                 إلغاء
               </Button>
-              <Button
+            <Button 
                 className="bg-[var(--danger)] text-white hover:bg-[var(--danger-hover)]"
                 onClick={handleDelete}
                 disabled={state.deleting}
@@ -1033,7 +1037,7 @@ export default function AdminCatalogPage() {
                   <Trash2 size={16} />
                 )}
                 {state.deleting ? 'جاري الحذف...' : 'حذف'}
-              </Button>
+            </Button>
             </div>
           </div>
         </div>

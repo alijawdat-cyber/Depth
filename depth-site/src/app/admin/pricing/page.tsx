@@ -122,7 +122,7 @@ export default function AdminPricingPage() {
         throw new Error('فشل في تحميل الفئات الفرعية');
       }
       const subcatData = await subcatResponse.json();
-      setSubcategories(subcatData.data || []);
+      setSubcategories(subcatData.items || subcatData.data || []);
 
       // تحميل المحاور
       const verticalResponse = await fetch('/api/catalog/verticals');
@@ -130,7 +130,7 @@ export default function AdminPricingPage() {
         throw new Error('فشل في تحميل المحاور');
       }
       const verticalData = await verticalResponse.json();
-      setVerticals(verticalData.data || []);
+      setVerticals(verticalData.items || verticalData.data || []);
 
     } catch (err) {
       console.error('خطأ في تحميل البيانات:', err);
@@ -263,8 +263,8 @@ export default function AdminPricingPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* نموذج الإدخال */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">بيانات العرض</h3>
+            <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6">
+              <h3 className="text-lg font-semibold text-[var(--text)] mb-6">بيانات العرض</h3>
               
               <div className="space-y-4">
                 {/* الفئة الفرعية */}
@@ -280,7 +280,7 @@ export default function AdminPricingPage() {
 
                 {/* الكمية */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     الكمية *
                   </label>
                   <input
@@ -288,14 +288,14 @@ export default function AdminPricingPage() {
                     min="1"
                     value={formData.qty}
                     onChange={(e) => setFormData(prev => ({ ...prev, qty: parseInt(e.target.value) || 1 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                     required
                   />
                 </div>
 
                 {/* المحور */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">المحور *</label>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">المحور *</label>
                   <Dropdown
                     value={formData.vertical}
                     onChange={(v) => setFormData(prev => ({ ...prev, vertical: String(v) }))}
@@ -306,7 +306,7 @@ export default function AdminPricingPage() {
 
                 {/* نوع المعالجة */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">نوع المعالجة *</label>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">نوع المعالجة *</label>
                   <Dropdown
                     value={formData.processing}
                     onChange={(v) => setFormData(prev => ({ ...prev, processing: v as 'raw_only' | 'raw_basic' | 'full_retouch' }))}
@@ -320,8 +320,8 @@ export default function AdminPricingPage() {
                 </div>
 
                 {/* إعدادات إضافية */}
-                <div className="space-y-3 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-700">إعدادات إضافية</h4>
+                <div className="space-y-3 pt-4 border-t border-[var(--elev)]">
+                  <h4 className="text-sm font-medium text-[var(--text)]">إعدادات إضافية</h4>
                   
                   {/* Rush */}
                   <div className="flex items-center">
@@ -333,16 +333,16 @@ export default function AdminPricingPage() {
                         ...prev,
                         conditions: { ...prev.conditions, rush: e.target.checked }
                       }))}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--accent-500)] focus:ring-[var(--accent-500)] border-[var(--border)] rounded"
                     />
-                    <label htmlFor="rush" className="ml-2 text-sm text-gray-700">
+                    <label htmlFor="rush" className="ml-2 text-sm text-[var(--text)]">
                       {`Rush (${rushPctLabel})`}
                     </label>
                   </div>
 
                   {/* Location Zone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">منطقة الموقع (Location Zone)</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1">منطقة الموقع (Location Zone)</label>
                     <Dropdown
                       value={formData.conditions?.locationZone || ''}
                       onChange={(v) => setFormData(prev => ({ ...prev, conditions: { ...prev.conditions, locationZone: String(v) } }))}
@@ -360,7 +360,7 @@ export default function AdminPricingPage() {
 
                   {/* Creator Tier */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">مستوى المبدع</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1">مستوى المبدع</label>
                     <Dropdown
                       value={formData.tier || ''}
                       onChange={(v) => setFormData(prev => ({ ...prev, tier: (v as 'T1' | 'T2' | 'T3') || undefined }))}
@@ -376,7 +376,7 @@ export default function AdminPricingPage() {
 
                   {/* التكلفة المقدرة */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1">
                       التكلفة المقدرة (د.ع)
                     </label>
                     <input
@@ -387,14 +387,14 @@ export default function AdminPricingPage() {
                         ...prev, 
                         estimatedCostIQD: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                       placeholder="للحساب الهامش"
                     />
                   </div>
 
                   {/* السعر المخصص */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--text)] mb-1">
                       السعر المخصص (د.ع)
                     </label>
                     <input
@@ -405,7 +405,7 @@ export default function AdminPricingPage() {
                         ...prev, 
                         overrideIQD: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                       placeholder="تخصص السعر"
                     />
                   </div>
@@ -423,22 +423,22 @@ export default function AdminPricingPage() {
             </div>
 
             {/* النتائج */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">نتائج التسعير</h3>
+            <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6">
+              <h3 className="text-lg font-semibold text-[var(--text)] mb-6">نتائج التسعير</h3>
               
               {result ? (
                 <div className="space-y-6">
                   {/* الإجماليات */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3">الإجماليات</h4>
+                  <div className="bg-[var(--bg)] rounded-[var(--radius)] p-4 border border-[var(--elev)]">
+                    <h4 className="font-medium text-[var(--text)] mb-3">الإجماليات</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">المبلغ بالدينار:</span>
+                        <span className="text-[var(--muted)]">المبلغ بالدينار:</span>
                         <span className="font-semibold">{formatCurrency(result.totals.iqd, 'IQD')}</span>
                       </div>
                       {result.totals.usd && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">المبلغ بالدولار:</span>
+                          <span className="text-[var(--muted)]">المبلغ بالدولار:</span>
                           <span className="font-semibold">{formatCurrency(result.totals.usd, 'USD')}</span>
                         </div>
                       )}
@@ -447,12 +447,12 @@ export default function AdminPricingPage() {
 
                   {/* تفاصيل الأسطر */}
                   {result.lines.map((line, index) => (
-                    <div key={index} className="border-t border-gray-200 pt-4">
+                    <div key={index} className="border-t border-[var(--elev)] pt-4">
                       <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm text-gray-600">السطر {index + 1}</span>
+                        <span className="text-sm text-[var(--muted)]">السطر {index + 1}</span>
                         <div className="text-right">
                           <div className="font-semibold">{formatCurrency(line.lineTotalIQD, 'IQD')}</div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[var(--muted)]">
                             {formatCurrency(line.unitPriceIQD, 'IQD')} × {line.qty}
                           </div>
                         </div>
@@ -464,9 +464,9 @@ export default function AdminPricingPage() {
                         const hasClinics = sub?.defaults?.complianceTags?.includes('clinics_policy');
                         if (!hasClinics) return null;
                         return (
-                          <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
-                            <h5 className="text-sm font-medium text-amber-800 mb-1">تنبيه امتثال (عيادات):</h5>
-                            <p className="text-sm text-amber-700">
+                          <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded p-3 mt-2">
+                            <h5 className="text-sm font-medium text-[var(--warning-fg)] mb-1">تنبيه امتثال (عيادات):</h5>
+                            <p className="text-sm text-[var(--warning-fg)]">
                               يتطلب هذا التسليم سياسة قبل/بعد للعيادات. الرجاء تضمين نص الإخلاء:
                               &quot;النتائج قد تختلف من شخص لآخر. المحتوى لأغراض توعوية فقط.&quot;
                             </p>
@@ -475,10 +475,10 @@ export default function AdminPricingPage() {
                       })()}
 
                       {line.warnings && line.warnings.length > 0 && (
-                        <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
-                          <h5 className="text-sm font-medium text-yellow-800 mb-1">تحذيرات:</h5>
+                        <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded p-3 mt-2">
+                          <h5 className="text-sm font-medium text-[var(--warning-fg)] mb-1">تحذيرات:</h5>
                           {line.warnings.map((warning, i) => (
-                            <p key={i} className="text-sm text-yellow-700">{warning}</p>
+                            <p key={i} className="text-sm text-[var(--warning-fg)]">{warning}</p>
                           ))}
                         </div>
                       )}
@@ -488,21 +488,21 @@ export default function AdminPricingPage() {
                   {/* فحص الهوامش */}
                   {result.guardrails && (
                     <div className={`rounded-lg p-4 ${
-                      result.guardrails.status === 'hard_stop' ? 'bg-red-50 border border-red-200' :
-                      result.guardrails.status === 'warn' ? 'bg-yellow-50 border border-yellow-200' :
-                      'bg-green-50 border border-green-200'
+                      result.guardrails.status === 'hard_stop' ? 'bg-[var(--danger-bg)] border border-[var(--danger-border)]' :
+                      result.guardrails.status === 'warn' ? 'bg-[var(--warning-bg)] border border-[var(--warning-border)]' :
+                      'bg-[var(--success-bg)] border border-[var(--success-border)]'
                     }`}>
                       <h4 className={`font-medium mb-2 ${
-                        result.guardrails.status === 'hard_stop' ? 'text-red-800' :
-                        result.guardrails.status === 'warn' ? 'text-yellow-800' :
-                        'text-green-800'
+                        result.guardrails.status === 'hard_stop' ? 'text-[var(--danger-fg)]' :
+                        result.guardrails.status === 'warn' ? 'text-[var(--warning-fg)]' :
+                        'text-[var(--success-fg)]'
                       }`}>
                         فحص الهوامش
                       </h4>
                       
                       {result.guardrails.margin !== undefined && (
                         <div className="mb-2">
-                          <span className="text-sm text-gray-600">الهامش: </span>
+                          <span className="text-sm text-[var(--muted)]">الهامش: </span>
                           <span className="font-semibold">
                             {(result.guardrails.margin * 100).toFixed(1)}%
                           </span>
@@ -511,9 +511,9 @@ export default function AdminPricingPage() {
                       
                       {result.guardrails.warnings && result.guardrails.warnings.map((warning, i) => (
                         <p key={i} className={`text-sm ${
-                          result.guardrails?.status === 'hard_stop' ? 'text-red-700' :
-                          result.guardrails?.status === 'warn' ? 'text-yellow-700' :
-                          'text-green-700'
+                          result.guardrails?.status === 'hard_stop' ? 'text-[var(--danger-fg)]' :
+                          result.guardrails?.status === 'warn' ? 'text-[var(--warning-fg)]' :
+                          'text-[var(--success-fg)]'
                         }`}>
                           {warning}
                         </p>
@@ -522,7 +522,7 @@ export default function AdminPricingPage() {
                   )}
                 </div>
               ) : (
-                <div className="text-center text-gray-500 py-8">
+                <div className="text-center text-[var(--muted)] py-8">
                   <p>أدخل بيانات العرض واضغط &quot;احسب التسعير&quot; لرؤية النتائج</p>
                 </div>
               )}
@@ -531,23 +531,23 @@ export default function AdminPricingPage() {
 
           {/* معلومات جدول الأسعار */}
           {rateCard && (
-            <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">معلومات جدول الأسعار النشط</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="mt-8 bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6">
+              <h3 className="text-lg font-semibold text-[var(--text)] mb-4">معلومات جدول الأسعار النشط</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-[var(--text)]">
                 <div>
-                  <span className="text-gray-600">الإصدار:</span>
+                  <span className="text-[var(--muted)]">الإصدار:</span>
                   <div className="font-semibold">{rateCard.versionId}</div>
                 </div>
                 <div>
-                  <span className="text-gray-600">الحالة:</span>
-                  <div className="font-semibold text-green-600">{rateCard.status}</div>
+                  <span className="text-[var(--muted)]">الحالة:</span>
+                  <div className="font-semibold text-[var(--text)]">{rateCard.status}</div>
                 </div>
                 <div>
-                  <span className="text-gray-600">ساري من:</span>
+                  <span className="text:[var(--muted)]">ساري من:</span>
                   <div className="font-semibold">{rateCard.effectiveFrom}</div>
                 </div>
                 <div>
-                  <span className="text-gray-600">العملة:</span>
+                  <span className="text-[var(--muted)]">العملة:</span>
                   <div className="font-semibold">{rateCard.currency}</div>
                 </div>
               </div>

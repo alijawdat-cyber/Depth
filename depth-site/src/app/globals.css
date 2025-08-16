@@ -335,4 +335,66 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
   }
 }
 
+/* Enhanced Hover Effects for Desktop */
+@media (min-width: 1024px) {
+  /* Dropdown hover effects */
+  button:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+  }
+  
+  /* Table hover effects */
+  tr:hover {
+    transform: translateX(2px);
+    transition: all 0.15s ease;
+  }
+  
+  /* Enhanced button interactions */
+  .hover\:bg-\[var\(--elev\)\]:hover {
+    background-color: var(--elev);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Mobile Table Optimizations */
+@media (max-width: 768px) {
+  /* Compact table styling */
+  table {
+    font-size: 12px;
+  }
+  
+  table th,
+  table td {
+    padding: 8px 6px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+  }
+  
+  /* Make action buttons smaller */
+  table td .flex.items-center.gap-2 button {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+  
+  table td .flex.items-center.gap-2 button svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  /* Hide less important columns on mobile */
+  table th:nth-child(4),
+  table td:nth-child(4),
+  table th:nth-child(5),
+  table td:nth-child(5) {
+    display: none;
+  }
+  
+  /* Adjust container padding */
+  .overflow-auto {
+    max-height: 60vh !important;
+  }
+}
+
 /* Marquee styles for react-fast-marquee */
