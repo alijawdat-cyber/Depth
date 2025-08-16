@@ -51,6 +51,11 @@
     "lastDate": null,
     "source": "admin"
   },
+  "processingLevels": {
+    "raw_only": -0.10,
+    "raw_basic": 0.00,
+    "full_retouch": [0.30, 0.40]
+  },
   "modifiers": {
     "processing": {
       "retouchMinPct": 0.30,
@@ -72,9 +77,22 @@
     "provinces_near": 25000,
     "provinces_far": 50000
   },
+  "verticals": [
+    "fashion",
+    "beauty",
+    "fnb",
+    "furniture",
+    "sports",
+    "b2b",
+    "restaurants",
+    "ecom",
+    "events",
+    "influencer"
+  ],
   "overrideCapPercent": 0.20,
   "guardrails": {
     "minMarginDefault": 0.50,
     "minMarginHardStop": 0.45
-  }
+  },
+  "roundingIQD": 250
 }

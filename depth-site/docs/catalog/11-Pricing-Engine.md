@@ -7,7 +7,7 @@
 4. Conditions: Rush٪، LocationZone (مبلغ ثابت IQD/جلسة)
 5. Creator Tier Modifier (٪)
 6. Override (ضمن `overrideCapPercent`) + فحص الهامش
-7. Rounding (تقريب افتراضي 250 د.ع)
+7. Rounding (يُقرأ من `rate-card.json → roundingIQD`, افتراضياً 250 د.ع)
 8. Taxes: لا يوجد حالياً (العراق)
 9. Speed Bonus: داخلي فقط للمبدع (لا يغيّر سعر العميل)
 
@@ -18,7 +18,7 @@
 - priceWithLocation = priceAfterRush + locationIQD
 - priceAfterTier = priceWithLocation * (1 + tierPct)
 - final = overrideAllowed ? overrideValue : priceAfterTier
-- finalRounded = round(final, 250)
+- finalRounded = round(final, roundingIQD)
 
 ## Guardrails
 - margin = (sellPriceIQD − estimatedCostIQD) / sellPriceIQD

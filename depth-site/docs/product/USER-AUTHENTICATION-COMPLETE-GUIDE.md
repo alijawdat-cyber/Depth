@@ -11,6 +11,8 @@
 
 هذا الدليل الشامل يغطي **نظام المصادقة المزدوج** (Email + Google OAuth) و**تحليل تدفق الاستخدام الكامل** لبوابة العملاء في Depth Agency. النظام مبني على NextAuth.js مع Firebase كقاعدة بيانات، ويوفر تجربة آمنة ومرنة للعملاء.
 
+> Pricing SSOT: العملة الأساسية IQD، وUSD للعرض التقديري فقط (FX يدوي محفوظ ضمن Snapshot). مصدر الأسعار: `docs/catalog/09-Seed/rate-card.json`.
+
 ### النتيجة العامة: ⚠️ يحتاج تحسين (توحيد المصدر: الكود)
 - ✅ **Email Authentication (Resend):** المُرسل الأساسي للإنتاج (SMTP اختياري)
 - ⚠️ **Google OAuth:** يحتاج إكمال إعداد الإنتاج (Authorized domains/URIs)

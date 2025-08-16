@@ -5,6 +5,13 @@
 - RAW + Basic Color (خام + تصحيح لوني أساسي): Base (0%).
 - Full Retouch (معالجة كاملة): تنظيف بشرة/إزالة عيوب/Composites. معامل موحّد: +30–40% (تُحدَّد الدقة في الـ Rate Card ويُشار لها فقط هنا).
 
+أكواد المعيارية (Canonical IDs) المستخدمة في النظام والـ JSON:
+- raw_only = −10%
+- raw_basic = 0%
+- full_retouch = +30–40%
+
+المصدر الوحيد للقيم النهائية: `docs/catalog/09-Seed/rate-card.json → processingLevels`.
+
 ### الظروف التنفيذية
 - Standard (زمن قياسي): ضمن SLA الافتراضي.
 - Rush (مستعجل): +35%.

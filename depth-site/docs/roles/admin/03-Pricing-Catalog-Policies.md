@@ -49,9 +49,9 @@
 مراجع: `docs/catalog/02-Processing-Levels.md`, `docs/catalog/06-Rate-Card-Strategy.md`.
 
 ## تسعير الأساس لكل فئة فرعية (Baseline IQD)
-- الصور (كل الـ subcategories): 5,000–15,000 د.ع أساساً.
-- الفيديو (مبدئياً):
-  - Try-On/Product/Transitions/Testimonial: 45,000–120,000 د.ع.
-  - BTS: 35,000–90,000 د.ع.
-  - Lead Gen Ad: 75,000–180,000 د.ع.
-- ملاحظة: يمكن تفصيل الفيديو حسب المدة (6–8s/15s/30–45s) في الـ Rate Card.
+- المرجع الوحيد للنطاقات هو `docs/catalog/09-Seed/rate-card.json → baseRangesIQD`.
+- الأرقام التالية إرشادية تاريخية فقط وقديمة؛ لا تُستخدم للحساب:
+  - الصور: راجع `baseRangesIQD` لكل subcategory.
+  - الفيديو: راجع `baseRangesIQD` لكل subcategory.
+  - التصميم: راجع `baseRangesIQD` لكل subcategory.
+  - ملاحظة: تفصيل الفيديو حسب المدة (6–8s/15s/30–45s) يُدار لاحقاً داخل الـ Rate Card.
