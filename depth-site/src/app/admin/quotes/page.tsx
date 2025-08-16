@@ -432,45 +432,45 @@ export default function AdminQuotesPage() {
 
           {/* نموذج إنشاء العرض */}
           {showCreateForm && (
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">إنشاء عرض جديد</h3>
+            <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 mb-6">
+              <h3 className="text-lg font-semibold text-[var(--text)] mb-4">إنشاء عرض جديد</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     بريد العميل *
                   </label>
                   <input
                     type="email"
                     value={newQuote.clientEmail || ''}
                     onChange={(e) => setNewQuote(prev => ({ ...prev, clientEmail: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                     placeholder="client@example.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     معرف المشروع (اختياري)
                   </label>
                   <input
                     type="text"
                     value={newQuote.projectId || ''}
                     onChange={(e) => setNewQuote(prev => ({ ...prev, projectId: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                     placeholder="PROJECT_001"
                   />
                 </div>
               </div>
 
               {/* تفاصيل السطر الأول */}
-              <div className="border-t border-gray-200 pt-4">
-                <h4 className="font-medium text-gray-900 mb-3">تفاصيل الخدمة</h4>
+              <div className="border-t border-[var(--elev)] pt-4">
+                <h4 className="font-medium text-[var(--text)] mb-3">تفاصيل الخدمة</h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">الفئة الفرعية *</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">الفئة الفرعية *</label>
                     <Dropdown
                       value={newQuote.lines?.[0]?.subcategoryId || ''}
                       onChange={(v) => setNewQuote(prev => ({
@@ -486,7 +486,7 @@ export default function AdminQuotesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">المحور *</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">المحور *</label>
                     <Dropdown
                       value={newQuote.lines?.[0]?.vertical || ''}
                       onChange={(v) => setNewQuote(prev => ({
@@ -502,7 +502,7 @@ export default function AdminQuotesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">
                       الكمية *
                     </label>
                     <input
@@ -516,7 +516,7 @@ export default function AdminQuotesPage() {
                           qty: parseInt(e.target.value) || 1
                         }]
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                       required
                     />
                   </div>
@@ -526,7 +526,7 @@ export default function AdminQuotesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                   {/* نوع المعالجة */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">نوع المعالجة</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">نوع المعالجة</label>
                     <Dropdown
                       value={newQuote.lines?.[0]?.processing || 'raw_basic'}
                       onChange={(v) => setNewQuote(prev => ({
@@ -547,7 +547,7 @@ export default function AdminQuotesPage() {
 
                   {/* Rush */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Rush</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">Rush</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -559,15 +559,15 @@ export default function AdminQuotesPage() {
                             conditions: { ...(prev.lines![0].conditions || {}), rush: e.target.checked }
                           }]
                         }))}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-[var(--accent-500)] focus:ring-[var(--accent-500)] border-[var(--border)] rounded"
                       />
-                      <span className="text-sm text-gray-700">تسليم عاجل</span>
+                      <span className="text-sm text-[var(--text)]">تسليم عاجل</span>
                     </div>
                   </div>
 
                   {/* Location Zone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">منطقة الموقع</label>
+                    <label className="block text-sm font-medium text-[var(--text)] mb-2">منطقة الموقع</label>
                     <input
                       type="text"
                       value={newQuote.lines?.[0]?.conditions?.locationZone || ''}
@@ -578,20 +578,20 @@ export default function AdminQuotesPage() {
                           conditions: { ...(prev.lines![0].conditions || {}), locationZone: e.target.value }
                         }]
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                       placeholder="مثال: baghdad_center"
                     />
                   </div>
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     ملاحظات إضافية
                   </label>
                   <textarea
                     value={newQuote.notes || ''}
                     onChange={(e) => setNewQuote(prev => ({ ...prev, notes: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
                     rows={3}
                     placeholder="أي ملاحظات أو متطلبات خاصة..."
                   />
@@ -616,9 +616,9 @@ export default function AdminQuotesPage() {
           )}
 
           {/* قائمة العروض */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] overflow-hidden">
+            <div className="px-6 py-4 border-b border-[var(--elev)]">
+              <h3 className="text-lg font-semibold text-[var(--text)]">
                 العروض ({quotes.length})
               </h3>
             </div>
@@ -629,45 +629,45 @@ export default function AdminQuotesPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[var(--elev)]">
+                  <thead className="bg-[var(--bg)]">
                     <tr>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                         العميل
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                         المبلغ
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                         الحالة
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                         تاريخ الإنشاء
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                         إجراءات
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-[var(--card)] divide-y divide-[var(--elev)]">
                     {quotes.map((quote) => (
-                      <tr key={quote.id} className="hover:bg-gray-50">
+                      <tr key={quote.id} className="hover:bg-[var(--bg)]">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[var(--text)]">
                             {quote.clientEmail}
                           </div>
                           {quote.projectId && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[var(--muted)]">
                               {quote.projectId}
                             </div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[var(--text)]">
                             {formatCurrency(quote.totals.iqd, 'IQD')}
                           </div>
                           {quote.totals.usd && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[var(--muted)]">
                               {formatCurrency(quote.totals.usd, 'USD')}
                             </div>
                           )}
@@ -677,7 +677,7 @@ export default function AdminQuotesPage() {
                             {getStatusText(quote.status)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--muted)]">
                           {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString('ar-IQ') : '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 space-x-reverse">
