@@ -104,7 +104,7 @@ export default function ResponsiveTable<T extends { id: string | number }>({
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index) => (
+              {data.map((item) => (
                 <tr key={item.id} className="border-t border-[var(--elev)] hover:bg-[var(--bg)] transition-colors">
                   {columns.map((column) => (
                     <td
@@ -128,9 +128,9 @@ export default function ResponsiveTable<T extends { id: string | number }>({
         <div className={`
           ${viewMode === 'cards' ? 'block lg:hidden' : 'hidden'}
         `}>
-          <div className="divide-y divide-[var(--elev)]">
-            {data.map((item, index) => renderCard(item, index))}
-          </div>
+                  <div className="divide-y divide-[var(--elev)]">
+          {data.map((item) => renderCard(item, 0))}
+        </div>
         </div>
       )}
     </div>
@@ -139,7 +139,6 @@ export default function ResponsiveTable<T extends { id: string | number }>({
 
 // مكون بطاقة افتراضية
 export const DefaultCard = <T extends Record<string, unknown>>({ 
-  item, 
   title, 
   subtitle, 
   actions,

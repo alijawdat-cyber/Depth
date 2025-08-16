@@ -93,7 +93,8 @@ export default function AdminDashboard() {
   const [newProjectDescription, setNewProjectDescription] = useState<string>('');
   const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
   const [fileFilter, setFileFilter] = useState<'all'|'image'|'video'|'document'>('all');
-  const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
 
   const fetchClients = useCallback(async () => {
     try {

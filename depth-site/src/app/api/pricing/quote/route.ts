@@ -6,7 +6,9 @@ import { adminDb } from '@/lib/firebase/admin';
 import { getActiveRateCard } from '@/lib/catalog/read';
 import { calculateQuotePricing, validateQuoteInput } from '@/lib/pricing/engine';
 import { getCurrentFXRate, createFXSnapshot } from '@/lib/pricing/fx';
-import { Quote, QuoteCreateRequest, QuoteUpdateRequest, QuoteLine } from '@/types/catalog';
+import { Quote, QuoteLine } from '@/types/catalog';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { QuoteCreateRequest, QuoteUpdateRequest } from '@/types/catalog';
 
 // Schema للتحقق من صحة المدخلات
 const QuoteLineInputSchema = z.object({

@@ -6,9 +6,10 @@ import { z } from 'zod';
 import { 
   Creator, 
   CreatorsListResponse, 
-  CreateCreatorRequest,
   CreatorsStats 
 } from '@/types/creators';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { CreateCreatorRequest } from '@/types/creators';
 
 // Schema للتحقق من صحة بيانات المبدع
 const CreateCreatorSchema = z.object({

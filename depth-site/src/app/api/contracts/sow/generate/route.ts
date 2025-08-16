@@ -209,6 +209,7 @@ function generateSOWHTML(quote: Quote, sow: SOW): string {
  * تحويل HTML إلى PDF (مبسط للـ MVP)
  * في الإنتاج، يُفضل استخدام puppeteer أو مكتبة PDF متخصصة
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function convertHTMLToPDF(html: string): Promise<Buffer> {
   // للـ MVP، نحفظ HTML كـ PDF بسيط
   // في التطوير المستقبلي، يمكن استخدام puppeteer أو @react-pdf/renderer

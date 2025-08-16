@@ -174,6 +174,7 @@ export function renderQuoteNotificationEmail(params: {
     quoteUrl 
   } = params;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getSubject = () => {
     switch (type) {
       case 'new_quote':

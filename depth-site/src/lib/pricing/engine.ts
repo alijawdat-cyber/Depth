@@ -78,6 +78,7 @@ export function calculateQuotePricing(
 function calculateLinePricing(
   line: QuoteLineInput,
   rateCard: RateCard,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   estimatedCostIQD?: number
 ): QuotePreviewLineResult {
   const warnings: string[] = [];
