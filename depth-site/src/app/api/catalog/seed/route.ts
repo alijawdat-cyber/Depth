@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
-import { seedCatalog, type SeedMode } from '@/lib/catalog/seed';
+// Note: lazy import inside handler to capture module-load errors in try/catch
 
 const BodySchema = z.object({ mode: z.enum(['full','rate-card','taxonomy']).optional().default('full') });
 
@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
 
     const raw = await req.json().catch(() => ({}));
     const { mode } = BodySchema.parse(raw);
-    const result = await seedCatalog(mode as SeedMode);
+    const mod = await import('@/lib/catalog/seed');
+    const result = await mod.seedCatalog(mode as (typeof mod)['SeedMode']);
     return NextResponse.json({ ok: true, requestId, ...result });
   } catch (error) {
     console.error('[catalog.seed] error', { requestId, error });
