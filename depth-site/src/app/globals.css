@@ -295,4 +295,44 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
   transform: scale(1.02);
 }
 
+/* Enhanced Scrolling for Desktop */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar Styles for Better Desktop Experience */
+@media (min-width: 1024px) {
+  .overflow-auto::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 4px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background: var(--accent-500);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-600);
+  }
+  
+  .overflow-auto::-webkit-scrollbar-corner {
+    background: var(--bg);
+  }
+}
+
+/* Firefox Scrollbar */
+@supports (scrollbar-width: thin) {
+  .overflow-auto {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-500) var(--bg);
+  }
+}
+
 /* Marquee styles for react-fast-marquee */
