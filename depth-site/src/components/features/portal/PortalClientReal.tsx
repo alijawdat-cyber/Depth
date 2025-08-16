@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { cloudflareImageUrl } from "@/lib/cloudflare-public";
 
 const CF_HASH = process.env.NEXT_PUBLIC_CF_IMAGES_ACCOUNT_HASH || '';
@@ -39,6 +40,7 @@ import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
 import { StateLoading, StateError, StateEmpty, StatCardSkeleton, FileCardSkeleton } from "@/components/ui/States";
 import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
 import NotificationBell from "@/components/ui/NotificationBell";
+import { BRAND } from "@/lib/constants/brand";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
 
@@ -277,6 +279,10 @@ export default function PortalClientReal() {
         </div>
         
         <div className="relative flex items-center justify-between">
+          {/* Center brand logo linking to public site */}
+          <Link href="https://depth-agency.com/" prefetch={false} className="absolute left-1/2 -translate-x-1/2 inline-flex items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
+            <Image src={BRAND.wordmark} alt="Depth" width={120} height={24} priority />
+          </Link>
           <div className="flex items-center gap-4">
             <div className="bg-[var(--neutral-0)]/10 p-3 rounded-full">
               <User size={24} className="text-[var(--text)]" />

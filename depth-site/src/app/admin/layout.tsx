@@ -7,6 +7,7 @@
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { 
   AlertCircle, 
@@ -29,6 +30,7 @@ import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { ToastContainer, useToast } from "@/components/ui/Toast";
+import { BRAND } from "@/lib/constants/brand";
 
 // تعريف عناصر التنقل الإداري المتقدم
 interface AdminNavItem {
@@ -351,7 +353,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* الشريط العلوي */}
           <header className="bg-[var(--card)] border-b border-[var(--elev)] px-6 py-4">
-            <div className="flex items-center justify-between">
+            <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setSidebarOpen(true)}
@@ -375,6 +377,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   )}
                 </div>
               </div>
+
+              {/* شعار في الوسط يعيد للموقع العام */}
+              <Link href="https://depth-agency.com/" prefetch={false} className="absolute left-1/2 -translate-x-1/2 inline-flex items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
+                <Image src={BRAND.wordmark} alt="Depth" width={120} height={24} priority />
+              </Link>
 
               <div className="flex items-center gap-4">
                 {/* زر الإشعارات */}

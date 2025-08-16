@@ -1,11 +1,11 @@
 // NextAuth Configuration
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import EmailProvider from 'next-auth/providers/email';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { FirestoreAdapter } from '@auth/firebase-adapter';
 import { cert } from 'firebase-admin/app';
-import { resend } from '@/lib/email/resend';
 import { adminDb } from '@/lib/firebase/admin';
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   adapter: FirestoreAdapter({
@@ -16,6 +16,75 @@ export const authOptions: NextAuthOptions = {
     }),
   }),
   providers: [
+    // Credentials Provider for Email + Password
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const email = credentials.email.toLowerCase();
+        
+        try {
+          // البحث في جميع المجموعات
+          const collections = ['clients', 'creators', 'employees'];
+          
+          for (const collectionName of collections) {
+            const userQuery = await adminDb
+              .collection(collectionName)
+              .where('email', '==', email)
+              .limit(1)
+              .get();
+
+            if (!userQuery.empty) {
+              const userDoc = userQuery.docs[0];
+              const userData = userDoc.data();
+              
+              // التحقق من كلمة المرور
+              if (userData.password && await bcrypt.compare(credentials.password, userData.password)) {
+                return {
+                  id: userDoc.id,
+                  email: userData.email,
+                  name: userData.name || userData.fullName,
+                  role: userData.role || collectionName.slice(0, -1) // clients -> client
+                };
+              }
+            }
+          }
+          
+          // البحث في creators collection للبريد في contact.email
+          const creatorQuery = await adminDb
+            .collection('creators')
+            .where('contact.email', '==', email)
+            .limit(1)
+            .get();
+
+          if (!creatorQuery.empty) {
+            const creatorDoc = creatorQuery.docs[0];
+            const creatorData = creatorDoc.data();
+            
+            if (creatorData.password && await bcrypt.compare(credentials.password, creatorData.password)) {
+              return {
+                id: creatorDoc.id,
+                email: creatorData.contact.email,
+                name: creatorData.fullName,
+                role: 'creator'
+              };
+            }
+          }
+        } catch (error) {
+          console.error('[auth.credentials] Error:', error);
+        }
+        
+        return null;
+      }
+    }),
+    
     // Google provider is added only when valid credentials exist
     ...(process.env.GOOGLE_CLIENT_ID &&
     process.env.GOOGLE_CLIENT_SECRET &&
@@ -27,51 +96,6 @@ export const authOptions: NextAuthOptions = {
           }),
         ]
       : []),
-    // Magic Link via Resend (no SMTP server required)
-    EmailProvider({
-      from: process.env.EMAIL_FROM,
-      async sendVerificationRequest({ identifier, url, provider }) {
-        const brandName = 'Depth Portal';
-        const signInUrl = url;
-        const html = `
-          <div dir="rtl" lang="ar" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,'Dubai',sans-serif;background:#f7fafc;padding:24px">
-            <table role="presentation" width="100%" style="max-width:560px;margin:auto;background:#ffffff;border:1px solid #e6eef5;border-radius:12px;overflow:hidden">
-              <tr>
-                <td style="padding:24px 24px 8px;color:#0f172a;font-size:18px;font-weight:700">${brandName}</td>
-              </tr>
-              <tr>
-                <td style="padding:0 24px 8px;color:#475569;font-size:14px">الرابط صالح لمدة 15 دقيقة</td>
-              </tr>
-              <tr>
-                <td style="padding:16px 24px;color:#0f172a;font-size:16px;line-height:1.7">
-                  لإكمال تسجيل الدخول إلى البوابة، يُرجى الضغط على الزر التالي.
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:8px 24px 24px">
-                  <a href="${signInUrl}" style="display:inline-block;background:#6C4CF5;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600">تسجيل الدخول</a>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:0 24px 24px;color:#475569;font-size:13px;line-height:1.7">
-                  إذا لم يعمل الزر، استخدم الرابط التالي خلال مدة الصلاحية:
-                  <div style="margin-top:6px;word-break:break-all"><a href="${signInUrl}" style="color:#2563eb;text-decoration:underline">${signInUrl}</a></div>
-                </td>
-              </tr>
-            </table>
-            <div style="max-width:560px;margin:12px auto 0;text-align:center;color:#64748b;font-size:12px">
-              إذا لم تطلب هذا البريد، يُرجى تجاهله.
-            </div>
-          </div>`;
-
-        await resend.emails.send({
-          from: provider.from ?? 'Depth <hello@depth-agency.com>',
-          to: [identifier],
-          subject: 'رابط تسجيل الدخول - Depth Portal',
-          html,
-        });
-      },
-    }),
   ],
   session: {
     strategy: 'jwt',
@@ -80,35 +104,27 @@ export const authOptions: NextAuthOptions = {
     updateAge: 60 * 60 * 24,   // حدّث التوكن كل 24 ساعة أثناء الاستخدام
   },
   pages: {
-    signIn: '/portal/auth/signin',
-    error: '/portal/auth/error',
+    signIn: '/auth/signin',
+    error: '/auth/error',
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       // Set role on first sign-in
       if (user) {
         token.userId = user.id;
-        const emailFirst = (user.email || '').toLowerCase();
-        // Derive role from env ADMIN_EMAILS (comma-separated), fallback to default admin
-        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
-          .split(',')
-          .map(e => e.trim().toLowerCase())
-          .filter(Boolean);
-        token.role = adminList.includes(emailFirst) ? 'admin' : 'client';
+        token.role = (user as any).role || await determineUserRole(user.email || '');
       }
+      
       // Ensure role is derived even when `user` is undefined (subsequent JWT calls)
       if (!token.role && token.email) {
-        const emailFallback = String(token.email).toLowerCase();
-        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
-          .split(',')
-          .map(e => e.trim().toLowerCase())
-          .filter(Boolean);
-        token.role = adminList.includes(emailFallback) ? 'admin' : 'client';
+        token.role = await determineUserRole(String(token.email));
       }
+      
       // allow role update from client if needed
       if (trigger === 'update' && session?.role) {
         token.role = session.role as string;
       }
+      
       return token;
     },
     async session({ session, token }) {
@@ -123,45 +139,51 @@ export const authOptions: NextAuthOptions = {
         const email = String(user?.email || '').toLowerCase();
         const provider = account?.provider || 'unknown';
         console.log('[auth.signIn] start', { email, provider });
+        
         if (!email) return true;
-        const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
-          .split(',')
-          .map(e => e.trim().toLowerCase())
-          .filter(Boolean);
-        if (adminList.includes(email)) return true;
-        // Ensure client exists (single source of truth)
-        const snap = await adminDb
-          .collection('clients')
-          .where('email', '==', email)
-          .limit(1)
-          .get();
-        if (snap.empty) {
-          await adminDb.collection('clients').add({
-            email,
-            name: user?.name || '',
-            phone: '',
-            company: '',
-            status: 'pending',
-            role: 'client',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
+        
+        // للمصادقة بـ Google، تحقق من وجود المستخدم في النظام
+        if (provider === 'google') {
+          const userRole = await determineUserRole(email);
+          
+          // إذا لم يكن موجود في أي مجموعة، أنشئ عميل جديد
+          if (userRole === 'client') {
+            const clientSnap = await adminDb
+              .collection('clients')
+              .where('email', '==', email)
+              .limit(1)
+              .get();
+              
+            if (clientSnap.empty) {
+              await adminDb.collection('clients').add({
+                email,
+                name: user?.name || '',
+                phone: '',
+                company: '',
+                status: 'pending',
+                role: 'client',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              });
+            }
+          }
         }
+        
+        return true;
       } catch (e) {
         console.error('[auth.signIn] provisioning error', e);
+        return true; // لا نفشل تسجيل الدخول بسبب أخطاء provisioning
       }
-      return true;
     },
     async redirect({ url, baseUrl }) {
       try {
-        // If absolute url to same origin, keep
-        const isInternal = url.startsWith(baseUrl);
-        // For post-auth default, route admin to /admin, others to /portal
-        if (isInternal && (url === baseUrl || url === `${baseUrl}/`)) {
-          // We cannot read token here directly; rely on default route for admin via callbackUrl
-          return `${baseUrl}/portal`;
+        // If absolute url to same origin, keep it
+        if (url.startsWith(baseUrl)) {
+          return url;
         }
-        return url;
+        
+        // For external URLs, redirect to portal by default
+        return `${baseUrl}/portal`;
       } catch {
         return `${baseUrl}/portal`;
       }
@@ -169,3 +191,49 @@ export const authOptions: NextAuthOptions = {
   },
   events: {},
 };
+
+// دالة تحديد دور المستخدم بناءً على البريد الإلكتروني
+async function determineUserRole(email: string): Promise<string> {
+  if (!email) return 'client';
+  
+  const emailLower = email.toLowerCase();
+  
+  try {
+    // 1. تحقق من الأدمن
+    const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (adminList.includes(emailLower)) return 'admin';
+    
+    // 2. تحقق من المبدعين
+    const creatorSnap = await adminDb
+      .collection('creators')
+      .where('contact.email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!creatorSnap.empty) return 'creator';
+    
+    // 3. تحقق من الموظفين
+    const employeeSnap = await adminDb
+      .collection('employees')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!employeeSnap.empty) return 'employee';
+    
+    // 4. تحقق من العملاء
+    const clientSnap = await adminDb
+      .collection('clients')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!clientSnap.empty) return 'client';
+    
+    // 5. افتراضي: عميل جديد
+    return 'client';
+  } catch (error) {
+    console.error('[determineUserRole] Error:', error);
+    return 'client';
+  }
+}

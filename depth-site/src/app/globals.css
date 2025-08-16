@@ -334,34 +334,52 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
 
 /* Custom Scrollbar Styles for Better Desktop Experience */
 @media (min-width: 1024px) {
-  .overflow-auto::-webkit-scrollbar {
+  .overflow-auto::-webkit-scrollbar,
+  .scroll-xy::-webkit-scrollbar,
+  .scroll-y::-webkit-scrollbar,
+  .scroll-x-only::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   
-  .overflow-auto::-webkit-scrollbar-track {
+  .overflow-auto::-webkit-scrollbar-track,
+  .scroll-xy::-webkit-scrollbar-track,
+  .scroll-y::-webkit-scrollbar-track,
+  .scroll-x-only::-webkit-scrollbar-track {
     background: var(--bg);
     border-radius: 4px;
   }
   
-  .overflow-auto::-webkit-scrollbar-thumb {
+  .overflow-auto::-webkit-scrollbar-thumb,
+  .scroll-xy::-webkit-scrollbar-thumb,
+  .scroll-y::-webkit-scrollbar-thumb,
+  .scroll-x-only::-webkit-scrollbar-thumb {
     background: var(--accent-500);
     border-radius: 4px;
     transition: background-color 0.2s ease;
   }
   
-  .overflow-auto::-webkit-scrollbar-thumb:hover {
+  .overflow-auto::-webkit-scrollbar-thumb:hover,
+  .scroll-xy::-webkit-scrollbar-thumb:hover,
+  .scroll-y::-webkit-scrollbar-thumb:hover,
+  .scroll-x-only::-webkit-scrollbar-thumb:hover {
     background: var(--accent-600);
   }
   
-  .overflow-auto::-webkit-scrollbar-corner {
+  .overflow-auto::-webkit-scrollbar-corner,
+  .scroll-xy::-webkit-scrollbar-corner,
+  .scroll-y::-webkit-scrollbar-corner,
+  .scroll-x-only::-webkit-scrollbar-corner {
     background: var(--bg);
   }
 }
 
 /* Firefox Scrollbar */
 @supports (scrollbar-width: thin) {
-  .overflow-auto {
+  .overflow-auto,
+  .scroll-xy,
+  .scroll-y,
+  .scroll-x-only {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-500) var(--bg);
   }
@@ -423,9 +441,11 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
     display: none;
   }
   
-  /* Adjust container padding */
-  .overflow-auto {
-    max-height: 60vh !important;
+  /* Adjust container height for small screens */
+  .overflow-auto,
+  .scroll-xy,
+  .scroll-y {
+    max-height: min(60vh, var(--scroll-max, 60vh)) !important;
   }
 }
 

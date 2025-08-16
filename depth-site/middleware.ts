@@ -10,7 +10,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/public') ||
-    pathname === '/favicon.ico'
+    pathname === '/favicon.ico' ||
+    pathname.startsWith('/join') ||
+    pathname.startsWith('/auth')
   ) {
     return NextResponse.next();
   }
@@ -18,30 +20,65 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
 
   const isApi = pathname.startsWith('/api/');
-  const isAdminArea = pathname.startsWith('/admin') || pathname.startsWith('/api/portal/admin');
+  
+  // تحديد المناطق المحمية
+  const isAdminArea = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+  const isCreatorArea = pathname.startsWith('/creators') || pathname.startsWith('/api/creators');
+  const isEmployeeArea = pathname.startsWith('/employees') || pathname.startsWith('/api/employees');
   const isPortalAuth = pathname.startsWith('/portal/auth');
   const isPortalAbout = pathname.startsWith('/portal/about');
   const isPortalArea = pathname.startsWith('/portal') && !isPortalAuth && !isPortalAbout;
 
-  // Admin protection: requires admin role
+  // حماية منطقة الأدمن: يتطلب دور admin
   if (isAdminArea) {
     if (!token || token.role !== 'admin') {
       if (isApi) {
         return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
       }
       const url = request.nextUrl.clone();
-      url.pathname = '/portal/auth/signin';
+      url.pathname = '/auth/signin';
       url.searchParams.set('from', 'admin');
       return NextResponse.redirect(url);
     }
     return NextResponse.next();
   }
 
-  // Portal protection: requires any authenticated user (client or admin)
-  if (isPortalArea) {
-    if (!token) {
+  // حماية منطقة المبدعين: يتطلب دور creator
+  if (isCreatorArea) {
+    if (!token || token.role !== 'creator') {
+      if (isApi) {
+        return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+      }
       const url = request.nextUrl.clone();
-      url.pathname = '/portal/auth/signin';
+      url.pathname = '/auth/signin';
+      url.searchParams.set('from', 'creators');
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // حماية منطقة الموظفين: يتطلب دور employee
+  if (isEmployeeArea) {
+    if (!token || token.role !== 'employee') {
+      if (isApi) {
+        return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+      }
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/signin';
+      url.searchParams.set('from', 'employees');
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // حماية بوابة العملاء: يتطلب دور client أو admin
+  if (isPortalArea) {
+    if (!token || (token.role !== 'client' && token.role !== 'admin')) {
+      if (isApi) {
+        return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+      }
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/signin';
       url.searchParams.set('from', 'portal');
       return NextResponse.redirect(url);
     }
@@ -53,11 +90,24 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin',
-    '/api/portal/admin/:path*',
-    '/portal',
-    '/portal/profile',
-    '/portal/(?!auth|about)(.*)',
+    // Admin routes
+    '/admin/:path*',
+    '/api/admin/:path*',
+    
+    // Creator routes
+    '/creators/:path*',
+    '/api/creators/:path*',
+    
+    // Employee routes
+    '/employees/:path*',
+    '/api/employees/:path*',
+    
+    // Client portal routes
+    '/portal/:path*',
+    '/api/portal/:path*',
+    
+    // Exclude auth and public routes
+    '/((?!api/auth|_next|favicon.ico|join|auth).*)',
   ],
 };
 

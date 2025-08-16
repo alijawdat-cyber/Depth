@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import bcrypt from 'bcryptjs';
 
-// POST /api/creators/signup
-// تسجيل مبدع جديد
+// POST /api/clients/signup
+// تسجيل عميل جديد
 export async function POST(req: NextRequest) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   
   try {
     const body = await req.json();
-    const { fullName, email, phone, password, role, city, canTravel } = body;
+    const { fullName, company, email, phone, password } = body;
 
     // Validation
     if (!fullName?.trim()) {
@@ -36,22 +36,6 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!city?.trim()) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'المدينة مطلوبة', 
-        requestId 
-      }, { status: 400 });
-    }
-
-    if (!role || !['photographer', 'videographer', 'designer', 'producer'].includes(role)) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'التخصص غير صحيح', 
-        requestId 
-      }, { status: 400 });
-    }
-
     if (!password || password.length < 8) {
       return NextResponse.json({ 
         success: false, 
@@ -61,13 +45,13 @@ export async function POST(req: NextRequest) {
     }
 
     // التحقق من عدم وجود بريد مكرر
-    const existingCreatorQuery = await adminDb
-      .collection('creators')
+    const existingClientQuery = await adminDb
+      .collection('clients')
       .where('email', '==', email.toLowerCase())
       .limit(1)
       .get();
 
-    if (!existingCreatorQuery.empty) {
+    if (!existingClientQuery.empty) {
       return NextResponse.json({ 
         success: false, 
         error: 'البريد الإلكتروني مستخدم مسبقاً', 
@@ -78,28 +62,26 @@ export async function POST(req: NextRequest) {
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // إنشاء بيانات المبدع
+    // إنشاء بيانات العميل
     const now = new Date().toISOString();
-    const creatorData = {
+    const clientData = {
       // معلومات أساسية
-      fullName: fullName.trim(),
+      name: fullName.trim(),
+      company: company?.trim() || '',
       email: email.toLowerCase().trim(),
       phone: phone.trim(),
-      role: role,
-      city: city.trim(),
-      canTravel: canTravel || false,
       
       // كلمة المرور المشفرة
       password: hashedPassword,
       
-      // حالة المبدع
-      status: 'pending', // في انتظار إكمال النموذج
+      // حالة العميل
+      status: 'pending', // في انتظار الموافقة
+      role: 'client',
       
       // بيانات النظام
       createdAt: now,
       updatedAt: now,
       lastLoginAt: null,
-      intakeFormCompleted: false,
       
       // audit
       createdBy: 'self-registration',
@@ -107,19 +89,18 @@ export async function POST(req: NextRequest) {
     };
 
     // حفظ في قاعدة البيانات
-    const docRef = await adminDb.collection('creators').add(creatorData);
+    const docRef = await adminDb.collection('clients').add(clientData);
 
     // تسجيل العملية في audit log
     await adminDb.collection('audit_log').add({
-      action: 'creator_registration',
-      entityType: 'creator',
+      action: 'client_registration',
+      entityType: 'client',
       entityId: docRef.id,
       userId: email,
       timestamp: now,
       details: {
         fullName,
-        role,
-        city,
+        company,
         source: 'web-signup'
       }
     });
@@ -129,24 +110,24 @@ export async function POST(req: NextRequest) {
       await adminDb.collection('users').add({
         name: fullName.trim(),
         email: email.toLowerCase().trim(),
-        role: 'creator',
-        creatorId: docRef.id,
+        role: 'client',
+        clientId: docRef.id,
         createdAt: now
       });
     } catch (error) {
-      console.warn('[creator.signup] Failed to create user record:', error);
+      console.warn('[client.signup] Failed to create user record:', error);
       // لا نفشل التسجيل إذا فشل إنشاء سجل المستخدم
     }
 
     return NextResponse.json({
       success: true,
-      message: 'تم إنشاء حساب المبدع بنجاح',
-      creatorId: docRef.id,
+      message: 'تم إنشاء حساب العميل بنجاح',
+      clientId: docRef.id,
       requestId
     }, { status: 201 });
 
   } catch (error) {
-    console.error('[creator.signup] Error:', error);
+    console.error('[client.signup] Error:', error);
     return NextResponse.json({
       success: false,
       error: 'حدث خطأ في الخادم',

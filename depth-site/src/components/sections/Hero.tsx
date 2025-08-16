@@ -50,11 +50,11 @@ export default function Hero() {
             >
               احجز جلسة
             </a>
-            <Link href="#packages" className={clsx(buttonStyles({ variant: "secondary" }))}>
-              اطلب عرض
+            <Link href="/join" className={clsx(buttonStyles({ variant: "secondary" }))}>
+              انضم إلينا
             </Link>
-            <Link href="/portal/auth/signup" className={clsx(buttonStyles({ variant: "ghost" }))}>
-              انضم كعميل
+            <Link href="/auth/signin" className={clsx(buttonStyles({ variant: "ghost" }))}>
+              تسجيل الدخول
             </Link>
           </motion.div>
         </div>
