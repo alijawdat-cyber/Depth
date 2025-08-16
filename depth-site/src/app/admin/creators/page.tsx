@@ -547,7 +547,7 @@ export default function AdminCreatorsPage() {
       {/* نموذج إضافة مبدع */}
       {state.showCreateForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-[var(--text)] mb-6">إضافة مبدع جديد</h3>
             
             <div className="space-y-6">

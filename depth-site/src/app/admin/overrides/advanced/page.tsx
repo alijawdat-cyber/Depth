@@ -520,7 +520,7 @@ export default function AdvancedOverridesPage() {
       {/* Create Request Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--card)] rounded-[var(--radius-lg)] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-[var(--text)] mb-4">
               طلب تعديل سعر جديد
             </h3>
@@ -651,7 +651,7 @@ export default function AdvancedOverridesPage() {
       {/* Request Details Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--card)] rounded-[var(--radius-lg)] p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-[var(--text)]">
                 تفاصيل طلب التعديل: {selectedRequest.quoteId}

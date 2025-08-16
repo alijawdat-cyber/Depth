@@ -2,13 +2,14 @@
 
 // صفحة إدارة الكتالوج - الفئات والمحاور والتصنيفات
 // الغرض: توفير واجهة إدارية شاملة لإدارة كتالوج الخدمات والفئات
-// المرحلة 1: عرض البيانات الحالية مع إمكانية التحديث والمعاينة
+// تحديث: عمليات CRUD كاملة مع نماذج تفاعلية
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import Dropdown from '@/components/ui/Dropdown';
 import Loader from '@/components/loaders/Loader';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   RefreshCw, 
   Plus, 
@@ -19,7 +20,9 @@ import {
   Tag,
   Settings,
   AlertCircle,
-  Package
+  Package,
+  Save,
+  X,
 } from 'lucide-react';
 import { Category, Subcategory, Vertical } from '@/types/catalog';
 
@@ -28,6 +31,16 @@ interface CatalogStats {
   totalSubcategories: number;
   totalVerticals: number;
   lastUpdated: string;
+}
+
+interface FormData {
+  id: string;
+  categoryId?: string;
+  nameAr: string;
+  nameEn: string;
+  desc?: string;
+  priceRangeKey?: string;
+  modifierPct?: number;
 }
 
 interface CatalogPageState {
@@ -39,8 +52,18 @@ interface CatalogPageState {
   error: string | null;
   selectedCategory: string;
   viewMode: 'overview' | 'categories' | 'subcategories' | 'verticals';
+  
+  // نماذج وحوارات
   showCreateForm: boolean;
-  editingItem: Subcategory | Vertical | null;
+  showEditForm: boolean;
+  showDeleteConfirm: boolean;
+  formType: 'subcategory' | 'vertical' | null;
+  formData: FormData;
+  itemToDelete: (Subcategory | Vertical) & { type: 'subcategory' | 'vertical' } | null;
+  
+  // حالات العمليات
+  submitting: boolean;
+  deleting: boolean;
 }
 
 export default function AdminCatalogPage() {
@@ -54,20 +77,32 @@ export default function AdminCatalogPage() {
     error: null,
     selectedCategory: 'all',
     viewMode: 'overview',
+    
+    // نماذج وحوارات
     showCreateForm: false,
-    editingItem: null
+    showEditForm: false,
+    showDeleteConfirm: false,
+    formType: null,
+    formData: {
+      id: '',
+      nameAr: '',
+      nameEn: '',
+      desc: '',
+      categoryId: 'photo',
+      priceRangeKey: '',
+      modifierPct: 0
+    },
+    itemToDelete: null,
+    
+    // حالات العمليات
+    submitting: false,
+    deleting: false
   });
 
   // التحقق من الجلسة والدور
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'admin';
 
-  useEffect(() => {
-    if (status === 'authenticated' && isAdmin) {
-      loadCatalogData();
-    }
-  }, [status, isAdmin]);
-
-  const loadCatalogData = async () => {
+  const loadCatalogData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -129,7 +164,166 @@ export default function AdminCatalogPage() {
         loading: false
       }));
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (status === 'authenticated' && isAdmin) {
+      loadCatalogData();
+    }
+  }, [status, isAdmin, loadCatalogData]);
+
+  // دالة لفتح نموذج الإنشاء
+  const openCreateForm = useCallback((type: 'subcategory' | 'vertical') => {
+    setState(prev => ({
+      ...prev,
+      showCreateForm: true,
+      formType: type,
+      formData: {
+        id: '',
+        nameAr: '',
+        nameEn: '',
+        desc: '',
+        categoryId: 'photo',
+        priceRangeKey: '',
+        modifierPct: 0
+      }
+    }));
+  }, []);
+
+  // دالة لفتح نموذج التعديل
+  const openEditForm = useCallback((item: Subcategory | Vertical, type: 'subcategory' | 'vertical') => {
+    setState(prev => ({
+      ...prev,
+      showEditForm: true,
+      formType: type,
+      formData: {
+        id: item.id,
+        nameAr: item.nameAr,
+        nameEn: item.nameEn || '',
+        desc: 'desc' in item ? item.desc || '' : '',
+        categoryId: 'categoryId' in item ? item.categoryId : undefined,
+        priceRangeKey: 'priceRangeKey' in item ? item.priceRangeKey || '' : '',
+        modifierPct: 'modifierPct' in item ? item.modifierPct || 0 : 0
+      }
+    }));
+  }, []);
+
+  // دالة لفتح تأكيد الحذف
+  const openDeleteConfirm = useCallback((item: Subcategory | Vertical, type: 'subcategory' | 'vertical') => {
+    setState(prev => ({
+      ...prev,
+      showDeleteConfirm: true,
+      itemToDelete: { ...item, type }
+    }));
+  }, []);
+
+  // دالة لإغلاق جميع النماذج
+  const closeAllForms = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      showCreateForm: false,
+      showEditForm: false,
+      showDeleteConfirm: false,
+      formType: null,
+      itemToDelete: null,
+      submitting: false,
+      deleting: false
+    }));
+  }, []);
+
+  // دالة لحفظ العنصر (إنشاء أو تعديل)
+  const handleSave = useCallback(async () => {
+    if (!state.formType) return;
+
+    try {
+      setState(prev => ({ ...prev, submitting: true, error: null }));
+
+      const endpoint = state.formType === 'subcategory' 
+        ? '/api/catalog/subcategories' 
+        : '/api/catalog/verticals';
+
+      const method = state.showEditForm ? 'PUT' : 'POST';
+      const url = state.showEditForm 
+        ? `${endpoint}/${state.formData.id}`
+        : endpoint;
+
+      // تحضير البيانات حسب النوع
+      const requestData = state.formType === 'subcategory' 
+        ? {
+            id: state.formData.id,
+            categoryId: state.formData.categoryId,
+            nameAr: state.formData.nameAr,
+            nameEn: state.formData.nameEn,
+            desc: state.formData.desc,
+            priceRangeKey: state.formData.priceRangeKey
+          }
+        : {
+            id: state.formData.id,
+            nameAr: state.formData.nameAr,
+            nameEn: state.formData.nameEn,
+            modifierPct: (state.formData.modifierPct || 0) / 100 // تحويل من نسبة مئوية
+          };
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'فشل في حفظ البيانات');
+      }
+
+      // إعادة تحميل البيانات
+      await loadCatalogData();
+      closeAllForms();
+
+    } catch (err) {
+      console.error('خطأ في حفظ البيانات:', err);
+      setState(prev => ({
+        ...prev,
+        error: err instanceof Error ? err.message : 'خطأ في حفظ البيانات',
+        submitting: false
+      }));
+    }
+  }, [state.formType, state.showEditForm, state.formData, loadCatalogData, closeAllForms]);
+
+  // دالة لحذف العنصر
+  const handleDelete = useCallback(async () => {
+    if (!state.itemToDelete) return;
+
+    try {
+      setState(prev => ({ ...prev, deleting: true, error: null }));
+
+      const endpoint = state.itemToDelete.type === 'subcategory'
+        ? '/api/catalog/subcategories'
+        : '/api/catalog/verticals';
+
+      const response = await fetch(`${endpoint}/${state.itemToDelete.id}`, {
+        method: 'DELETE'
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'فشل في حذف العنصر');
+      }
+
+      // إعادة تحميل البيانات
+      await loadCatalogData();
+      closeAllForms();
+
+    } catch (err) {
+      console.error('خطأ في حذف العنصر:', err);
+      setState(prev => ({
+        ...prev,
+        error: err instanceof Error ? err.message : 'خطأ في حذف العنصر',
+        deleting: false
+      }));
+    }
+  }, [state.itemToDelete, loadCatalogData, closeAllForms]);
 
   // التحقق من الصلاحيات
   if (status === 'loading') {
@@ -173,6 +367,9 @@ export default function AdminCatalogPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
+      {/* مسار التنقل */}
+      <Breadcrumbs />
+      
       {/* رأس الصفحة */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -188,10 +385,21 @@ export default function AdminCatalogPage() {
             <RefreshCw size={16} className={state.loading ? "animate-spin" : ""} />
             تحديث
           </Button>
-          <Button onClick={() => setState(prev => ({ ...prev, showCreateForm: true }))}>
-            <Plus size={16} />
-            إضافة عنصر
-          </Button>
+          
+          {/* أزرار الإضافة حسب العرض الحالي */}
+          {state.viewMode === 'subcategories' && (
+            <Button onClick={() => openCreateForm('subcategory')}>
+              <Plus size={16} />
+              إضافة فئة فرعية
+            </Button>
+          )}
+          
+          {state.viewMode === 'verticals' && (
+            <Button onClick={() => openCreateForm('vertical')}>
+              <Plus size={16} />
+              إضافة محور
+            </Button>
+          )}
         </div>
       </div>
 
@@ -386,11 +594,20 @@ export default function AdminCatalogPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="ghost">
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => openEditForm(subcategory, 'subcategory')}
+                            >
                               <Edit3 size={14} />
                               تعديل
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-[var(--danger)] hover:bg-[var(--danger-bg)]">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)]"
+                              onClick={() => openDeleteConfirm(subcategory, 'subcategory')}
+                            >
                               <Trash2 size={14} />
                               حذف
                             </Button>
@@ -433,11 +650,20 @@ export default function AdminCatalogPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="ghost">
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => openEditForm(vertical, 'vertical')}
+                            >
                               <Edit3 size={14} />
                               تعديل
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-[var(--danger)] hover:bg-[var(--danger-bg)]">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-[var(--danger)] hover:bg-[var(--danger-bg)]"
+                              onClick={() => openDeleteConfirm(vertical, 'vertical')}
+                            >
                               <Trash2 size={14} />
                               حذف
                             </Button>
@@ -453,18 +679,362 @@ export default function AdminCatalogPage() {
         </>
       )}
 
-      {/* نموذج الإنشاء (المرحلة القادمة) */}
+      {/* نموذج الإنشاء */}
       {state.showCreateForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-[var(--text)] mb-4">إضافة عنصر جديد</h3>
-            <p className="text-[var(--muted)] mb-4">ستتوفر هذه الميزة في المرحلة القادمة</p>
-            <Button 
-              onClick={() => setState(prev => ({ ...prev, showCreateForm: false }))}
-              className="w-full"
-            >
-              إغلاق
-            </Button>
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-lg">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-[var(--text)]">
+                {state.formType === 'subcategory' ? 'إضافة فئة فرعية جديدة' : 'إضافة محور جديد'}
+              </h3>
+              <Button size="sm" variant="ghost" onClick={closeAllForms}>
+                <X size={16} />
+              </Button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
+              {/* معرف العنصر */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  المعرف *
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.id}
+                  onChange={(e) => setState(prev => ({
+                    ...prev,
+                    formData: { ...prev.formData, id: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                  placeholder="مثال: portrait-photography"
+                  required
+                />
+              </div>
+
+              {/* الفئة الرئيسية (للفئات الفرعية فقط) */}
+              {state.formType === 'subcategory' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    الفئة الرئيسية *
+                  </label>
+                  <select
+                    value={state.formData.categoryId}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, categoryId: e.target.value }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    required
+                  >
+                    <option value="photo">صورة</option>
+                    <option value="video">فيديو</option>
+                    <option value="design">تصميم</option>
+                  </select>
+                </div>
+              )}
+
+              {/* الاسم العربي */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  الاسم العربي *
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.nameAr}
+                  onChange={(e) => setState(prev => ({
+                    ...prev,
+                    formData: { ...prev.formData, nameAr: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                  placeholder="الاسم باللغة العربية"
+                  required
+                />
+              </div>
+
+              {/* الاسم الإنجليزي */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  الاسم الإنجليزي
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.nameEn}
+                  onChange={(e) => setState(prev => ({
+                    ...prev,
+                    formData: { ...prev.formData, nameEn: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                  placeholder="الاسم باللغة الإنجليزية"
+                />
+              </div>
+
+              {/* الوصف (للفئات الفرعية فقط) */}
+              {state.formType === 'subcategory' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    الوصف
+                  </label>
+                  <textarea
+                    value={state.formData.desc}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, desc: e.target.value }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    rows={3}
+                    placeholder="وصف مختصر للفئة الفرعية"
+                  />
+                </div>
+              )}
+
+              {/* معامل التسعير (للمحاور فقط) */}
+              {state.formType === 'vertical' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    معامل التسعير (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={state.formData.modifierPct}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, modifierPct: parseFloat(e.target.value) || 0 }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    placeholder="0.0"
+                  />
+                  <p className="text-xs text-[var(--muted)] mt-1">
+                    معامل يؤثر على السعر النهائي (مثال: 10 = زيادة 10%)
+                  </p>
+                </div>
+              )}
+
+              {/* أزرار العمل */}
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={closeAllForms}
+                  disabled={state.submitting}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={state.submitting || !state.formData.id || !state.formData.nameAr}
+                >
+                  {state.submitting ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  {state.submitting ? 'جاري الحفظ...' : 'حفظ'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* نموذج التعديل */}
+      {state.showEditForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-lg">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-[var(--text)]">
+                {state.formType === 'subcategory' ? 'تعديل فئة فرعية' : 'تعديل محور'}
+              </h3>
+              <Button size="sm" variant="ghost" onClick={closeAllForms}>
+                <X size={16} />
+              </Button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
+              {/* معرف العنصر (للقراءة فقط) */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  المعرف
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.id}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--muted-bg)] text-[var(--muted)] cursor-not-allowed"
+                  readOnly
+                />
+              </div>
+
+              {/* الفئة الرئيسية (للفئات الفرعية فقط) */}
+              {state.formType === 'subcategory' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    الفئة الرئيسية *
+                  </label>
+                  <select
+                    value={state.formData.categoryId}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, categoryId: e.target.value }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    required
+                  >
+                    <option value="photo">صورة</option>
+                    <option value="video">فيديو</option>
+                    <option value="design">تصميم</option>
+                  </select>
+                </div>
+              )}
+
+              {/* الاسم العربي */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  الاسم العربي *
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.nameAr}
+                  onChange={(e) => setState(prev => ({
+                    ...prev,
+                    formData: { ...prev.formData, nameAr: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                  placeholder="الاسم باللغة العربية"
+                  required
+                />
+              </div>
+
+              {/* الاسم الإنجليزي */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  الاسم الإنجليزي
+                </label>
+                <input
+                  type="text"
+                  value={state.formData.nameEn}
+                  onChange={(e) => setState(prev => ({
+                    ...prev,
+                    formData: { ...prev.formData, nameEn: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                  placeholder="الاسم باللغة الإنجليزية"
+                />
+              </div>
+
+              {/* الوصف (للفئات الفرعية فقط) */}
+              {state.formType === 'subcategory' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    الوصف
+                  </label>
+                  <textarea
+                    value={state.formData.desc}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, desc: e.target.value }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    rows={3}
+                    placeholder="وصف مختصر للفئة الفرعية"
+                  />
+                </div>
+              )}
+
+              {/* معامل التسعير (للمحاور فقط) */}
+              {state.formType === 'vertical' && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                    معامل التسعير (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={state.formData.modifierPct}
+                    onChange={(e) => setState(prev => ({
+                      ...prev,
+                      formData: { ...prev.formData, modifierPct: parseFloat(e.target.value) || 0 }
+                    }))}
+                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
+                    placeholder="0.0"
+                  />
+                  <p className="text-xs text-[var(--muted)] mt-1">
+                    معامل يؤثر على السعر النهائي (مثال: 10 = زيادة 10%)
+                  </p>
+                </div>
+              )}
+
+              {/* أزرار العمل */}
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={closeAllForms}
+                  disabled={state.submitting}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={state.submitting || !state.formData.nameAr}
+                >
+                  {state.submitting ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  {state.submitting ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* تأكيد الحذف */}
+      {state.showDeleteConfirm && state.itemToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-6 w-full max-w-md">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-[var(--danger-bg)] rounded-full flex items-center justify-center">
+                <AlertCircle className="text-[var(--danger-fg)]" size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[var(--text)]">تأكيد الحذف</h3>
+                <p className="text-[var(--muted)] text-sm">هذا الإجراء لا يمكن التراجع عنه</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-[var(--text)] mb-2">
+                هل أنت متأكد من حذف {state.itemToDelete.type === 'subcategory' ? 'الفئة الفرعية' : 'المحور'}:
+              </p>
+              <div className="bg-[var(--bg)] p-3 rounded-[var(--radius)] border border-[var(--elev)]">
+                <p className="font-medium text-[var(--text)]">{state.itemToDelete.nameAr}</p>
+                <p className="text-sm text-[var(--muted)]">المعرف: {state.itemToDelete.id}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={closeAllForms}
+                disabled={state.deleting}
+              >
+                إلغاء
+              </Button>
+              <Button
+                className="bg-[var(--danger)] text-white hover:bg-[var(--danger-hover)]"
+                onClick={handleDelete}
+                disabled={state.deleting}
+              >
+                {state.deleting ? (
+                  <RefreshCw size={16} className="animate-spin" />
+                ) : (
+                  <Trash2 size={16} />
+                )}
+                {state.deleting ? 'جاري الحذف...' : 'حذف'}
+              </Button>
+            </div>
           </div>
         </div>
       )}
