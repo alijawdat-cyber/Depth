@@ -1,7 +1,6 @@
-@import "tailwindcss";
-@plugin "@tailwindcss/typography";
-@plugin "@tailwindcss/forms";
-@plugin "@tailwindcss/container-queries";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* Dubai font */
 @font-face {
@@ -76,11 +75,13 @@
   --accent-200:#C3D0FF; --accent-300:#9AB1FF; --accent-400:#6A86FF; --accent-500:#3E5BFF; --accent-700:#253DB8;
 }
 
-@theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--text);
-  --font-sans: var(--font-dubai);
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+@layer base {
+  :root {
+    --color-background: var(--bg);
+    --color-foreground: var(--text);
+    --font-sans: var(--font-dubai);
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
 }
 
 /* Unified Dark Theme System */
@@ -170,8 +171,8 @@ html, body {
 
 /* Horizontal scroll area for mobile lists/tables */
 .scroll-x {
+  /* أُفقي فقط: لا نغيّر overflow-y حتى لا نكسر تمرير .data-scroll العمودي */
   overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
 }

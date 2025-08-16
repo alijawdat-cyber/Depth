@@ -184,6 +184,57 @@ const STEPS = [
   }
 ];
 
+// Validation functions
+const validatePersonalInfo = (data: CreatorIntakeForm['personalInfo']): string[] => {
+  const errors: string[] = [];
+  
+  if (!data.fullName?.trim()) errors.push('الاسم الكامل مطلوب');
+  if (!data.email?.trim()) errors.push('البريد الإلكتروني مطلوب');
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.push('البريد الإلكتروني غير صحيح');
+  if (!data.phone?.trim()) errors.push('رقم الهاتف مطلوب');
+  if (!data.whatsapp?.trim()) errors.push('رقم الواتساب مطلوب');
+  if (!data.city?.trim()) errors.push('المدينة مطلوبة');
+  if (!data.languages?.length) errors.push('يجب اختيار لغة واحدة على الأقل');
+  
+  return errors;
+};
+
+const validateProfessionalInfo = (data: CreatorIntakeForm['professionalInfo']): string[] => {
+  const errors: string[] = [];
+  
+  if (!data.role) errors.push('الدور المهني مطلوب');
+  if (data.experienceYears < 0) errors.push('سنوات الخبرة يجب أن تكون رقم موجب');
+  
+  return errors;
+};
+
+const validateCurrentStep = (step: number, formData: CreatorIntakeForm): string[] => {
+  switch (step) {
+    case 1:
+      return validatePersonalInfo(formData.personalInfo);
+    case 2:
+      return validateProfessionalInfo(formData.professionalInfo);
+    case 3:
+      return Object.keys(formData.skills).length === 0 ? ['يجب إضافة مهارة واحدة على الأقل'] : [];
+    case 4:
+      const hasEquipment = Object.values(formData.equipment).some(items => items.length > 0);
+      return hasEquipment ? [] : ['يجب إضافة معدة واحدة على الأقل'];
+    case 5:
+      return formData.capacity.maxAssetsPerDay <= 0 ? ['يجب تحديد السعة اليومية'] : [];
+    case 6:
+      return formData.verticals.length === 0 ? ['يجب اختيار محور واحد على الأقل'] : [];
+    case 7:
+      return formData.portfolio.length === 0 ? ['يجب إضافة عمل واحد على الأقل للمعرض'] : [];
+    case 8:
+      return Object.keys(formData.internalCost).length === 0 ? ['يجب تحديد التسعير الداخلي'] : [];
+    case 9:
+      const { clinicsTraining, ndaSigned, equipmentAgreement } = formData.compliance;
+      return !(clinicsTraining && ndaSigned && equipmentAgreement) ? ['يجب الموافقة على جميع شروط الامتثال'] : [];
+    default:
+      return [];
+  }
+};
+
 export default function CreatorIntakePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession();
@@ -196,6 +247,8 @@ export default function CreatorIntakePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   // Form data
   const [formData, setFormData] = useState<CreatorIntakeForm>({
@@ -304,31 +357,38 @@ export default function CreatorIntakePage() {
   };
 
   const nextStep = () => {
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
+    // Validate current step before proceeding
+    const errors = validateCurrentStep(currentStep, formData);
+    setValidationErrors(errors);
+    
+    if (errors.length === 0) {
+      // Mark current step as completed
+      setCompletedSteps(prev => new Set([...prev, currentStep]));
+      
+      if (currentStep < STEPS.length) {
+        setCurrentStep(currentStep + 1);
+      }
+    } else {
+      // Show error message
+      setError('يرجى إكمال جميع الحقول المطلوبة قبل المتابعة');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
   const prevStep = () => {
+    setValidationErrors([]);
+    setError(null);
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const isStepValid = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return !!(formData.personalInfo.fullName && 
-                 formData.personalInfo.email && 
-                 formData.personalInfo.phone && 
-                 formData.personalInfo.city);
-      case 2:
-        return !!(formData.professionalInfo.role && 
-                 formData.professionalInfo.experienceYears > 0);
-      // Add validation for other steps
-      default:
-        return true;
-    }
+    return validateCurrentStep(step, formData).length === 0;
+  };
+
+  const isStepCompleted = (step: number): boolean => {
+    return completedSteps.has(step);
   };
 
   const renderStepContent = () => {
@@ -773,9 +833,21 @@ export default function CreatorIntakePage() {
       {/* Progress Stepper */}
       <div className="mb-8">
         <Stepper
-          steps={STEPS}
+          steps={STEPS.map((step, index) => ({
+            ...step,
+            status: isStepCompleted(index + 1) ? 'completed' : 
+                   currentStep === index + 1 ? 'current' : 
+                   'pending'
+          }))}
           currentStep={currentStep}
-          onStepClick={setCurrentStep}
+          onStepClick={(stepNumber) => {
+            // Allow navigation to previous steps or current step
+            if (stepNumber <= currentStep || isStepCompleted(stepNumber)) {
+              setCurrentStep(stepNumber);
+              setValidationErrors([]);
+              setError(null);
+            }
+          }}
           orientation="horizontal"
           showDescription={true}
           className="mb-6"
@@ -797,6 +869,23 @@ export default function CreatorIntakePage() {
           <div className="flex items-center gap-2 text-[var(--success-fg)]">
             <CheckCircle size={20} />
             <span>{success}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <div className="mb-6 p-4 bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-[var(--radius)]">
+          <div className="flex items-start gap-2 text-[var(--warning-fg)]">
+            <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
+            <div>
+              <div className="font-medium mb-2">يرجى إصلاح الأخطاء التالية:</div>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}

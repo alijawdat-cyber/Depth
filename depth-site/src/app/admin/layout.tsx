@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { 
   AlertCircle, 
+  AlertTriangle,
   LayoutDashboard, 
   Calculator, 
   FileText, 
@@ -26,6 +27,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import { ToastContainer, useToast } from "@/components/ui/Toast";
 
 // تعريف عناصر التنقل الإداري المتقدم
 interface AdminNavItem {
@@ -78,7 +81,21 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: '/admin/overrides',
     label: 'التعديلات',
     icon: DollarSign,
-    description: 'طلبات تعديل الأسعار من المبدعين'
+    description: 'طلبات تعديل الأسعار من المبدعين',
+    children: [
+      {
+        href: '/admin/overrides',
+        label: 'التعديلات الأساسية',
+        icon: DollarSign,
+        description: 'طلبات التعديل العادية'
+      },
+      {
+        href: '/admin/overrides/advanced',
+        label: 'التعديلات المتقدمة',
+        icon: AlertTriangle,
+        description: 'التعديلات المعقدة والاستراتيجية'
+      }
+    ]
   }
 ];
 
@@ -88,6 +105,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { toasts, removeToast } = useToast();
   
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
@@ -183,47 +201,97 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {ADMIN_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
+                const hasChildren = item.children && item.children.length > 0;
                 
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={clsx(
-                      "flex items-center gap-3 px-4 py-3 rounded-[var(--radius)] transition-all duration-200 group",
-                      active 
-                        ? "bg-[var(--accent-500)] text-white shadow-lg" 
-                        : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--elev)]"
-                    )}
-                  >
-                    <Icon 
-                      size={20} 
+                  <div key={item.href}>
+                    <Link
+                      href={item.href}
                       className={clsx(
-                        "transition-colors",
-                        active ? "text-white" : "text-[var(--muted)] group-hover:text-[var(--accent-500)]"
-                      )} 
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">{item.label}</div>
-                      {item.description && (
-                        <div className={clsx(
-                          "text-xs mt-0.5 transition-colors",
-                          active ? "text-white/80" : "text-[var(--muted)]"
-                        )}>
-                          {item.description}
-                        </div>
-                      )}
-                    </div>
-                    {item.badge && (
-                      <span className={clsx(
-                        "text-xs px-2 py-0.5 rounded-full font-medium",
+                        "flex items-center gap-3 px-4 py-3 rounded-[var(--radius)] transition-all duration-200 group",
                         active 
-                          ? "bg-white/20 text-white" 
-                          : "bg-[var(--accent-100)] text-[var(--accent-700)]"
-                      )}>
-                        {item.badge}
-                      </span>
+                          ? "bg-[var(--accent-500)] text-white shadow-lg" 
+                          : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--elev)]"
+                      )}
+                    >
+                      <Icon 
+                        size={20} 
+                        className={clsx(
+                          "transition-colors",
+                          active ? "text-white" : "text-[var(--muted)] group-hover:text-[var(--accent-500)]"
+                        )} 
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{item.label}</div>
+                        {item.description && (
+                          <div className={clsx(
+                            "text-xs mt-0.5 transition-colors",
+                            active ? "text-white/80" : "text-[var(--muted)]"
+                          )}>
+                            {item.description}
+                          </div>
+                        )}
+                      </div>
+                      {item.badge && (
+                        <span className={clsx(
+                          "text-xs px-2 py-0.5 rounded-full font-medium",
+                          active 
+                            ? "bg-white/20 text-white" 
+                            : "bg-[var(--accent-100)] text-[var(--accent-700)]"
+                        )}>
+                          {item.badge}
+                        </span>
+                      )}
+                      {hasChildren && (
+                        <ChevronDown 
+                          size={16} 
+                          className={clsx(
+                            "transition-transform",
+                            active ? "text-white" : "text-[var(--muted)]"
+                          )}
+                        />
+                      )}
+                    </Link>
+                    
+                    {/* Sub-items */}
+                    {hasChildren && (
+                      <div className="mt-2 mr-8 space-y-1">
+                        {item.children!.map((child) => {
+                          const ChildIcon = child.icon;
+                          const childActive = isActive(child.href);
+                          
+                          return (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className={clsx(
+                                "flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] transition-all duration-200 group text-sm",
+                                childActive 
+                                  ? "bg-[var(--accent-100)] text-[var(--accent-700)] border-r-2 border-[var(--accent-500)]" 
+                                  : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--elev)]"
+                              )}
+                            >
+                              <ChildIcon 
+                                size={16} 
+                                className={clsx(
+                                  "transition-colors",
+                                  childActive ? "text-[var(--accent-600)]" : "text-[var(--muted)] group-hover:text-[var(--accent-500)]"
+                                )} 
+                              />
+                              <div className="flex-1">
+                                <div className="font-medium">{child.label}</div>
+                                {child.description && (
+                                  <div className="text-xs mt-0.5 text-[var(--muted)]">
+                                    {child.description}
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
                     )}
-                  </Link>
+                  </div>
                 );
               })}
             </nav>
@@ -329,7 +397,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* محتوى الصفحة */}
           <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-7xl mx-auto">
-              {children}
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
             </div>
           </main>
         </div>
@@ -342,6 +412,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} position="top-right" />
     </div>
   );
 }

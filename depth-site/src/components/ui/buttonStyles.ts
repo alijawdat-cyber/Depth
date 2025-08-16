@@ -10,6 +10,7 @@ export const buttonStyles = tv({
       secondary:
         "bg-[var(--card)] text-[var(--text)] border border-[var(--elev)] hover:bg-[var(--neutral-50)] tracking-tight",
       ghost: "bg-transparent text-[var(--text)] hover:bg-[var(--neutral-50)]",
+      outline: "bg-transparent text-[var(--accent-500)] border border-[var(--accent-500)] hover:bg-[var(--accent-50)] hover:text-[var(--accent-700)] tracking-tight",
     },
     size: {
       sm: "h-11 px-4 text-[13px] leading-none gap-1.5",

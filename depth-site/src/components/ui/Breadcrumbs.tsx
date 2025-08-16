@@ -59,6 +59,21 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'التعديلات', href: '/admin/overrides' },
       { label: 'التعديلات المتقدمة', href: '/admin/overrides/advanced' }
+    ],
+    '/admin/creators/evaluate': [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'المبدعين', href: '/admin/creators' },
+      { label: 'تقييم المبدع', href: '#' }
+    ],
+    '/admin/pricing/rate-card': [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'التسعير', href: '/admin/pricing' },
+      { label: 'جدول الأسعار', href: '/admin/pricing/rate-card' }
+    ],
+    '/admin/quotes/create': [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'العروض', href: '/admin/quotes' },
+      { label: 'إنشاء عرض جديد', href: '/admin/quotes/create' }
     ]
   };
 
@@ -70,18 +85,27 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
   // البحث عن مطابقة جزئية للمسارات الديناميكية
   for (const [path, breadcrumbs] of Object.entries(breadcrumbsMap)) {
     if (pathname.startsWith(path) && path !== '/admin') {
-      // إضافة الصفحة الحالية إذا لم تكن موجودة
-      const currentPageName = pathname.split('/').pop() || '';
-      const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
-      
-      if (!lastBreadcrumb.href.includes(currentPageName)) {
-        return [
-          ...breadcrumbs,
-          { label: currentPageName, href: pathname }
-        ];
-      }
       return breadcrumbs;
     }
+  }
+
+  // معالجة خاصة للمسارات الديناميكية
+  if (pathname.includes('/admin/creators/') && pathname.includes('/evaluate')) {
+    const creatorId = pathname.split('/')[3];
+    return [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'المبدعين', href: '/admin/creators' },
+      { label: `تقييم المبدع #${creatorId}`, href: pathname }
+    ];
+  }
+
+  if (pathname.includes('/admin/quotes/') && !pathname.endsWith('/quotes')) {
+    const quoteId = pathname.split('/').pop();
+    return [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'العروض', href: '/admin/quotes' },
+      { label: `عرض السعر #${quoteId}`, href: pathname }
+    ];
   }
 
   // العودة إلى الافتراضي

@@ -498,6 +498,17 @@ export default function AdminCreatorsPage() {
                               نموذج الإدخال
                             </Button>
                           )}
+                          
+                          {(creator.status === 'intake_submitted' || creator.status === 'under_review' || creator.status === 'approved') && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => router.push(`/admin/creators/${creator.id}/evaluate`)}
+                            >
+                              <Star size={14} />
+                              تقييم
+                            </Button>
+                          )}
 
                           {(creator.status === 'intake_submitted' || creator.status === 'under_review') && (
                             <Button 
