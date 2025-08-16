@@ -19,10 +19,12 @@
 
 ## 4) الحساب (Calculation)
 - Base (Rate Card) ± Vertical Modifier + Processing + Conditions + Creator Modifier + Add‑ons
-- Guardrails: هامش ≥ 45%، حدود دنيا/عليا، تحذيرات امتثال
+- Guardrails: هامش ≥ 50% افتراضياً، مع استثناء مبرّر حتى 45%؛ حدود دنيا/عليا؛ تحذيرات امتثال.
 
 ## 5) المخرجات
 - جدول تفصيلي (سطر لكل Deliverable)
-- الإجماليات والضرائب (إن وجدت)
+- الإجماليات (لا ضرائب في العراق)
 - ملاحظات وأسباب (Audit)
 - توليد SOW (Ready)
+
+مراجع: SLA → `docs/catalog/13-SLA-Matrix.md`، Location Zones → `docs/catalog/14-Location-Zones.md`.

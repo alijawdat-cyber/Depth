@@ -1,44 +1,80 @@
 {
-  "basePricesUSD": {
-    "photo_ecom_packshot": 15,
-    "photo_flat_lay": 15,
-    "photo_on_model": 18,
-    "photo_ghost": 20,
-    "photo_detail": 15,
-    "photo_lifestyle": 18,
-    "photo_before_after": 22,
+  "currency": "IQD",
+  "basePricesIQD": {
+    "photo_ecom_packshot": 19500,
+    "photo_flat_lay": 19500,
+    "photo_on_model": 23400,
+    "photo_ghost": 26000,
+    "photo_detail": 19500,
+    "photo_lifestyle": 23400,
+    "photo_before_after": 28600,
 
-    "reel_try_on": 120,
-    "reel_product_montage": 120,
-    "reel_transitions": 120,
-    "reel_testimonial": 120,
-    "reel_bts": 110,
-    "ad_lead_gen": 140,
+    "reel_try_on": 156000,
+    "reel_product_montage": 156000,
+    "reel_transitions": 156000,
+    "reel_testimonial": 156000,
+    "reel_bts": 143000,
+    "ad_lead_gen": 182000,
 
-    "design_discount": 35,
-    "design_carousel": 45,
-    "design_story_cover": 25,
-    "design_catalog_banner": 60,
-    "design_clinic_disclaimer": 30
+    "design_discount": 45500,
+    "design_carousel": 58500,
+    "design_story_cover": 32500,
+    "design_catalog_banner": 78000,
+    "design_clinic_disclaimer": 39000
   },
-  "processingModifiers": {
-    "RAW_ONLY": -0.10,
-    "RAW_BASIC_COLOR": 0.0,
-    "FULL_RETOUCH": 0.40
+  "basePricesUSD": null,
+  "baseRangesIQD": {
+    "photo_ecom_packshot": [15000, 25000],
+    "photo_flat_lay": [15000, 25000],
+    "photo_on_model": [20000, 35000],
+    "photo_ghost": [22000, 40000],
+    "photo_detail": [15000, 25000],
+    "photo_lifestyle": [20000, 35000],
+    "photo_before_after": [25000, 45000],
+
+    "reel_try_on": [120000, 200000],
+    "reel_product_montage": [120000, 200000],
+    "reel_transitions": [120000, 200000],
+    "reel_testimonial": [120000, 200000],
+    "reel_bts": [100000, 180000],
+    "ad_lead_gen": [150000, 240000],
+
+    "design_discount": [15000, 30000],
+    "design_carousel": [25000, 80000],
+    "design_story_cover": [10000, 25000],
+    "design_catalog_banner": [40000, 120000],
+    "design_clinic_disclaimer": [15000, 45000]
   },
-  "conditionModifiers": {
-    "RUSH": 0.35,
-    "LOCATION_FLAT_USD": 25
+  "fxPolicy": {
+    "mode": "manual",
+    "lastRate": null,
+    "lastDate": null,
+    "source": "admin"
+  },
+  "modifiers": {
+    "processing": {
+      "retouchMinPct": 0.30,
+      "retouchMaxPct": 0.40,
+      "rawPct": -0.10
+    },
+    "rushPct": 0.35,
+    "creatorTierPct": {"T1": 0.00, "T2": 0.10, "T3": 0.20}
   },
   "verticalModifiers": {
     "beauty": 0.10,
     "furniture": 0.05,
-    "fashion": 0.0,
-    "default": 0.0
+    "fashion": 0.00,
+    "default": 0.00
   },
+  "locationZonesIQD": {
+    "baghdad_center": 5000,
+    "baghdad_outer": 10000,
+    "provinces_near": 25000,
+    "provinces_far": 50000
+  },
+  "overrideCapPercent": 0.20,
   "guardrails": {
-    "minMarginPct": 0.45,
-    "minUnitUSD": 10,
-    "maxUnitUSD": 800
+    "minMarginDefault": 0.50,
+    "minMarginHardStop": 0.45
   }
 }

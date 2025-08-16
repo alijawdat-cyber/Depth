@@ -14,11 +14,14 @@
    - `ns-cloud-a4.googledomains.com`
 
 ### 2) سجلات DNS (Domain Name System — نظام أسماء النطاقات)
-- MX (Mail Exchange — تبادل البريد) — Google (الإعداد الحديث):
-  - `SMTP.GOOGLE.COM.` (أولوية 1)
+- MX (Mail Exchange — تبادل البريد) — Google Workspace (الصيغة القياسية):
+  - `ASPMX.L.GOOGLE.COM.` (Priority 1)
+  - `ALT1.ASPMX.L.GOOGLE.COM.` (Priority 5)
+  - `ALT2.ASPMX.L.GOOGLE.COM.` (Priority 5)
+  - `ALT3.ASPMX.L.GOOGLE.COM.` (Priority 10)
+  - `ALT4.ASPMX.L.GOOGLE.COM.` (Priority 10)
   - TTL: 3600s (مُستحسن)
-  - الحالة: Active/Pass (مفحوصة على أكثر من ريزولفر)
-  - ملاحظة: الإعداد القديم كان خمسة سجلات (`ASPMX/ALT1..ALT4`). لا حاجة لها مع الإعداد الحديث.
+  - ملاحظة: أي إعداد single‑MX قد يعمل لكنه غير مفضّل وقد يربك أدوات الفحص؛ الصيغة القياسية أعلاه هي SSOT.
 
 - SPF (Sender Policy Framework — إطار سياسة المرسل) — TXT على الجذر `@`:
   - `v=spf1 include:_spf.google.com ~all`

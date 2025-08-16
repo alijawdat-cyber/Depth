@@ -51,5 +51,169 @@
     {"id":"ecom","nameAr":"متاجر إلكترونية","nameEn":"E-commerce"},
     {"id":"events","nameAr":"فعاليات/تغطيات","nameEn":"Events/Coverage"},
     {"id":"influencer","nameAr":"مؤثرين/UGC","nameEn":"Influencers/UGC"}
+  ],
+  "defaultsPerSubcategory": [
+    {
+      "subcategory": "photo_ecom_packshot",
+      "verticalsAllowed": ["ecom", "fashion", "fnb"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["1:1", "4:5"],
+      "defaultFormats": ["jpg", "webp"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_ecom_packshot"
+    },
+    {
+      "subcategory": "photo_flat_lay",
+      "verticalsAllowed": ["fashion", "fnb", "sports", "ecom"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["1:1", "4:5", "9:16"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_flat_lay"
+    },
+    {
+      "subcategory": "photo_on_model",
+      "verticalsAllowed": ["fashion", "sports", "ecom"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["4:5", "1:1"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_on_model"
+    },
+    {
+      "subcategory": "photo_ghost",
+      "verticalsAllowed": ["fashion", "ecom"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["1:1", "4:5"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_ghost"
+    },
+    {
+      "subcategory": "photo_detail",
+      "verticalsAllowed": ["fashion", "fnb", "furniture", "ecom"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["1:1", "4:5"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_detail"
+    },
+    {
+      "subcategory": "photo_lifestyle",
+      "verticalsAllowed": ["fashion", "fnb", "furniture", "sports", "ecom"],
+      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultRatios": ["4:5", "1:1"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": [],
+      "priceRangeKey": "photo_lifestyle"
+    },
+    {
+      "subcategory": "photo_before_after",
+      "verticalsAllowed": ["clinics", "beauty"],
+      "defaultProcessingLevels": ["retouch"],
+      "defaultRatios": ["1:1", "4:5"],
+      "defaultFormats": ["jpg", "png"],
+      "complianceTags": ["clinics_policy"],
+      "priceRangeKey": "photo_before_after"
+    },
+    {
+      "subcategory": "reel_try_on",
+      "verticalsAllowed": ["fashion", "sports", "ecom"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "4:5", "1:1"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "reel_try_on"
+    },
+    {
+      "subcategory": "reel_product_montage",
+      "verticalsAllowed": ["ecom", "fnb", "fashion"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "4:5", "1:1"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "reel_product_montage"
+    },
+    {
+      "subcategory": "reel_transitions",
+      "verticalsAllowed": ["fashion", "ecom"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "4:5", "1:1"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "reel_transitions"
+    },
+    {
+      "subcategory": "reel_testimonial",
+      "verticalsAllowed": ["beauty", "b2b", "restaurants"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "1:1"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "reel_testimonial"
+    },
+    {
+      "subcategory": "reel_bts",
+      "verticalsAllowed": ["fashion", "ecom", "events"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "4:5", "1:1"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "reel_bts"
+    },
+    {
+      "subcategory": "ad_lead_gen",
+      "verticalsAllowed": ["ecom", "b2b", "restaurants"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["9:16", "1:1", "4:5"],
+      "defaultFormats": ["mp4"],
+      "complianceTags": [],
+      "priceRangeKey": "ad_lead_gen"
+    },
+    {
+      "subcategory": "design_discount",
+      "verticalsAllowed": ["fashion", "sports", "restaurants", "ecom"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["1:1", "4:5", "9:16"],
+      "defaultFormats": ["png", "jpg", "svg"],
+      "complianceTags": [],
+      "priceRangeKey": "design_discount"
+    },
+    {
+      "subcategory": "design_carousel",
+      "verticalsAllowed": ["fashion", "ecom"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["1:1", "4:5"],
+      "defaultFormats": ["png", "jpg", "svg"],
+      "complianceTags": [],
+      "priceRangeKey": "design_carousel"
+    },
+    {
+      "subcategory": "design_story_cover",
+      "verticalsAllowed": ["fashion", "ecom", "influencer"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["1:1", "9:16"],
+      "defaultFormats": ["png", "jpg", "svg"],
+      "complianceTags": [],
+      "priceRangeKey": "design_story_cover"
+    },
+    {
+      "subcategory": "design_catalog_banner",
+      "verticalsAllowed": ["ecom", "furniture", "fashion"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": [],
+      "defaultFormats": ["png", "jpg", "svg"],
+      "complianceTags": [],
+      "priceRangeKey": "design_catalog_banner"
+    },
+    {
+      "subcategory": "design_clinic_disclaimer",
+      "verticalsAllowed": ["clinics"],
+      "defaultProcessingLevels": [],
+      "defaultRatios": ["1:1", "9:16"],
+      "defaultFormats": ["png", "jpg", "svg"],
+      "complianceTags": ["clinics_policy"],
+      "priceRangeKey": "design_clinic_disclaimer"
+    }
   ]
 }

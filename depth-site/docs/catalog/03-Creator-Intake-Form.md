@@ -38,13 +38,13 @@
 ## 7) الكلفة الداخلية (Internal Cost Baseline)
 - Photo per asset (IQD)
 - Reel per asset (IQD)
-- Day Rate (USD) (اختياري)
+- Day Rate (IQD) — وUSD للعرض فقط (اختياري مع FX يدوي)
 
 ## 8) التسعير الفردي (Rate Overrides)
 - لكل Deliverable (+ Vertical اختياري):
   - Processing: RAW Only | RAW+Color | Full Retouch
   - Conditions: Studio/Location, Standard/Rush
-  - Price (USD)
+  - Price (IQD) — وUSD للعرض فقط (اختياري)
   - Notes (اختياري)
 
 ## 9) الجودة والانضباط (Self‑Assessment)

@@ -7,6 +7,13 @@
 ## الأدوار/النطاقات (Roles & Scopes)
 - أمثلة Scopes: `pricing.write`, `catalog.publish`, `contracts.send`, `approvals.manage`.
 - تخصيص نطاقات فرعية لحسابات إدارية خاصة (مثل “مدير التسعير”).
+ - توسيع النطاقات المقترحة:
+   - `pricing.write` — تعديل الأسعار والمعاملات.
+   - `catalog.publish` — نشر/إصدار تغييرات الكتالوغ.
+   - `approvals.manage` — إدارة الموافقات (Quotes/Overrides/Compliance).
+   - `contracts.send` — إرسال العقود.
+   - `projects.assign` — إسناد المهام/التسليمات للمبدعين/الموظفين.
+   - `reports.read` — قراءة التقارير.
 
 ## 2FA
 - إلزام للأدمن (موصى به)، اختياري لغيره.

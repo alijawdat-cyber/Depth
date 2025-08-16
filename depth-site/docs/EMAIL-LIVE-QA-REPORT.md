@@ -33,7 +33,7 @@ MAIL_FROM=Depth <no-reply@depth-agency.com>
 MAIL_CC_ADMIN=admin@depth-agency.com  
 BRAND_URL=https://depth-agency.com
 MAIL_DRY_RUN=0 (for live sending)
-RESEND_API_KEY=re_Bp1hBE12_Mf9xAXh4x1emLvng7vxKTs2Q
+RESEND_API_KEY=re_XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ### حالة الإنتاج الفعلية
@@ -340,13 +340,14 @@ MAIL_FROM=Depth <hello@depth-agency.com>
 #### 1. Production Deployment
 ```bash
 # Fix Vercel environment variables
-vercel env add RESEND_API_KEY re_Bp1hBE12_Mf9xAXh4x1emLvng7vxKTs2Q
+vercel env add RESEND_API_KEY re_XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 vercel env add MAIL_DRY_RUN 0
 vercel env add BRAND_URL https://depth-agency.com
 
 # Re-deploy to apply changes
 vercel --prod
 ```
+ملاحظة أمنية: دوّر (Rotate) مفاتيح البريد عند كل حادثة أو مشاركة، ولا تحفظ المفاتيح الحقيقية داخل المستندات/المستودع.
 
 #### 2. Missing Logo Asset
 ```bash
