@@ -434,8 +434,9 @@ export default function AdminCreatorsPage() {
               <p className="text-[var(--muted)]">لا يوجد مبدعون</p>
             </div>
           ) : (
-            <div className="scroll-xy">
-              <table className="w-full">
+            <div className="admin-scroll-container">
+              <div className="admin-scroll-content">
+                <table className="w-full">
                 <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
                   <tr>
                     <th className="text-right p-4 font-medium text-[var(--text)]">المبدع</th>
@@ -549,7 +550,8 @@ export default function AdminCreatorsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           )}
         </div>

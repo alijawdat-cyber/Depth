@@ -29,6 +29,31 @@ export async function middleware(request: NextRequest) {
   const isPortalAbout = pathname.startsWith('/portal/about');
   const isPortalArea = pathname.startsWith('/portal') && !isPortalAuth && !isPortalAbout;
 
+  // توحيد الوصول لصفحات البروفايل وفق الدور
+  if (pathname === '/portal/profile' || pathname === '/admin/profile' || pathname === '/creators/profile' || pathname === '/employees/profile') {
+    const role = token?.role as string | undefined;
+    const profileForRole = (r?: string) => {
+      switch (r) {
+        case 'admin':
+          return '/admin/profile';
+        case 'creator':
+          return '/creators/profile';
+        case 'employee':
+          return '/employees/profile';
+        case 'client':
+          return '/portal/profile';
+        default:
+          return '/auth/signin?from=profile';
+      }
+    };
+    const expected = profileForRole(role);
+    if (pathname !== expected) {
+      const url = request.nextUrl.clone();
+      url.pathname = expected;
+      return NextResponse.redirect(url);
+    }
+  }
+
   // حماية منطقة الأدمن: يتطلب دور admin
   if (isAdminArea) {
     if (!token || token.role !== 'admin') {

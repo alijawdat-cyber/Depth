@@ -31,7 +31,7 @@ export default function CreatorProfilePage() {
     if (status === "authenticated") {
       fetchProfile();
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchProfile = async () => {
     try {

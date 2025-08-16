@@ -172,7 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       {/* التخطيط الرئيسي: شريط علوي + شريط جانبي + محتوى */}
-      <div className="flex h-screen">
+      <div className="flex min-h-screen">
         
         {/* الشريط الجانبي للتنقل - مخفي في الموبايل */}
         <div className={clsx(
@@ -351,9 +351,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* المحتوى الرئيسي */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col">
           {/* الشريط العلوي */}
-          <header className="bg-[var(--card)] border-b border-[var(--elev)] px-6 py-4">
+          <header className="bg-[var(--card)] border-b border-[var(--elev)] px-6 py-4 flex-shrink-0">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
@@ -403,8 +403,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </header>
 
           {/* محتوى الصفحة */}
-          <main className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-7xl mx-auto">
+          <main className="flex-1 p-6 min-h-0">
+            <div className="h-full max-w-7xl mx-auto">
               <ErrorBoundary>
                 {children}
               </ErrorBoundary>

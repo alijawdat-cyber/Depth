@@ -354,8 +354,9 @@ export default function AdvancedOverridesPage() {
             <p className="text-[var(--muted)]">لا توجد طلبات تعديل</p>
           </div>
         ) : (
-          <div className="scroll-xy">
-          <table className="w-full">
+          <div className="admin-scroll-container">
+            <div className="admin-scroll-content">
+              <table className="w-full">
               <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
               <tr>
                 <th className="text-right p-4 font-medium text-[var(--text)]">العميل</th>
@@ -439,9 +440,10 @@ export default function AdvancedOverridesPage() {
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
+                        </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
     </div>

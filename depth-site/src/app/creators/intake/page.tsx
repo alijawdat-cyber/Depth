@@ -407,8 +407,8 @@ export default function CreatorIntakePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] py-12">
-      <Container>
+    <Container>
+      <div className="p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -531,7 +531,7 @@ export default function CreatorIntakePage() {
             )}
           </motion.div>
         </div>
-      </Container>
-    </div>
+      </div>
+    </Container>
   );
 }

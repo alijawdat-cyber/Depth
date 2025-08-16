@@ -29,7 +29,7 @@ export default function AdminProfilePage() {
     if (status === 'authenticated') {
       fetchProfile();
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchProfile = async () => {
     try {
@@ -77,7 +77,9 @@ export default function AdminProfilePage() {
         <Container>
           <div className="max-w-2xl mx-auto">
             <h1 className="text-2xl font-bold mb-1">الملف الشخصي (أدمن)</h1>
-            <p className="text-[var(--muted)] mb-6">إعدادات الحساب والأمان</p>
+            <p className="text-[var(--muted)] mb-6">
+              إعدادات الحساب والأمان - مرحباً {session?.user?.name || session?.user?.email || 'المدير'}
+            </p>
 
             {message && (
               <div className="mb-4 text-sm p-3 rounded border border-[var(--elev)]">{message}</div>
@@ -101,7 +103,7 @@ export default function AdminProfilePage() {
               </label>
               <label className="grid gap-2">
                 <span className="text-sm">السِمة</span>
-                <select value={profile.theme || 'system'} onChange={(e) => setProfile({ ...profile, theme: e.target.value as any })} className="input">
+                <select value={profile.theme || 'system'} onChange={(e) => setProfile({ ...profile, theme: e.target.value as 'light' | 'dark' | 'system' })} className="input">
                   <option value="light">فاتح</option>
                   <option value="dark">داكن</option>
                   <option value="system">حسب النظام</option>

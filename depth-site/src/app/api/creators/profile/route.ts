@@ -1,134 +1,54 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
-// GET /api/creators/profile
-// الحصول على بيانات المبدع المسجل دخوله
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
     if (!session?.user?.email) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'غير مسموح - يتطلب تسجيل الدخول' 
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    if (session.user.role !== 'creator') {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'غير مسموح - مخصص للمبدعين فقط' 
-      }, { status: 403 });
-    }
-
-    const email = session.user.email.toLowerCase();
-
-    // البحث في creators collection
-    const creatorQuery = await adminDb
-      .collection('creators')
-      .where('contact.email', '==', email)
-      .limit(1)
-      .get();
-
-    if (creatorQuery.empty) {
-      // البحث في المجموعة الجديدة للمبدعين
-      const newCreatorQuery = await adminDb
-        .collection('creators')
-        .where('email', '==', email)
-        .limit(1)
-        .get();
-
-      if (newCreatorQuery.empty) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'لم يتم العثور على بيانات المبدع' 
-        }, { status: 404 });
-      }
-
-      const creatorDoc = newCreatorQuery.docs[0];
-      const creatorData = creatorDoc.data();
-
-      // إحصائيات افتراضية للمبدعين الجدد
-      const stats = {
-        total: 0,
-        completed: 0,
-        ongoing: 0,
-        earnings: 0
+    const snap = await adminDb.collection('creators').where('email', '==', session.user.email).limit(1).get();
+    if (snap.empty) {
+      // create a lightweight default profile for first-time users
+      const defaultProfile = {
+        email: session.user.email,
+        name: session.user.name || '',
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
-
-      return NextResponse.json({
-        success: true,
-        creator: {
-          id: creatorDoc.id,
-          fullName: creatorData.fullName,
-          role: creatorData.role,
-          status: creatorData.status,
-          city: creatorData.city,
-          phone: creatorData.phone,
-          canTravel: creatorData.canTravel,
-          createdAt: creatorData.createdAt,
-          intakeFormCompleted: creatorData.intakeFormCompleted || false
-        },
-        stats
-      });
+      const ref = await adminDb.collection('creators').add(defaultProfile);
+      return NextResponse.json({ success: true, profile: { id: ref.id, ...defaultProfile } });
     }
+    const doc = snap.docs[0];
+    const data = { id: doc.id, ...doc.data() } as Record<string, unknown>;
+    delete data.createdAt; delete data.updatedAt;
+    return NextResponse.json({ success: true, profile: data });
+  } catch (_e) {
+    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+  }
+}
 
-    const creatorDoc = creatorQuery.docs[0];
-    const creatorData = creatorDoc.data();
-
-    // حساب الإحصائيات من المشاريع
-    const stats = {
-      total: 0,
-      completed: 0,
-      ongoing: 0,
-      earnings: 0
-    };
-
-    try {
-      // البحث عن المشاريع المرتبطة بالمبدع
-      const projectsQuery = await adminDb
-        .collection('projects')
-        .where('creatorId', '==', creatorDoc.id)
-        .get();
-
-      stats.total = projectsQuery.docs.length;
-      
-      projectsQuery.docs.forEach(doc => {
-        const project = doc.data();
-        if (project.status === 'completed') {
-          stats.completed++;
-          stats.earnings += project.amount || 0;
-        } else if (['in_progress', 'assigned'].includes(project.status)) {
-          stats.ongoing++;
-        }
-      });
-    } catch (error) {
-      console.warn('[creator.profile] Failed to calculate stats:', error);
+export async function PUT(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    return NextResponse.json({
-      success: true,
-      creator: {
-        id: creatorDoc.id,
-        fullName: creatorData.fullName,
-        role: creatorData.role,
-        status: creatorData.status,
-        city: creatorData.city,
-        phone: creatorData.contact?.phone || '',
-        canTravel: creatorData.canTravel,
-        createdAt: creatorData.createdAt,
-        intakeFormCompleted: creatorData.intakeFormCompleted || false
-      },
-      stats
-    });
-
-  } catch (error) {
-    console.error('[creator.profile] Error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'حدث خطأ في الخادم'
-    }, { status: 500 });
+    const updates = await req.json();
+    // sanitize
+    delete updates.email; delete updates.status; delete updates.role; delete updates.createdAt; delete updates.updatedAt;
+    updates.updatedAt = new Date();
+    const snap = await adminDb.collection('creators').where('email', '==', session.user.email).limit(1).get();
+    if (snap.empty) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+    }
+    const doc = snap.docs[0];
+    await doc.ref.update(updates);
+    return NextResponse.json({ success: true, message: 'تم الحفظ' });
+  } catch (_e) {
+    return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }

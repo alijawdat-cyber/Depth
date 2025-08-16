@@ -158,8 +158,8 @@ export default function CreatorsPortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] py-8">
-      <Container>
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -454,7 +454,7 @@ export default function CreatorsPortalPage() {
             </div>
           </motion.div>
         )}
-      </Container>
+      </div>
     </div>
   );
 }

@@ -164,18 +164,21 @@ html, body {
   scrollbar-gutter: stable both-edges;
 }
 
-/* Unified, modern scroll system */
+/* Unified, modern scroll system - Admin Panel Optimized */
 /* Both axes, used for data tables/cards with sticky headers inside */
 .scroll-xy {
   position: relative;
   overflow: auto;
-  max-height: var(--scroll-max, 72vh);
-  max-block-size: var(--scroll-max, 72vh);
-  /* كبح السلسلة أفقياً فقط، والسماح للعمودي بالانتقال للأب */
-  overscroll-behavior-inline: contain;
-  overscroll-behavior-block: auto;
+  /* Dynamic height calculation for admin panels */
+  height: var(--scroll-height, calc(100vh - 280px));
+  max-height: var(--scroll-max-height, calc(100vh - 280px));
+  min-height: var(--scroll-min-height, 400px);
+  /* Enhanced scroll behavior for desktop */
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
 }
 
 /* Vertical only (lists/panels) */
@@ -183,10 +186,12 @@ html, body {
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: var(--scroll-max, 72vh);
-  max-block-size: var(--scroll-max, 72vh);
+  height: var(--scroll-height, calc(100vh - 280px));
+  max-height: var(--scroll-max-height, calc(100vh - 280px));
+  min-height: var(--scroll-min-height, 400px);
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Horizontal only (wide tables) */
@@ -195,6 +200,25 @@ html, body {
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
+  scroll-behavior: smooth;
+}
+
+/* Admin-specific scroll containers */
+.admin-scroll-container {
+  position: relative;
+  height: calc(100vh - 240px);
+  min-height: 500px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-scroll-content {
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Safe area padding for iOS notch within sticky headers if needed */
@@ -446,11 +470,39 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
     display: none;
   }
   
-  /* Adjust container height for small screens */
-  .overflow-auto,
+  /* Mobile-optimized scroll containers */
   .scroll-xy,
   .scroll-y {
-    max-height: min(60vh, var(--scroll-max, 60vh)) !important;
+    height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 200px) !important;
+    min-height: 300px !important;
+  }
+  
+  .admin-scroll-container {
+    height: calc(100vh - 160px) !important;
+    min-height: 400px !important;
+  }
+}
+
+/* Desktop optimizations for admin panels */
+@media (min-width: 1024px) {
+  .scroll-xy,
+  .scroll-y {
+    height: calc(100vh - 280px);
+    max-height: calc(100vh - 280px);
+    min-height: 500px;
+  }
+  
+  .admin-scroll-container {
+    height: calc(100vh - 240px);
+    min-height: 600px;
+  }
+  
+  /* Enhanced table interactions */
+  .scroll-xy table tbody tr:hover {
+    background-color: var(--elev);
+    transform: translateX(2px);
+    transition: all 0.15s ease;
   }
 }
 

@@ -41,6 +41,7 @@ import { StateLoading, StateError, StateEmpty, StatCardSkeleton, FileCardSkeleto
 import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
 import NotificationBell from "@/components/ui/NotificationBell";
 import { BRAND } from "@/lib/constants/brand";
+import { profilePathForRole } from "@/lib/roles";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
 
@@ -301,7 +302,7 @@ export default function PortalClientReal() {
             <NotificationBell highlight={pathname === '/portal' || pathname?.startsWith('/portal/notifications')} />
             <Button 
               variant="ghost" 
-              onClick={() => router.push('/portal/profile')}
+              onClick={() => router.push(profilePathForRole(((session?.user as { role?: string } | undefined)?.role)))}
               className="text-[var(--text)] hover:bg-[var(--neutral-0)]/10 border-[var(--neutral-0)]/20"
             >
               <Settings size={16} className="mr-2" />
@@ -513,7 +514,7 @@ export default function PortalClientReal() {
                     <Button 
                       variant="ghost" 
                       className="flex items-center justify-center gap-2 p-4 rounded-[var(--radius-lg)] font-medium transition-all hover:scale-105 bg-purple-50 hover:bg-purple-100 text-purple-700"
-                      onClick={() => router.push('/portal/profile')}
+                      onClick={() => router.push(profilePathForRole(((session?.user as { role?: string } | undefined)?.role)))}
                     >
                       <Settings size={20} />
                       حدّث بيانات حسابك

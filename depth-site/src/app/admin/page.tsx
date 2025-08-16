@@ -93,7 +93,6 @@ export default function AdminDashboard() {
   const [newProjectDescription, setNewProjectDescription] = useState<string>('');
   const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
   const [fileFilter, setFileFilter] = useState<'all'|'image'|'video'|'document'>('all');
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
 
   const fetchClients = useCallback(async () => {
@@ -289,8 +288,10 @@ export default function AdminDashboard() {
       {/* رأس لوحة التحكم المحدث */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">لوحة التحكم الرئيسية</h1>
-          <p className="text-[var(--muted)]">نظرة شاملة على الأعمال والإحصائيات</p>
+                      <h1 className="text-3xl font-bold text-[var(--text)] mb-2">لوحة التحكم الرئيسية</h1>
+            <p className="text-[var(--muted)]">
+              نظرة شاملة على الأعمال والإحصائيات - صلاحية: {userRole === 'admin' ? 'مدير' : userRole}
+            </p>
         </div>
         <div className="flex items-center gap-3">
           <Button 
@@ -516,8 +517,9 @@ export default function AdminDashboard() {
           {/* Clients Table */}
           {!loading && !error && (
             <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
-              <div className="scroll-xy">
-                <table className="w-full">
+              <div className="admin-scroll-container">
+                <div className="admin-scroll-content">
+                  <table className="w-full">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
                     <tr>
                       <th className="text-right p-4 font-semibold text-[var(--text)]">العميل</th>
@@ -638,16 +640,17 @@ export default function AdminDashboard() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
-              
-              {clients.length === 0 && (
-                <div className="text-center py-12">
-                  <Users size={48} className="mx-auto mb-4 text-[var(--slate-400)]" />
-                  <h3 className="text-lg font-semibold text-[var(--text)] mb-2">لا توجد طلبات</h3>
-                  <p className="text-[var(--slate-600)]">لم يتم استلام أي طلبات عضوية حتى الآن</p>
+                  </table>
                 </div>
-              )}
+              
+                {clients.length === 0 && (
+                  <div className="text-center py-12">
+                    <Users size={48} className="mx-auto mb-4 text-[var(--slate-400)]" />
+                    <h3 className="text-lg font-semibold text-[var(--text)] mb-2">لا توجد طلبات</h3>
+                    <p className="text-[var(--slate-600)]">لم يتم استلام أي طلبات عضوية حتى الآن</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -722,8 +725,9 @@ export default function AdminDashboard() {
             )}
             {!projectsLoading && !projectsError && (
               <div className="bg-[var(--card)] rounded-lg border border-[var(--elev)] overflow-hidden">
-                <div className="scroll-xy">
-                  <table className="w-full">
+                <div className="admin-scroll-container">
+                  <div className="admin-scroll-content">
+                    <table className="w-full">
                     <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
                       <tr>
                         <th className="text-right p-4 font-semibold text-[var(--text)]">العنوان</th>
@@ -762,7 +766,8 @@ export default function AdminDashboard() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
                 </div>
                 {projects.length === 0 && (
                   <div className="text-center py-8 text-[var(--slate-600)]">لا توجد مشاريع حتى الآن</div>
@@ -811,6 +816,6 @@ export default function AdminDashboard() {
               <UnifiedUploader projectId={selectedProjectIdForUpload || ''} onUploaded={() => { fetchProjects(); }} />
             </div>
           </div>
-    </div>
-  );
-}
+      </div>
+    );
+  }

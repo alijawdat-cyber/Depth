@@ -628,8 +628,9 @@ export default function AdminQuotesPage() {
                 <p className="text-gray-500">لا توجد عروض</p>
               </div>
             ) : (
-              <div className="scroll-xy">
-                <table className="min-w-full divide-y divide-[var(--elev)]">
+              <div className="admin-scroll-container">
+                <div className="admin-scroll-content">
+                  <table className="min-w-full divide-y divide-[var(--elev)]">
                   <thead className="bg-[var(--bg)]">
                     <tr>
                       <th className="px-6 py-3 text-right text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
@@ -733,7 +734,8 @@ export default function AdminQuotesPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             )}
           </div>
