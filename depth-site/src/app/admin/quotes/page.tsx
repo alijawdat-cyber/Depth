@@ -628,7 +628,7 @@ export default function AdminQuotesPage() {
                 <p className="text-gray-500">لا توجد عروض</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="data-scroll scroll-x">
                 <table className="min-w-full divide-y divide-[var(--elev)]">
                   <thead className="bg-[var(--bg)]">
                     <tr>

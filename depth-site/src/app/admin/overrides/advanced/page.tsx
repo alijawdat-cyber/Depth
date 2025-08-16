@@ -415,7 +415,7 @@ export default function AdvancedOverridesPage() {
 
       {/* Override Requests Table */}
       <div className="bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="data-scroll scroll-x">
           <table className="w-full">
             <thead className="bg-[var(--elev)]">
               <tr>

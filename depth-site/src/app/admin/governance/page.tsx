@@ -58,7 +58,11 @@ export default function GovernancePage() {
       // Load versions and stats
       const versionsResponse = await fetch('/api/governance/versions');
       if (!versionsResponse.ok) {
-        throw new Error('فشل في تحميل الإصدارات');
+        if (versionsResponse.status === 401) {
+          throw new Error('غير مصرح لك بالوصول إلى صفحة الحوكمة');
+        }
+        const errorData = await versionsResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || 'فشل في تحميل الإصدارات');
       }
       const versionsData = await versionsResponse.json();
 

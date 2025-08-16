@@ -160,6 +160,22 @@ html, body {
   touch-action: pan-y pinch-zoom;
 }
 
+/* Scroll containers for data tables/cards */
+.data-scroll {
+  position: relative;
+  overflow: auto;
+  max-height: 72vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Horizontal scroll area for mobile lists/tables */
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
 /* Safe area padding for iOS notch within sticky headers if needed */
 .safe-area-inline {
   padding-left: max(env(safe-area-inset-left), 0px);
