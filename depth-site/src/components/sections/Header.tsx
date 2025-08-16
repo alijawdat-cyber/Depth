@@ -91,7 +91,7 @@ export default function Header() {
             {mounted ? (resolvedTheme === "dark" ? <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> : <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />) : null}
           </Button>
           {status === 'authenticated' ? (
-            <div className="relative hidden sm:flex">
+            <div className="relative flex">
               <button
                 aria-label="account menu"
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--elev)] hover:bg-[var(--elev)]"
@@ -149,6 +149,17 @@ export default function Header() {
               );
             })}
           </nav>
+          {status === 'authenticated' && (
+            <div className="mt-3 grid gap-1 text-sm">
+              {role !== 'admin' && (
+                <Link href="/portal" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">بوابتي</Link>
+              )}
+              <Link href="/portal/profile" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">ملفي</Link>
+              {role === 'admin' && (
+                <Link href="/admin" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">لوحة الأدمن</Link>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-2 mt-3">
             <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
               <span suppressHydrationWarning>{mounted ? (resolvedTheme === "dark" ? "وضع فاتح" : "وضع داكن") : "تبديل الوضع"}</span>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/Button";
 import Loader from "@/components/loaders/Loader";
 import { 
@@ -137,32 +136,29 @@ export default function OverridesPage() {
 
   if (state.loading && state.overrides.length === 0) {
     return (
-      <AdminLayout title="طلبات التعديل">
+      <div>
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader />
             <p className="mt-4 text-[var(--muted)]">جاري تحميل طلبات التعديل...</p>
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout 
-      title="طلبات التعديل"
-      description="مراجعة والموافقة على طلبات تعديل الأسعار من المبدعين"
-      actions={
-        <Button
-          variant="secondary"
-          onClick={loadData}
-          disabled={state.loading}
-        >
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">طلبات التعديل</h1>
+          <p className="text-[var(--muted)]">مراجعة والموافقة على طلبات تعديل الأسعار من المبدعين</p>
+        </div>
+        <Button variant="secondary" onClick={loadData} disabled={state.loading}>
           <RefreshCw size={16} className={state.loading ? "animate-spin" : ""} />
           تحديث
         </Button>
-      }
-    >
+      </div>
       {/* Error Display */}
       {state.error && (
         <div className="mb-6 p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-[var(--radius)]">
@@ -385,6 +381,6 @@ export default function OverridesPage() {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </div>
   );
 }

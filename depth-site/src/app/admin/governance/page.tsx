@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/Button";
 import Loader from "@/components/loaders/Loader";
 import { 
@@ -185,28 +184,26 @@ export default function GovernancePage() {
 
   if (state.loading && state.versions.length === 0) {
     return (
-      <AdminLayout title="الحوكمة والإصدارات">
+      <div>
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader />
             <p className="mt-4 text-[var(--muted)]">جاري تحميل بيانات الحوكمة...</p>
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout 
-      title="الحوكمة والإصدارات"
-      description="إدارة إصدارات جدول الأسعار ومراجعة التغييرات"
-      actions={
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">الحوكمة والإصدارات</h1>
+          <p className="text-[var(--muted)]">إدارة إصدارات جدول الأسعار ومراجعة التغييرات</p>
+        </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            onClick={loadData}
-            disabled={state.loading}
-          >
+          <Button variant="secondary" onClick={loadData} disabled={state.loading}>
             <RefreshCw size={16} className={state.loading ? "animate-spin" : ""} />
             تحديث
           </Button>
@@ -215,8 +212,7 @@ export default function GovernancePage() {
             إصدار جديد
           </Button>
         </div>
-      }
-    >
+      </div>
       {/* Error Display */}
       {state.error && (
         <div className="mb-6 p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-[var(--radius)]">
@@ -436,6 +432,6 @@ export default function GovernancePage() {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </div>
   );
 }

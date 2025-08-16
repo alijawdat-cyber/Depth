@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
+import Dropdown from '@/components/ui/Dropdown';
 
 interface RateCard {
   versionId: string;
@@ -243,15 +243,15 @@ export default function AdminPricingPage() {
   };
 
   return (
-    <AdminLayout
-      title="محرك التسعير"
-      description="حساب وتجربة أسعار العروض"
-      actions={
-        <Button onClick={loadData} disabled={loading}>
-          تحديث البيانات
-        </Button>
-      }
-    >
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">محرك التسعير</h1>
+          <p className="text-[var(--muted)]">حساب وتجربة أسعار العروض</p>
+        </div>
+        <Button onClick={loadData} disabled={loading}>تحديث البيانات</Button>
+      </div>
+
       <div className="max-w-4xl mx-auto">
 
           {error && (
@@ -268,22 +268,13 @@ export default function AdminPricingPage() {
               <div className="space-y-4">
                 {/* الفئة الفرعية */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الفئة الفرعية *
-                  </label>
-                  <select
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الفئة الفرعية *</label>
+                  <Dropdown
                     value={formData.subcategoryId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, subcategoryId: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="">اختر الفئة الفرعية</option>
-                    {subcategories.map(sub => (
-                      <option key={sub.id} value={sub.id}>
-                        {sub.nameAr} {sub.nameEn && `(${sub.nameEn})`}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => setFormData(prev => ({ ...prev, subcategoryId: String(v) }))}
+                    options={[{ value: '', label: 'اختر الفئة الفرعية' }, ...subcategories.map(sub => ({ value: sub.id, label: `${sub.nameAr}${sub.nameEn ? ` (${sub.nameEn})` : ''}` }))]}
+                    className="w-full"
+                  />
                 </div>
 
                 {/* الكمية */}
@@ -303,40 +294,28 @@ export default function AdminPricingPage() {
 
                 {/* المحور */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    المحور *
-                  </label>
-                  <select
+                  <label className="block text-sm font-medium text-gray-700 mb-2">المحور *</label>
+                  <Dropdown
                     value={formData.vertical}
-                    onChange={(e) => setFormData(prev => ({ ...prev, vertical: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="">اختر المحور</option>
-                    {verticals.map(vertical => (
-                      <option key={vertical.id} value={vertical.id}>
-                        {vertical.nameAr} {vertical.nameEn && `(${vertical.nameEn})`}
-                        {vertical.modifierPct && ` - ${(vertical.modifierPct * 100).toFixed(0)}%`}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => setFormData(prev => ({ ...prev, vertical: String(v) }))}
+                    options={[{ value: '', label: 'اختر المحور' }, ...verticals.map(vertical => ({ value: vertical.id, label: `${vertical.nameAr}${vertical.nameEn ? ` (${vertical.nameEn})` : ''}${vertical.modifierPct ? ` - ${(vertical.modifierPct * 100).toFixed(0)}%` : ''}` }))]}
+                    className="w-full"
+                  />
                 </div>
 
                 {/* نوع المعالجة */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    نوع المعالجة *
-                  </label>
-                  <select
+                  <label className="block text-sm font-medium text-gray-700 mb-2">نوع المعالجة *</label>
+                  <Dropdown
                     value={formData.processing}
-                    onChange={(e) => setFormData(prev => ({ ...prev, processing: e.target.value as 'raw_only' | 'raw_basic' | 'full_retouch' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="raw_only">{`Raw Only (${rawOnlyPctLabel})`}</option>
-                    <option value="raw_basic">Raw + Basic (0%)</option>
-                    <option value="full_retouch">{`Full Retouch (${fullRetouchPctLabel})`}</option>
-                  </select>
+                    onChange={(v) => setFormData(prev => ({ ...prev, processing: v as 'raw_only' | 'raw_basic' | 'full_retouch' }))}
+                    options={[
+                      { value: 'raw_only', label: `Raw Only (${rawOnlyPctLabel})` },
+                      { value: 'raw_basic', label: 'Raw + Basic (0%)' },
+                      { value: 'full_retouch', label: `Full Retouch (${fullRetouchPctLabel})` },
+                    ]}
+                    className="w-full"
+                  />
                 </div>
 
                 {/* إعدادات إضافية */}
@@ -362,41 +341,36 @@ export default function AdminPricingPage() {
 
                   {/* Location Zone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      منطقة الموقع (Location Zone)
-                    </label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-1">منطقة الموقع (Location Zone)</label>
+                    <Dropdown
                       value={formData.conditions?.locationZone || ''}
-                      onChange={(e) => setFormData(prev => ({
-                        ...prev,
-                        conditions: { ...prev.conditions, locationZone: e.target.value }
-                      }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">بدون رسوم موقع</option>
-                      {rateCard?.locationZonesIQD && Object.entries(rateCard.locationZonesIQD).map(([key, amount]) => (
-                        <option key={key} value={key}>
-                          {key} (+{formatCurrency(amount, 'IQD')})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(v) => setFormData(prev => ({ ...prev, conditions: { ...prev.conditions, locationZone: String(v) } }))}
+                      options={[
+                        { value: '', label: 'بدون رسوم موقع' },
+                        ...(
+                          rateCard?.locationZonesIQD
+                            ? Object.entries(rateCard.locationZonesIQD).map(([key, amount]) => ({ value: key, label: `${key} (+${formatCurrency(amount, 'IQD')})` }))
+                            : []
+                        )
+                      ]}
+                      className="w-full"
+                    />
                   </div>
 
                   {/* Creator Tier */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      مستوى المبدع
-                    </label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-1">مستوى المبدع</label>
+                    <Dropdown
                       value={formData.tier || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, tier: (e.target.value as 'T1' | 'T2' | 'T3') || undefined }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">بدون تخصص</option>
-                      <option value="T1">{`T1 - مبتدئ (${tierPctLabel('T1')})`}</option>
-                      <option value="T2">{`T2 - متوسط (${tierPctLabel('T2')})`}</option>
-                      <option value="T3">{`T3 - خبير (${tierPctLabel('T3')})`}</option>
-                    </select>
+                      onChange={(v) => setFormData(prev => ({ ...prev, tier: (v as 'T1' | 'T2' | 'T3') || undefined }))}
+                      options={[
+                        { value: '', label: 'بدون تخصص' },
+                        { value: 'T1', label: `T1 - مبتدئ (${tierPctLabel('T1')})` },
+                        { value: 'T2', label: `T2 - متوسط (${tierPctLabel('T2')})` },
+                        { value: 'T3', label: `T3 - خبير (${tierPctLabel('T3')})` },
+                      ]}
+                      className="w-full"
+                    />
                   </div>
 
                   {/* التكلفة المقدرة */}
@@ -563,6 +537,6 @@ export default function AdminPricingPage() {
             </div>
           )}
       </div>
-    </AdminLayout>
+    </div>
   );
 }

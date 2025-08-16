@@ -6,7 +6,8 @@ import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
-import { Quote, QuoteCreateRequest, Subcategory, Vertical } from '@/types/catalog';
+import Dropdown from '@/components/ui/Dropdown';
+import { Quote, QuoteCreateRequest, Subcategory, Vertical, RateCard } from '@/types/catalog';
 
 interface QuoteStats {
   draft: number;
@@ -22,6 +23,7 @@ export default function AdminQuotesPage() {
   const [stats, setStats] = useState<QuoteStats | null>(null);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [verticals, setVerticals] = useState<Vertical[]>([]);
+  const [rateCard, setRateCard] = useState<RateCard | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -68,21 +70,27 @@ export default function AdminQuotesPage() {
       setQuotes(quotesData.quotes || []);
       setStats(quotesData.stats);
 
-      // تحميل الفئات الفرعية والمحاور (إذا لم تكن محملة)
-      if (subcategories.length === 0) {
-        const [subcatResponse, verticalResponse] = await Promise.all([
+      // تحميل الفئات الفرعية والمحاور والريت كارد (إذا لم تكن محملة)
+      if (subcategories.length === 0 || verticals.length === 0 || !rateCard) {
+        const [subcatResponse, verticalResponse, rateResponse] = await Promise.all([
           fetch('/api/catalog/subcategories'),
-          fetch('/api/catalog/verticals')
+          fetch('/api/catalog/verticals'),
+          fetch('/api/pricing/rate-card/active')
         ]);
 
         if (subcatResponse.ok) {
           const subcatData = await subcatResponse.json();
-          setSubcategories(subcatData.data || []);
+          setSubcategories(subcatData.data || subcatData.items || []);
         }
 
         if (verticalResponse.ok) {
           const verticalData = await verticalResponse.json();
-          setVerticals(verticalData.data || []);
+          setVerticals(verticalData.data || verticalData.items || []);
+        }
+
+        if (rateResponse.ok) {
+          const rateData = await rateResponse.json();
+          setRateCard(rateData.rateCard ?? null);
         }
       }
 
@@ -95,8 +103,13 @@ export default function AdminQuotesPage() {
   };
 
   const createQuote = async () => {
-    if (!newQuote.clientEmail || !newQuote.lines?.[0]?.subcategoryId || !newQuote.lines?.[0]?.vertical) {
-      setError('يرجى ملء جميع الحقول المطلوبة');
+    if (!newQuote.clientEmail || !newQuote.lines || newQuote.lines.length === 0) {
+      setError('يرجى ملء بريد العميل وإضافة سطر واحد على الأقل');
+      return;
+    }
+    const invalid = newQuote.lines.some(l => !l.subcategoryId || !l.vertical || !l.qty || l.qty <= 0);
+    if (invalid) {
+      setError('يرجى إكمال الحقول المطلوبة لكل سطر (الفئة، المحور، الكمية)');
       return;
     }
 
@@ -210,6 +223,76 @@ export default function AdminQuotesPage() {
     );
   }
 
+  // Helpers to manage multiple quote lines
+  const addLine = () => {
+    setNewQuote(prev => ({
+      ...prev,
+      lines: [
+        ...(prev.lines || []),
+        {
+          subcategoryId: '',
+          qty: 1,
+          vertical: '',
+          processing: 'raw_basic',
+          conditions: { rush: false, locationZone: '' },
+          tier: undefined,
+          overrideIQD: undefined,
+          estimatedCostIQD: undefined,
+          notes: ''
+        }
+      ]
+    }));
+  };
+
+  const removeLine = (index: number) => {
+    setNewQuote(prev => ({
+      ...prev,
+      lines: (prev.lines || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const duplicateLine = (index: number) => {
+    setNewQuote(prev => {
+      const lines = prev.lines ? [...prev.lines] : [];
+      const source = lines[index];
+      if (!source) return prev;
+      lines.splice(index + 1, 0, { ...source });
+      return { ...prev, lines };
+    });
+  };
+
+  const updateLineField = <K extends keyof QuoteCreateRequest['lines'][number]>(
+    index: number,
+    key: K,
+    value: QuoteCreateRequest['lines'][number][K]
+  ) => {
+    setNewQuote(prev => {
+      const lines = prev.lines ? [...prev.lines] : [];
+      const current = lines[index] || {
+        subcategoryId: '', qty: 1, vertical: '', processing: 'raw_basic', conditions: { rush: false, locationZone: '' }
+      };
+      lines[index] = { ...current, [key]: value } as QuoteCreateRequest['lines'][number];
+      return { ...prev, lines };
+    });
+  };
+
+  const updateLineConditions = (
+    index: number,
+    partial: NonNullable<QuoteCreateRequest['lines'][number]['conditions']>
+  ) => {
+    setNewQuote(prev => {
+      const lines = prev.lines ? [...prev.lines] : [];
+      const current = lines[index] || {
+        subcategoryId: '', qty: 1, vertical: '', processing: 'raw_basic', conditions: { rush: false, locationZone: '' }
+      };
+      lines[index] = { 
+        ...current, 
+        conditions: { ...(current.conditions || {}), ...partial }
+      } as QuoteCreateRequest['lines'][number];
+      return { ...prev, lines };
+    });
+  };
+
   const generateSOW = async (quoteId: string) => {
     try {
       setUpdating(quoteId);
@@ -316,21 +399,20 @@ export default function AdminQuotesPage() {
           {/* أدوات التحكم */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="all">جميع العروض</option>
-                <option value="draft">مسودات</option>
-                <option value="sent">مُرسلة</option>
-                <option value="approved">معتمدة</option>
-                <option value="rejected">مرفوضة</option>
-              </select>
-              
-              <Button onClick={loadData} disabled={loading}>
-                تحديث
-              </Button>
+              <div className="min-w-[200px]">
+                <Dropdown
+                  value={selectedStatus}
+                  onChange={(v) => setSelectedStatus(String(v))}
+                  options={[
+                    { value: 'all', label: 'جميع العروض' },
+                    { value: 'draft', label: 'مسودات' },
+                    { value: 'sent', label: 'مُرسلة' },
+                    { value: 'approved', label: 'معتمدة' },
+                    { value: 'rejected', label: 'مرفوضة' },
+                  ]}
+                />
+              </div>
+              <Button onClick={loadData} disabled={loading}>تحديث</Button>
             </div>
 
             <Button 
@@ -381,53 +463,35 @@ export default function AdminQuotesPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      الفئة الفرعية *
-                    </label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-2">الفئة الفرعية *</label>
+                    <Dropdown
                       value={newQuote.lines?.[0]?.subcategoryId || ''}
-                      onChange={(e) => setNewQuote(prev => ({
+                      onChange={(v) => setNewQuote(prev => ({
                         ...prev,
                         lines: [{
                           ...prev.lines![0],
-                          subcategoryId: e.target.value
+                          subcategoryId: String(v)
                         }]
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">اختر الفئة الفرعية</option>
-                      {subcategories.map(sub => (
-                        <option key={sub.id} value={sub.id}>
-                          {sub.nameAr} {sub.nameEn && `(${sub.nameEn})`}
-                        </option>
-                      ))}
-                    </select>
+                      options={[{ value: '', label: 'اختر الفئة الفرعية' }, ...subcategories.map(sub => ({ value: sub.id, label: `${sub.nameAr}${sub.nameEn ? ` (${sub.nameEn})` : ''}` }))]}
+                      className="w-full"
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      المحور *
-                    </label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-2">المحور *</label>
+                    <Dropdown
                       value={newQuote.lines?.[0]?.vertical || ''}
-                      onChange={(e) => setNewQuote(prev => ({
+                      onChange={(v) => setNewQuote(prev => ({
                         ...prev,
                         lines: [{
                           ...prev.lines![0],
-                          vertical: e.target.value
+                          vertical: String(v)
                         }]
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">اختر المحور</option>
-                      {verticals.map(vertical => (
-                        <option key={vertical.id} value={vertical.id}>
-                          {vertical.nameAr} {vertical.nameEn && `(${vertical.nameEn})`}
-                        </option>
-                      ))}
-                    </select>
+                      options={[{ value: '', label: 'اختر المحور' }, ...verticals.map(vertical => ({ value: vertical.id, label: `${vertical.nameAr}${vertical.nameEn ? ` (${vertical.nameEn})` : ''}` }))]}
+                      className="w-full"
+                    />
                   </div>
 
                   <div>
@@ -455,24 +519,23 @@ export default function AdminQuotesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                   {/* نوع المعالجة */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      نوع المعالجة
-                    </label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-2">نوع المعالجة</label>
+                    <Dropdown
                       value={newQuote.lines?.[0]?.processing || 'raw_basic'}
-                      onChange={(e) => setNewQuote(prev => ({
+                      onChange={(v) => setNewQuote(prev => ({
                         ...prev,
                         lines: [{
                           ...prev.lines![0],
-                          processing: e.target.value as 'raw_only' | 'raw_basic' | 'full_retouch'
+                          processing: v as 'raw_only' | 'raw_basic' | 'full_retouch'
                         }]
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="raw_only">Raw Only</option>
-                      <option value="raw_basic">Raw + Basic</option>
-                      <option value="full_retouch">Full Retouch</option>
-                    </select>
+                      options={[
+                        { value: 'raw_only', label: 'Raw Only' },
+                        { value: 'raw_basic', label: 'Raw + Basic' },
+                        { value: 'full_retouch', label: 'Full Retouch' },
+                      ]}
+                      className="w-full"
+                    />
                   </div>
 
                   {/* Rush */}
