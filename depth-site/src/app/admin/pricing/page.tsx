@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Container } from '@/components/ui/Container';
-import SectionHeading from '@/components/ui/SectionHeading';
+import { useSession, signIn } from 'next-auth/react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
@@ -73,6 +73,7 @@ interface QuotePreviewResult {
 }
 
 export default function AdminPricingPage() {
+  const { data: session, status } = useSession();
   const [rateCard, setRateCard] = useState<RateCard | null>(null);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [verticals, setVerticals] = useState<Vertical[]>([]);
@@ -112,7 +113,7 @@ export default function AdminPricingPage() {
         throw new Error('فشل في تحميل جدول الأسعار');
       }
       const rateData = await rateResponse.json();
-      setRateCard(rateData.data);
+      setRateCard(rateData.rateCard ?? null);
 
       // تحميل الفئات الفرعية
       const subcatResponse = await fetch('/api/catalog/subcategories');
@@ -176,6 +177,37 @@ export default function AdminPricingPage() {
     }
   };
 
+  // حراسة الوصول: تسجيل الدخول والأدمن فقط
+  const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
+  if (status !== 'authenticated') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-md mx-auto bg-white rounded-lg border p-6 text-center">
+            <h1 className="text-2xl font-bold mb-3">لوحة التسعير</h1>
+            <p className="text-gray-600 mb-4">سجّل الدخول بحساب الأدمن للوصول.</p>
+            <Button onClick={() => signIn('google', { callbackUrl: '/admin/pricing' })}>
+              تسجيل الدخول عبر Google
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (userRole !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-md mx-auto bg-white rounded-lg border p-6 text-center">
+            <h1 className="text-2xl font-bold mb-3">لا تملك صلاحية الوصول</h1>
+            <p className="text-gray-600 mb-4">هذه الصفحة خاصة بمدراء النظام.</p>
+            <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -185,14 +217,16 @@ export default function AdminPricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <Container>
-        <div className="max-w-4xl mx-auto">
-          <SectionHeading
-            title="محرك التسعير"
-            subtitle="حساب وتجربة أسعار العروض"
-            className="text-center mb-12"
-          />
+    <AdminLayout
+      title="محرك التسعير"
+      description="حساب وتجربة أسعار العروض"
+      actions={
+        <Button onClick={loadData} disabled={loading}>
+          تحديث البيانات
+        </Button>
+      }
+    >
+      <div className="max-w-4xl mx-auto">
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -480,8 +514,7 @@ export default function AdminPricingPage() {
               </div>
             </div>
           )}
-        </div>
-      </Container>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

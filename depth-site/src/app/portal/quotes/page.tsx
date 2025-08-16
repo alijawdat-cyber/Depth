@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Container } from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
@@ -10,26 +10,20 @@ import { formatCurrency } from '@/lib/pricing/fx';
 import { Quote } from '@/types/catalog';
 
 export default function ClientQuotesPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  // تحميل العروض
-  useEffect(() => {
-    if (status === 'authenticated') {
-      loadQuotes();
-    }
-  }, [status, selectedStatus]);
-
-  const loadQuotes = async () => {
+  const loadQuotes = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/pricing/quote?status=${selectedStatus === 'all' ? '' : selectedStatus}&limit=50`);
+      const qs = selectedStatus === 'all' ? '?limit=50' : `?status=${selectedStatus}&limit=50`;
+      const response = await fetch(`/api/pricing/quote${qs}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'فشل في تحميل العروض');
@@ -44,7 +38,14 @@ export default function ClientQuotesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus]);
+
+  // تحميل العروض
+  useEffect(() => {
+    if (status === 'authenticated') {
+      loadQuotes();
+    }
+  }, [status, selectedStatus, loadQuotes]);
 
   const updateQuoteStatus = async (quoteId: string, action: 'approve' | 'reject', reason?: string) => {
     try {
@@ -64,15 +65,9 @@ export default function ClientQuotesPage() {
         throw new Error(errorData.error || 'فشل في تحديث العرض');
       }
 
-      const data = await response.json();
-      
-      // تحديث العرض في القائمة
-      setQuotes(prev => prev.map(quote => 
-        quote.id === quoteId ? data.quote : quote
-      ));
-
-      // إعادة تحميل القائمة
-      loadQuotes();
+      await response.json();
+      // إعادة تحميل القائمة لتفادي عدم الاتساق اللحظي
+      await loadQuotes();
 
     } catch (err) {
       console.error('خطأ في تحديث العرض:', err);
@@ -304,6 +299,7 @@ export default function ClientQuotesPage() {
                           <div>
                             <p className="text-sm font-medium text-green-800">تم اعتماد العرض بنجاح</p>
                             <p className="text-sm text-green-700">سيتم التواصل معك قريباً لبدء تنفيذ المشروع</p>
+                            <a href="/portal/documents" className="text-blue-600 underline text-xs mt-2 inline-block">عرض المستندات (SOW)</a>
                           </div>
                         </div>
                       </div>

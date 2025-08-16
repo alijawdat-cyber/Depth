@@ -148,4 +148,147 @@ function escapeHtml(input: string) {
     .replace(/'/g, '&#039;');
 }
 
+// Quote Email Templates
+export function renderQuoteNotificationEmail(params: {
+  type: 'new_quote' | 'quote_approved' | 'quote_rejected';
+  recipientName: string;
+  recipientEmail: string;
+  quoteId: string;
+  projectTitle?: string;
+  totalAmountIQD: number;
+  totalAmountUSD?: number;
+  clientMessage?: string;
+  adminMessage?: string;
+  quoteUrl: string;
+}) {
+  const { 
+    type, 
+    recipientName, 
+    recipientEmail, 
+    quoteId, 
+    projectTitle, 
+    totalAmountIQD, 
+    totalAmountUSD, 
+    clientMessage, 
+    adminMessage, 
+    quoteUrl 
+  } = params;
+
+  const getSubject = () => {
+    switch (type) {
+      case 'new_quote':
+        return `عرض سعر جديد من Depth Agency - ${quoteId}`;
+      case 'quote_approved':
+        return `تم قبول عرض السعر - ${quoteId}`;
+      case 'quote_rejected':
+        return `تم رفض عرض السعر - ${quoteId}`;
+      default:
+        return `تحديث عرض السعر - ${quoteId}`;
+    }
+  };
+
+  const getHeading = () => {
+    switch (type) {
+      case 'new_quote':
+        return 'عرض سعر جديد';
+      case 'quote_approved':
+        return 'تم قبول عرض السعر';
+      case 'quote_rejected':
+        return 'تم رفض عرض السعر';
+      default:
+        return 'تحديث عرض السعر';
+    }
+  };
+
+  const getMessage = () => {
+    switch (type) {
+      case 'new_quote':
+        return `مرحباً ${recipientName}، تم إرسال عرض سعر جديد لمشروعك. يمكنك مراجعة التفاصيل والموافقة عليه من خلال البوابة.`;
+      case 'quote_approved':
+        return `شكراً لك ${recipientName} على موافقتك على عرض السعر. سنبدأ العمل على مشروعك قريباً وسنرسل لك بيان العمل (SOW).`;
+      case 'quote_rejected':
+        return `تم رفض عرض السعر بنجاح. يمكنك التواصل معنا لمناقشة التعديلات المطلوبة.`;
+      default:
+        return `تم تحديث عرض السعر الخاص بك.`;
+    }
+  };
+
+  const getButtonText = () => {
+    switch (type) {
+      case 'new_quote':
+        return 'مراجعة العرض';
+      case 'quote_approved':
+        return 'عرض المستندات';
+      case 'quote_rejected':
+        return 'عرض التفاصيل';
+      default:
+        return 'عرض العرض';
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case 'new_quote':
+        return '#6C2BFF';
+      case 'quote_approved':
+        return '#10B981';
+      case 'quote_rejected':
+        return '#EF4444';
+      default:
+        return '#6C2BFF';
+    }
+  };
+
+  return `
+  <table dir="rtl" lang="ar" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f8fa;padding:24px;font-family:'Dubai',Tahoma,Arial,sans-serif;color:#0B0F14">
+    <tr>
+      <td align="center">
+        <table width="640" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08);overflow:hidden">
+          <tr>
+            <td style="padding:20px 24px;background:${getButtonColor()};color:#fff;font-weight:700;font-size:18px;text-align:center">
+              <div style="margin-bottom:8px">
+                <img src="https://depth-agency.com/brand/logo-wordmark.svg" alt="Depth Agency" style="height:32px;filter:brightness(0) invert(1)"/>
+              </div>
+              ${getHeading()}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px">
+              <h2 style="margin:0 0 16px 0;color:#0B0F14">${getMessage()}</h2>
+              
+              <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0">
+                <p style="margin:0 0 8px 0;font-size:14px;color:#6A7D8F"><strong>رقم العرض:</strong> ${quoteId}</p>
+                ${projectTitle ? `<p style="margin:0 0 8px 0;font-size:14px;color:#6A7D8F"><strong>المشروع:</strong> ${escapeHtml(projectTitle)}</p>` : ''}
+                <p style="margin:0 0 8px 0;font-size:16px;color:#0B0F14"><strong>المبلغ:</strong> ${totalAmountIQD.toLocaleString('ar-IQ')} د.ع</p>
+                ${totalAmountUSD ? `<p style="margin:0;font-size:14px;color:#6A7D8F">المبلغ بالدولار: $${totalAmountUSD.toLocaleString('en-US')}</p>` : ''}
+              </div>
+
+              ${(clientMessage || adminMessage) ? `
+              <div style="background:#e3f2fd;border-right:4px solid #2196f3;padding:16px;margin:16px 0">
+                <p style="margin:0 0 8px 0;font-size:14px;color:#1976d2;font-weight:600">
+                  ${clientMessage ? 'رسالة من العميل:' : 'ملاحظات إضافية:'}
+                </p>
+                <p style="margin:0;color:#1976d2">${escapeHtml(clientMessage || adminMessage || '')}</p>
+              </div>
+              ` : ''}
+
+              <div style="text-align:center;margin-top:32px">
+                <a href="${quoteUrl}" style="display:inline-block;padding:12px 24px;background:${getButtonColor()};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600">
+                  ${getButtonText()}
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 24px;background:#FAFBFC;color:#6A7D8F;font-size:12px;text-align:center">
+              <p style="margin:0 0 8px 0">تم إرسال هذا الإيميل إلى ${escapeHtml(recipientEmail)}</p>
+              <p style="margin:0">© 2025 Depth Agency. جميع الحقوق محفوظة.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>`;
+}
+
 

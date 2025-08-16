@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Container } from "@/components/ui/Container";
+import { useState, useEffect, useCallback, useRef } from "react";
+
 import { Button } from "@/components/ui/Button";
-import PageLayout from "@/components/layout/PageLayout";
+import AdminLayout from "@/components/admin/AdminLayout";
 import { CheckCircle, XCircle, Users, Clock, Mail, Phone, Building, RefreshCw, AlertCircle } from "lucide-react";
 import UnifiedUploader from "@/components/features/portal/files/UnifiedUploader";
 import { signIn, useSession } from "next-auth/react";
@@ -21,6 +21,7 @@ interface Client {
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
+  const createProjectRef = useRef<HTMLDivElement | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -189,53 +190,52 @@ export default function AdminDashboard() {
   // Enforce Google sign-in for admin
   if (status !== 'authenticated') {
     return (
-      <PageLayout>
-        <div className="py-12 md:py-20">
-          <Container>
-            <div className="max-w-md mx-auto">
-              <div className="bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)]">
-                <div className="text-center mb-8">
-                  <Users size={48} className="mx-auto mb-4 text-[var(--accent-500)]" />
-                  <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لوحة إدارة العملاء</h1>
-                  <p className="text-[var(--slate-600)]">سجّل الدخول عبر Google باستخدام حساب الأدمن <span className="font-mono text-[var(--text)]">admin@depth-agency.com</span></p>
-                </div>
-                
-                <div className="space-y-4">
-                  <Button onClick={() => signIn('google', { callbackUrl: '/admin' })} className="w-full">
-                    تسجيل الدخول عبر Google
-                  </Button>
-                  <p className="text-xs text-center text-[var(--slate-600)]">بعد تسجيل الدخول الناجح، ستظهر لك لوحة الإدارة بدلاً من صفحة انتظار العميل.</p>
-                </div>
-              </div>
+      <AdminLayout>
+        <div className="max-w-md mx-auto">
+          <div className="bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)]">
+            <div className="text-center mb-8">
+              <Users size={48} className="mx-auto mb-4 text-[var(--accent-500)]" />
+              <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لوحة إدارة العملاء</h1>
+              <p className="text-[var(--slate-600)]">سجّل الدخول عبر Google باستخدام حساب الأدمن <span className="font-mono text-[var(--text)]">admin@depth-agency.com</span></p>
             </div>
-          </Container>
+            
+            <div className="space-y-4">
+              <Button onClick={() => signIn('google', { callbackUrl: '/admin' })} className="w-full">
+                تسجيل الدخول عبر Google
+              </Button>
+              <p className="text-xs text-center text-[var(--slate-600)]">بعد تسجيل الدخول الناجح، ستظهر لك لوحة الإدارة بدلاً من صفحة انتظار العميل.</p>
+            </div>
+          </div>
         </div>
-      </PageLayout>
+      </AdminLayout>
     );
   }
   if (!isAdmin) {
     return (
-      <PageLayout>
-        <div className="py-12 md:py-20">
-          <Container>
-            <div className="max-w-xl mx-auto bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)] text-center">
-              <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
-              <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لا تملك صلاحية الوصول</h1>
-              <p className="text-[var(--slate-600)] mb-6">هذه الصفحة خاصة بمدراء النظام. استخدم بوابتك لمتابعة مشاريعك.</p>
-              <div className="flex justify-center gap-2">
-                <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
-              </div>
-            </div>
-          </Container>
+      <AdminLayout>
+        <div className="max-w-xl mx-auto bg-[var(--card)] p-8 rounded-[var(--radius-lg)] border border-[var(--elev)] text-center">
+          <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
+          <h1 className="text-2xl font-bold text-[var(--text)] mb-2">لا تملك صلاحية الوصول</h1>
+          <p className="text-[var(--slate-600)] mb-6">هذه الصفحة خاصة بمدراء النظام. استخدم بوابتك لمتابعة مشاريعك.</p>
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
+          </div>
         </div>
-      </PageLayout>
+      </AdminLayout>
     );
   }
 
   return (
-    <PageLayout>
-      <div className="py-12 md:py-20">
-        <Container>
+    <AdminLayout 
+      title="لوحة الإدارة"
+      description="إدارة العملاء والمشاريع والملفات"
+      actions={
+        <Button onClick={fetchClients} disabled={loading}>
+          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          تحديث
+        </Button>
+      }
+    >
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -452,6 +452,21 @@ export default function AdminDashboard() {
                               {client.status === 'approved' ? 'تم القبول' : 'تم الرفض'}
                             </span>
                           )}
+                          {client.status === 'approved' && (
+                            <div className="mt-2">
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setNewProjectClientEmail(client.email);
+                                  if (createProjectRef.current) {
+                                    createProjectRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }
+                                }}
+                              >
+                                إنشاء مشروع لهذا العميل
+                              </Button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -480,7 +495,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Create Project */}
-            <div className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
+            <div ref={createProjectRef} className="bg-[var(--card)] p-6 rounded-lg border border-[var(--elev)] mb-6">
               <h3 className="text-lg font-semibold text-[var(--text)] mb-4">إنشاء مشروع جديد</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -611,8 +626,6 @@ export default function AdminDashboard() {
               <UnifiedUploader projectId={selectedProjectIdForUpload || ''} onUploaded={() => { fetchProjects(); }} />
             </div>
           </div>
-        </Container>
-      </div>
-    </PageLayout>
+    </AdminLayout>
   );
 }

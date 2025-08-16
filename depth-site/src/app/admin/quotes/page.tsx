@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
-import { Container } from '@/components/ui/Container';
-import SectionHeading from '@/components/ui/SectionHeading';
+import { useSession, signIn } from 'next-auth/react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
@@ -17,6 +17,7 @@ interface QuoteStats {
 }
 
 export default function AdminQuotesPage() {
+  const { data: session, status } = useSession();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [stats, setStats] = useState<QuoteStats | null>(null);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -49,6 +50,7 @@ export default function AdminQuotesPage() {
   // تحميل البيانات عند بداية الصفحة
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStatus]);
 
   const loadData = async () => {
@@ -57,7 +59,8 @@ export default function AdminQuotesPage() {
       setError(null);
 
       // تحميل العروض
-      const quotesResponse = await fetch(`/api/pricing/quote?status=${selectedStatus === 'all' ? '' : selectedStatus}&limit=50`);
+      const qs = selectedStatus === 'all' ? '?limit=50' : `?status=${selectedStatus}&limit=50`;
+      const quotesResponse = await fetch(`/api/pricing/quote${qs}`);
       if (!quotesResponse.ok) {
         throw new Error('فشل في تحميل العروض');
       }
@@ -165,15 +168,9 @@ export default function AdminQuotesPage() {
         throw new Error(errorData.error || 'فشل في تحديث العرض');
       }
 
-      const data = await response.json();
-      
-      // تحديث العرض في القائمة
-      setQuotes(prev => prev.map(quote => 
-        quote.id === quoteId ? data.quote : quote
-      ));
-
-      // إعادة تحميل الإحصائيات
-      loadData();
+      await response.json();
+      // إعادة تحميل البيانات (تحديث القائمة + الإحصائيات)
+      await loadData();
 
     } catch (err) {
       console.error('خطأ في تحديث العرض:', err);
@@ -182,6 +179,36 @@ export default function AdminQuotesPage() {
       setUpdating(null);
     }
   };
+  // حراسة الوصول: تسجيل الدخول والأدمن فقط
+  const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
+  if (status !== 'authenticated') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-md mx-auto bg-white rounded-lg border p-6 text-center">
+            <h1 className="text-2xl font-bold mb-3">لوحة إدارة العروض</h1>
+            <p className="text-gray-600 mb-4">سجّل الدخول بحساب الأدمن للوصول.</p>
+            <Button onClick={() => signIn('google', { callbackUrl: '/admin/quotes' })}>
+              تسجيل الدخول عبر Google
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (userRole !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-md mx-auto bg-white rounded-lg border p-6 text-center">
+            <h1 className="text-2xl font-bold mb-3">لا تملك صلاحية الوصول</h1>
+            <p className="text-gray-600 mb-4">هذه الصفحة خاصة بمدراء النظام.</p>
+            <Button onClick={() => location.assign('/portal')}>الانتقال إلى البوابة</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const generateSOW = async (quoteId: string) => {
     try {
@@ -241,14 +268,21 @@ export default function AdminQuotesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <Container>
-        <div className="max-w-7xl mx-auto">
-          <SectionHeading
-            title="إدارة العروض"
-            subtitle="إنشاء وإدارة عروض الأسعار للعملاء"
-            className="text-center mb-12"
-          />
+    <AdminLayout
+      title="إدارة العروض"
+      description="إنشاء وإدارة عروض الأسعار للعملاء"
+      actions={
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={loadData} disabled={loading}>
+            تحديث
+          </Button>
+          <Button onClick={() => setShowCreateForm(true)}>
+            عرض جديد
+          </Button>
+        </div>
+      }
+    >
+      <div className="max-w-7xl mx-auto">
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -537,6 +571,25 @@ export default function AdminQuotesPage() {
                             </Button>
                           )}
 
+                          {quote.status === 'sent' && (
+                            <>
+                              <Button
+                                onClick={() => updateQuoteStatus(quote.id!, 'approve')}
+                                disabled={updating === quote.id}
+                                className="bg-green-600 hover:bg-green-700 text-xs px-3 py-1"
+                              >
+                                اعتماد
+                              </Button>
+                              <Button
+                                onClick={() => updateQuoteStatus(quote.id!, 'reject')}
+                                disabled={updating === quote.id}
+                                className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1"
+                              >
+                                رفض
+                              </Button>
+                            </>
+                          )}
+
                           <Button
                             onClick={() => {
                               // عرض تفاصيل العرض
@@ -554,8 +607,7 @@ export default function AdminQuotesPage() {
               </div>
             )}
           </div>
-        </div>
-      </Container>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
