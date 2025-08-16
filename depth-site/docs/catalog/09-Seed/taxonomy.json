@@ -1,0 +1,55 @@
+{
+  "categories": [
+    {
+      "id": "photo",
+      "nameAr": "صورة",
+      "nameEn": "Photo",
+      "subcategories": [
+        {"id": "photo_ecom_packshot", "nameAr": "Packshot أبيض", "nameEn": "E-com Packshot", "desc": "خلفية بيضاء للمتاجر", "ratios": ["1:1","4:5"], "formats": ["JPG","WEBP"]},
+        {"id": "photo_flat_lay", "nameAr": "Flat Lay", "nameEn": "Flat Lay", "desc": "ترتيب أفقي متناسق"},
+        {"id": "photo_on_model", "nameAr": "On-Model", "nameEn": "On-Model", "desc": "عرض على مودل"},
+        {"id": "photo_ghost", "nameAr": "Ghost Mannequin", "nameEn": "Ghost Mannequin", "desc": "تفريغ المانيكان 3D"},
+        {"id": "photo_detail", "nameAr": "تفاصيل/Macro", "nameEn": "Detail/Macro", "desc": "تفاصيل وخامات"},
+        {"id": "photo_lifestyle", "nameAr": "Lifestyle", "nameEn": "Lifestyle", "desc": "مشهد واقعي"},
+        {"id": "photo_before_after", "nameAr": "Before/After", "nameEn": "Before/After", "desc": "امتثال تجميلي", "verticals": ["clinics","beauty"]}
+      ]
+    },
+    {
+      "id": "video",
+      "nameAr": "فيديو",
+      "nameEn": "Video",
+      "subcategories": [
+        {"id": "reel_try_on", "nameAr": "Try-On/Lookbook", "nameEn": "Try-On/Lookbook", "desc": "عرض لبس سريع", "durations": ["6-8s","15s","30-45s"], "ratios":["9:16","4:5","1:1"]},
+        {"id": "reel_product_montage", "nameAr": "Product Montage", "nameEn": "Product Montage", "desc": "مونتاج لقطات المنتج"},
+        {"id": "reel_transitions", "nameAr": "Transitions", "nameEn": "Transitions", "desc": "انتقالات للفت الانتباه"},
+        {"id": "reel_testimonial", "nameAr": "Testimonial", "nameEn": "Testimonial", "desc": "شهادة عميل"},
+        {"id": "reel_bts", "nameAr": "BTS", "nameEn": "BTS", "desc": "كواليس حقيقية"},
+        {"id": "ad_lead_gen", "nameAr": "Lead Gen Ad", "nameEn": "Lead Gen Ad", "desc": "إعلان تحصيل عملاء", "deliverable": "mp4+copy"}
+      ]
+    },
+    {
+      "id": "design",
+      "nameAr": "تصميم",
+      "nameEn": "Design",
+      "subcategories": [
+        {"id": "design_discount", "nameAr": "تصميم تخفيض/عرض", "nameEn": "Discount/Offer Card", "desc": "عرض/سعر واضح"},
+        {"id": "design_carousel", "nameAr": "Carousel Promo", "nameEn": "Carousel Promo", "desc": "سلسلة شرائح"},
+        {"id": "design_story_cover", "nameAr": "Story Covers", "nameEn": "Story Covers", "desc": "أغلفة بصرية"},
+        {"id": "design_catalog_banner", "nameAr": "Catalog Banner", "nameEn": "Catalog Banner", "desc": "بانر متجر/موسم"},
+        {"id": "design_clinic_disclaimer", "nameAr": "إخلاء طبي", "nameEn": "Clinic Disclaimer", "desc": "امتثال عيادات", "verticals":["clinics"]}
+      ]
+    }
+  ],
+  "verticals": [
+    {"id":"fashion","nameAr":"أزياء/ملابس","nameEn":"Fashion"},
+    {"id":"beauty","nameAr":"تجميل/عيادات","nameEn":"Beauty/Clinics"},
+    {"id":"fnb","nameAr":"أطعمة/مشروبات","nameEn":"F&B"},
+    {"id":"furniture","nameAr":"مفروشات/ديكور","nameEn":"Furniture/Decor"},
+    {"id":"sports","nameAr":"رياضة/تجزئة","nameEn":"Sports/Retail"},
+    {"id":"b2b","nameAr":"B2B/مكاتب","nameEn":"B2B/Offices"},
+    {"id":"restaurants","nameAr":"مطاعم/كافيهات","nameEn":"Restaurants/Cafes"},
+    {"id":"ecom","nameAr":"متاجر إلكترونية","nameEn":"E-commerce"},
+    {"id":"events","nameAr":"فعاليات/تغطيات","nameEn":"Events/Coverage"},
+    {"id":"influencer","nameAr":"مؤثرين/UGC","nameEn":"Influencers/UGC"}
+  ]
+}

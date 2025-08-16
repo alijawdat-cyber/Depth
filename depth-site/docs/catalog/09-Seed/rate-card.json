@@ -1,0 +1,44 @@
+{
+  "basePricesUSD": {
+    "photo_ecom_packshot": 15,
+    "photo_flat_lay": 15,
+    "photo_on_model": 18,
+    "photo_ghost": 20,
+    "photo_detail": 15,
+    "photo_lifestyle": 18,
+    "photo_before_after": 22,
+
+    "reel_try_on": 120,
+    "reel_product_montage": 120,
+    "reel_transitions": 120,
+    "reel_testimonial": 120,
+    "reel_bts": 110,
+    "ad_lead_gen": 140,
+
+    "design_discount": 35,
+    "design_carousel": 45,
+    "design_story_cover": 25,
+    "design_catalog_banner": 60,
+    "design_clinic_disclaimer": 30
+  },
+  "processingModifiers": {
+    "RAW_ONLY": -0.10,
+    "RAW_BASIC_COLOR": 0.0,
+    "FULL_RETOUCH": 0.40
+  },
+  "conditionModifiers": {
+    "RUSH": 0.35,
+    "LOCATION_FLAT_USD": 25
+  },
+  "verticalModifiers": {
+    "beauty": 0.10,
+    "furniture": 0.05,
+    "fashion": 0.0,
+    "default": 0.0
+  },
+  "guardrails": {
+    "minMarginPct": 0.45,
+    "minUnitUSD": 10,
+    "maxUnitUSD": 800
+  }
+}
