@@ -74,4 +74,42 @@ export function cloudflareStreamIframeUrl(videoId: string) {
   return `https://iframe.videodelivery.net/${videoId}`;
 }
 
+// R2 document upload helper (S3-compatible) — used later for SOW PDFs
+export async function uploadDocumentToR2(params: {
+  key: string; // e.g., `sow/<quoteId>.pdf`
+  content: Buffer | Uint8Array | ArrayBuffer;
+  contentType?: string;
+}) {
+  const { key, content, contentType } = params;
+  const accountId = process.env.R2_ACCOUNT_ID;
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  const bucket = process.env.R2_BUCKET;
+  if (!accountId || !accessKeyId || !secretAccessKey || !bucket) {
+    throw new Error('R2 credentials are missing');
+  }
+  const endpoint = `https://${accountId}.r2.cloudflarestorage.com`;
+
+  // Use Web standard fetch with AWS S3 sigV4 via aws-sdk-lite (avoid heavy deps)
+  // To keep lightweight and avoid adding a library now, use presigned approach later if needed.
+  // Placeholder: simple unsigned PUT works only with public buckets; for private, swap to a signed upload.
+  const url = `${endpoint}/${bucket}/${encodeURIComponent(key)}`;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': contentType || 'application/pdf',
+      'x-amz-acl': 'private',
+      // NOTE: For private buckets, implement AWS SigV4 signing here or use a presigner.
+    },
+    body: content as ArrayBuffer,
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to upload to R2: ${res.status}`);
+  }
+  return {
+    key,
+    url: `r2://${bucket}/${key}`,
+  };
+}
+
 

@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-// Sanitize helper to remove accidental newlines/CR and surrounding whitespace
-const sanitize = (value?: string) =>
-  (value ?? '')
-    .replace(/\r/g, '')
-    .trim();
+// Sanitize helper: trim and normalize, but preserve `undefined` for optional vars
+const sanitize = (value?: string) => {
+  if (value == null) return undefined;
+  const trimmed = String(value).replace(/\r/g, '').trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
 
 const EnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
