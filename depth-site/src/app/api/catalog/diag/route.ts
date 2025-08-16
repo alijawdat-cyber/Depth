@@ -12,7 +12,7 @@ export async function GET() {
     };
 
     // Try a lightweight read from Firestore
-    const snap = await adminDb.collection('health').limit(1).get().catch((e: unknown) => ({ error: e })) as any;
+    const snap = await adminDb.collection('health').limit(1).get().catch((e: unknown) => ({ error: e })) as { error?: unknown; size?: number };
     if ('error' in snap) {
       checks.firestore = { ok: false, error: String((snap as { error: unknown }).error).slice(0, 300) };
     } else {

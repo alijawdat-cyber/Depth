@@ -1,4 +1,7 @@
 {
+  "versionId": "v2025.01.15",
+  "status": "active",
+  "effectiveFrom": "2025-01-15",
   "currency": "IQD",
   "basePricesIQD": {
     "photo_ecom_packshot": 19500,

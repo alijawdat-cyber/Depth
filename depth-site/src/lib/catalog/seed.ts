@@ -5,7 +5,13 @@ import taxonomyJson from '../../../docs/catalog/09-Seed/taxonomy.json';
 import rateCardJson from '../../../docs/catalog/09-Seed/rate-card.json';
 
 const TaxonomySchema = z.object({
-  categories: z.array(z.object({ id: z.string(), nameAr: z.string(), nameEn: z.string().optional(), order: z.number().optional() })),
+  categories: z.array(z.object({ 
+    id: z.string(), 
+    nameAr: z.string(), 
+    nameEn: z.string().optional(), 
+    order: z.number().optional(),
+    subcategories: z.array(z.any()).optional() // We'll process this separately
+  })),
   subcategories: z.array(z.object({
     id: z.string(),
     categoryId: z.string(),
@@ -20,8 +26,22 @@ const TaxonomySchema = z.object({
       complianceTags: z.array(z.string()).optional(),
     }).partial().optional(),
     priceRangeKey: z.string().optional(),
+  })).optional(),
+  verticals: z.array(z.object({ 
+    id: z.string(), 
+    nameAr: z.string(), 
+    nameEn: z.string().optional(), 
+    modifierPct: z.number().optional() 
   })),
-  verticals: z.array(z.object({ id: z.string(), nameAr: z.string(), nameEn: z.string().optional(), modifierPct: z.number().optional() })),
+  defaultsPerSubcategory: z.array(z.object({
+    subcategory: z.string(),
+    verticalsAllowed: z.array(z.string()).optional(),
+    defaultProcessingLevels: z.array(z.string()).optional(),
+    defaultRatios: z.array(z.string()).optional(),
+    defaultFormats: z.array(z.string()).optional(),
+    complianceTags: z.array(z.string()).optional(),
+    priceRangeKey: z.string().optional(),
+  })).optional(),
 });
 
 const RateCardSchema = z.object({
@@ -69,21 +89,94 @@ export async function seedCatalog(mode: SeedMode = 'full') {
   if (mode === 'full' || mode === 'taxonomy') {
     const rawTax = taxonomyJson as unknown;
     const tax = TaxonomySchema.parse(rawTax);
-    // categories
+    
+    // Process categories and extract subcategories from nested structure
+    const allSubcategories: Array<{
+      id: string;
+      categoryId: string;
+      nameAr: string;
+      nameEn?: string;
+      desc?: string;
+      defaults: {
+        ratios: string[];
+        formats: string[];
+        processingLevels: string[];
+        verticalsAllowed: string[];
+        complianceTags: string[];
+      };
+      priceRangeKey: string;
+      [key: string]: unknown;
+    }> = [];
     for (const c of tax.categories) {
-      await upsertCollection('catalog_categories', c.id, { ...c });
+      // Clean category object (remove nested subcategories)
+      const { subcategories: nestedSubs, ...cleanCategory } = c;
+      await upsertCollection('catalog_categories', c.id, { 
+        ...cleanCategory, 
+        order: cleanCategory.order || 0 
+      });
+      
+      // Extract subcategories from nested structure
+      if (nestedSubs && Array.isArray(nestedSubs)) {
+        for (const sub of nestedSubs) {
+          allSubcategories.push({
+            ...sub,
+            categoryId: c.id,
+            defaults: {
+              ratios: sub.ratios || [],
+              formats: sub.formats || [],
+              processingLevels: ['raw_only', 'raw_basic', 'full_retouch'],
+              verticalsAllowed: sub.verticals || [],
+              complianceTags: sub.verticals?.includes('beauty') ? ['clinics_policy'] : [],
+            },
+            priceRangeKey: sub.id,
+          });
+        }
+      }
     }
-    // subcategories
-    for (const s of tax.subcategories) {
+    
+    // Process extracted subcategories
+    for (const s of allSubcategories) {
       await upsertCollection('catalog_subcategories', s.id, { ...s });
     }
+    
+    // Process standalone subcategories if they exist
+    if (tax.subcategories && tax.subcategories.length > 0) {
+      for (const s of tax.subcategories) {
+        await upsertCollection('catalog_subcategories', s.id, { ...s });
+      }
+    }
+    
+    // Apply defaults from defaultsPerSubcategory
+    if (tax.defaultsPerSubcategory && tax.defaultsPerSubcategory.length > 0) {
+      for (const def of tax.defaultsPerSubcategory) {
+        const existing = await adminDb.collection('catalog_subcategories').doc(def.subcategory).get();
+        if (existing.exists) {
+          await existing.ref.update({
+            defaults: {
+              ratios: def.defaultRatios || [],
+              formats: def.defaultFormats || [],
+              processingLevels: def.defaultProcessingLevels || ['raw_only', 'raw_basic', 'full_retouch'],
+              verticalsAllowed: def.verticalsAllowed || [],
+              complianceTags: def.complianceTags || [],
+            },
+            priceRangeKey: def.priceRangeKey || def.subcategory,
+            updatedAt: new Date(),
+          });
+        }
+      }
+    }
+    
     // verticals
     for (const v of tax.verticals) {
-      await upsertCollection('catalog_verticals', v.id, { ...v });
+      await upsertCollection('catalog_verticals', v.id, { 
+        ...v, 
+        modifierPct: v.modifierPct || 0 
+      });
     }
+    
     summary.taxonomy = {
       categories: tax.categories.length,
-      subcategories: tax.subcategories.length,
+      subcategories: allSubcategories.length + (tax.subcategories?.length || 0),
       verticals: tax.verticals.length,
     };
   }

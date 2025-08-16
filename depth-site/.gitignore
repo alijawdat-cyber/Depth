@@ -43,29 +43,43 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files - NEVER COMMIT THESE
-.env*
+# 🔒 ENVIRONMENT FILES - NEVER COMMIT THESE
+.env
+.env.*
 .env.local
-.env.production
 .env.development
+.env.staging
+.env.production
+.env.test
+.env.example.local
 *.env
+**/.env
+**/.env.*
 
-# Firebase service account files
+# 🔥 Firebase service account files
 *firebase-adminsdk*.json
+firebase-adminsdk-*.json
 service-account-key.json
+firebase-service-account.json
+depth-portal-*-firebase-adminsdk-*.json
 
-# Security keys
+# 🔐 Security & API keys
 private-key.pem
 *.key
+*.pem
+api-keys.json
+secrets.json
+credentials.json
 
-# vercel
+# 🚀 Vercel specific
 .vercel
+.vercel.json
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# Additional cleanup rules
+# 📊 Additional cleanup rules
 *.log
 *.backup
 *.bak
@@ -73,4 +87,40 @@ next-env.d.ts
 lhr-*.json
 /audits/
 /email-signatures/
-.env*.local
+
+# 🔧 Development & Testing
+coverage/
+.nyc_output/
+.coverage/
+junit.xml
+test-results/
+playwright-report/
+test-report/
+
+# 🗄️ Database & Cache
+*.sqlite
+*.sqlite3
+*.db
+redis-dump.rdb
+dump.rdb
+
+# 📱 Mobile & Native
+ios/
+android/
+.expo/
+
+# 🎯 IDE & Editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# 🌍 OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
