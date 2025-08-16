@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, requestId, ...result });
   } catch (error) {
     console.error('[catalog.seed] error', { requestId, error });
-    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Failed to seed catalog', requestId }, { status: 500 });
+    const msg = (error instanceof Error ? error.message : String(error)).slice(0, 300);
+    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Failed to seed catalog', requestId, detail: msg }, { status: 500 });
   }
 }
 

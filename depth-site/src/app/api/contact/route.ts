@@ -174,7 +174,7 @@ export async function POST(req: Request) {
     };
 
     // 1) Send to appropriate department with admin CC (multipart)
-    const teamEmailResult = await resend.emails.send({
+    const teamEmailResult = (await resend.emails.send({
       from: EMAIL_FROM,
       to: [targetEmail],
       cc: [EMAIL_CC_ADMIN],
@@ -183,7 +183,7 @@ export async function POST(req: Request) {
       html: teamEmailHtml,
       text: teamEmailText,
       headers: customHeaders,
-    });
+    })) as unknown as { data?: { id?: string } };
 
     console.log("✅ Team email sent successfully:", {
       requestId,
@@ -193,7 +193,7 @@ export async function POST(req: Request) {
     });
 
     // 2) Send branded autoreply to user (multipart)
-    const autoreplyResult = await resend.emails.send({
+    const autoreplyResult = (await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
       subject: AUTOREPLY_SUBJECTS[type],
@@ -203,7 +203,7 @@ export async function POST(req: Request) {
         ...customHeaders,
         "X-Depth-Email-Type": "autoreply"
       },
-    });
+    })) as unknown as { data?: { id?: string } };
 
     console.log("✅ Auto-reply sent successfully:", {
       requestId,
