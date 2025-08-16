@@ -86,6 +86,7 @@ export interface QuoteLineInput {
   tier?: 'T1' | 'T2' | 'T3';
   overrideIQD?: number | null;
   estimatedCostIQD?: number | null;
+  notes?: string;
 }
 
 export interface QuotePreviewBreakdown {
@@ -115,7 +116,115 @@ export interface QuotePreviewResponse {
   guardrails?: { margin?: number; status?: 'ok' | 'warn' | 'hard_stop'; warnings?: string[] };
 }
 
+// ===============================
+// Quote Types (Complete CRUD)
+// ===============================
+
+export interface QuoteLine {
+  subcategoryId: string;
+  qty: number;
+  vertical: string;
+  processing: 'raw_only' | 'raw_basic' | 'full_retouch';
+  conditions?: {
+    rush?: boolean;
+    locationZone?: string;
+  };
+  tier?: 'T1' | 'T2' | 'T3';
+  unitPriceIQD: number;
+  calcBreakdown: QuotePreviewBreakdown;
+  notes?: string;
+  estimatedCostIQD?: number;
+  overrideIQD?: number;
+}
+
+export interface QuoteSnapshot {
+  rateCardVersion: string;
+  fx: {
+    rate: number;
+    date: string;
+    source: string;
+  };
+}
+
+export interface Quote {
+  id?: string;
+  clientEmail: string;
+  projectId?: string | null;
+  lines: QuoteLine[];
+  totals: {
+    iqd: number;
+    usd?: number;
+  };
+  guardrails?: {
+    margin?: number;
+    status?: 'ok' | 'warn' | 'hard_stop';
+    warnings?: string[];
+  };
+  status: 'draft' | 'sent' | 'approved' | 'rejected';
+  snapshot?: QuoteSnapshot;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string; // admin email who created it
+}
+
+export interface QuoteCreateRequest {
+  clientEmail: string;
+  projectId?: string;
+  lines: QuoteLineInput[];
+  notes?: string;
+}
+
+export interface QuoteUpdateRequest {
+  id: string;
+  action: 'send' | 'approve' | 'reject';
+  reason?: string; // for reject
+}
+
+// ===============================
+// SOW Types (Complete)
+// ===============================
+
+export interface SOWField {
+  label: string;
+  value: string;
+  type?: 'text' | 'number' | 'date' | 'currency';
+}
+
+export interface SOW {
+  id?: string;
+  quoteId: string;
+  projectId?: string | null;
+  status: 'generated' | 'sent' | 'signed';
+  pdfUrl?: string | null;
+  fields: {
+    clientName: string;
+    clientEmail: string;
+    projectTitle?: string;
+    totalAmountIQD: number;
+    totalAmountUSD?: number;
+    currency: string;
+    deliverables: Array<{
+      title: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+      total: number;
+      sla?: string;
+    }>;
+    paymentTerms: string;
+    additionalTerms?: string[];
+  };
+  createdAt?: string;
+  generatedBy?: string; // admin email
+}
+
+export interface SOWGenerateRequest {
+  quoteId: string;
+}
+
 export interface SOWLight {
+  id?: string;
   quoteId: string;
   projectId?: string | null;
   pdfUrl?: string | null;
