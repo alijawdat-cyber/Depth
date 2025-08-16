@@ -490,7 +490,7 @@ export default function AdminCatalogPage() {
                 <h2 className="text-xl font-semibold text-[var(--text)]">الفئات الرئيسية</h2>
                 <p className="text-[var(--muted)] mt-1">الفئات الأساسية للخدمات</p>
               </div>
-              <div className="data-scroll scroll-x border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
+              <div className="scroll-xy border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
                 <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
@@ -570,7 +570,7 @@ export default function AdminCatalogPage() {
                   </div>
                 </div>
               </div>
-              <div className="data-scroll scroll-x border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
+              <div className="scroll-xy border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
                 <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
@@ -631,7 +631,7 @@ export default function AdminCatalogPage() {
                 <h2 className="text-xl font-semibold text-[var(--text)]">المحاور التجارية</h2>
                 <p className="text-[var(--muted)] mt-1">القطاعات والأسواق المستهدفة</p>
               </div>
-              <div className="data-scroll scroll-x border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
+              <div className="scroll-xy border border-[var(--elev)] rounded-[var(--radius)] scrollbar-thin scrollbar-thumb-[var(--accent-500)] scrollbar-track-[var(--bg)] hover:scrollbar-thumb-[var(--accent-600)] smooth-scroll">
                 <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>

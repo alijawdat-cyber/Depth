@@ -162,18 +162,32 @@ html, body {
   touch-action: pan-y pinch-zoom;
 }
 
-/* Scroll containers for data tables/cards */
-.data-scroll {
+/* Unified, modern scroll system */
+/* Both axes, used for data tables/cards with sticky headers inside */
+.scroll-xy {
   position: relative;
   overflow: auto;
-  max-height: 72vh;
+  max-height: var(--scroll-max, 72vh);
+  max-block-size: var(--scroll-max, 72vh);
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Horizontal scroll area for mobile lists/tables */
-.scroll-x {
-  /* أُفقي فقط: لا نغيّر overflow-y حتى لا نكسر تمرير .data-scroll العمودي */
+/* Vertical only (lists/panels) */
+.scroll-y {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: var(--scroll-max, 72vh);
+  max-block-size: var(--scroll-max, 72vh);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Horizontal only (wide tables) */
+.scroll-x-only {
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
 }

@@ -27,7 +27,7 @@ function normalizeCfUrl(url?: string, imageId?: string) {
   } catch {}
   return url;
 }
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Calendar, FileText, CheckCircle, BarChart3, Download, Eye, Clock, DollarSign, RefreshCw, MessageCircle, Settings, User, LogOut, TrendingUp, Target, Briefcase, Copy } from "lucide-react";
 import UnifiedUploader from "./files/UnifiedUploader";
 import { Button } from "@/components/ui/Button";
@@ -38,6 +38,7 @@ import WelcomeOnboarding from "./WelcomeOnboarding";
 import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
 import { StateLoading, StateError, StateEmpty, StatCardSkeleton, FileCardSkeleton } from "@/components/ui/States";
 import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 type Tab = "summary" | "files" | "approvals" | "reports";
 
@@ -46,6 +47,7 @@ type Tab = "summary" | "files" | "approvals" | "reports";
 export default function PortalClientReal() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [tab, setTab] = useState<Tab>("summary");
   const { projects = [], isLoading: isLoadingProjects, refresh: refreshProjects } = useProjects();
   const activeProjectId = projects?.[0]?.id;
@@ -290,7 +292,7 @@ export default function PortalClientReal() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Notification bell moved to global Header for portal routes */}
+            <NotificationBell highlight={pathname === '/portal' || pathname?.startsWith('/portal/notifications')} />
             <Button 
               variant="ghost" 
               onClick={() => router.push('/portal/profile')}
