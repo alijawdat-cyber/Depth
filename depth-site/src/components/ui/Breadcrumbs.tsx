@@ -38,11 +38,6 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'التسعير', href: '/admin/pricing' }
     ],
-    '/admin/pricing/rate-card': [
-      { label: 'لوحة التحكم', href: '/admin', icon: Home },
-      { label: 'التسعير', href: '/admin/pricing' },
-      { label: 'جدول الأسعار', href: '/admin/pricing/rate-card' }
-    ],
     '/admin/quotes': [
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'العروض', href: '/admin/quotes' }
@@ -65,11 +60,7 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
       { label: 'المبدعين', href: '/admin/creators' },
       { label: 'تقييم المبدع', href: '#' }
     ],
-    '/admin/pricing/rate-card': [
-      { label: 'لوحة التحكم', href: '/admin', icon: Home },
-      { label: 'التسعير', href: '/admin/pricing' },
-      { label: 'جدول الأسعار', href: '/admin/pricing/rate-card' }
-    ],
+    // '/admin/pricing/rate-card' مذكورة مرة واحدة أعلاه لتجنّب تكرار المفاتيح
     '/admin/quotes/create': [
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'العروض', href: '/admin/quotes' },
