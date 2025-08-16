@@ -620,17 +620,17 @@ States/Empty/Errors متوافقة مع المكوّنات الحالية (State
 - ملاحظة: هاي القائمة تفصيلية ومجمّعة حسب الدومين حتى نتابع الإنجاز خطوة بخطوة. كل بند يذكر المسار قبل/بعد وأسماء الملفات المقصودة.
 
 - **Types & Schemas**
-  - [ ] إنشاء `src/types/catalog.ts` (جديد) — تعريف: `Category`, `Subcategory`, `Vertical`, `RateCard`, `Quote`, `QuoteLine`, `SOW`.
-  - [ ] تدقيق تداخل مع `src/types/entities.ts` (قبل: بدون أنواع تسعير/عروض) → (بعد: الإبقاء منفصل، ربط خفيف فقط إن لزم).
+  - [x] إنشاء `src/types/catalog.ts` (جديد) — تعريف: `Category`, `Subcategory`, `Vertical`, `RateCard`, `Quote`, `QuoteLine`, `SOW`.
+  - [x] تدقيق تداخل مع `src/types/entities.ts` (قبل: بدون أنواع تسعير/عروض) → (بعد: الإبقاء منفصل، ربط خفيف فقط إن لزم).
   - [ ] Zod Schemas داخل `src/lib/pricing/schemas.ts` (جديد) أو ضمن route نفسه كبداية.
 
 - **Catalog / Seed / Read**
-  - [ ] `src/lib/catalog/seed.ts` (جديد) — قراءة `docs/catalog/09-Seed/taxonomy.json` و`rate-card.json`، زرع Firestore.
-  - [ ] `src/app/api/catalog/seed/route.ts` (جديد) — POST، Admin فقط، idempotent، logs + metrics.
-  - [ ] `src/lib/catalog/read.ts` (جديد) — دوال: `getSubcategories(categoryId?)`, `getVerticals()`, `getActiveRateCard()`.
-  - [ ] `src/app/api/catalog/subcategories/route.ts` (جديد) — GET مع `categoryId?`، paging لاحقاً.
-  - [ ] `src/app/api/catalog/verticals/route.ts` (جديد) — GET.
-  - [ ] `src/app/api/pricing/rate-card/active/route.ts` (جديد) — GET.
+  - [x] `src/lib/catalog/seed.ts` (جديد) — قراءة `docs/catalog/09-Seed/taxonomy.json` و`rate-card.json`، زرع Firestore.
+  - [x] `src/app/api/catalog/seed/route.ts` (جديد) — POST، Admin فقط، idempotent، logs + metrics (+ دعم x-seed-key للتجهيز المحلي).
+  - [x] `src/lib/catalog/read.ts` (جديد) — دوال: `getSubcategories(categoryId?)`, `getVerticals()`, `getActiveRateCard()`.
+  - [x] `src/app/api/catalog/subcategories/route.ts` (جديد) — GET مع `categoryId?`، paging لاحقاً.
+  - [x] `src/app/api/catalog/verticals/route.ts` (جديد) — GET.
+  - [x] `src/app/api/pricing/rate-card/active/route.ts` (جديد) — GET.
   - [ ] Indexes مقترحة لـ `catalog_subcategories` by `categoryId` (Firestore Index) — توثيق فقط حالياً.
 
 - **Pricing Engine**
@@ -649,7 +649,7 @@ States/Empty/Errors متوافقة مع المكوّنات الحالية (State
 - **SOW Generate / Store**
   - [ ] `src/app/api/contracts/sow/generate/route.ts` (جديد) — POST { quoteId }.
   - [ ] خيار توليد PDF: HTML+`puppeteer` أو `@react-pdf/renderer` (نختار الأبسط أولاً).
-  - [ ] رفع إلى R2 عبر `src/lib/cloudflare.ts` (موجود) — إضافة دالة `uploadDocument(buffer, key)`.
+  - [x] رفع إلى R2 عبر `src/lib/cloudflare.ts` — إضافة دالة `uploadDocumentToR2(...)` (أُنجزت).
   - [ ] حفظ doc في `sow` collection وربط `pdfUrl`.
 
 - **Governance / Versions / Audit**

@@ -1,10 +1,8 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { z } from 'zod';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
-const RootDir = process.cwd();
-const DocsDir = path.join(RootDir, 'docs', 'catalog', '09-Seed');
+// Bundle seed data statically so it's available in serverless runtime
+import taxonomyJson from '../../../docs/catalog/09-Seed/taxonomy.json';
+import rateCardJson from '../../../docs/catalog/09-Seed/rate-card.json';
 
 const TaxonomySchema = z.object({
   categories: z.array(z.object({ id: z.string(), nameAr: z.string(), nameEn: z.string().optional(), order: z.number().optional() })),
@@ -30,8 +28,8 @@ const RateCardSchema = z.object({
   versionId: z.string(),
   status: z.enum(['active','archived','draft']).default('active'),
   effectiveFrom: z.string().optional(),
-  basePricesIQD: z.record(z.number()).optional(),
-  baseRangesIQD: z.record(z.tuple([z.number(), z.number()])).optional(),
+  basePricesIQD: z.record(z.string(), z.number()).optional(),
+  baseRangesIQD: z.record(z.string(), z.tuple([z.number(), z.number()])).optional(),
   processingLevels: z.object({
     raw_only: z.number().optional(),
     raw_basic: z.number().optional(),
@@ -44,8 +42,8 @@ const RateCardSchema = z.object({
     retouchMinPct: z.number().optional(),
     retouchMaxPct: z.number().optional(),
   }).partial().optional(),
-  verticalModifiers: z.record(z.number()).optional(),
-  locationZonesIQD: z.record(z.number()).optional(),
+  verticalModifiers: z.record(z.string(), z.number()).optional(),
+  locationZonesIQD: z.record(z.string(), z.number()).optional(),
   overrideCapPercent: z.number().optional(),
   guardrails: z.object({ minMarginDefault: z.number().optional(), minMarginHardStop: z.number().optional() }).partial().optional(),
   roundingIQD: z.number().optional(),
@@ -53,11 +51,6 @@ const RateCardSchema = z.object({
 });
 
 export type SeedMode = 'full' | 'rate-card' | 'taxonomy';
-
-async function readJsonFile<T = unknown>(filePath: string): Promise<T> {
-  const content = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(content) as T;
-}
 
 async function upsertCollection(collection: string, id: string, data: Record<string, unknown>) {
   const ref = adminDb.collection(collection).doc(id);
@@ -74,8 +67,7 @@ export async function seedCatalog(mode: SeedMode = 'full') {
   const summary: Record<string, unknown> = { requestId };
 
   if (mode === 'full' || mode === 'taxonomy') {
-    const taxonomyPath = path.join(DocsDir, 'taxonomy.json');
-    const rawTax = await readJsonFile(taxonomyPath).catch((e) => { throw new Error(`Failed to read taxonomy.json: ${String(e)}`); });
+    const rawTax = taxonomyJson as unknown;
     const tax = TaxonomySchema.parse(rawTax);
     // categories
     for (const c of tax.categories) {
@@ -97,8 +89,7 @@ export async function seedCatalog(mode: SeedMode = 'full') {
   }
 
   if (mode === 'full' || mode === 'rate-card') {
-    const rateCardPath = path.join(DocsDir, 'rate-card.json');
-    const rawRc = await readJsonFile(rateCardPath).catch((e) => { throw new Error(`Failed to read rate-card.json: ${String(e)}`); });
+    const rawRc = rateCardJson as unknown;
     const rc = RateCardSchema.parse(rawRc);
 
     // archive existing active if versionId differs
