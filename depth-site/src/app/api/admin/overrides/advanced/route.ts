@@ -196,7 +196,13 @@ export async function GET(request: NextRequest) {
     const requests = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    })) as Array<{
+      id: string;
+      status?: string;
+      discountAmount?: number;
+      discountPercentage?: number;
+      [key: string]: unknown;
+    }>;
 
     // Calculate summary stats
     const stats = {

@@ -12,7 +12,7 @@ const VerticalUpdateSchema = z.object({
 });
 
 // تحديث محور
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -27,7 +27,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const validatedData = VerticalUpdateSchema.parse(body);
 
@@ -87,7 +87,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // حذف محور
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -102,7 +102,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // التحقق من وجود المحور
     const docRef = adminDb.collection('catalog_verticals').doc(id);
@@ -154,10 +154,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 }
 
 // الحصول على محور واحد
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const docRef = adminDb.collection('catalog_verticals').doc(id);
     const doc = await docRef.get();

@@ -185,8 +185,8 @@ const STEPS = [
 ];
 
 export default function CreatorIntakePage() {
-  const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const creatorId = searchParams.get('creatorId');

@@ -225,7 +225,7 @@ export async function POST(req: NextRequest) {
       status: 'registered',
       createdAt: now,
       updatedAt: now,
-      createdBy: session.user.email
+      createdBy: session.user.email || 'unknown'
     };
 
     // حفظ في قاعدة البيانات
