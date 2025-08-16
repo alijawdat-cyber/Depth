@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Container } from '@/components/ui/Container';
+// Container غير مستخدم في هذا التخطيط - تم حذفه
 import { Button } from '@/components/ui/Button';
 import { 
   Menu,
@@ -17,9 +17,7 @@ import {
   FileText,
   Star,
   Settings,
-  Calendar,
   MessageSquare,
-  Award,
   Bell,
   LogOut,
   ChevronDown,
@@ -28,11 +26,8 @@ import {
   Palette,
   Cog,
   TrendingUp,
-  Upload,
   Clock,
-  Shield,
-  Target,
-  BarChart3
+  Target
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
@@ -133,7 +128,11 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [creatorData, setCreatorData] = useState<any>(null);
+  const [creatorData, setCreatorData] = useState<{
+    fullName?: string;
+    role?: string;
+    status?: string;
+  } | null>(null);
   const [notifications, setNotifications] = useState(0);
 
   // التحقق من صلاحية الوصول
@@ -160,6 +159,10 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
       if (response.ok) {
         const data = await response.json();
         setCreatorData(data.creator);
+        // تحديث عدد الإشعارات من الاستجابة
+        if (data.notificationCount !== undefined) {
+          setNotifications(data.notificationCount);
+        }
       }
     } catch (error) {
       console.error('Failed to load creator data:', error);

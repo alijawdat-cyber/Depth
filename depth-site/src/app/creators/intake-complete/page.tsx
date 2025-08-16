@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Container } from '@/components/ui/Container';
+// motion و Container غير مستخدمين في هذا الإصدار - تم حذفهما
 import { Button } from '@/components/ui/Button';
 import { 
   User, 
@@ -15,16 +14,13 @@ import {
   CheckCircle,
   ArrowLeft,
   ArrowRight,
-  Camera,
-  Video,
-  Palette,
+
   Briefcase,
   Clock,
   Shield,
   TrendingUp,
   AlertCircle,
-  Plus,
-  Trash2,
+
   Star
 } from 'lucide-react';
 
@@ -148,6 +144,7 @@ export default function CompleteCreatorIntakePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isWelcome = searchParams.get('welcome') === 'true';
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -201,6 +198,56 @@ export default function CompleteCreatorIntakePage() {
     }
   });
 
+  const loadExistingData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/creators/profile');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.creator) {
+          // تحديث البيانات الشخصية
+          if (data.creator.fullName || data.creator.role || data.creator.city) {
+            setFormData(prev => ({
+              ...prev,
+              personalInfo: {
+                ...prev.personalInfo,
+                fullName: data.creator.fullName || prev.personalInfo.fullName,
+                role: data.creator.role || prev.personalInfo.role,
+                city: data.creator.city || prev.personalInfo.city,
+                canTravel: data.creator.canTravel !== undefined ? data.creator.canTravel : prev.personalInfo.canTravel,
+                languages: data.creator.languages || prev.personalInfo.languages,
+                contact: {
+                  ...prev.personalInfo.contact,
+                  email: data.creator.email || prev.personalInfo.contact.email,
+                  whatsapp: data.creator.whatsapp || prev.personalInfo.contact.whatsapp,
+                  instagram: data.creator.instagram || prev.personalInfo.contact.instagram,
+                }
+              }
+            }));
+          }
+          
+          // تحديث المهارات إذا وجدت
+          if (data.creator.skills) {
+            setFormData(prev => ({
+              ...prev,
+              skills: data.creator.skills
+            }));
+          }
+          
+          // تحديث المحاور المفضلة
+          if (data.creator.verticals) {
+            setFormData(prev => ({
+              ...prev,
+              verticals: data.creator.verticals
+            }));
+          }
+        }
+      }
+    } catch (loadError) {
+      console.error('Failed to load existing data:', loadError);
+      setError('فشل في تحميل البيانات الموجودة');
+    }
+  }, []);
+
   // التحقق من الجلسة
   useEffect(() => {
     if (status === 'loading') return;
@@ -215,38 +262,9 @@ export default function CompleteCreatorIntakePage() {
       return;
     }
 
-    // تحميل البيانات الحالية إذا وجدت
-    loadExistingData();
-  }, [session, status, router]);
-
-  const loadExistingData = async () => {
-    try {
-      const response = await fetch('/api/creators/profile');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.creator) {
-          // ملء البيانات الموجودة
-          setFormData(prev => ({
-            ...prev,
-            personalInfo: {
-              ...prev.personalInfo,
-              fullName: data.creator.fullName || '',
-              role: data.creator.role || 'photographer',
-              city: data.creator.city || '',
-              canTravel: data.creator.canTravel || false,
-              contact: {
-                email: session?.user?.email || '',
-                whatsapp: data.creator.phone || '',
-                instagram: ''
-              }
-            }
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load existing data:', error);
-    }
-  };
+      // تحميل البيانات الحالية إذا وجدت
+  loadExistingData();
+}, [session, status, router, loadExistingData]);
 
   const nextStep = () => {
     if (currentStep < STEPS.length) {
@@ -282,7 +300,8 @@ export default function CompleteCreatorIntakePage() {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إرسال النموذج');
       }
-    } catch (error) {
+    } catch (submitError) {
+      console.error('Submit error:', submitError);
       setError('حدث خطأ في الاتصال');
     } finally {
       setLoading(false);
@@ -351,7 +370,7 @@ export default function CompleteCreatorIntakePage() {
             value={formData.personalInfo.role}
             onChange={(e) => setFormData(prev => ({
               ...prev,
-              personalInfo: { ...prev.personalInfo, role: e.target.value as any }
+              personalInfo: { ...prev.personalInfo, role: e.target.value as 'photographer' | 'videographer' | 'designer' | 'producer' }
             }))}
             className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
           >
@@ -849,6 +868,22 @@ export default function CompleteCreatorIntakePage() {
               </div>
             </div>
             
+            {/* Welcome Message */}
+            {isWelcome && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <CheckCircle size={20} className="text-green-600 inline mr-2" />
+                <span className="text-green-800">🎉 مرحباً بك! تم إنشاء حسابك بنجاح.</span>
+              </div>
+            )}
+            
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <AlertCircle size={20} className="text-red-600 inline mr-2" />
+                <span className="text-red-800">{error}</span>
+              </div>
+            )}
+            
             <div className="w-full bg-[var(--border)] rounded-full h-2">
               <div 
                 className="bg-[var(--accent-500)] h-2 rounded-full transition-all duration-300"
@@ -861,13 +896,14 @@ export default function CompleteCreatorIntakePage() {
                 <div 
                   key={step.id}
                   className={`text-center ${currentStep >= step.id ? 'text-[var(--accent-500)]' : ''}`}
+                  style={{ flex: `1 1 ${100 / STEPS.length}%` }}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
                     currentStep >= step.id 
                       ? 'bg-[var(--accent-500)] text-white' 
                       : 'bg-[var(--border)] text-[var(--muted)]'
                   }`}>
-                    {currentStep > step.id ? <CheckCircle size={16} /> : step.id}
+                    {currentStep > step.id ? <CheckCircle size={16} /> : (index + 1)}
                   </div>
                   <div className="hidden md:block">{step.title}</div>
                 </div>

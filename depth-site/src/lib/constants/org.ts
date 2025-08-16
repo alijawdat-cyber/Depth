@@ -5,7 +5,7 @@ export const ORG = {
   socials: {
     instagram: 'https://www.instagram.com/depth_agency/',
     facebook: 'https://www.facebook.com/depthagency',
-    linkedin: 'https://www.linkedin.com/company/depth-agency/',
+    linkedin: 'https://www.linkedin.com/company/depth-agency',
     tiktok: 'https://www.tiktok.com/@depth.agency',
     snapchat: 'https://www.snapchat.com/add/depthagency',
   },

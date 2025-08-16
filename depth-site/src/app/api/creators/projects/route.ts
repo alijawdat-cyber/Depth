@@ -92,11 +92,16 @@ export async function GET(req: NextRequest) {
       }
 
       // حساب المهام المُسندة للمبدع
-      const creatorTasks = (projectData.tasks || []).filter((task: any) => 
+      interface Task {
+        assignedTo?: string;
+        status?: string;
+      }
+      
+      const creatorTasks = (projectData.tasks || []).filter((task: Task) => 
         task.assignedTo === creatorId
       );
 
-      const completedTasks = creatorTasks.filter((task: any) => 
+      const completedTasks = creatorTasks.filter((task: Task) => 
         task.status === 'completed'
       );
 

@@ -26,7 +26,8 @@ export async function GET() {
     const data = { id: doc.id, ...doc.data() } as Record<string, unknown>;
     delete data.createdAt; delete data.updatedAt;
     return NextResponse.json({ success: true, profile: data });
-  } catch (_e) {
+  } catch (error) {
+    console.error('Failed to fetch creator profile:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }
@@ -48,7 +49,8 @@ export async function PUT(req: Request) {
     const doc = snap.docs[0];
     await doc.ref.update(updates);
     return NextResponse.json({ success: true, message: 'تم الحفظ' });
-  } catch (_e) {
+  } catch (error) {
+    console.error('Failed to update creator profile:', error);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }

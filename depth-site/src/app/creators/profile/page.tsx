@@ -79,7 +79,9 @@ export default function CreatorProfilePage() {
         <Container>
           <div className="max-w-2xl mx-auto">
             <h1 className="text-2xl font-bold mb-1">ملفي كمبدع</h1>
-            <p className="text-[var(--muted)] mb-6">تحديث بياناتك المهنية وروابط أعمالك</p>
+            <p className="text-[var(--muted)] mb-6">
+              تحديث بياناتك المهنية وروابط أعمالك - مرحباً {session?.user?.name || session?.user?.email || 'المبدع'}
+            </p>
 
             {message && (
               <div className="mb-4 text-sm p-3 rounded border border-[var(--elev)]">{message}</div>
