@@ -490,9 +490,9 @@ export default function AdminCatalogPage() {
                 <h2 className="text-xl font-semibold text-[var(--text)]">الفئات الرئيسية</h2>
                 <p className="text-[var(--muted)] mt-1">الفئات الأساسية للخدمات</p>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-auto max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)]">
                 <table className="w-full">
-                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
+                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
                       <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
                       <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
@@ -568,9 +568,9 @@ export default function AdminCatalogPage() {
                   </div>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-auto max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)]">
                 <table className="w-full">
-                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
+                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
                       <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
                       <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
@@ -628,9 +628,9 @@ export default function AdminCatalogPage() {
                 <h2 className="text-xl font-semibold text-[var(--text)]">المحاور التجارية</h2>
                 <p className="text-[var(--muted)] mt-1">القطاعات والأسواق المستهدفة</p>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-auto max-h-[600px] border border-[var(--elev)] rounded-[var(--radius)]">
                 <table className="w-full">
-                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
+                  <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
                       <th className="text-right p-4 font-medium text-[var(--text)]">المعرف</th>
                       <th className="text-right p-4 font-medium text-[var(--text)]">الاسم العربي</th>
@@ -717,19 +717,19 @@ export default function AdminCatalogPage() {
                   <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     الفئة الرئيسية *
                   </label>
-                  <select
-                    value={state.formData.categoryId}
-                    onChange={(e) => setState(prev => ({
+                  <Dropdown
+                    value={state.formData.categoryId as string}
+                    onChange={(v) => setState(prev => ({
                       ...prev,
-                      formData: { ...prev.formData, categoryId: e.target.value }
+                      formData: { ...prev.formData, categoryId: String(v) }
                     }))}
-                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
-                    required
-                  >
-                    <option value="photo">صورة</option>
-                    <option value="video">فيديو</option>
-                    <option value="design">تصميم</option>
-                  </select>
+                    options={[
+                      { value: 'photo', label: 'صورة' },
+                      { value: 'video', label: 'فيديو' },
+                      { value: 'design', label: 'تصميم' },
+                    ]}
+                    placeholder="اختر الفئة"
+                  />
                 </div>
               )}
 
@@ -870,19 +870,19 @@ export default function AdminCatalogPage() {
                   <label className="block text-sm font-medium text-[var(--text)] mb-2">
                     الفئة الرئيسية *
                   </label>
-                  <select
-                    value={state.formData.categoryId}
-                    onChange={(e) => setState(prev => ({
+                  <Dropdown
+                    value={state.formData.categoryId as string}
+                    onChange={(v) => setState(prev => ({
                       ...prev,
-                      formData: { ...prev.formData, categoryId: e.target.value }
+                      formData: { ...prev.formData, categoryId: String(v) }
                     }))}
-                    className="w-full px-3 py-2 border border-[var(--elev)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-500)]"
-                    required
-                  >
-                    <option value="photo">صورة</option>
-                    <option value="video">فيديو</option>
-                    <option value="design">تصميم</option>
-                  </select>
+                    options={[
+                      { value: 'photo', label: 'صورة' },
+                      { value: 'video', label: 'فيديو' },
+                      { value: 'design', label: 'تصميم' },
+                    ]}
+                    placeholder="اختر الفئة"
+                  />
                 </div>
               )}
 

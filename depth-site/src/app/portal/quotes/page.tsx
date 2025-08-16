@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Container } from '@/components/ui/Container';
+import Dropdown from '@/components/ui/Dropdown';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/loaders/Loader';
@@ -152,17 +153,19 @@ export default function ClientQuotesPage() {
           {/* أدوات التحكم */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center space-x-4 space-x-reverse">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="all">جميع العروض</option>
-                <option value="sent">في انتظار الرد</option>
-                <option value="approved">معتمدة</option>
-                <option value="rejected">مرفوضة</option>
-              </select>
-              
+              <div className="w-48">
+                <Dropdown
+                  value={selectedStatus}
+                  onChange={(v) => setSelectedStatus(String(v))}
+                  options={[
+                    { value: 'all', label: 'جميع العروض' },
+                    { value: 'sent', label: 'في انتظار الرد' },
+                    { value: 'approved', label: 'معتمدة' },
+                    { value: 'rejected', label: 'مرفوضة' },
+                  ]}
+                  placeholder="تصفية الحالات"
+                />
+              </div>
               <Button onClick={loadQuotes} disabled={loading}>
                 تحديث
               </Button>

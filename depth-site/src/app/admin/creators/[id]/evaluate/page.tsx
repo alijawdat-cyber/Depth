@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
+import Dropdown from '@/components/ui/Dropdown';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { 
   Star, 
@@ -830,18 +831,16 @@ export default function CreatorEvaluationPage({ params }: PageProps) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">التوصية</label>
-              <select
+              <Dropdown
                 value={evaluation.recommendation}
-                onChange={(e) => setEvaluation(prev => ({
-                  ...prev,
-                  recommendation: e.target.value as 'approve' | 'reject' | 'conditional_approve'
-                }))}
-                className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
-              >
-                <option value="approve">الموافقة</option>
-                <option value="conditional_approve">الموافقة المشروطة</option>
-                <option value="reject">الرفض</option>
-              </select>
+                onChange={(v) => setEvaluation(prev => ({ ...prev, recommendation: v as 'approve' | 'reject' | 'conditional_approve' }))}
+                options={[
+                  { value: 'approve', label: 'الموافقة' },
+                  { value: 'conditional_approve', label: 'الموافقة المشروطة' },
+                  { value: 'reject', label: 'الرفض' },
+                ]}
+                placeholder="اختر التوصية"
+              />
             </div>
 
             <div>
