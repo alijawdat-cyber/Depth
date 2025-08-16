@@ -11,7 +11,7 @@
         {"id": "photo_ghost", "nameAr": "Ghost Mannequin", "nameEn": "Ghost Mannequin", "desc": "تفريغ المانيكان 3D"},
         {"id": "photo_detail", "nameAr": "تفاصيل/Macro", "nameEn": "Detail/Macro", "desc": "تفاصيل وخامات"},
         {"id": "photo_lifestyle", "nameAr": "Lifestyle", "nameEn": "Lifestyle", "desc": "مشهد واقعي"},
-        {"id": "photo_before_after", "nameAr": "Before/After", "nameEn": "Before/After", "desc": "امتثال تجميلي", "verticals": ["clinics","beauty"]}
+        {"id": "photo_before_after", "nameAr": "Before/After", "nameEn": "Before/After", "desc": "امتثال تجميلي", "verticals": ["beauty"]}
       ]
     },
     {
@@ -36,7 +36,7 @@
         {"id": "design_carousel", "nameAr": "Carousel Promo", "nameEn": "Carousel Promo", "desc": "سلسلة شرائح"},
         {"id": "design_story_cover", "nameAr": "Story Covers", "nameEn": "Story Covers", "desc": "أغلفة بصرية"},
         {"id": "design_catalog_banner", "nameAr": "Catalog Banner", "nameEn": "Catalog Banner", "desc": "بانر متجر/موسم"},
-        {"id": "design_clinic_disclaimer", "nameAr": "إخلاء طبي", "nameEn": "Clinic Disclaimer", "desc": "امتثال عيادات", "verticals":["clinics"]}
+        {"id": "design_clinic_disclaimer", "nameAr": "إخلاء طبي", "nameEn": "Clinic Disclaimer", "desc": "امتثال عيادات", "verticals":["beauty"]}
       ]
     }
   ],
@@ -56,7 +56,7 @@
     {
       "subcategory": "photo_ecom_packshot",
       "verticalsAllowed": ["ecom", "fashion", "fnb"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["1:1", "4:5"],
       "defaultFormats": ["jpg", "webp"],
       "complianceTags": [],
@@ -65,7 +65,7 @@
     {
       "subcategory": "photo_flat_lay",
       "verticalsAllowed": ["fashion", "fnb", "sports", "ecom"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["1:1", "4:5", "9:16"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": [],
@@ -74,7 +74,7 @@
     {
       "subcategory": "photo_on_model",
       "verticalsAllowed": ["fashion", "sports", "ecom"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["4:5", "1:1"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": [],
@@ -83,7 +83,7 @@
     {
       "subcategory": "photo_ghost",
       "verticalsAllowed": ["fashion", "ecom"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["1:1", "4:5"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": [],
@@ -92,7 +92,7 @@
     {
       "subcategory": "photo_detail",
       "verticalsAllowed": ["fashion", "fnb", "furniture", "ecom"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["1:1", "4:5"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": [],
@@ -101,7 +101,7 @@
     {
       "subcategory": "photo_lifestyle",
       "verticalsAllowed": ["fashion", "fnb", "furniture", "sports", "ecom"],
-      "defaultProcessingLevels": ["raw_basic", "retouch"],
+      "defaultProcessingLevels": ["raw_only", "raw_basic", "full_retouch"],
       "defaultRatios": ["4:5", "1:1"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": [],
@@ -110,7 +110,7 @@
     {
       "subcategory": "photo_before_after",
       "verticalsAllowed": ["clinics", "beauty"],
-      "defaultProcessingLevels": ["retouch"],
+      "defaultProcessingLevels": ["full_retouch"],
       "defaultRatios": ["1:1", "4:5"],
       "defaultFormats": ["jpg", "png"],
       "complianceTags": ["clinics_policy"],
@@ -208,7 +208,7 @@
     },
     {
       "subcategory": "design_clinic_disclaimer",
-      "verticalsAllowed": ["clinics"],
+      "verticalsAllowed": ["beauty"],
       "defaultProcessingLevels": [],
       "defaultRatios": ["1:1", "9:16"],
       "defaultFormats": ["png", "jpg", "svg"],

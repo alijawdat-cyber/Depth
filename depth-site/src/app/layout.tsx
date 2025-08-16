@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     url: siteUrl,
     images: [
       {
-        url: '/depth-icon-1563x1563-rgba.png',
-        width: 1563,
-        height: 1563,
+        url: '/brand/icon-apple-512.png',
+        width: 512,
+        height: 512,
         alt: 'Depth Agency Logo',
       },
     ],

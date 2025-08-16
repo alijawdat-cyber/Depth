@@ -7,14 +7,15 @@ Final Price = Base (حسب الفئة الفرعية) ± Vertical Modifier + Pro
 - Vertical Modifier: Clinics +10%، Furniture +5%، Fashion 0% (قابلة للتحديث).
 - Processing: RAW −10%، RAW+Color 0%، Full Retouch +30–40% (المصدر: Rate Card).
 - Conditions: Rush +35%، Location + مبلغ ثابت.
-- Creator Modifier: −10% → +20% حسب تقييم الإدارة.
+- Creator Modifier: 0% → +20% حسب تقييم الإدارة (دون نسب سلبية).
 - Add‑ons: Models/Location/Props/Stylist/MUA/Source Files.
 
 ملاحظة العملة: الأساس IQD. USD للعرض فقط وبـ FX يدوي محفوظ ضمن Snapshot عند الحاجة.
 مصدر الحقيقة: `docs/catalog/09-Seed/rate-card.json`.
 
 ## Guardrails (حواجز)
-- هامش ≥ 45% لكل أصل.
+- هامش ≥ 50% افتراضياً.
+- مسموح النزول حتى 45% باستثناء مبرّر (Hard Stop).
 - حدود دنيا/قصوى للسعر.
 - إنذار امتثال لتجميلي/قبل‑بعد.
 
@@ -24,7 +25,7 @@ Final Price = Base (حسب الفئة الفرعية) ± Vertical Modifier + Pro
 
 ## ربط العقود
 - كل سطر تسليم يتولّد كبند SOW: مواصفات/كمية/سعر/SLA/امتثال.
-- سياسات الدفع والـ Kill Fee/Late Fee من الـ MSA تلقائياً.
+- سياسات الدفع والجزاءات تُسحب حسب `docs/catalog/15-Taxes-and-Invoicing.md` والـ MSA (Kill Fee 25–50% وتمديد SLA عند تأخر العميل).
 
 ## تحديثات دورية
 - مراجعة ربع سنوية للـ Base/Modifiers وفق السوق والأداء.
