@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { ToastContainer, useToast } from "@/components/ui/Toast";
+import { profilePathForRole } from "@/lib/roles";
 import { BRAND } from "@/lib/constants/brand";
 
 // تعريف عناصر التنقل الإداري المتقدم
@@ -329,7 +330,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {userMenuOpen && (
                   <div className="absolute bottom-full right-0 left-0 mb-2 bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius)] shadow-lg py-2">
                     <button 
-                      onClick={() => router.push('/portal/profile')}
+                      onClick={() => router.push(profilePathForRole(userRole))}
                       className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--elev)] transition-colors"
                     >
                       <User size={16} />

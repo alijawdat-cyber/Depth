@@ -56,6 +56,26 @@ export default function CreatorsPortalPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  const fetchCreatorData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/creators/profile');
+      if (response.ok) {
+        const data = await response.json();
+        setCreatorData(data.creator);
+        setProjectStats(data.stats || {
+          total: 0,
+          completed: 0,
+          ongoing: 0,
+          earnings: 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch creator data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (status === 'loading') return;
     
@@ -71,21 +91,6 @@ export default function CreatorsPortalPage() {
 
     fetchCreatorData();
   }, [session, status, router, fetchCreatorData]);
-
-  const fetchCreatorData = async () => {
-    try {
-      const response = await fetch('/api/creators/profile');
-      if (response.ok) {
-        const data = await response.json();
-        setCreatorData(data.creator);
-        setProjectStats(data.stats || projectStats);
-      }
-    } catch (error) {
-      console.error('Failed to fetch creator data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -3,7 +3,7 @@
 // مكون Toast محسن للرسائل والإشعارات
 // الغرض: عرض رسائل تفاعلية مع animations وإغلاق تلقائي
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, AlertCircle, XCircle, Info, X } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -60,6 +60,14 @@ export default function Toast({
   const styles = getToastStyles(type);
   const { IconComponent } = styles;
 
+  const handleClose = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose?.();
+    }, 300);
+  }, [onClose]);
+
   useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {
@@ -68,15 +76,7 @@ export default function Toast({
 
       return () => clearTimeout(timer);
     }
-  }, [duration]);
-
-  const handleClose = () => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose?.();
-    }, 300);
-  };
+  }, [duration, handleClose]);
 
   if (!isVisible) return null;
 

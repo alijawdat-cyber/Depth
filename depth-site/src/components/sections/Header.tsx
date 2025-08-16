@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { NAV_ITEMS, CTA_ITEMS } from "@/lib/constants/nav";
 import NotificationBell from "@/components/ui/NotificationBell";
+import { profilePathForRole } from "@/lib/roles";
 
 // WhatsApp CTA is now replaced with internal /book route
 
@@ -105,7 +106,7 @@ export default function Header() {
                   {role !== 'admin' && (
                     <Link href="/portal" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>بوابتي</Link>
                   )}
-                  <Link href="/portal/profile" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
+                  <Link href={profilePathForRole(role)} className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
                   {role === 'admin' && (
                     <Link href="/admin" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>لوحة الأدمن</Link>
                   )}
@@ -154,7 +155,7 @@ export default function Header() {
               {role !== 'admin' && (
                 <Link href="/portal" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">بوابتي</Link>
               )}
-              <Link href="/portal/profile" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">ملفي</Link>
+              <Link href={profilePathForRole(role)} onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">ملفي</Link>
               {role === 'admin' && (
                 <Link href="/admin" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">لوحة الأدمن</Link>
               )}
