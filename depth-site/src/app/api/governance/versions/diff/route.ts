@@ -25,7 +25,7 @@ function diffNumericMaps(
       const changePercent = oldValue === 0 ? 100 : ((newValue - oldValue) / Math.abs(oldValue)) * 100;
       changes.push({
         type,
-        [fieldName]: key as any,
+        [fieldName]: key,
         oldValue,
         newValue,
         changePercent

@@ -12,7 +12,7 @@ const VerticalUpdateSchema = z.object({
 });
 
 // تحديث محور
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -87,7 +87,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // حذف محور
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -154,7 +154,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 }
 
 // الحصول على محور واحد
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     const { id } = params;

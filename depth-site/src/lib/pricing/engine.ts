@@ -78,7 +78,7 @@ export function calculateQuotePricing(
 function calculateLinePricing(
   line: QuoteLineInput,
   rateCard: RateCard,
-  _estimatedCostIQD?: number
+  estimatedCostIQD?: number
 ): QuotePreviewLineResult {
   const warnings: string[] = [];
   

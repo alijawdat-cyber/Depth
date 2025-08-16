@@ -209,7 +209,7 @@ function generateSOWHTML(quote: Quote, sow: SOW): string {
  * تحويل HTML إلى PDF (مبسط للـ MVP)
  * في الإنتاج، يُفضل استخدام puppeteer أو مكتبة PDF متخصصة
  */
-async function convertHTMLToPDF(_html: string): Promise<Buffer> {
+async function convertHTMLToPDF(html: string): Promise<Buffer> {
   // للـ MVP، نحفظ HTML كـ PDF بسيط
   // في التطوير المستقبلي، يمكن استخدام puppeteer أو @react-pdf/renderer
   

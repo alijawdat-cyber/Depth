@@ -9,7 +9,7 @@ import Loader from '@/components/loaders/Loader';
 import { Quote, SOWLight } from '@/types/catalog';
 
 export default function ClientDocumentsPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [sows, setSows] = useState<SOWLight[]>([]);
   const [loading, setLoading] = useState(true);

@@ -33,6 +33,7 @@ interface Subcategory {
   nameAr: string;
   nameEn?: string;
   categoryId: string;
+  defaults?: { complianceTags?: string[] };
 }
 
 interface Vertical {
@@ -457,6 +458,22 @@ export default function AdminPricingPage() {
                         </div>
                       </div>
                       
+                      {/* تحذير امتثال Clinics */}
+                      {(() => {
+                        const sub = subcategories.find(s => s.id === line.subcategoryId);
+                        const hasClinics = sub?.defaults?.complianceTags?.includes('clinics_policy');
+                        if (!hasClinics) return null;
+                        return (
+                          <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
+                            <h5 className="text-sm font-medium text-amber-800 mb-1">تنبيه امتثال (عيادات):</h5>
+                            <p className="text-sm text-amber-700">
+                              يتطلب هذا التسليم سياسة قبل/بعد للعيادات. الرجاء تضمين نص الإخلاء:
+                              &quot;النتائج قد تختلف من شخص لآخر. المحتوى لأغراض توعوية فقط.&quot;
+                            </p>
+                          </div>
+                        );
+                      })()}
+
                       {line.warnings && line.warnings.length > 0 && (
                         <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
                           <h5 className="text-sm font-medium text-yellow-800 mb-1">تحذيرات:</h5>

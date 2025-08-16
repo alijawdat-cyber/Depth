@@ -4,17 +4,19 @@
 // الغرض: إدارة شاملة للمبدعين مع نماذج الإدخال والتقييم والمهارات والمعدات
 // المرحلة 1: عرض وإدارة المبدعين الحاليين + إضافة مبدعين جدد
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import Dropdown from '@/components/ui/Dropdown';
 import Loader from '@/components/loaders/Loader';
 import SectionHeading from '@/components/ui/SectionHeading';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import { LoadingCreators } from '@/components/ui/LoadingStates';
 import { 
   RefreshCw, 
   Plus, 
   Edit3, 
-  Trash2, 
   Eye,
   User,
   Camera,
@@ -45,6 +47,7 @@ interface CreatorsPageState {
 
 export default function AdminCreatorsPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [state, setState] = useState<CreatorsPageState>({
     creators: [],
     stats: null,
@@ -96,13 +99,7 @@ export default function AdminCreatorsPage() {
   // التحقق من الجلسة والدور
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'admin';
 
-  useEffect(() => {
-    if (status === 'authenticated' && isAdmin) {
-      loadCreatorsData();
-    }
-  }, [status, isAdmin, state.selectedStatus, state.selectedRole]);
-
-  const loadCreatorsData = async () => {
+  const loadCreatorsData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -116,29 +113,34 @@ export default function AdminCreatorsPage() {
       queryParams.set('limit', '50');
 
       const response = await fetch(`/api/admin/creators?${queryParams}`);
-
       if (!response.ok) {
         throw new Error('فشل في تحميل بيانات المبدعين');
       }
 
       const data = await response.json();
-      
-      setState(prev => ({
-        ...prev,
+      setState(prev => ({ 
+        ...prev, 
         creators: data.creators || [],
         stats: data.stats || null,
-        loading: false
+        loading: false 
       }));
 
-    } catch (err) {
-      console.error('خطأ في تحميل بيانات المبدعين:', err);
-      setState(prev => ({
-        ...prev,
-        error: err instanceof Error ? err.message : 'خطأ غير معروف',
-        loading: false
+    } catch (error) {
+      setState(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : 'خطأ في التحميل',
+        loading: false 
       }));
     }
-  };
+  }, [state.selectedStatus, state.selectedRole]);
+
+  useEffect(() => {
+    if (status === 'authenticated' && isAdmin) {
+      loadCreatorsData();
+    }
+  }, [status, isAdmin, loadCreatorsData]);
+
+
 
   const handleCreateCreator = async () => {
     try {
@@ -281,6 +283,9 @@ export default function AdminCreatorsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
+      
       {/* رأس الصفحة */}
       <SectionHeading
         title="إدارة المبدعين"
@@ -474,14 +479,38 @@ export default function AdminCreatorsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="ghost">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => router.push(`/admin/creators/${creator.id}/profile`)}
+                          >
                             <Eye size={14} />
                             عرض
                           </Button>
-                          <Button size="sm" variant="ghost">
-                            <Edit3 size={14} />
-                            تعديل
-                          </Button>
+                          
+                          {(creator.status === 'registered' || creator.status === 'intake_submitted') && (
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => router.push(`/admin/creators/intake?creatorId=${creator.id}`)}
+                            >
+                              <Edit3 size={14} />
+                              نموذج الإدخال
+                            </Button>
+                          )}
+
+                          {(creator.status === 'intake_submitted' || creator.status === 'under_review') && (
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="text-blue-600 hover:bg-blue-50"
+                              onClick={() => router.push(`/admin/creators/${creator.id}/evaluate`)}
+                            >
+                              <Star size={14} />
+                              تقييم
+                            </Button>
+                          )}
+
                           {creator.status === 'under_review' && (
                             <>
                               <Button 

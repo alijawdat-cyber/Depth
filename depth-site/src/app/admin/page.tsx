@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/Button";
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   CheckCircle, 
   XCircle, 
@@ -26,7 +27,6 @@ import {
 import UnifiedUploader from "@/components/features/portal/files/UnifiedUploader";
 import { useSession } from "next-auth/react";
 import Dropdown from "@/components/ui/Dropdown";
-import SectionHeading from "@/components/ui/SectionHeading";
 
 interface Client {
   id: string;
@@ -94,7 +94,6 @@ export default function AdminDashboard() {
   const [selectedProjectIdForUpload, setSelectedProjectIdForUpload] = useState('');
   const [fileFilter, setFileFilter] = useState<'all'|'image'|'video'|'document'>('all');
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
-  const isAdmin = userRole === 'admin';
 
   const fetchClients = useCallback(async () => {
     try {
@@ -283,6 +282,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
+      
       {/* رأس لوحة التحكم المحدث */}
       <div className="flex items-center justify-between">
         <div>

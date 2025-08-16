@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { z } from 'zod';
-import { Creator, UpdateCreatorRequest } from '@/types/creators';
+import { Creator } from '@/types/creators';
 
 // Schema للتحديث
 const UpdateCreatorSchema = z.object({
@@ -86,7 +86,8 @@ const UpdateCreatorSchema = z.object({
 });
 
 // الحصول على مبدع واحد
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -100,8 +101,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         requestId 
       }, { status: 401 });
     }
-
-    const { id } = params;
 
     const docRef = adminDb.collection('creators').doc(id);
     const doc = await docRef.get();
@@ -135,7 +134,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // تحديث مبدع
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -150,7 +150,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       }, { status: 401 });
     }
 
-    const { id } = params;
     const body = await req.json();
     const validatedData = UpdateCreatorSchema.parse(body);
 
@@ -249,7 +248,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // حذف مبدع
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -263,8 +263,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         requestId 
       }, { status: 401 });
     }
-
-    const { id } = params;
 
     // التحقق من وجود المبدع
     const docRef = adminDb.collection('creators').doc(id);

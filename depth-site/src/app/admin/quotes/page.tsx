@@ -223,7 +223,8 @@ export default function AdminQuotesPage() {
     );
   }
 
-  // Helpers to manage multiple quote lines
+  // Helpers to manage multiple quote lines - TODO: للاستخدام المستقبلي
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addLine = () => {
     setNewQuote(prev => ({
       ...prev,
@@ -244,6 +245,7 @@ export default function AdminQuotesPage() {
     }));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const removeLine = (index: number) => {
     setNewQuote(prev => ({
       ...prev,
@@ -251,6 +253,7 @@ export default function AdminQuotesPage() {
     }));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const duplicateLine = (index: number) => {
     setNewQuote(prev => {
       const lines = prev.lines ? [...prev.lines] : [];
@@ -261,6 +264,8 @@ export default function AdminQuotesPage() {
     });
   };
 
+  // TODO: سيتم استخدام هذه الدالة عند إضافة ميزة الأسطر المتعددة في المرحلة القادمة
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateLineField = <K extends keyof QuoteCreateRequest['lines'][number]>(
     index: number,
     key: K,
@@ -276,6 +281,8 @@ export default function AdminQuotesPage() {
     });
   };
 
+  // TODO: سيتم استخدام هذه الدالة عند إضافة ميزة الأسطر المتعددة في المرحلة القادمة  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateLineConditions = (
     index: number,
     partial: NonNullable<QuoteCreateRequest['lines'][number]['conditions']>

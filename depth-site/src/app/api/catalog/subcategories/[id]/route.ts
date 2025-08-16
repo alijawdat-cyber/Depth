@@ -14,7 +14,7 @@ const SubcategoryUpdateSchema = z.object({
 });
 
 // تحديث فئة فرعية
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -89,7 +89,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // حذف فئة فرعية
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     // التحقق من الصلاحيات
@@ -156,7 +156,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 }
 
 // الحصول على فئة فرعية واحدة
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: any) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
     const { id } = params;
