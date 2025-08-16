@@ -372,33 +372,33 @@ export default function AdminQuotesPage() {
       </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-red-800 text-sm">{error}</p>
+            <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-[var(--radius)] p-4 mb-6">
+              <p className="text-[var(--danger-fg)] text-sm">{error}</p>
             </div>
           )}
 
           {/* الإحصائيات */}
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-                <div className="text-sm text-gray-600">إجمالي العروض</div>
+              <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--text)]">{stats.total}</div>
+                <div className="text-sm text-[var(--muted)]">إجمالي العروض</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-                <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
-                <div className="text-sm text-gray-600">مسودات</div>
+              <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--text)]">{stats.draft}</div>
+                <div className="text-sm text-[var(--muted)]">مسودات</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{stats.sent}</div>
-                <div className="text-sm text-gray-600">مُرسلة</div>
+              <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--text)]">{stats.sent}</div>
+                <div className="text-sm text-[var(--muted)]">مُرسلة</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
-                <div className="text-sm text-gray-600">معتمدة</div>
+              <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--text)]">{stats.approved}</div>
+                <div className="text-sm text-[var(--muted)]">معتمدة</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-                <div className="text-sm text-gray-600">مرفوضة</div>
+              <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--elev)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--text)]">{stats.rejected}</div>
+                <div className="text-sm text-[var(--muted)]">مرفوضة</div>
               </div>
             </div>
           )}
