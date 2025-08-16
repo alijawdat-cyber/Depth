@@ -87,7 +87,7 @@ export default function ResponsiveTable<T extends { id: string | number }>({
       <div className={`
         ${renderCard && viewMode === 'cards' ? 'hidden lg:block' : 'block'}
       `}>
-        <div className="overflow-x-auto">
+        <div className="scroll-xy">
           <table className="w-full">
             <thead className="bg-[var(--elev)]">
               <tr>

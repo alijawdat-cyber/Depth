@@ -119,7 +119,7 @@ export default function ClientSignUpPage() {
       await signIn('google', { 
         callbackUrl: '/portal?welcome=true&provider=google' 
       });
-    } catch (err) {
+    } catch {
       setError('فشل في التسجيل عبر Google');
       setLoading(false);
     }

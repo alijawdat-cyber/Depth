@@ -160,6 +160,8 @@ html, body {
   max-width: 100%;
   width: 100%;
   touch-action: pan-y pinch-zoom;
+  /* منع قفزات التخطيط عند ظهور شريط التمرير */
+  scrollbar-gutter: stable both-edges;
 }
 
 /* Unified, modern scroll system */
@@ -169,8 +171,11 @@ html, body {
   overflow: auto;
   max-height: var(--scroll-max, 72vh);
   max-block-size: var(--scroll-max, 72vh);
-  overscroll-behavior: contain;
+  /* كبح السلسلة أفقياً فقط، والسماح للعمودي بالانتقال للأب */
+  overscroll-behavior-inline: contain;
+  overscroll-behavior-block: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
 }
 
 /* Vertical only (lists/panels) */

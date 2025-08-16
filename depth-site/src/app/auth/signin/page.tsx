@@ -55,7 +55,7 @@ export default function SignInPage() {
         
         // الحصول على الجلسة لتحديد الدور والتوجيه المناسب
         const session = await getSession();
-        const userRole = (session?.user as any)?.role || 'client';
+        const userRole = (session?.user as { role?: string })?.role || 'client';
         
         // التوجيه حسب الدور
         switch (userRole) {

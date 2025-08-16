@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -70,7 +70,7 @@ export default function CreatorsPortalPage() {
     }
 
     fetchCreatorData();
-  }, [session, status, router]);
+  }, [session, status, router, fetchCreatorData]);
 
   const fetchCreatorData = async () => {
     try {

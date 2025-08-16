@@ -131,7 +131,7 @@ export default function CreatorSignUpPage() {
       await signIn('google', { 
         callbackUrl: '/creators/intake?welcome=true&provider=google' 
       });
-    } catch (err) {
+    } catch {
       setError('فشل في التسجيل عبر Google');
       setLoading(false);
     }
@@ -147,15 +147,7 @@ export default function CreatorSignUpPage() {
     }
   };
 
-  const getRoleLabel = (role: string) => {
-    const labels = {
-      photographer: 'مصور',
-      videographer: 'مصور فيديو',
-      designer: 'مصمم',
-      producer: 'منتج'
-    };
-    return labels[role as keyof typeof labels] || role;
-  };
+
 
   return (
     <div className="min-h-screen bg-[var(--bg)] py-12">
@@ -229,7 +221,7 @@ export default function CreatorSignUpPage() {
                     </div>
                     <select
                       value={formData.role}
-                      onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as any }))}
+                      onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'photographer' | 'videographer' | 'designer' | 'producer' }))}
                       className="w-full pr-10 pl-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all appearance-none"
                       required
                     >

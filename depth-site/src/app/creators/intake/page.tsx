@@ -7,9 +7,6 @@ import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { 
-  Camera, 
-  Video, 
-  Palette, 
   Settings, 
   CheckCircle,
   ArrowLeft,
@@ -124,7 +121,7 @@ export default function CreatorIntakePage() {
     }
   };
 
-  const updateFormData = (field: keyof IntakeFormData, value: any) => {
+  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

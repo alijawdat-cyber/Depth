@@ -11,7 +11,6 @@ import {
   CheckCircle,
   Star,
   Briefcase,
-  TrendingUp,
   Award
 } from "lucide-react";
 

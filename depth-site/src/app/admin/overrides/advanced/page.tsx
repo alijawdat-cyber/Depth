@@ -354,7 +354,7 @@ export default function AdvancedOverridesPage() {
             <p className="text-[var(--muted)]">لا توجد طلبات تعديل</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="scroll-xy">
           <table className="w-full">
               <thead className="bg-[var(--bg)] border-b border-[var(--elev)]">
               <tr>

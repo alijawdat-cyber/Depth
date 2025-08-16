@@ -112,7 +112,7 @@ export const authOptions: NextAuthOptions = {
       // Set role on first sign-in
       if (user) {
         token.userId = user.id;
-        token.role = (user as any).role || await determineUserRole(user.email || '');
+        token.role = (user as { role?: string }).role || await determineUserRole(user.email || '');
       }
       
       // Ensure role is derived even when `user` is undefined (subsequent JWT calls)
