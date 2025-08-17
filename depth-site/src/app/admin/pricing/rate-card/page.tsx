@@ -14,8 +14,6 @@ import { LoadingRateCard } from '@/components/ui/LoadingStates';
 import { DEFAULT_GUARDRAILS, type GuardrailsConfig } from '@/lib/pricing/guardrails-engine';
 import { 
   Save, 
-  Upload, 
-  Download, 
   AlertTriangle,
   CheckCircle,
   Edit3,
@@ -176,33 +174,7 @@ export default function RateCardEditorPage() {
     }
   };
 
-  // تحميل البيانات الأولية من seed
-  const handleLoadSeedData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
 
-      const response = await fetch('/api/catalog/seed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'full' })
-      });
-
-      if (!response.ok) throw new Error('فشل في تحميل البيانات الأولية');
-
-      setSuccess('تم تحميل البيانات الأولية بنجاح');
-      
-      // إعادة تحميل البيانات
-      setTimeout(() => {
-        loadRateCardData();
-      }, 1000);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'فشل في تحميل البيانات الأولية');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUpdatePrice = (subcategoryId: string, newPrice: number) => {
     if (!rateCard) return;
@@ -606,38 +578,27 @@ export default function RateCardEditorPage() {
         defaultView="table"
       />
 
-      {/* Action Buttons */}
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--elev)]">
-        <div className="flex items-center gap-2">
-          <Button variant="secondary">
-            <Upload size={16} />
-            استيراد
-          </Button>
-          <Button variant="secondary">
-            <Download size={16} />
-            تصدير
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="secondary" 
-            onClick={() => handleSaveRateCard(true)}
-            disabled={saving}
-          >
-            <Save size={16} />
-            {saving ? 'جاري الحفظ...' : 'حفظ مسودة'}
-          </Button>
-          
-          <Button 
-            onClick={() => handleSaveRateCard(false)}
-            disabled={saving}
-          >
-            <CheckCircle size={16} />
-            {saving ? 'جاري التفعيل...' : 'تفعيل الإصدار'}
-          </Button>
-        </div>
-      </div>
+                    {/* Action Buttons */}
+       <div className="flex items-center justify-end mt-8 pt-6 border-t border-[var(--elev)]">
+         <div className="flex items-center gap-2">
+           <Button 
+             variant="secondary" 
+             onClick={() => handleSaveRateCard(true)}
+             disabled={saving || !rateCard}
+           >
+             <Save size={16} />
+             {saving ? 'جاري الحفظ...' : 'حفظ مسودة'}
+           </Button>
+           
+           <Button 
+             onClick={() => handleSaveRateCard(false)}
+             disabled={saving || !rateCard}
+           >
+             <CheckCircle size={16} />
+             {saving ? 'جاري التفعيل...' : 'تفعيل الإصدار'}
+           </Button>
+         </div>
+       </div>
 
       {/* Edit Item Modal */}
       {editingItem && (
