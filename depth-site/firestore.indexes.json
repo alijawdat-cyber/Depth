@@ -172,6 +172,31 @@
         { "fieldPath": "userId", "order": "ASCENDING" },
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "equipment_catalog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "brand", "order": "ASCENDING" },
+        { "fieldPath": "model", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "equipment_catalog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "brand", "order": "ASCENDING" },
+        { "fieldPath": "model", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "equipment_presets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "targetRole", "order": "ASCENDING" },
+        { "fieldPath": "nameAr", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

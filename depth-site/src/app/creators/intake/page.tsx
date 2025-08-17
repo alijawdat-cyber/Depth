@@ -246,8 +246,9 @@ export default function CreatorIntakePage() {
   const [skillsOptions, setSkillsOptions] = useState<Array<{ id: string; nameAr: string }>>([]);
   const [equipmentCatalog, setEquipmentCatalog] = useState<EquipmentCatalogItem[]>([]);
   const [equipmentPresets, setEquipmentPresets] = useState<EquipmentPresetKit[]>([]);
-  // Loading states سيتم استخدامها لاحقاً
-  // const [equipmentLoading, setEquipmentLoading] = useState(false);
+  // Loading states
+  const [equipmentLoading, setEquipmentLoading] = useState(false);
+  const [dataError, setDataError] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   useEffect(() => {
@@ -255,24 +256,40 @@ export default function CreatorIntakePage() {
   }, []);
 
   const loadInitialData = async () => {
+    setEquipmentLoading(true);
+    setDataError('');
+    
     try {
       const [subsRes, eqRes] = await Promise.all([
         fetch('/api/catalog/subcategories?includeDefaults=true'),
         fetch('/api/catalog/equipment?includePresets=true&limit=100'),
       ]);
       
-              if (subsRes.ok) {
-          const data = await subsRes.json();
-          setSkillsOptions((data.items || []).map((i: { id: string; nameAr: string }) => ({ id: i.id, nameAr: i.nameAr })));
-        }
+      if (subsRes.ok) {
+        const data = await subsRes.json();
+        setSkillsOptions((data.items || []).map((i: { id: string; nameAr: string }) => ({ id: i.id, nameAr: i.nameAr })));
+      } else {
+        console.warn('Failed to load skills options:', subsRes.status);
+      }
       
       if (eqRes.ok) {
         const data = await eqRes.json();
         setEquipmentCatalog(data.items || []);
         setEquipmentPresets(data.presets || []);
+        
+        // التحقق من وجود البيانات
+        if (!data.items || data.items.length === 0) {
+          setDataError('لا توجد معدات في الكتالوج. يرجى تحميل البيانات الأولية أولاً.');
+        }
+      } else {
+        setDataError(`فشل في تحميل كتالوج المعدات: ${eqRes.status}`);
+        console.error('Equipment API error:', eqRes.status, await eqRes.text());
       }
     } catch (error) {
       console.error('Failed to load initial data:', error);
+      setDataError('خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setEquipmentLoading(false);
     }
   };
 
@@ -414,32 +431,78 @@ export default function CreatorIntakePage() {
             {/* اختيار المعدات */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">إضافة معدات من الكتالوج</label>
-              <div className="max-h-64 overflow-y-auto border border-[var(--border)] rounded-lg">
-                {getFilteredEquipment().map(item => (
-                  <div key={item.id} className="p-3 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-alt)] transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="font-medium text-[var(--text)]">
-                          {item.brand} {item.model}
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {item.capabilities.slice(0, 4).map(cap => (
-                            <span key={cap} className="px-2 py-0.5 bg-[var(--accent-100)] text-[var(--accent-700)] text-xs rounded">
-                              {cap}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => addEquipmentItem(item.id)}
-                        disabled={formData.equipment.some(eq => eq.catalogId === item.id)}
-                        className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)] disabled:bg-gray-300 disabled:cursor-not-allowed"
-                      >
-                        {formData.equipment.some(eq => eq.catalogId === item.id) ? 'مضاف' : 'إضافة'}
-                      </button>
-                    </div>
+              
+              {/* رسائل الخطأ والتحميل */}
+              {equipmentLoading && (
+                <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-4 mb-4">
+                  <div className="flex items-center gap-2 text-[var(--accent-fg)]">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--accent-fg)]" />
+                    <span>جاري تحميل كتالوج المعدات...</span>
                   </div>
-                ))}
+                </div>
+              )}
+              
+              {dataError && (
+                <div className="bg-[var(--error-bg)] border border-[var(--error-border)] rounded-lg p-4 mb-4">
+                  <div className="flex items-center gap-2 text-[var(--error-fg)] mb-2">
+                    <AlertCircle size={20} />
+                    <span className="font-medium">خطأ في تحميل البيانات</span>
+                  </div>
+                  <p className="text-sm text-[var(--error-fg)] mb-3">{dataError}</p>
+                  <button
+                    onClick={loadInitialData}
+                    className="px-3 py-1 bg-[var(--error-fg)] text-[var(--error-bg)] text-sm rounded hover:opacity-90"
+                  >
+                    إعادة المحاولة
+                  </button>
+                </div>
+              )}
+              
+              <div className="max-h-64 overflow-y-auto border border-[var(--border)] rounded-lg">
+                {equipmentLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent-500)] mx-auto mb-2" />
+                    <p className="text-[var(--muted)]">جاري التحميل...</p>
+                  </div>
+                ) : getFilteredEquipment().length === 0 ? (
+                  <div className="p-8 text-center">
+                    <Settings size={48} className="mx-auto mb-4 text-[var(--muted)]" />
+                    <p className="text-[var(--muted)] mb-2">
+                      {dataError ? 'فشل في تحميل المعدات' : 'لا توجد معدات متاحة'}
+                    </p>
+                    {!dataError && (
+                      <p className="text-sm text-[var(--muted)]">
+                        يرجى التواصل مع الإدارة لتحميل كتالوج المعدات
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  getFilteredEquipment().map(item => (
+                    <div key={item.id} className="p-3 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-alt)] transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="font-medium text-[var(--text)]">
+                            {item.brand} {item.model}
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {item.capabilities.slice(0, 4).map(cap => (
+                              <span key={cap} className="px-2 py-0.5 bg-[var(--accent-100)] text-[var(--accent-700)] text-xs rounded">
+                                {cap}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => addEquipmentItem(item.id)}
+                          disabled={formData.equipment.some(eq => eq.catalogId === item.id)}
+                          className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                        >
+                          {formData.equipment.some(eq => eq.catalogId === item.id) ? 'مضاف' : 'إضافة'}
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

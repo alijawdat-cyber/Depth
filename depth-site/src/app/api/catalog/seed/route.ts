@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const raw = await req.json().catch(() => ({}));
     const { mode } = BodySchema.parse(raw);
     const mod = await import('@/lib/catalog/seed');
-    const result = await mod.seedCatalog(mode as 'full' | 'taxonomy' | 'rate-card');
+    const result = await mod.seedCatalog(mode as 'full' | 'taxonomy' | 'rate-card' | 'equipment');
     return NextResponse.json({ ok: true, requestId, ...result });
   } catch (error) {
     console.error('[catalog.seed] error', { requestId, error });

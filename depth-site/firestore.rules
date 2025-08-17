@@ -41,5 +41,44 @@ service cloud.firestore {
       allow write: if request.auth != null && 
         request.auth.token.email in ['admin@depth-agency.com'];
     }
+    
+    // Catalog collections - read access for authenticated users
+    match /equipment_catalog/{equipmentId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
+    
+    match /equipment_presets/{presetId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
+    
+    match /catalog_subcategories/{subcategoryId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
+    
+    match /catalog_categories/{categoryId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
+    
+    match /catalog_verticals/{verticalId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
+    
+    // Creators collection - creators can read/update their own data
+    match /creators/{creatorId} {
+      allow read, update: if request.auth != null && 
+        resource.data.email == request.auth.token.email;
+      allow create, delete: if request.auth != null && 
+        request.auth.token.email in ['admin@depth-agency.com'];
+    }
   }
 }
