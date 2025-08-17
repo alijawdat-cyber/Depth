@@ -1,3 +1,9 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
+
 // Minimal endpoints used by UI
 export async function GET() {
   try {
@@ -33,11 +39,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'SERVER_ERROR' }, { status: 500 });
   }
 }
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { adminDb } from '@/lib/firebase/admin';
-import { getActiveRateCard } from '@/lib/catalog/read';
 
 interface RateCardItem {
   id: string;

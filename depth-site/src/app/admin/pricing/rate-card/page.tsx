@@ -132,13 +132,15 @@ export default function RateCardEditorPage() {
       setError(null);
 
       // تحميل الفئات الفرعية من API
-      const subcatResponse = await fetch('/api/catalog/subcategories');
+      const subcatResponse = await fetch('/api/catalog/subcategories?includeDefaults=true');
       if (!subcatResponse.ok) {
         throw new Error('فشل في تحميل الفئات الفرعية - تأكد من تشغيل الخادم وإعداد قاعدة البيانات');
       }
       
       const subcatData = await subcatResponse.json();
       const loadedSubcategories = subcatData.items || subcatData.data || [];
+      
+      console.log('Loaded subcategories:', loadedSubcategories.length, loadedSubcategories.slice(0, 3));
       
       if (loadedSubcategories.length === 0) {
         throw new Error('لا توجد فئات فرعية في قاعدة البيانات - يرجى تحميل البيانات الأولية أولاً');
@@ -151,12 +153,14 @@ export default function RateCardEditorPage() {
         const rateResponse = await fetch('/api/pricing/rate-card/active');
         if (rateResponse.ok) {
           const rateData = await rateResponse.json();
+          console.log('Loaded rate card:', rateData);
           if (rateData?.rateCard) {
             setRateCard(rateData.rateCard);
             if (rateData.rateCard?.guardrails) {
               setGuardrailsConfig(rateData.rateCard.guardrails);
             }
           } else {
+            console.log('No rate card found, creating new one');
             createNewRateCard();
           }
         } else {
