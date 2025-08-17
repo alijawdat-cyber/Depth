@@ -491,7 +491,7 @@ export default function AdminCatalogPage() {
                 <p className="text-[var(--muted)] mt-1">الفئات الأساسية للخدمات</p>
               </div>
               <div className="admin-scroll-container border border-[var(--elev)] rounded-[var(--radius)]">
-                <div className="admin-scroll-content">
+                <div className="admin-scroll-content scroll-y">
                   <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
@@ -573,7 +573,7 @@ export default function AdminCatalogPage() {
                 </div>
               </div>
               <div className="admin-scroll-container border border-[var(--elev)] rounded-[var(--radius)]">
-                <div className="admin-scroll-content">
+                <div className="admin-scroll-content scroll-y">
                   <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>
@@ -636,7 +636,7 @@ export default function AdminCatalogPage() {
                 <p className="text-[var(--muted)] mt-1">القطاعات والأسواق المستهدفة</p>
               </div>
               <div className="admin-scroll-container border border-[var(--elev)] rounded-[var(--radius)]">
-                <div className="admin-scroll-content">
+                <div className="admin-scroll-content scroll-y">
                   <table className="w-full min-w-full table-auto">
                   <thead className="bg-[var(--bg)] border-b border-[var(--elev)] sticky top-0 z-10">
                     <tr>

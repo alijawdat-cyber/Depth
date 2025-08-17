@@ -51,6 +51,12 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     description: 'نظرة عامة على النشاط والإحصائيات'
   },
   {
+    href: '/admin/projects',
+    label: 'المشاريع',
+    icon: FileText,
+    description: 'إدارة المشاريع مع حساب التسعير وفحص Guardrails'
+  },
+  {
     href: '/admin/creators',
     label: 'المبدعين',
     icon: UserCheck,

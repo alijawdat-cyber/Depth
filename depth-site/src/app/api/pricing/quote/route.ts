@@ -167,6 +167,28 @@ export async function POST(req: NextRequest) {
     const docRef = await adminDb.collection('quotes').add(quote);
     const savedQuote = { ...quote, id: docRef.id };
 
+    // فهرسة الأسطر في مجموعة مسطّحة لسرعة الاستعلامات (quote_lines)
+    try {
+      const batch = adminDb.batch();
+      quoteLines.forEach((line, index) => {
+        const lineDocRef = adminDb.collection('quote_lines').doc(`${docRef.id}_${index}`);
+        batch.set(lineDocRef, {
+          quoteId: docRef.id,
+          lineIndex: index,
+          subcategoryId: line.subcategoryId,
+          vertical: line.vertical,
+          processing: line.processing,
+          status: 'draft',
+          createdAt: quote.createdAt,
+          updatedAt: quote.updatedAt,
+        }, { merge: true });
+      });
+      await batch.commit();
+    } catch (e) {
+      console.error(`[quote-create] ${requestId} - quote_lines index error:`, e);
+      // لا نفشل العملية الرئيسية بسبب فهرس ثانوي
+    }
+
     // تسجيل العملية للمراقبة
     console.log(`[quote-create] ${requestId} - Created by: ${session.user.email}, Client: ${clientEmail}, Lines: ${lines.length}, Total: ${pricingResult.totals.iqd} IQD`);
 
@@ -441,6 +463,26 @@ export async function PUT(req: NextRequest) {
 
     // تحديث في Firestore
     await adminDb.collection('quotes').doc(id).update(updateData);
+
+    // تحديث حالة الفهرس المسطح للأسطر
+    try {
+      if (updateData.status) {
+        const linesSnap = await adminDb
+          .collection('quote_lines')
+          .where('quoteId', '==', id)
+          .get();
+        if (!linesSnap.empty) {
+          const batch = adminDb.batch();
+          linesSnap.docs.forEach((d) => {
+            batch.update(d.ref, { status: updateData.status, updatedAt: new Date().toISOString() });
+          });
+          await batch.commit();
+        }
+      }
+    } catch (e) {
+      console.error(`[quote-update] ${requestId} - quote_lines index update error:`, e);
+      // لا نفشل العملية الرئيسية بسبب فهرس ثانوي
+    }
 
     const updatedQuote = { ...quote, ...updateData };
 

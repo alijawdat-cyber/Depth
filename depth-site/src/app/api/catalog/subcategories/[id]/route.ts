@@ -120,13 +120,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     }
 
     // التحقق من عدم وجود عروض أسعار مرتبطة بهذه الفئة
-    const quotesSnapshot = await adminDb
-      .collectionGroup('lines')
+    // نعتمد على فهرس مسطّح `quote_lines` بدلاً من collectionGroup غير الموجود
+    const linkedLinesSnap = await adminDb
+      .collection('quote_lines')
       .where('subcategoryId', '==', id)
       .limit(1)
       .get();
 
-    if (!quotesSnapshot.empty) {
+    if (!linkedLinesSnap.empty) {
       return NextResponse.json({ 
         success: false, 
         code: 'CONSTRAINT_VIOLATION', 
