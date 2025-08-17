@@ -90,6 +90,9 @@ interface PageState {
   showCreateForm: boolean;
 }
 
+// تعطيل static generation للصفحة
+export const dynamic = 'force-dynamic';
+
 export default function AdvancedOverridesPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -141,19 +144,49 @@ export default function AdvancedOverridesPage() {
 
     } catch (error) {
       console.error('Error loading overrides:', error);
+      let errorMessage = 'حدث خطأ غير متوقع';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          errorMessage = 'غير مخول للوصول. يرجى تسجيل الدخول كمدير.';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+        error: errorMessage,
         loading: false
       }));
     }
   }, [state.selectedStatus, state.selectedRiskLevel, state.searchTerm]);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadOverridesData();
+    if (status === 'loading') return; // انتظار تحميل الجلسة
+    
+    if (!session?.user) {
+      setState(prev => ({ 
+        ...prev, 
+        error: 'يرجى تسجيل الدخول للوصول لهذه الصفحة',
+        loading: false 
+      }));
+      return;
     }
-  }, [isAdmin, loadOverridesData]);
+    
+    if (!isAdmin) {
+      setState(prev => ({ 
+        ...prev, 
+        error: 'غير مخول للوصول. هذه الصفحة مخصصة للمديرين فقط.',
+        loading: false 
+      }));
+      return;
+    }
+    
+    loadOverridesData();
+  }, [session, isAdmin, loadOverridesData]);
 
   // Helper functions
   const getRiskLevelColor = (level: string) => {

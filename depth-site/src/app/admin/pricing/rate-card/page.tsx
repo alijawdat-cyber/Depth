@@ -117,8 +117,8 @@ export default function RateCardEditorPage() {
         creatorTierPct: {}
       },
       guardrails: {
-        minMarginDefault: DEFAULT_GUARDRAILS.profitMargins.standard,
-        minMarginHardStop: DEFAULT_GUARDRAILS.profitMargins.minimum
+        minMarginDefault: DEFAULT_GUARDRAILS?.profitMargins?.standard || 0.5,
+        minMarginHardStop: DEFAULT_GUARDRAILS?.profitMargins?.minimum || 0.45
       },
       roundingIQD: 1000
     };
@@ -460,13 +460,13 @@ export default function RateCardEditorPage() {
             </div>
             <div className="text-center p-3 bg-[var(--bg)] rounded-[var(--radius)]">
               <div className="text-2xl font-bold text-blue-600">
-                {(guardrailsConfig.profitMargins.standard * 100).toFixed(0)}%
+                {(guardrailsConfig?.profitMargins?.standard ? guardrailsConfig.profitMargins.standard * 100 : 50).toFixed(0)}%
               </div>
               <div className="text-xs text-[var(--muted)]">هامش الربح المعياري</div>
             </div>
             <div className="text-center p-3 bg-[var(--bg)] rounded-[var(--radius)]">
               <div className="text-2xl font-bold text-purple-600">
-                {(guardrailsConfig.discountLimits.maxDiscountPercent * 100).toFixed(0)}%
+                {(guardrailsConfig?.discountLimits?.maxDiscountPercent ? guardrailsConfig.discountLimits.maxDiscountPercent * 100 : 10).toFixed(0)}%
               </div>
               <div className="text-xs text-[var(--muted)]">الحد الأقصى للتخفيض</div>
             </div>
@@ -518,7 +518,7 @@ export default function RateCardEditorPage() {
                     type="number"
                     min="0"
                     max="100"
-                    value={(guardrailsConfig.profitMargins.standard * 100).toFixed(0)}
+                    value={(guardrailsConfig?.profitMargins?.standard ? guardrailsConfig.profitMargins.standard * 100 : 50).toFixed(0)}
                     onChange={(e) => setGuardrailsConfig(prev => ({
                       ...prev,
                       profitMargins: {

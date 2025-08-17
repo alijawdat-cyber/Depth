@@ -39,6 +39,9 @@ interface OverridesPageState {
   showCreateForm: boolean;
 }
 
+// تعطيل static generation للصفحة
+export const dynamic = 'force-dynamic';
+
 export default function OverridesPage() {
   // const router = useRouter(); // محجوز للاستخدام المستقبلي
 
@@ -60,6 +63,16 @@ export default function OverridesPage() {
     loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.selectedType, state.selectedStatus, state.selectedRiskLevel, state.searchTerm]);
+
+  // التحقق من المصادقة والصلاحيات
+  useEffect(() => {
+    // TODO: إضافة فحص المصادقة هنا عند توفر session
+    // if (status === 'loading') return;
+    // if (!session?.user || session.user.role !== 'admin') {
+    //   setState(prev => ({ ...prev, error: 'غير مخول للوصول', loading: false }));
+    //   return;
+    // }
+  }, []);
 
   const loadData = async () => {
     try {
@@ -90,9 +103,21 @@ export default function OverridesPage() {
 
     } catch (err) {
       console.error('Error loading overrides:', err);
+      let errorMessage = 'خطأ غير معروف';
+      
+      if (err instanceof Error) {
+        if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+          errorMessage = 'غير مخول للوصول. يرجى تسجيل الدخول كمدير.';
+        } else if (err.message.includes('500')) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setState(prev => ({
         ...prev,
-        error: err instanceof Error ? err.message : 'خطأ غير معروف',
+        error: errorMessage,
         loading: false
       }));
     }
