@@ -1,8 +1,10 @@
 import { tv } from "tailwind-variants";
 
+// ملاحظة: ضمان ثبات نفس سلسلة الكلاسات بين SSR و Client لتجنب hydration mismatch
+// تمت إعادة الهياكل الأصلية (height/px) داخل المتغيرات وليس القاعدة لتفادي اختلافات محتملة.
 export const buttonStyles = tv({
   base:
-    "inline-flex items-center justify-center rounded-[var(--radius)] px-5 h-11 min-h-[44px] min-w-[44px] text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)] shadow-[var(--shadow)] touch-manipulation active:scale-95",
+    "inline-flex items-center justify-center rounded-[var(--radius)] min-h-[44px] min-w-[44px] text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)] shadow-[var(--shadow)] touch-manipulation active:scale-95",
   variants: {
     variant: {
       primary:

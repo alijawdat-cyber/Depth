@@ -5,6 +5,7 @@ import { createContext, useContext, useReducer, useCallback, useEffect } from 'r
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/components/ui/Toast';
 import type {
   OnboardingFormData,
   OnboardingState,
@@ -268,6 +269,7 @@ export function useOnboarding(): OnboardingContextType {
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const [{ formData, uiState }, dispatch] = useReducer(onboardingReducer, {
     formData: initialFormData,
     uiState: initialState
@@ -457,8 +459,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const result = await response.json();
         console.log('Account created successfully:', result);
         
-        // انتظار أطول للتأكد من حفظ البيانات في Firebase
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // عرض toast للنجاح
+        showSuccess('تم إنشاء حسابك بنجاح!', 'مرحباً بك');
+        
+        // تقليل وقت الانتظار الأولي
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         // تسجيل دخول تلقائي مع retry محسن
         let signInResult;
@@ -478,8 +483,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
             if (signInResult?.ok && !signInResult?.error) {
               console.log(`Sign in successful on attempt ${attempt}`);
               
-              // انتظار أطول للتأكد من تحديث الجلسة
-              await new Promise(resolve => setTimeout(resolve, 3000));
+              // انتظار أقل للتأكد من تحديث الجلسة
+              await new Promise(resolve => setTimeout(resolve, 1000));
               
               // التحقق من تحديث الجلسة من خلال API
               try {
@@ -508,7 +513,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           }
           
           if (attempt < 8) {
-            const delayTime = Math.min(2000 * attempt, 10000); // تأخير متزايد مع حد أقصى
+            const delayTime = Math.min(1000 * attempt, 3000); // تأخير أقل مع حد أقصى 3 ثواني
             console.log(`Sign in attempt ${attempt} failed: ${lastError}, retrying in ${delayTime}ms...`);
             await new Promise(resolve => setTimeout(resolve, delayTime));
           }
@@ -518,7 +523,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           // إذا فشل تسجيل الدخول، نعرض رسالة وننقل المستخدم لصفحة تسجيل الدخول
           console.error('Sign in failed after all retries:', lastError);
           
-          dispatch({ type: 'SET_ERROR', payload: `تم إنشاء الحساب بنجاح! 🎉\n\nيرجى تسجيل الدخول الآن باستخدام البيانات التي أدخلتها.` });
+          showError('يرجى تسجيل الدخول الآن باستخدام البيانات التي أدخلتها', 'تم إنشاء الحساب بنجاح!');
           dispatch({ type: 'SET_LOADING', payload: false });
           
           // إعادة توجيه للصفحة الرئيسية مع رسالة النجاح
@@ -530,6 +535,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         }
         
         // إذا نجح تسجيل الدخول
+        showSuccess('تم تسجيل الدخول بنجاح! جاري الانتقال للمرحلة التالية...', 'مرحلة مكتملة');
         console.log('Account creation and login successful, proceeding to step 2');
         
         // تسجيل إكمال الخطوة الأولى
@@ -567,7 +573,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         // إعادة تحميل الصفحة للتأكد من تحديث الجلسة بشكل كامل
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500); // تقليل من 1000 إلى 500
 
         return true;
         
@@ -598,7 +604,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
     
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress]);
+  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, showError]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
@@ -622,6 +628,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: 'SET_ERROR', payload: null });
     
     try {
+      // التحقق من صحة البيانات قبل الإرسال
+      const isValid = validateCurrentStep();
+      if (!isValid) {
+        dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
+        throw new Error('يرجى إكمال جميع الحقول المطلوبة');
+      }
+
       const response = await fetch('/api/creators/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -633,6 +646,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       
       if (response.ok) {
         dispatch({ type: 'SET_SUCCESS', payload: true });
+        showSuccess('تم إرسال طلبك بنجاح! سيتم مراجعته خلال 24-48 ساعة.');
         
         // توجيه للصفحة التالية بعد النجاح
         setTimeout(() => {
@@ -647,11 +661,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
+      showError(errorMessage);
       return false;
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [formData, router]);
+  }, [formData, router, validateCurrentStep, showSuccess, showError]);
 
   // دالة لتحديث حالة التفاعل
   const setHasInteracted = useCallback(() => {

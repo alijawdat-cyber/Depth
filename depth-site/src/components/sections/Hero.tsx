@@ -12,9 +12,8 @@ export default function Hero() {
   const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_TEXT)}` : "https://wa.me/";
   const reduce = useReducedMotion();
   
-  // تحسين للموبايل - حركات أبسط
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const simpleTransition = { duration: isMobile ? 0.3 : 0.6, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] };
+  // تجنّب استخدام window أثناء SSR لتفادي اختلافات hydration
+  const simpleTransition = { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] };
   
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[var(--bg)] text-[var(--text)]">

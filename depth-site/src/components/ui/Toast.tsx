@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, AlertCircle, XCircle, Info, X } from 'lucide-react';
 import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -55,17 +56,13 @@ export default function Toast({
   showCloseButton = true
 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [isLeaving, setIsLeaving] = useState(false);
 
   const styles = getToastStyles(type);
   const { IconComponent } = styles;
 
   const handleClose = useCallback(() => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose?.();
-    }, 300);
+    setIsVisible(false);
+    onClose?.();
   }, [onClose]);
 
   useEffect(() => {
@@ -81,14 +78,25 @@ export default function Toast({
   if (!isVisible) return null;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: -50, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      transition={{ 
+        duration: 0.3, 
+        ease: [0.25, 0.46, 0.45, 0.94], // easeOutQuart
+        scale: { duration: 0.2 }
+      }}
       className={clsx(
-        'relative p-4 border rounded-lg shadow-sm transition-all duration-300 ease-in-out',
+        'relative p-4 border rounded-lg shadow-sm',
         styles.container,
-        isLeaving ? 'opacity-0 transform translate-y-2' : 'opacity-100 transform translate-y-0',
         className
       )}
       role="alert"
+      whileHover={{ 
+        scale: 1.02,
+        boxShadow: "0 8px 25px rgba(0,0,0,0.15)"
+      }}
     >
       <div className="flex items-start gap-3">
         <IconComponent size={20} className={clsx('flex-shrink-0 mt-0.5', styles.icon)} />
@@ -101,16 +109,18 @@ export default function Toast({
         </div>
 
         {showCloseButton && (
-          <button
+          <motion.button
             onClick={handleClose}
             className="flex-shrink-0 p-1 hover:bg-black/10 rounded transition-colors"
             aria-label="إغلاق"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             <X size={16} />
-          </button>
+          </motion.button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -125,7 +135,10 @@ export function useToast() {
   }>>([]);
 
   const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
-    const id = Date.now().toString();
+    // استخدام crypto.randomUUID() للـ ID بدلاً من Date.now() لتجنب hydration mismatch
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : `toast-${Math.random().toString(36).substr(2, 9)}`;
     setToasts(prev => [...prev, { ...toast, id }]);
   };
 
@@ -180,16 +193,18 @@ export function ToastContainer({
 
   return (
     <div className={clsx(positionClasses[position], 'space-y-2')}>
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          type={toast.type}
-          title={toast.title}
-          message={toast.message}
-          duration={toast.duration}
-          onClose={() => onRemove(toast.id)}
-        />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            type={toast.type}
+            title={toast.title}
+            message={toast.message}
+            duration={toast.duration}
+            onClose={() => onRemove(toast.id)}
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

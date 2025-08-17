@@ -54,7 +54,7 @@ export default function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden">
+    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden" suppressHydrationWarning>
       <Container className="flex items-center justify-between min-h-14 h-14 overflow-x-hidden">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
           <Image src={BRAND.wordmark} alt="Depth" width={135} height={30} className="h-7 md:h-8 lg:h-9 w-auto min-w-28 brand-logo" priority />
@@ -88,8 +88,13 @@ export default function Header() {
             onClick={toggleTheme}
             aria-label="toggle theme"
             className="inline-flex"
+            suppressHydrationWarning
           >
-            {mounted ? (resolvedTheme === "dark" ? <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> : <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />) : null}
+            {mounted && resolvedTheme === "dark" ? (
+              <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            ) : (
+              <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            )}
           </Button>
           {status === 'authenticated' ? (
             <div className="relative flex">

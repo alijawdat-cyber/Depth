@@ -307,7 +307,9 @@ export default function EnhancedAvailabilityGrid({
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="text-3xl">{day.emoji}</div>
+                    <div className="w-8 h-8 rounded-lg bg-[var(--accent-100)] flex items-center justify-center">
+                      <Calendar size={18} className="text-[var(--accent-600)]" />
+                    </div>
                     <div>
                       <h4 className="font-bold text-[var(--text)]">{day.label}</h4>
                       <p className="text-sm text-[var(--muted)]">
@@ -338,9 +340,7 @@ export default function EnhancedAvailabilityGrid({
                       className="absolute top-1 w-6 h-6 bg-white rounded-full shadow-md"
                     />
                   </button>
-                </div>
-
-                {/* أوقات العمل */}
+                </div>                {/* أوقات العمل */}
                 {dayData.available && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -393,7 +393,7 @@ export default function EnhancedAvailabilityGrid({
             <Clock size={24} className="text-white" />
           </div>
           <div>
-            <h4 className="font-bold text-[var(--accent-800)] mb-2">💡 نصائح لتحسين التوفر</h4>
+            <h4 className="font-bold text-[var(--accent-800)] mb-2 flex items-center gap-2"><Clock size={16}/> نصائح لتحسين التوفر</h4>
             <ul className="space-y-1 text-sm text-[var(--accent-700)]">
               <li>• استخدم القوالب السريعة لتوفير الوقت</li>
               <li>• حدد أوقات واقعية تناسب ظروفك</li>

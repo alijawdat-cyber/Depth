@@ -2,12 +2,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Zap, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, Zap, CheckCircle, AlertTriangle, Briefcase, Timer, Target, RefreshCw } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { SelectField, InputField, CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
 import EnhancedAvailabilityGrid from '../shared/EnhancedAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
+import { toast } from 'sonner';
 
 export default function Step5_Availability() {
   const { formData, updateAvailability, getFieldError } = useOnboarding();
@@ -128,11 +129,11 @@ export default function Step5_Availability() {
                     )}
 
                     <div className="text-center">
-                      <div className={`text-2xl mb-3 ${option.color}`}>
-                        {option.value === 'full-time' && '⏰'}
-                        {option.value === 'part-time' && '📅'}
-                        {option.value === 'weekends' && '🎯'}
-                        {option.value === 'flexible' && '🔄'}
+                      <div className={`mb-3 flex justify-center ${option.color}`}>
+                        {option.value === 'full-time' && <Timer size={28} />}
+                        {option.value === 'part-time' && <Briefcase size={28} />}
+                        {option.value === 'weekends' && <Target size={28} />}
+                        {option.value === 'flexible' && <RefreshCw size={28} />}
                       </div>
                       <h4 className={`font-bold text-lg mb-2 ${isSelected ? option.color : 'text-[var(--text)]'}`}>
                         {option.label}
@@ -226,7 +227,7 @@ export default function Step5_Availability() {
                 <Calendar size={24} className="text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-[var(--accent-fg)] mb-3">📋 ملخص توفرك</h4>
+                <h4 className="font-bold text-[var(--accent-fg)] mb-3 flex items-center gap-2"><Calendar size={16}/> ملخص توفرك</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-[var(--accent-fg)]">
                   <div>
                     <p className="font-medium mb-1">نوع التوفر:</p>
@@ -242,7 +243,7 @@ export default function Step5_Availability() {
                   </div>
                   <div>
                     <p className="font-medium mb-1">العمل العاجل:</p>
-                    <p>{availability.urgentWork ? '✅ متاح' : '❌ غير متاح'}</p>
+                    <p>{availability.urgentWork ? 'متاح' : 'غير متاح'}</p>
                   </div>
                 </div>
                 
@@ -282,10 +283,10 @@ export default function Step5_Availability() {
               <Zap size={24} className="text-white" />
             </div>
             <div>
-              <h4 className="font-bold text-emerald-800 mb-3">💡 نصائح لزيادة فرص العمل</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-emerald-700">
+              <h4 className="font-bold text-emerald-800 mb-3 flex items-center gap-2"><Zap size={16}/> نصائح لزيادة فرص العمل</h4>
+              <div className="text-sm text-emerald-700">
                 <div>
-                  <p className="font-medium mb-2">⭐ توفر أكثر = فرص أكثر:</p>
+                  <p className="font-medium mb-2 flex items-center gap-2"><CheckCircle size={14}/> توفر أكثر = فرص أكثر:</p>
                   <ul className="space-y-1">
                     <li>• المرونة في الأوقات تزيد الطلب</li>
                     <li>• العمل العاجل له أجر إضافي</li>
@@ -293,7 +294,7 @@ export default function Step5_Availability() {
                   </ul>
                 </div>
                 <div>
-                  <p className="font-medium mb-2">⚠️ كن واقعياً:</p>
+                  <p className="font-medium mb-2 flex items-center gap-2"><AlertTriangle size={14}/> كن واقعياً:</p>
                   <ul className="space-y-1">
                     <li>• لا تلتزم بأكثر من طاقتك</li>
                     <li>• يمكن تعديل التوفر لاحقاً</li>
@@ -334,7 +335,7 @@ export default function Step5_Availability() {
       >
         <div className="bg-[var(--accent-500)] text-white rounded-xl p-6">
           <CheckCircle size={48} className="mx-auto mb-4" />
-          <h3 className="text-xl font-bold mb-2">🎉 أكملت جميع الخطوات الأساسية!</h3>
+          <h3 className="text-xl font-bold mb-2 flex items-center justify-center gap-2"><CheckCircle size={20}/> أكملت جميع الخطوات الأساسية!</h3>
           <p className="text-white/90 mb-4">
             أصبح ملفك الشخصي جاهزاً للمراجعة. اضغط &quot;إرسال النموذج&quot; لإرسال طلبك للموافقة.
           </p>

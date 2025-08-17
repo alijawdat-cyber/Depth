@@ -167,8 +167,12 @@ export default function EquipmentSelector({
   // إضافة معدة مخصصة
   const addCustomEquipment = async () => {
     if (!customEquipment.name.trim() || !customEquipment.brand.trim()) {
+      console.log('Missing required fields:', { name: customEquipment.name, brand: customEquipment.brand });
       return;
     }
+
+    console.log('Adding custom equipment:', customEquipment);
+    console.log('Active category:', activeCategory);
 
     try {
       // إرسال المعدة المخصصة للمراجعة
@@ -184,11 +188,15 @@ export default function EquipmentSelector({
         })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        
+      console.log('API Response status:', response.status);
+      const result = await response.json();
+      console.log('API Response data:', result);
+
+      if (response.ok && result.success) {
         // إضافة المعدة للمبدع مع حالة "مراجعة معلقة"
         const categoryKey = EQUIPMENT_CATEGORY_MAPPING[activeCategory as keyof typeof EQUIPMENT_CATEGORY_MAPPING];
+        console.log('Category key:', categoryKey);
+        
         if (categoryKey) {
           const newItem: CreatorEquipmentItem = {
             catalogId: result.data.id,
@@ -205,10 +213,15 @@ export default function EquipmentSelector({
             }
           };
 
+          console.log('New item to add:', newItem);
+          console.log('Current equipment value:', value);
+
           const updatedInventory = {
             ...value,
             [categoryKey]: [...(value[categoryKey] || []), newItem]
           };
+          
+          console.log('Updated inventory:', updatedInventory);
           onChange(updatedInventory);
         }
 
@@ -222,6 +235,10 @@ export default function EquipmentSelector({
           condition: 'good'
         });
         setShowCustomForm(false);
+        
+        console.log('Custom equipment added successfully');
+      } else {
+        console.error('API returned error:', result);
       }
     } catch (error) {
       console.error('Error adding custom equipment:', error);
@@ -233,10 +250,23 @@ export default function EquipmentSelector({
     return Object.values(value).reduce((total, items) => total + (items?.length || 0), 0);
   };
 
-  // فلترة المعدات حسب الفئة النشطة
+  // فلترة المعدات حسب الفئة النشطة + المعدات المخصصة المملوكة
+  const getCustomEquipmentForCategory = () => {
+    const categoryKey = EQUIPMENT_CATEGORY_MAPPING[activeCategory as keyof typeof EQUIPMENT_CATEGORY_MAPPING];
+    if (!categoryKey) return [];
+    
+    return (value[categoryKey] || []).filter(item => item.isCustom && item.customData);
+  };
+
   const filteredEquipment = availableEquipment.filter(item => 
     item.category === activeCategory
   );
+
+  const customEquipmentForCategory = getCustomEquipmentForCategory();
+  
+  console.log('Filtered equipment:', filteredEquipment.length);
+  console.log('Custom equipment for category:', customEquipmentForCategory.length);
+  console.log('Custom equipment items:', customEquipmentForCategory);
 
   if (selectedCategories.length === 0) {
     return (
@@ -377,7 +407,7 @@ export default function EquipmentSelector({
               <span>{apiError}</span>
             </div>
           </div>
-        ) : filteredEquipment.length === 0 ? (
+        ) : (filteredEquipment.length === 0 && customEquipmentForCategory.length === 0) ? (
           <div className="text-center py-12">
             <Package size={48} className="mx-auto mb-4 text-[var(--muted)] opacity-50" />
             <p className="text-[var(--muted)]">
@@ -386,9 +416,12 @@ export default function EquipmentSelector({
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* المعدات العادية من الكاتالوج */}
             {filteredEquipment.map((equipment) => {
               const ownedItem = isEquipmentOwned(equipment.id);
               const isOwned = !!ownedItem;
+              const isCustom = ownedItem?.isCustom;
+              const pending = ownedItem?.status === 'pending_review';
               
               return (
                 <motion.div
@@ -397,12 +430,18 @@ export default function EquipmentSelector({
                   animate={{ opacity: 1, y: 0 }}
                   className={`
                     relative p-4 rounded-xl border-2 transition-all duration-200
-                    ${isOwned 
-                      ? 'border-[var(--accent-500)] bg-[var(--accent-50)]' 
-                      : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--accent-300)]'
-                    }
+                    ${isOwned ? (
+                      isCustom && pending
+                        ? 'border-amber-400 bg-amber-50/70'
+                        : 'border-[var(--accent-500)] bg-[var(--accent-50)]'
+                    ) : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--accent-300)]'}
                   `}
                 >
+                  {isCustom && (
+                    <div className={`absolute -top-2 -left-2 px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide shadow ${pending ? 'bg-amber-500 text-white' : 'bg-green-600 text-white'}`}>
+                      {pending ? 'معدة مخصصة (قيد المراجعة)' : 'معدة مخصصة'}
+                    </div>
+                  )}
                   {/* معلومات المعدة */}
                   <div className="mb-4">
                     <h4 className="font-semibold text-[var(--text)] mb-1">
@@ -446,9 +485,11 @@ export default function EquipmentSelector({
                   ) : (
                     <div className="space-y-3">
                       {/* مؤشر الملكية */}
-                      <div className="flex items-center gap-2 text-green-600">
-                        <Check size={16} />
-                        <span className="text-sm font-medium">مملوك</span>
+                      <div className="flex items-center gap-2">
+                        <Check size={16} className={pending ? 'text-amber-600' : 'text-green-600'} />
+                        <span className={`text-sm font-medium ${pending ? 'text-amber-700' : 'text-green-600'}`}>
+                          {pending ? 'مملوك (قيد المراجعة)' : 'مملوك'}
+                        </span>
                       </div>
                       
                       {/* حالة المعدة */}
@@ -490,6 +531,94 @@ export default function EquipmentSelector({
                       </button>
                     </div>
                   )}
+                </motion.div>
+              );
+            })}
+            
+            {/* المعدات المخصصة المملوكة */}
+            {customEquipmentForCategory.map((customItem) => {
+              const pending = customItem.status === 'pending_review';
+              
+              return (
+                <motion.div
+                  key={`custom-${customItem.catalogId}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`
+                    relative p-4 rounded-xl border-2 transition-all duration-200
+                    ${pending
+                      ? 'border-amber-400 bg-amber-50/70'
+                      : 'border-green-500 bg-green-50'
+                    }
+                  `}
+                >
+                  <div className={`absolute -top-2 -left-2 px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide shadow ${pending ? 'bg-amber-500 text-white' : 'bg-green-600 text-white'}`}>
+                    {pending ? 'معدة مخصصة (قيد المراجعة)' : 'معدة مخصصة (مُعتمدة)'}
+                  </div>
+
+                  {/* معلومات المعدة المخصصة */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-[var(--text)] mb-1">
+                      {customItem.customData?.brand} {customItem.customData?.model}
+                    </h4>
+                    <p className="text-sm text-[var(--muted)] mb-2">
+                      {customItem.customData?.name}
+                    </p>
+                    {customItem.customData?.description && (
+                      <p className="text-xs text-[var(--muted)] mb-3">
+                        {customItem.customData.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* حالة المعدة والتحكم */}
+                  <div className="space-y-3">
+                    {/* مؤشر الملكية */}
+                    <div className="flex items-center gap-2">
+                      <Check size={16} className={pending ? 'text-amber-600' : 'text-green-600'} />
+                      <span className={`text-sm font-medium ${pending ? 'text-amber-700' : 'text-green-600'}`}>
+                        {pending ? 'مملوك (قيد المراجعة)' : 'مملوك (مُعتمد)'}
+                      </span>
+                    </div>
+                    
+                    {/* حالة المعدة */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-[var(--text)]">حالة المعدة:</p>
+                      <div className="grid grid-cols-2 gap-1">
+                        {CONDITION_OPTIONS.map((condition) => {
+                          const isSelected = customItem.condition === condition.value;
+                          
+                          return (
+                            <button
+                              key={condition.value}
+                              type="button"
+                              onClick={() => updateEquipmentItem(customItem.catalogId, { condition: condition.value as CreatorEquipmentItem['condition'] })}
+                              disabled={disabled}
+                              className={`
+                                px-2 py-1 rounded text-xs font-medium transition-all
+                                ${isSelected 
+                                  ? `${condition.bgColor} ${condition.color} border border-current` 
+                                  : 'bg-[var(--bg-alt)] text-[var(--muted)] hover:bg-[var(--accent-50)]'
+                                }
+                              `}
+                            >
+                              {condition.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* زر الإزالة */}
+                    <button
+                      type="button"
+                      onClick={() => removeEquipmentItem(customItem.catalogId)}
+                      disabled={disabled}
+                      className="w-full px-3 py-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-all text-sm"
+                    >
+                      إزالة من الجرد
+                    </button>
+                  </div>
                 </motion.div>
               );
             })}

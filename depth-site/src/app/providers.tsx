@@ -36,9 +36,21 @@ export default function Providers({ children }: ProvidersProps) {
 
   return (
     <SessionProvider>
-      <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeProvider 
+        attribute="data-theme" 
+        defaultTheme="system" 
+        enableSystem 
+        disableTransitionOnChange
+        enableColorScheme={false}
+      >
         <MotionConfig
-          transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.8 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 170, 
+            damping: 26, 
+            mass: 0.8,
+            bounce: 0.2
+          }}
           reducedMotion="user"
         >
           {children}

@@ -212,9 +212,9 @@ export default function OnboardingLayout({
               <div className="w-full bg-[var(--border)] rounded-full h-2 overflow-hidden">
                 <motion.div
                   className="h-full bg-[var(--accent-500)] rounded-full"
-                  initial={{ width: 0 }}
+                  initial={false}
                   animate={{ width: `${progress.completionPercentage}%` }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 />
               </div>
 
@@ -233,9 +233,9 @@ export default function OnboardingLayout({
                 <div className="w-full bg-[var(--neutral-200)] rounded-full h-2">
                   <motion.div
                     className="h-full bg-[var(--accent-500)] rounded-full"
-                    initial={{ width: 0 }}
+                    initial={false}
                     animate={{ width: `${progress.completionPercentage}%` }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
                   />
                 </div>
               </div>
@@ -302,10 +302,8 @@ export default function OnboardingLayout({
           {/* Step Content */}
           <motion.div
             key={formData.currentStep}
-            initial={{ opacity: 0, x: 20 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
             className="bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden"
           >
             {/* Step Header */}
@@ -343,9 +341,8 @@ export default function OnboardingLayout({
           {/* Navigation */}
           {showNavigation && !state.loading && !state.success && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
               className="mt-8"
             >
               <div className="flex items-center justify-center gap-3">
@@ -404,7 +401,7 @@ export default function OnboardingLayout({
           {/* Skip Option للخطوات الاختيارية */}
           {progress.canSkipToEnd && formData.currentStep >= 4 && !state.success && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="text-center mt-6"
             >
@@ -445,7 +442,7 @@ export function StepHeader({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       className="text-center mb-8"
     >
@@ -487,7 +484,7 @@ export function FieldContainer({
       {children}
       {error && (
         <motion.p
-          initial={{ opacity: 0, y: -10 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="text-sm text-red-600 flex items-center gap-1"
         >
