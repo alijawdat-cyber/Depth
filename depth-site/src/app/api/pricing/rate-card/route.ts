@@ -1,3 +1,38 @@
+// Minimal endpoints used by UI
+export async function GET() {
+  try {
+    const rateCard = await getActiveRateCard();
+    return NextResponse.json({ ok: true, rateCard });
+  } catch (error) {
+    console.error('[rate-card.GET] error', error);
+    return NextResponse.json({ ok: false, error: 'SERVER_ERROR' }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    const role = (session?.user as { role?: string } | undefined)?.role;
+    if (!session?.user || role !== 'admin') {
+      return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const rateCard = body?.rateCard as { id?: string; version?: string; versionId?: string; status?: string } | undefined;
+    if (!rateCard) {
+      return NextResponse.json({ ok: false, error: 'INVALID_BODY' }, { status: 400 });
+    }
+
+    const id = (rateCard as { versionId?: string }).versionId || (rateCard as { id?: string }).id || 'active';
+    const docRef = adminDb.collection('pricing_rate_card').doc(id);
+    await docRef.set({ ...rateCard, updatedAt: new Date() }, { merge: true });
+
+    return NextResponse.json({ ok: true, rateCard: { ...rateCard, versionId: id } });
+  } catch (error) {
+    console.error('[rate-card.PUT] error', error);
+    return NextResponse.json({ ok: false, error: 'SERVER_ERROR' }, { status: 500 });
+  }
+}
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
