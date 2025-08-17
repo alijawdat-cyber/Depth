@@ -4,6 +4,7 @@
 import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import type {
   OnboardingFormData,
   OnboardingState,
@@ -66,7 +67,7 @@ const initialFormData: OnboardingFormData = {
     specialSetups: []
   },
   metadata: {
-    startedAt: new Date().toISOString(),
+    startedAt: '', // سيتم تحديثه في useEffect لتجنب hydration mismatch
     source: 'web'
   }
 };
@@ -97,6 +98,7 @@ type OnboardingAction =
   | { type: 'UPDATE_PORTFOLIO'; payload: Partial<PortfolioData> }
   | { type: 'UPDATE_AVAILABILITY'; payload: Partial<AvailabilityData> }
   | { type: 'UPDATE_EQUIPMENT'; payload: Partial<EquipmentInventory> }
+  | { type: 'UPDATE_METADATA'; payload: Partial<OnboardingFormData['metadata']> }
   | { type: 'SET_CURRENT_STEP'; payload: OnboardingStep }
   | { type: 'COMPLETE_STEP'; payload: OnboardingStep }
   | { type: 'SET_HAS_INTERACTED'; payload: boolean }
@@ -199,6 +201,15 @@ function onboardingReducer(
         }
       };
     
+    case 'UPDATE_METADATA':
+      return {
+        ...state,
+        formData: {
+          ...state.formData,
+          metadata: { ...state.formData.metadata, ...action.payload }
+        }
+      };
+    
     case 'SET_CURRENT_STEP':
       return {
         ...state,
@@ -262,6 +273,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     uiState: initialState
   });
 
+  // تحديث startedAt بعد mount لتجنب hydration mismatch
+  useEffect(() => {
+    if (!formData.metadata.startedAt) {
+      dispatch({ 
+        type: 'UPDATE_METADATA', 
+        payload: { startedAt: new Date().toISOString() } 
+      });
+    }
+  }, [formData.metadata.startedAt]);
+
   // تحميل البيانات المحفوظة عند بدء الجلسة
   const loadSavedProgress = useCallback(async () => {
     // للمستخدمين الجدد، لا نحمل بيانات محفوظة
@@ -274,7 +295,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       if (response.ok) {
         const result = await response.json();
         if (result.data) {
-          dispatch({ type: 'LOAD_SAVED_DATA', payload: result.data });
+          const savedFormData = result.data.formData || result.data;
+          if (savedFormData) {
+            dispatch({ type: 'LOAD_SAVED_DATA', payload: savedFormData });
+            if (typeof savedFormData.currentStep === 'number') {
+              dispatch({ type: 'SET_CURRENT_STEP', payload: savedFormData.currentStep });
+            }
+          }
         }
       }
     } catch (error) {
@@ -340,13 +367,27 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     switch (step) {
       case 1: // Account Creation
+        const isValidEmail = formData.account.email.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email);
+        const isValidPassword = formData.account.password.length >= 8;
+        const passwordsMatch = formData.account.password === formData.account.confirmPassword;
+        const isValidPhone = formData.account.phone.trim();
+        const isValidName = formData.account.fullName.trim();
+        
+        logger.onboardingDebug('Step 1 validation', {
+          isValidName,
+          isValidEmail,
+          isValidPassword,
+          passwordsMatch,
+          isValidPhone,
+          agreeToTerms: formData.account.agreeToTerms
+        });
+        
         return !!(
-          formData.account.fullName.trim() &&
-          formData.account.email.trim() &&
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email) &&
-          formData.account.password.length >= 8 &&
-          formData.account.password === formData.account.confirmPassword &&
-          formData.account.phone.trim() &&
+          isValidName &&
+          isValidEmail &&
+          isValidPassword &&
+          passwordsMatch &&
+          isValidPhone &&
           formData.account.agreeToTerms
         );
       
@@ -382,15 +423,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {
-    console.log(`[nextStep] Starting step transition from ${formData.currentStep}`);
-    console.log(`[nextStep] Current session:`, session?.user ? 'logged in' : 'not logged in');
-    console.log(`[nextStep] Form data validation:`, validateCurrentStep());
+    logger.onboardingDebug(`Starting step transition from ${formData.currentStep}`);
+    logger.onboardingDebug(`Current session: ${session?.user ? 'logged in' : 'not logged in'}`);
+    logger.onboardingDebug(`Form data validation: ${validateCurrentStep()}`);
     
     // تفعيل عرض الأخطاء عند محاولة الانتقال
     dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
     
     if (!validateCurrentStep()) {
-      console.log(`[nextStep] Validation failed for step ${formData.currentStep}`);
+      logger.onboardingDebug(`Validation failed for step ${formData.currentStep}`);
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
       return false;
     }
@@ -416,73 +457,119 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const result = await response.json();
         console.log('Account created successfully:', result);
         
-        // انتظار قصير للتأكد من حفظ البيانات
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // انتظار أطول للتأكد من حفظ البيانات في Firebase
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
         // تسجيل دخول تلقائي مع retry محسن
         let signInResult;
         let lastError = '';
+        let sessionUpdated = false;
         
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        for (let attempt = 1; attempt <= 8; attempt++) {
           console.log(`Attempting sign in - attempt ${attempt}`);
           
-          signInResult = await signIn('credentials', {
-            email: formData.account.email,
-            password: formData.account.password,
-            redirect: false
-          });
-          
-          if (signInResult?.ok) {
-            console.log(`Sign in successful on attempt ${attempt}`);
+          try {
+            signInResult = await signIn('credentials', {
+              email: formData.account.email.toLowerCase().trim(),
+              password: formData.account.password,
+              redirect: false
+            });
             
-            // انتظار إضافي للتأكد من تحديث الجلسة
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // تسجيل إكمال الخطوة الأولى
-            dispatch({ type: 'COMPLETE_STEP', payload: 1 });
-
-            // حضّر نسخة محدثة للحفظ الفوري في حال صار Remount
-            const updatedFormData = {
-              ...formData,
-              currentStep: 2,
-              completedSteps: Array.from(new Set([...(formData.completedSteps || []), 1]))
-            };
-
-            // حفظ التقدم فوراً في السيرفر (بدون الاعتماد على الـ auto-save)
-            try {
-              await fetch('/api/creators/onboarding/progress', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  step: 2,
-                  data: updatedFormData,
-                  autoSave: false
-                })
-              });
-            } catch (e) {
-              console.warn('Immediate progress save failed (will rely on auto-save later).', e);
+            if (signInResult?.ok && !signInResult?.error) {
+              console.log(`Sign in successful on attempt ${attempt}`);
+              
+              // انتظار أطول للتأكد من تحديث الجلسة
+              await new Promise(resolve => setTimeout(resolve, 3000));
+              
+              // التحقق من تحديث الجلسة من خلال API
+              try {
+                const sessionResponse = await fetch('/api/auth/session');
+                const sessionData = await sessionResponse.json();
+                
+                if (sessionData?.user?.email) {
+                  console.log('Session verified and updated:', sessionData.user.email);
+                  sessionUpdated = true;
+                  break;
+                } else {
+                  console.log('Session not yet updated, retrying...');
+                  lastError = 'الجلسة لم يتم تحديثها بعد';
+                }
+              } catch (sessionError) {
+                console.error('Error checking session:', sessionError);
+                lastError = 'خطأ في التحقق من الجلسة';
+              }
+            } else {
+              lastError = signInResult?.error || 'فشل في تسجيل الدخول';
+              console.log(`Sign in failed on attempt ${attempt}:`, lastError);
             }
-
-            // الانتقال للخطوة التالية في الواجهة
-            dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
-            dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
-            dispatch({ type: 'SET_SUCCESS', payload: false }); // إعادة تعيين success
-            dispatch({ type: 'SET_LOADING', payload: false });
-
-            return true;
+          } catch (authError) {
+            lastError = authError instanceof Error ? authError.message : 'خطأ في التصديق';
+            console.error(`Sign in attempt ${attempt} error:`, authError);
           }
           
-          lastError = signInResult?.error || 'فشل في تسجيل الدخول';
-          
-          if (attempt < 5) {
-            console.log(`Sign in attempt ${attempt} failed: ${lastError}, retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 2000 * attempt)); // تأخير متزايد
+          if (attempt < 8) {
+            const delayTime = Math.min(2000 * attempt, 10000); // تأخير متزايد مع حد أقصى
+            console.log(`Sign in attempt ${attempt} failed: ${lastError}, retrying in ${delayTime}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delayTime));
           }
         }
         
-        // إذا فشل تسجيل الدخول بعد كل المحاولات
-        console.error('Sign in failed after all retries:', lastError);
-        throw new Error(`تم إنشاء الحساب بنجاح، لكن فشل تسجيل الدخول التلقائي. يرجى تسجيل الدخول يدوياً.`);
+        if (!sessionUpdated) {
+          // إذا فشل تسجيل الدخول، نعرض رسالة وننقل المستخدم لصفحة تسجيل الدخول
+          console.error('Sign in failed after all retries:', lastError);
+          
+          dispatch({ type: 'SET_ERROR', payload: `تم إنشاء الحساب بنجاح! 🎉\n\nيرجى تسجيل الدخول الآن باستخدام البيانات التي أدخلتها.` });
+          dispatch({ type: 'SET_LOADING', payload: false });
+          
+          // إعادة توجيه للصفحة الرئيسية مع رسالة النجاح
+          setTimeout(() => {
+            window.location.href = `/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`;
+          }, 4000);
+          
+          return false;
+        }
+        
+        // إذا نجح تسجيل الدخول
+        console.log('Account creation and login successful, proceeding to step 2');
+        
+        // تسجيل إكمال الخطوة الأولى
+        dispatch({ type: 'COMPLETE_STEP', payload: 1 });
+
+        // حضّر نسخة محدثة للحفظ الفوري
+        const updatedFormData = {
+          ...formData,
+          currentStep: 2,
+          completedSteps: Array.from(new Set([...(formData.completedSteps || []), 1]))
+        };
+
+        // حفظ التقدم فوراً في السيرفر
+        try {
+          await fetch('/api/creators/onboarding/progress', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              step: 2,
+              data: updatedFormData,
+              autoSave: false
+            })
+          });
+          console.log('Progress saved successfully');
+        } catch (e) {
+          console.warn('Immediate progress save failed:', e);
+        }
+
+        // الانتقال للخطوة التالية في الواجهة
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+        dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+        dispatch({ type: 'SET_SUCCESS', payload: false });
+        dispatch({ type: 'SET_LOADING', payload: false });
+
+        // إعادة تحميل الصفحة للتأكد من تحديث الجلسة بشكل كامل
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+
+        return true;
         
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'حدث خطأ في إنشاء الحساب';
@@ -511,7 +598,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
     
     return false;
-  }, [formData.currentStep, formData.account, session, validateCurrentStep, saveProgress]);
+  }, [formData, session, validateCurrentStep, saveProgress]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {

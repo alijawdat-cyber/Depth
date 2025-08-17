@@ -12,7 +12,6 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 
 // Component للمحتوى الداخلي
@@ -50,39 +49,49 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    // تجنب التحقق أثناء loading الجلسة
     if (status === 'loading') return;
 
-    // للمستخدمين المسجلين: التحقق من الدور
-    if (session?.user) {
-      if (session.user.role && session.user.role !== 'creator') {
-        // إذا كان له دور آخر، توجيه للوحة التحكم المناسبة
-        router.push('/portal');
-        return;
+    // إذا لم يكن هناك جلسة وليس loading، السماح بالوصول لصفحة التسجيل
+    if (status === 'unauthenticated') {
+      // يمكن للمستخدمين الجدد الوصول لصفحة onboarding للتسجيل
+      return;
+    }
+
+    // إذا كان مسجل الدخول، التحقق من الدور
+    if (session?.user && 'role' in session.user) {
+      const userRole = (session.user as { role?: string }).role;
+      if (userRole && userRole !== 'creator') {
+        // توجيه غير المبدعين لصفحاتهم المناسبة
+        switch (userRole) {
+          case 'admin':
+            router.push('/admin');
+            break;
+          case 'client':
+            router.push('/portal');
+            break;
+          case 'employee':
+            router.push('/employees');
+            break;
+          default:
+            router.push('/');
+        }
       }
     }
-    // للمستخدمين الجدد: يمكنهم الوصول للـ onboarding لإنشاء حساب
   }, [session, status, router]);
 
-  // عرض شاشة تحميل أثناء التحقق
+  // عرض loader أثناء تحميل الجلسة
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-500)] to-[var(--accent-600)] rounded-2xl flex items-center justify-center mb-4 mx-auto">
-            <Loader2 size={32} className="text-white animate-spin" />
-          </div>
-          <h2 className="text-xl font-bold text-[var(--text)] mb-2">جاري التحميل...</h2>
-          <p className="text-[var(--muted)]">يرجى الانتظار</p>
-        </motion.div>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--accent-500)] mx-auto mb-4" />
+          <p className="text-[var(--muted)]">جاري التحميل...</p>
+        </div>
       </div>
     );
   }
 
-  // السماح للمستخدمين الجدد بالوصول للـ onboarding
   return <>{children}</>;
 }
 

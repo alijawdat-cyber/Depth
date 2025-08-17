@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -32,6 +32,21 @@ export default function SignInPage() {
 
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
   const from = searchParams?.get('from');
+  const accountCreatedMessage = searchParams?.get('message');
+  const prefilledEmail = searchParams?.get('email');
+
+  // معالجة رسالة إنشاء الحساب
+  useEffect(() => {
+    if (accountCreatedMessage === 'account_created') {
+      setMessage("🎉 تم إنشاء حسابك بنجاح! الآن يمكنك تسجيل الدخول.");
+      setMessageType('success');
+      
+      // تعبئة البريد الإلكتروني إذا كان متوفراً
+      if (prefilledEmail) {
+        setEmail(decodeURIComponent(prefilledEmail));
+      }
+    }
+  }, [accountCreatedMessage, prefilledEmail]);
 
   const handleCredentialsSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

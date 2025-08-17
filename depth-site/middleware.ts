@@ -110,7 +110,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // إضافة headers للأداء
+  const response = NextResponse.next();
+  
+  // إضافة headers لتحسين الأداء وتقليل التحذيرات
+  if (!isApi) {
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+    
+    // Cache headers for static assets
+    if (pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$/)) {
+      response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+
+  return response;
 }
 
 export const config = {

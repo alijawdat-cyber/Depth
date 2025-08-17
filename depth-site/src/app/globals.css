@@ -272,18 +272,19 @@ body {
   min-width: 320px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* منع التمرير الأفقي عالمياً */
+  /* تم إزالة overflow-x: hidden لحل مشكلة sticky elements */
 }
 
-/* منع التمرير الأفقي في جميع العناصر الرئيسية */
-html, body, #__next, main {
+/* منع التمرير الأفقي في العناصر المحددة فقط */
+main {
   max-width: 100%;
   overflow-x: hidden;
   width: 100%;
 }
 
+/* معالجة أكثر دقة للـ overflow */
 @supports (overflow: clip) {
-  html, body, #__next, main {
+  main {
     overflow-x: clip;
   }
 }
