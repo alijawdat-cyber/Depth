@@ -173,7 +173,7 @@ export default function PortalAboutPage() {
                   ابدأ التسجيل الآن
                 </Button>
               </Link>
-              <Link href="/portal/auth/signin">
+              <Link href="/auth/signin">
                 <Button variant="ghost" className="text-white border-white hover:bg-white/10 px-8 py-3">
                   لدي حساب بالفعل
                 </Button>

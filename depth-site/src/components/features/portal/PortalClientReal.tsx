@@ -211,7 +211,7 @@ export default function PortalClientReal() {
   if (status === 'unauthenticated') {
     return (
       <StateEmpty text="تسجيل الدخول مطلوب للوصول إلى بوابتك">
-        <Button onClick={() => router.push('/portal/auth/signin')}>تسجيل الدخول</Button>
+        <Button onClick={() => router.push('/auth/signin')}>تسجيل الدخول</Button>
       </StateEmpty>
     );
   }

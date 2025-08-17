@@ -201,7 +201,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AlertCircle size={48} className="mx-auto mb-4 text-[var(--accent-500)]" />
           <h1 className="text-xl font-bold text-[var(--text)] mb-2">يجب تسجيل الدخول</h1>
           <p className="text-[var(--muted)] mb-6">تحتاج إلى تسجيل الدخول للوصول إلى لوحة الإدارة</p>
-          <Button onClick={() => router.push('/portal/auth/signin')} className="w-full">
+          <Button onClick={() => router.push('/auth/signin')} className="w-full">
             تسجيل الدخول
           </Button>
         </div>

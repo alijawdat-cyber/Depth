@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/portal/auth/signin');
+      router.push('/auth/signin');
       return;
     }
 

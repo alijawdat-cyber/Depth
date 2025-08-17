@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'email is required' }, { status: 400 });
       }
       const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://depth-agency.com';
-      const signinUrl = `${baseUrl.replace(/\/$/, '')}/portal/auth/signin`;
+      const signinUrl = `${baseUrl.replace(/\/$/, '')}/auth/signin`;
       const html = await render(ClientInvite({ recipientName: email.split('@')[0], inviteUrl: signinUrl, brandUrl: baseUrl }));
       const text = renderClientInviteText({ recipientName: email.split('@')[0], inviteUrl: signinUrl });
       await resend.emails.send({

@@ -17,7 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const CTA_ITEMS = {
   book: { href: '/book', label: 'احجز جلسة' },
-  signin: { href: '/portal/auth/signin', label: 'تسجيل الدخول' },
+  signin: { href: '/auth/signin', label: 'تسجيل الدخول' },
 };
 
 

@@ -38,7 +38,7 @@ export function dashboardPathForRole(role?: string | null): string {
       return '/portal';
     case 'guest':
     default:
-      return '/portal/auth/signin';
+      return '/auth/signin';
   }
 }
 

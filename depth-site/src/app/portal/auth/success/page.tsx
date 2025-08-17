@@ -108,7 +108,7 @@ export default function SignUpSuccessPage() {
 
             {/* Quick Actions */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/portal/auth/signin">
+              <Link href="/auth/signin">
                 <Button variant="primary" className="px-8 py-3">
                   تسجيل الدخول الآن
                 </Button>

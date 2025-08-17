@@ -118,7 +118,7 @@ export default function ClientQuotesPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">يجب تسجيل الدخول لعرض العروض</p>
-          <Button onClick={() => window.location.href = '/portal/auth/signin'}>
+          <Button onClick={() => window.location.href = '/auth/signin'}>
             تسجيل الدخول
           </Button>
         </div>
