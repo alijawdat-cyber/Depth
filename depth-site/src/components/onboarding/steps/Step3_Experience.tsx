@@ -43,35 +43,28 @@ export default function Step3_Experience() {
       />
 
       <div className="space-y-8 max-w-2xl mx-auto">
-        {/* مستوى الخبرة */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {/* مستوى الخبرة الموحد */}
+        <div className="max-w-md mx-auto">
           <SelectField
             label="مستوى خبرتك"
             value={experience.experienceLevel}
-            onChange={(value) => updateExperience({ experienceLevel: value as ExperienceLevel })}
+            onChange={(value) => {
+              const level = value as ExperienceLevel;
+              updateExperience({ 
+                experienceLevel: level,
+                // تحديث سنوات الخبرة تلقائياً حسب المستوى
+                experienceYears: level === 'beginner' ? '0-1' : 
+                                level === 'intermediate' ? '2-5' : '6+'
+              });
+            }}
             options={[
-              { value: 'beginner', label: '🌱 مبتدئ - أقل من سنتين' },
-              { value: 'intermediate', label: '💼 متوسط - 2-5 سنوات' },
-              { value: 'professional', label: '🏆 محترف - أكثر من 5 سنوات' }
+              { value: 'beginner', label: '🌱 مبتدئ (أقل من سنتين)' },
+              { value: 'intermediate', label: '💼 متوسط (2-5 سنوات)' },
+              { value: 'professional', label: '🏆 محترف (أكثر من 5 سنوات)' }
             ]}
             required
             error={getFieldError('الخبرة')}
-            description="اختر المستوى الذي يناسب خبرتك الفعلية"
-          />
-
-          <SelectField
-            label="سنوات الخبرة"
-            value={experience.experienceYears}
-            onChange={(value) => updateExperience({ experienceYears: value })}
-            options={[
-              { value: '0-1', label: 'أقل من سنتين' },
-              { value: '2-3', label: '2-3 سنوات' },
-              { value: '4-5', label: '4-5 سنوات' },
-              { value: '6-10', label: '6-10 سنوات' },
-              { value: '10+', label: 'أكثر من 10 سنوات' }
-            ]}
-            required
-            error={getFieldError('سنوات')}
+            description="اختر المستوى الذي يناسب خبرتك الفعلية - سيتم تحديد سنوات الخبرة تلقائياً"
           />
         </div>
 

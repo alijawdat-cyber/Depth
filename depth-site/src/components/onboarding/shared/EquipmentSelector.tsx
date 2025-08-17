@@ -15,7 +15,8 @@ import {
   Search,
   Filter,
   Package,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 import type { EquipmentInventory, CreatorEquipmentItem, EquipmentCatalogItem } from '@/types/creators';
 
@@ -71,6 +72,15 @@ export default function EquipmentSelector({
   const [activeCategory, setActiveCategory] = useState<string>('camera');
   const [filters, setFilters] = useState<EquipmentFilters>({});
   const [brands, setBrands] = useState<string[]>([]);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customEquipment, setCustomEquipment] = useState({
+    name: '',
+    brand: '',
+    model: '',
+    category: activeCategory,
+    description: '',
+    condition: 'good' as 'excellent' | 'good' | 'fair' | 'poor'
+  });
 
   // جلب المعدات المتاحة
   useEffect(() => {
@@ -152,6 +162,70 @@ export default function EquipmentSelector({
       ...value,
       [categoryKey]: updatedItems
     });
+  };
+
+  // إضافة معدة مخصصة
+  const addCustomEquipment = async () => {
+    if (!customEquipment.name.trim() || !customEquipment.brand.trim()) {
+      return;
+    }
+
+    try {
+      // إرسال المعدة المخصصة للمراجعة
+      const response = await fetch('/api/catalog/equipment/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...customEquipment,
+          category: activeCategory,
+          status: 'pending_review',
+          submittedBy: 'creator',
+          submittedAt: new Date().toISOString()
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // إضافة المعدة للمبدع مع حالة "مراجعة معلقة"
+        const categoryKey = EQUIPMENT_CATEGORY_MAPPING[activeCategory as keyof typeof EQUIPMENT_CATEGORY_MAPPING];
+        if (categoryKey) {
+          const newItem: CreatorEquipmentItem = {
+            catalogId: result.data.id,
+            owned: true,
+            condition: customEquipment.condition,
+            quantity: 1,
+            isCustom: true,
+            status: 'pending_review',
+            customData: {
+              name: customEquipment.name,
+              brand: customEquipment.brand,
+              model: customEquipment.model,
+              description: customEquipment.description
+            }
+          };
+
+          const updatedInventory = {
+            ...value,
+            [categoryKey]: [...(value[categoryKey] || []), newItem]
+          };
+          onChange(updatedInventory);
+        }
+
+        // إعادة تعيين النموذج
+        setCustomEquipment({
+          name: '',
+          brand: '',
+          model: '',
+          category: activeCategory,
+          description: '',
+          condition: 'good'
+        });
+        setShowCustomForm(false);
+      }
+    } catch (error) {
+      console.error('Error adding custom equipment:', error);
+    }
   };
 
   // حساب إجمالي المعدات
@@ -388,7 +462,7 @@ export default function EquipmentSelector({
                               <button
                                 key={condition.value}
                                 type="button"
-                                onClick={() => updateEquipmentItem(equipment.id, { condition: condition.value as any })}
+                                onClick={() => updateEquipmentItem(equipment.id, { condition: condition.value as CreatorEquipmentItem['condition'] })}
                                 disabled={disabled}
                                 className={`
                                   px-2 py-1 rounded text-xs font-medium transition-all
@@ -421,7 +495,142 @@ export default function EquipmentSelector({
             })}
           </div>
         )}
+
+        {/* زر إضافة معدة مخصصة */}
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={() => setShowCustomForm(true)}
+            disabled={disabled}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent-500)] text-white rounded-lg hover:bg-[var(--accent-600)] disabled:opacity-50 transition-all"
+          >
+            <Plus size={16} />
+            أضف معدة غير موجودة
+          </button>
+          <p className="text-xs text-[var(--muted)] mt-1">
+            ستتم مراجعة المعدة من قبل فريقنا قبل إضافتها للكاتالوج
+          </p>
+        </div>
       </div>
+
+      {/* نموذج إضافة معدة مخصصة */}
+      {showCustomForm && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => e.target === e.currentTarget && setShowCustomForm(false)}
+        >
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">إضافة معدة مخصصة</h3>
+              <button
+                type="button"
+                onClick={() => setShowCustomForm(false)}
+                className="text-[var(--muted)] hover:text-[var(--text)]"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                  اسم المعدة *
+                </label>
+                <input
+                  type="text"
+                  value={customEquipment.name}
+                  onChange={(e) => setCustomEquipment(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="مثال: Canon EOS R5"
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                  الماركة *
+                </label>
+                <input
+                  type="text"
+                  value={customEquipment.brand}
+                  onChange={(e) => setCustomEquipment(prev => ({ ...prev, brand: e.target.value }))}
+                  placeholder="مثال: Canon"
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                  الموديل
+                </label>
+                <input
+                  type="text"
+                  value={customEquipment.model}
+                  onChange={(e) => setCustomEquipment(prev => ({ ...prev, model: e.target.value }))}
+                  placeholder="مثال: Mark IV"
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                  حالة المعدة
+                </label>
+                <select
+                  value={customEquipment.condition}
+                  onChange={(e) => setCustomEquipment(prev => ({ ...prev, condition: e.target.value as 'excellent' | 'good' | 'fair' | 'poor' }))}
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                >
+                  {CONDITION_OPTIONS.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                  وصف إضافي
+                </label>
+                <textarea
+                  value={customEquipment.description}
+                  onChange={(e) => setCustomEquipment(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="معلومات إضافية عن المعدة..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-700">
+                  <strong>ملاحظة:</strong> ستتم مراجعة المعدة من قبل فريقنا وإضافتها للكاتالوج بعد الموافقة. 
+                  ستظهر في ملفك الشخصي مع حالة &quot;قيد المراجعة&quot; حتى يتم اعتمادها.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowCustomForm(false)}
+                className="flex-1 px-4 py-2 border border-[var(--border)] text-[var(--text)] rounded-lg hover:bg-[var(--bg-alt)] transition-all"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={addCustomEquipment}
+                disabled={!customEquipment.name.trim() || !customEquipment.brand.trim()}
+                className="flex-1 px-4 py-2 bg-[var(--accent-500)] text-white rounded-lg hover:bg-[var(--accent-600)] disabled:opacity-50 transition-all"
+              >
+                إضافة للمراجعة
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* رسالة الخطأ */}
       {error && (

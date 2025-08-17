@@ -3,7 +3,9 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Calendar, ToggleLeft, ToggleRight, AlertCircle, Coffee, Save, Loader2 } from 'lucide-react';
+import { Clock, Calendar, ToggleLeft, ToggleRight, AlertCircle, Coffee, Save, Loader2, Settings } from 'lucide-react';
+import TimePicker from '@/components/ui/TimePicker';
+import { DayToggleGroup } from '@/components/ui/DayToggle';
 import type { WeeklyAvailability } from '@/types/creators';
 
 interface WeeklyAvailabilityGridProps {

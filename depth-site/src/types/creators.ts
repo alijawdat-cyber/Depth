@@ -88,6 +88,14 @@ export interface CreatorEquipmentItem {
   condition: 'excellent' | 'good' | 'fair' | 'poor';
   quantity: number;
   notes?: string;
+  isCustom?: boolean;        // للمعدات المخصصة
+  status?: 'pending_review' | 'approved' | 'rejected'; // حالة المراجعة للمعدات المخصصة
+  customData?: {             // بيانات المعدة المخصصة
+    name: string;
+    brand: string;
+    model: string;
+    description: string;
+  };
 }
 
 export interface EquipmentInventory {

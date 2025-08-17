@@ -6,7 +6,7 @@ import { Calendar, Clock, Zap, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { SelectField, InputField, CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
-import WeeklyAvailabilityGrid from '../shared/WeeklyAvailabilityGrid';
+import EnhancedAvailabilityGrid from '../shared/EnhancedAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
 
 export default function Step5_Availability() {
@@ -185,9 +185,9 @@ export default function Step5_Availability() {
           />
         </div>
 
-        {/* جدول التوفر الأسبوعي المفصل */}
+        {/* جدول التوفر الأسبوعي المحسن */}
         <div>
-          <WeeklyAvailabilityGrid
+          <EnhancedAvailabilityGrid
             value={availability.weeklyAvailability || []}
             onChange={(weeklyAvailability) => updateAvailability({ weeklyAvailability })}
             error={getFieldError('التوفر')}
