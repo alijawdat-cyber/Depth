@@ -376,6 +376,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     // للخطوة الأولى: إنشاء الحساب إذا لم يكن موجود
     if (formData.currentStep === 1 && !session?.user) {
       dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null }); // مسح الأخطاء السابقة
+      
       try {
         // إنشاء حساب جديد
         const response = await fetch('/api/creators/onboarding/create-account', {
@@ -389,15 +391,39 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           throw new Error(errorData.error || 'فشل في إنشاء الحساب');
         }
         
-        // تسجيل دخول تلقائي
-        const signInResult = await signIn('credentials', {
-          email: formData.account.email,
-          password: formData.account.password,
-          redirect: false
-        });
+        const result = await response.json();
+        console.log('Account created successfully:', result);
+        
+        // انتظار قصير للتأكد من حفظ البيانات
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // تسجيل دخول تلقائي مع retry
+        let signInResult;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          signInResult = await signIn('credentials', {
+            email: formData.account.email,
+            password: formData.account.password,
+            redirect: false
+          });
+          
+          if (signInResult?.ok) {
+            console.log(`Sign in successful on attempt ${attempt}`);
+            break;
+          }
+          
+          if (attempt < 3) {
+            console.log(`Sign in attempt ${attempt} failed, retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
         
         if (signInResult?.error) {
-          throw new Error('تم إنشاء الحساب لكن فشل تسجيل الدخول');
+          console.error('Sign in error after retries:', signInResult.error);
+          throw new Error(`فشل تسجيل الدخول: ${signInResult.error}`);
+        }
+        
+        if (!signInResult?.ok) {
+          throw new Error('تم إنشاء الحساب لكن فشل تسجيل الدخول - يرجى تسجيل الدخول يدوياً');
         }
         
       } catch (error) {

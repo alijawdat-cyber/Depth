@@ -374,7 +374,7 @@ export default function OnboardingLayout({
                   {state.loading ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      جاري المعالجة...
+                      {formData.currentStep === 1 ? 'جاري إنشاء الحساب...' : 'جاري الحفظ...'}
                     </>
                   ) : formData.currentStep === 5 ? (
                     <>

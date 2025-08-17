@@ -50,8 +50,9 @@ export const authOptions: NextAuthOptions = {
               const userDoc = userQuery.docs[0];
               const userData = userDoc.data();
 
-              // التحقق من كلمة المرور
-              if (userData.password && await bcrypt.compare(credentials.password, userData.password)) {
+              // التحقق من كلمة المرور (password أو hashedPassword)
+              const passwordHash = userData.password || userData.hashedPassword;
+              if (passwordHash && await bcrypt.compare(credentials.password, passwordHash)) {
                 return {
                   id: userDoc.id,
                   email: userData.email,
@@ -74,7 +75,8 @@ export const authOptions: NextAuthOptions = {
             const creatorDoc = creatorQuery.docs[0];
             const creatorData = creatorDoc.data();
             
-            if (creatorData.password && await bcrypt.compare(credentials.password, creatorData.password)) {
+            const passwordHash = creatorData.password || creatorData.hashedPassword;
+            if (passwordHash && await bcrypt.compare(credentials.password, passwordHash)) {
               return {
                 id: creatorDoc.id,
                 email: creatorData.contact.email,
@@ -94,7 +96,8 @@ export const authOptions: NextAuthOptions = {
           if (!creatorTopQuery.empty) {
             const creatorDoc = creatorTopQuery.docs[0];
             const creatorData = creatorDoc.data();
-            if (creatorData.password && await bcrypt.compare(credentials.password, creatorData.password)) {
+            const passwordHash = creatorData.password || creatorData.hashedPassword;
+            if (passwordHash && await bcrypt.compare(credentials.password, passwordHash)) {
               return {
                 id: creatorDoc.id,
                 email: creatorData.email,

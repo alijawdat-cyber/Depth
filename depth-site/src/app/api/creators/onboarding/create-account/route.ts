@@ -69,7 +69,8 @@ export async function POST(req: NextRequest) {
       phone,
       role: 'creator',
       status: 'onboarding_started',
-      hashedPassword, // نحفظها للتحقق في المستقبل
+      password: hashedPassword, // للتوافق مع credentials provider
+      hashedPassword, // نسخة احتياطية
       onboardingStartedAt: new Date().toISOString(),
       agreeToTerms,
       agreeToTermsAt: new Date().toISOString(),
@@ -89,6 +90,8 @@ export async function POST(req: NextRequest) {
       phone,
       role: 'photographer', // سيتم تحديثه في الخطوة التالية
       status: 'onboarding_started',
+      password: hashedPassword, // للتوافق مع credentials provider
+      hashedPassword, // نسخة احتياطية
       city: '',
       canTravel: false,
       onboardingProgress: {
