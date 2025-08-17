@@ -76,26 +76,18 @@ export async function POST(req: NextRequest) {
       disabled: false
     });
 
-    // إنشاء وثيقة المستخدم في Firestore
+    // إنشاء وثيقة المستخدم في Firestore للتوافق مع NextAuth
     const userData = {
-      uid: userRecord.uid,
+      name: fullName,
       email,
-      fullName,
-      phone,
+      emailVerified: null, // للتوافق مع NextAuth adapter
+      image: null,
       role: 'creator',
-      status: 'onboarding_started',
-      password: hashedPassword, // للتوافق مع credentials provider
-      hashedPassword, // نسخة احتياطية
-      onboardingStartedAt: new Date().toISOString(),
-      agreeToTerms,
-      agreeToTermsAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      source: 'onboarding_system',
-      isActive: true
+      updatedAt: new Date().toISOString()
     };
 
-    await adminDb.collection('users').doc(userRecord.uid).set(userData);
+    const userDoc = await adminDb.collection('users').add(userData);
 
     // إنشاء وثيقة المبدع الأولية
     const creatorData = {
@@ -115,21 +107,30 @@ export async function POST(req: NextRequest) {
         startedAt: new Date().toISOString()
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      userId: userDoc.id // ربط بسجل المستخدم
     };
 
-    await adminDb.collection('creators').doc(userRecord.uid).set(creatorData);
+    const creatorDocRef = await adminDb.collection('creators').add(creatorData);
+
+    // تحديث سجل المستخدم بمعرف المبدع
+    await adminDb.collection('users').doc(userDoc.id).update({
+      creatorId: creatorDocRef.id,
+      updatedAt: new Date().toISOString()
+    });
 
     console.log('Account and creator profile created successfully for:', email);
     
     return NextResponse.json({
       success: true,
-      message: 'تم إنشاء الحساب بنجاح',
+      message: 'تم إنشاء الحساب بنجاح! يمكنك الآن الانتقال للمرحلة التالية',
       data: {
         uid: userRecord.uid,
+        creatorId: creatorDocRef.id,
         email,
         fullName,
-        status: 'onboarding_started'
+        status: 'onboarding_started',
+        nextStep: 2
       }
     });
 
