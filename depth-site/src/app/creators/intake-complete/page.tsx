@@ -141,6 +141,11 @@ const STEPS = [
   { id: 10, title: 'المرفقات', icon: FileText, description: 'Portfolio والشهادات' }
 ];
 
+// Types for catalog-driven UI (lightweight, aligns with API shapes used below)
+interface SubcategoryItem { id: string; nameAr: string; description?: string; category?: { nameAr?: string }; basePrice?: number }
+interface VerticalItem { id: string; nameAr: string; icon?: string; description?: string }
+interface EquipmentCatalogItemLite { id: string; nameAr: string; model?: string; description?: string; specifications?: string; category?: { id?: string; nameAr?: string; icon?: string } }
+
 export default function CompleteCreatorIntakePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -152,9 +157,9 @@ export default function CompleteCreatorIntakePage() {
   const [success, setSuccess] = useState(false);
   
   // بيانات الكتالوج من قاعدة البيانات
-  const [subcategories, setSubcategories] = useState<any[]>([]);
-  const [verticals, setVerticals] = useState<any[]>([]);
-  const [equipmentCatalog, setEquipmentCatalog] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<SubcategoryItem[]>([]);
+  const [verticals, setVerticals] = useState<VerticalItem[]>([]);
+  const [equipmentCatalog, setEquipmentCatalog] = useState<EquipmentCatalogItemLite[]>([]);
 
   // بيانات النموذج الكاملة
   const [formData, setFormData] = useState<IntakeFormData>({
@@ -495,14 +500,12 @@ export default function CompleteCreatorIntakePage() {
   // 2) Skills Matrix - مربوط بالكتالوج
   const renderSkillsMatrixStep = () => {
     // تجميع الفئات الفرعية حسب الفئة الرئيسية
-    const categorizedSubcategories = subcategories.reduce((acc: any, subcat: any) => {
+    const categorizedSubcategories = subcategories.reduce((acc: Record<string, SubcategoryItem[]>, subcat: SubcategoryItem) => {
       const categoryName = subcat.category?.nameAr || 'أخرى';
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
+      if (!acc[categoryName]) acc[categoryName] = [];
       acc[categoryName].push(subcat);
       return acc;
-    }, {});
+    }, {} as Record<string, SubcategoryItem[]>);
 
     const handleSkillChange = (subcategoryId: string, level: string) => {
       setFormData(prev => ({
@@ -541,11 +544,11 @@ export default function CompleteCreatorIntakePage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(categorizedSubcategories).map(([categoryName, subcats]: [string, any]) => (
+            {Object.entries(categorizedSubcategories).map(([categoryName, subcats]: [string, SubcategoryItem[]]) => (
               <div key={categoryName} className="border border-[var(--border)] rounded-lg p-4">
                 <h3 className="font-semibold text-[var(--text)] mb-4 text-lg">{categoryName}</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {subcats.map((subcat: any) => (
+                  {subcats.map((subcat: SubcategoryItem) => (
                     <div key={subcat.id} className="border border-[var(--border)] rounded p-3">
                       <div className="flex items-center justify-between mb-2">
                         <label className="font-medium text-[var(--text)]">{subcat.nameAr}</label>
@@ -565,7 +568,7 @@ export default function CompleteCreatorIntakePage() {
                       
                       <Dropdown
                         value={formData.skills[subcat.id]?.level || ''}
-                        onChange={(level: any) => handleSkillChange(subcat.id, level)}
+                        onChange={(level: string | number) => handleSkillChange(subcat.id, String(level))}
                         options={[
                           { value: '', label: 'اختر المستوى' },
                           { value: 'beginner', label: '🌱 مبتدئ' },
@@ -593,7 +596,7 @@ export default function CompleteCreatorIntakePage() {
                 <h4 className="font-medium text-[var(--text)] mb-3">المهارات المختارة ({Object.keys(formData.skills).length})</h4>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(formData.skills).map(([subcatId, skill]) => {
-                    const subcat = subcategories.find((s: any) => s.id === subcatId);
+                    const subcat = subcategories.find((s: SubcategoryItem) => s.id === subcatId);
                     const levelEmoji = skill.level === 'pro' ? '🏆' : skill.level === 'intermediate' ? '💼' : '🌱';
                     return (
                       <span 
@@ -613,35 +616,108 @@ export default function CompleteCreatorIntakePage() {
     );
   };
 
-  // باقي الخطوات - مبسطة مؤقتاً
-  const renderVerticalsStep = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-[var(--text)] mb-2">المحاور المفضلة</h2>
-        <p className="text-[var(--muted)]">اختر المجالات التي تفضل العمل بها</p>
-      </div>
-      
-      <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
-        <div className="flex items-center gap-2 text-[var(--text)]">
-          <AlertCircle size={20} />
-          <span className="font-medium">قيد التطوير</span>
+  // 3) المحاور المفضلة - مربوط بقاعدة البيانات
+  const renderVerticalsStep = () => {
+    const handleVerticalToggle = (verticalId: string) => {
+      setFormData(prev => ({
+        ...prev,
+        verticals: prev.verticals.includes(verticalId)
+          ? prev.verticals.filter(id => id !== verticalId)
+          : [...prev.verticals, verticalId]
+      }));
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--text)] mb-2">المحاور المفضلة</h2>
+          <p className="text-[var(--muted)]">اختر المجالات التي تفضل العمل بها</p>
         </div>
-        <p className="text-sm text-[var(--text)] mt-1">
-          سيتم إضافة قائمة المحاور: Fashion, Beauty/Clinics, F&B, إلخ...
-        </p>
+        
+        {verticals.length === 0 ? (
+          <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
+            <div className="flex items-center gap-2 text-[var(--warning-fg)]">
+              <AlertCircle size={20} />
+              <span className="font-medium">جاري تحميل المحاور...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {verticals.map((vertical: any) => (
+                <div
+                  key={vertical.id}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                    formData.verticals.includes(vertical.id)
+                      ? 'border-[var(--accent-500)] bg-[var(--accent-50)]'
+                      : 'border-[var(--border)] hover:border-[var(--accent-300)]'
+                  }`}
+                  onClick={() => handleVerticalToggle(vertical.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.verticals.includes(vertical.id)}
+                      onChange={() => handleVerticalToggle(vertical.id)}
+                      className="w-5 h-5 text-[var(--accent-500)] bg-[var(--bg)] border-[var(--border)] rounded focus:ring-[var(--accent-500)]"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        {vertical.icon && <span className="text-xl">{vertical.icon}</span>}
+                        <h3 className="font-medium text-[var(--text)]">{vertical.nameAr}</h3>
+                      </div>
+                      {vertical.description && (
+                        <p className="text-xs text-[var(--muted)] mt-1">{vertical.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* ملخص المحاور المختارة */}
+            {formData.verticals.length > 0 && (
+              <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
+                <h4 className="font-medium text-[var(--text)] mb-3">المحاور المختارة ({formData.verticals.length})</h4>
+                <div className="flex flex-wrap gap-2">
+                  {formData.verticals.map(verticalId => {
+                    const vertical = verticals.find((v: any) => v.id === verticalId);
+                    return (
+                      <span 
+                        key={verticalId}
+                        className="px-3 py-1 bg-[var(--accent-100)] text-[var(--accent-700)] rounded-full text-sm flex items-center gap-1"
+                      >
+                        {vertical?.icon && <span>{vertical.icon}</span>}
+                        {vertical?.nameAr || verticalId}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderEquipmentStep = () => {
-    const equipmentCategories = [
-      { id: 'cameras', nameAr: 'الكاميرات', icon: '📷' },
-      { id: 'lenses', nameAr: 'العدسات', icon: '🔍' },
-      { id: 'lighting', nameAr: 'الإضاءة', icon: '💡' },
-      { id: 'audio', nameAr: 'الصوتيات', icon: '🎤' },
-      { id: 'accessories', nameAr: 'الإكسسوارات', icon: '🛠️' },
-      { id: 'specialSetups', nameAr: 'التجهيزات الخاصة', icon: '⚙️' }
-    ];
+    // تجميع المعدات حسب الفئة من الكتالوج
+    const categorizedEquipment = equipmentCatalog.reduce((acc: any, item: any) => {
+      const categoryName = item.category?.nameAr || 'أخرى';
+      if (!acc[categoryName]) {
+        acc[categoryName] = {
+          id: item.category?.id || 'other',
+          nameAr: categoryName,
+          icon: item.category?.icon || '🛠️',
+          items: []
+        };
+      }
+      acc[categoryName].items.push(item);
+      return acc;
+    }, {});
+
+    const equipmentCategories = Object.values(categorizedEquipment) as any[];
 
     return (
       <div className="space-y-6">
@@ -660,49 +736,83 @@ export default function CompleteCreatorIntakePage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {equipmentCategories.map(category => {
-            const categoryEquipment = formData.equipment[category.id as keyof typeof formData.equipment] as EquipmentItem[];
-            
-            return (
-              <div key={category.id} className="border border-[var(--border)] rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-[var(--text)] flex items-center gap-2">
-                    <span>{category.icon}</span>
-                    {category.nameAr}
-                    {categoryEquipment?.length > 0 && (
-                      <span className="text-sm bg-[var(--accent-100)] text-[var(--accent-700)] px-2 py-1 rounded">
-                        {categoryEquipment.length}
-                      </span>
-                    )}
-                  </h3>
-                  <button
-                    onClick={() => {
-                      // إضافة عنصر فارغ جديد
-                      const newItem: EquipmentItem = {
-                        name: '',
-                        model: '',
-                        quantity: 1,
-                        condition: 'excellent',
-                        notes: ''
-                      };
-                      setFormData(prev => ({
-                        ...prev,
-                        equipment: {
-                          ...prev.equipment,
-                          [category.id]: [...(categoryEquipment || []), newItem]
-                        }
-                      }));
-                    }}
-                    className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)]"
-                  >
-                    + إضافة
-                  </button>
-                </div>
+        {equipmentCatalog.length === 0 ? (
+          <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
+            <div className="flex items-center gap-2 text-[var(--warning-fg)]">
+              <AlertCircle size={20} />
+              <span className="font-medium">جاري تحميل كتالوج المعدات...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {equipmentCategories.map(category => {
+              const selectedEquipment = formData.equipment[category.id as keyof typeof formData.equipment] as EquipmentItem[] || [];
+              
+              return (
+                <div key={category.id} className="border border-[var(--border)] rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-[var(--text)] flex items-center gap-2">
+                      <span>{category.icon}</span>
+                      {category.nameAr}
+                      {selectedEquipment.length > 0 && (
+                        <span className="text-sm bg-[var(--accent-100)] text-[var(--accent-700)] px-2 py-1 rounded">
+                          {selectedEquipment.length}
+                        </span>
+                      )}
+                    </h3>
+                  </div>
 
-                {categoryEquipment && categoryEquipment.length > 0 ? (
-                  <div className="space-y-3">
-                    {categoryEquipment.map((item, index) => (
+                  {/* قائمة المعدات المتاحة في الكتالوج */}
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-[var(--text)] mb-2">اختر من الكتالوج:</h4>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {category.items.map((item: any) => {
+                        const isSelected = selectedEquipment.some(eq => eq.name === item.nameAr);
+                        return (
+                          <div
+                            key={item.id}
+                            className={`border rounded p-3 cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-[var(--accent-500)] bg-[var(--accent-50)]'
+                                : 'border-[var(--border)] hover:border-[var(--accent-300)]'
+                            }`}
+                            onClick={() => {
+                              if (!isSelected) {
+                                const newItem: EquipmentItem = {
+                                  name: item.nameAr,
+                                  model: item.model || '',
+                                  quantity: 1,
+                                  condition: 'excellent',
+                                  notes: ''
+                                };
+                                setFormData(prev => ({
+                                  ...prev,
+                                  equipment: {
+                                    ...prev.equipment,
+                                    [category.id]: [...selectedEquipment, newItem]
+                                  }
+                                }));
+                              }
+                            }}
+                          >
+                            <div className="text-sm font-medium text-[var(--text)]">{item.nameAr}</div>
+                            {item.description && (
+                              <div className="text-xs text-[var(--muted)] mt-1">{item.description}</div>
+                            )}
+                            {item.specifications && (
+                              <div className="text-xs text-[var(--muted)] mt-1">{item.specifications}</div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {selectedEquipment.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-[var(--text)] mb-2">المعدات المختارة:</h4>
+                      <div className="space-y-3">
+                        {selectedEquipment.map((item, index) => (
                       <div key={index} className="grid md:grid-cols-6 gap-3 p-3 bg-[var(--bg)] rounded border">
                         <div>
                           <label className="block text-xs text-[var(--muted)] mb-1">النوع/الاسم</label>
@@ -710,7 +820,7 @@ export default function CompleteCreatorIntakePage() {
                             type="text"
                             value={item.name}
                             onChange={(e) => {
-                              const updated = [...categoryEquipment];
+                              const updated = [...selectedEquipment];
                               updated[index] = { ...updated[index], name: e.target.value };
                               setFormData(prev => ({
                                 ...prev,
@@ -728,7 +838,7 @@ export default function CompleteCreatorIntakePage() {
                             type="text"
                             value={item.model || ''}
                             onChange={(e) => {
-                              const updated = [...categoryEquipment];
+                              const updated = [...selectedEquipment];
                               updated[index] = { ...updated[index], model: e.target.value };
                               setFormData(prev => ({
                                 ...prev,
@@ -747,7 +857,7 @@ export default function CompleteCreatorIntakePage() {
                             min="1"
                             value={item.quantity}
                             onChange={(e) => {
-                              const updated = [...categoryEquipment];
+                              const updated = [...selectedEquipment];
                               updated[index] = { ...updated[index], quantity: parseInt(e.target.value) || 1 };
                               setFormData(prev => ({
                                 ...prev,
@@ -762,8 +872,8 @@ export default function CompleteCreatorIntakePage() {
                           <label className="block text-xs text-[var(--muted)] mb-1">الحالة</label>
                           <Dropdown
                             value={item.condition}
-                            onChange={(v: string | number) => {
-                              const updated = [...categoryEquipment];
+                            onChange={(v: any) => {
+                              const updated = [...selectedEquipment];
                               updated[index] = { ...updated[index], condition: String(v) as EquipmentItem['condition'] };
                               setFormData(prev => ({
                                 ...prev,
@@ -784,7 +894,7 @@ export default function CompleteCreatorIntakePage() {
                             type="text"
                             value={item.notes || ''}
                             onChange={(e) => {
-                              const updated = [...categoryEquipment];
+                              const updated = [...selectedEquipment];
                               updated[index] = { ...updated[index], notes: e.target.value };
                               setFormData(prev => ({
                                 ...prev,
@@ -799,7 +909,7 @@ export default function CompleteCreatorIntakePage() {
                         <div className="flex items-end">
                           <button
                             onClick={() => {
-                              const updated = categoryEquipment.filter((_, i) => i !== index);
+                              const updated = selectedEquipment.filter((_, i) => i !== index);
                               setFormData(prev => ({
                                 ...prev,
                                 equipment: { ...prev.equipment, [category.id]: updated }
@@ -810,18 +920,16 @@ export default function CompleteCreatorIntakePage() {
                             حذف
                           </button>
                         </div>
-                      </div>
-                    ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center text-[var(--muted)] py-8">
-                    لا توجد معدات في هذه الفئة
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* تحذير إذا لم تكن هناك معدات كافية */}
         {(() => {
