@@ -112,34 +112,7 @@ export default function CreatorOnboardingPage() {
             <OnboardingContent />
           </div>
 
-          {/* Footer إضافي للمساعدة */}
-          <footer className="relative z-10 bg-[var(--card)]/80 backdrop-blur-sm border-t border-[var(--border)]">
-            <div className="max-w-6xl mx-auto px-4 py-6">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
-                  <span>© 2024 Depth Creative Platform</span>
-                  <span>•</span>
-                  <span>نظام انضمام المبدعين المطور</span>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <a 
-                    href="mailto:support@depth.com" 
-                    className="text-sm text-[var(--accent-600)] hover:underline"
-                  >
-                    تحتاج مساعدة؟ تواصل معنا
-                  </a>
-                  <span className="text-[var(--border)]">|</span>
-                  <a 
-                    href="/legal#privacy" 
-                    className="text-sm text-[var(--muted)] hover:text-[var(--text)]"
-                  >
-                    سياسة الخصوصية
-                  </a>
-                </div>
-              </div>
-            </div>
-          </footer>
+          {/* تم إزالة الفوتر الخاص بالأونبوردن حسب الطلب. يبقى فوتر الموقع العام فقط. */}
         </div>
       </OnboardingProvider>
     </AuthGuard>

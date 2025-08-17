@@ -7,7 +7,8 @@ import type { AccountCreationData } from '@/types/onboarding';
 export async function POST(req: NextRequest) {
   try {
     const accountData: AccountCreationData = await req.json();
-    const { fullName, email, password, phone, agreeToTerms } = accountData;
+    const { fullName, password, phone, agreeToTerms } = accountData;
+    const email = String(accountData.email || '').toLowerCase();
 
     // التحقق من البيانات الأساسية
     if (!fullName?.trim() || !email?.trim() || !password || !phone?.trim() || !agreeToTerms) {
@@ -61,6 +62,13 @@ export async function POST(req: NextRequest) {
           { status: 409 }
         );
       }
+      const existingUserDoc = await adminDb.collection('users').where('email', '==', email).limit(1).get();
+      if (!existingUserDoc.empty) {
+        return NextResponse.json(
+          { error: 'البريد الإلكتروني مستخدم مسبقاً' },
+          { status: 409 }
+        );
+      }
     } catch (error) {
       console.error('Error checking existing creator in Firestore:', error);
     }
@@ -99,6 +107,7 @@ export async function POST(req: NextRequest) {
       status: 'onboarding_started',
       password: hashedPassword, // للتوافق مع credentials provider
       hashedPassword, // نسخة احتياطية
+      contact: { email },
       city: '',
       canTravel: false,
       onboardingProgress: {
