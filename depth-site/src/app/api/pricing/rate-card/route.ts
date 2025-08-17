@@ -1,9 +1,8 @@
-// API endpoint لإدارة جدول الأسعار - متوافق مع docs/catalog/06-Rate-Card-Strategy.md
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
 
 interface RateCardItem {
   id: string;
@@ -33,8 +32,8 @@ interface RateCardVersion {
   notes?: string;
 }
 
-// PUT: Update rate card
-export async function PUT(request: NextRequest) {
+// PUT: Update rate card (legacy rate_cards collection)
+export async function PUT_LEGACY(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as { role?: string }).role !== 'admin') {
@@ -143,8 +142,8 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// GET: Retrieve rate cards
-export async function GET(request: NextRequest) {
+// GET: Retrieve rate cards (legacy rate_cards collection)
+export async function GET_LEGACY(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as { role?: string }).role !== 'admin') {
