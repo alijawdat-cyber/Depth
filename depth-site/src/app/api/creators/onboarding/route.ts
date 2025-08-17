@@ -109,26 +109,19 @@ export async function POST(req: NextRequest) {
       } as OnboardingApiResponse, { status: 400 });
     }
 
-    // التحقق من الخبرة
-    if (!formData.experience.experienceLevel || (formData.experience.specializations && formData.experience.specializations.length === 0)) {
+    // التحقق من الخبرة (اجعل التخصصات اختيارية)
+    if (!formData.experience.experienceLevel) {
       return NextResponse.json({
         success: false,
-        error: 'مستوى الخبرة والتخصصات مطلوبة',
+        error: 'مستوى الخبرة مطلوب',
         requestId
       } as OnboardingApiResponse, { status: 400 });
     }
 
-    // التحقق من المعرض (الحد الأدنى)
-    if (formData.portfolio.workSamples.length < 2) {
-      return NextResponse.json({
-        success: false,
-        error: 'يجب إضافة عينتين على الأقل من الأعمال',
-        requestId
-      } as OnboardingApiResponse, { status: 400 });
-    }
+    // المعرض اختياري حالياً: لا نمنع الإرسال إذا كانت العينات أقل من 2
 
-    // التحقق من التوفر
-    if (!formData.availability.availability || formData.availability.preferredWorkdays.length === 0) {
+    // التحقق من التوفر (مطلوب: النوع + على الأقل يوم واحد سواء من الشبكة أو preferredWorkdays)
+    if (!formData.availability.availability) {
       return NextResponse.json({
         success: false,
         error: 'معلومات التوفر مطلوبة',

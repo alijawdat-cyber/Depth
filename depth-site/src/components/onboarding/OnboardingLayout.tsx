@@ -346,37 +346,19 @@ export default function OnboardingLayout({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="flex items-center justify-between mt-8"
+              className="mt-8"
             >
-              {/* Previous Button */}
-              <Button
-                variant="ghost"
-                onClick={prevStep}
-                disabled={formData.currentStep === 1 || state.saving}
-                className="flex items-center gap-2 px-6 py-3"
-              >
-                <ArrowLeft size={18} />
-                السابق
-              </Button>
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={prevStep}
+                  disabled={formData.currentStep === 1 || state.saving}
+                  className="flex items-center gap-2 px-6 py-3"
+                >
+                  <ArrowLeft size={18} />
+                  السابق
+                </Button>
 
-              {/* Step Info & Next Button */}
-              <div className="flex items-center gap-4">
-                {/* Auto-save indicator */}
-                {state.saving && (
-                  <div className="flex items-center gap-2 text-[var(--accent-600)]">
-                    <Save size={16} className="animate-pulse" />
-                    <span className="text-sm">جاري الحفظ...</span>
-                  </div>
-                )}
-
-                {/* Validation status - يظهر فقط بعد التفاعل */}
-                {!state.canProceed && errors.length > 0 && formData.hasInteracted && (
-                  <div className="text-sm text-red-600 max-w-xs">
-                    {errors.length} خطأ يجب إصلاحه
-                  </div>
-                )}
-
-                {/* Next/Submit Button */}
                 <Button
                   onClick={handleNext}
                   disabled={(!state.canProceed && formData.hasInteracted) || state.saving || state.loading}
@@ -400,6 +382,21 @@ export default function OnboardingLayout({
                     </>
                   )}
                 </Button>
+              </div>
+
+              {/* حالة الحفظ والتحقق أسفل الأزرار لتكون قريبة من المستخدم */}
+              <div className="mt-3 flex items-center justify-center gap-4">
+                {state.saving && (
+                  <div className="flex items-center gap-2 text-[var(--accent-600)]">
+                    <Save size={16} className="animate-pulse" />
+                    <span className="text-sm">جاري الحفظ...</span>
+                  </div>
+                )}
+                {!state.canProceed && errors.length > 0 && formData.hasInteracted && (
+                  <div className="text-sm text-red-600">
+                    {errors.length} خطأ يجب إصلاحه
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -426,38 +423,7 @@ export default function OnboardingLayout({
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="bg-[var(--card)]/50 backdrop-blur-sm border-t border-[var(--border)] mt-12">
-          <div className="max-w-6xl mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Progress Summary */}
-              <div className="flex items-center gap-6 text-sm text-[var(--muted)]">
-                <div className="flex items-center gap-2">
-                  <CheckCircle size={16} className="text-green-500" />
-                  <span>{progress.completedSteps.length} خطوات مكتملة</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} />
-                  <span>~{progress.estimatedTimeRemaining} دقائق متبقية</span>
-                </div>
-                {progress.lastSavedAt && (
-                  <div className="flex items-center gap-2">
-                    <Save size={16} />
-                    <span>آخر حفظ: {new Date(progress.lastSavedAt).toLocaleTimeString('ar-IQ')}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Help & Support */}
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-[var(--muted)]">تحتاج مساعدة؟</span>
-                <Button variant="ghost" size="sm">
-                  تواصل معنا
-                </Button>
-              </div>
-            </div>
-          </div>
-        </footer>
+        {/* إزالة الفوتر الخاص بالأونبوردن حسب الطلب */}
       </div>
     </div>
   );
