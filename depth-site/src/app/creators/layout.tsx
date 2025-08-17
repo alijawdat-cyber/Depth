@@ -125,6 +125,7 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const isOnboardingRoute = pathname?.startsWith('/creators/onboarding');
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -139,7 +140,11 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
   useEffect(() => {
     if (status === 'loading') return;
     
+    // السماح بالوصول لصفحة الانضمام للمبدعين بدون تسجيل دخول
     if (!session) {
+      if (isOnboardingRoute) {
+        return;
+      }
       router.push('/auth/signin?from=' + encodeURIComponent(pathname));
       return;
     }
@@ -151,7 +156,7 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
 
     // تحميل بيانات المبدع
     loadCreatorData();
-  }, [session, status, router, pathname]);
+  }, [session, status, router, pathname, isOnboardingRoute]);
 
   const loadCreatorData = async () => {
     try {
@@ -234,6 +239,11 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-500)]" />
       </div>
     );
+  }
+
+  // في مسار الانضمام: اعرض المحتوى مباشرة بدون تخطيط المبدعين
+  if (isOnboardingRoute && !session) {
+    return <>{children}</>;
   }
 
   // التحقق من الجلسة
