@@ -1,20 +1,13 @@
 // مكوّن محسن لجدول التوفر الأسبوعي مع UI متطور
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Clock, 
   Calendar, 
   Settings, 
-  Coffee, 
-  Save, 
-  Loader2, 
-  Plus,
-  Trash2,
-  Copy,
   RotateCcw,
-  CheckCircle,
   AlertCircle
 } from 'lucide-react';
 import TimePicker from '@/components/ui/TimePicker';
@@ -26,8 +19,6 @@ interface EnhancedAvailabilityGridProps {
   onChange: (availability: WeeklyAvailability[]) => void;
   error?: string;
   disabled?: boolean;
-  autoSave?: boolean;
-  onSave?: (availability: WeeklyAvailability[]) => Promise<boolean>;
 }
 
 const DAYS_CONFIG = [
@@ -67,13 +58,8 @@ export default function EnhancedAvailabilityGrid({
   value,
   onChange,
   error,
-  disabled = false,
-  autoSave = false,
-  onSave
+  disabled = false
 }: EnhancedAvailabilityGridProps) {
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [showTemplates, setShowTemplates] = useState(false);
 
@@ -130,19 +116,7 @@ export default function EnhancedAvailabilityGrid({
     setShowTemplates(false);
   };
 
-  // نسخ أوقات يوم إلى أيام أخرى
-  const copyDayTimes = (fromDayId: string, toDayIds: string[]) => {
-    const sourceDay = getDayData(fromDayId);
-    if (!sourceDay.available) return;
 
-    toDayIds.forEach(dayId => {
-      updateDayData(dayId, {
-        available: true,
-        startTime: sourceDay.startTime,
-        endTime: sourceDay.endTime
-      });
-    });
-  };
 
   // حساب إجمالي ساعات العمل الأسبوعية
   const calculateTotalHours = (): number => {
@@ -247,12 +221,7 @@ export default function EnhancedAvailabilityGrid({
           مسح الكل
         </button>
 
-        {lastSaved && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm">
-            <CheckCircle size={14} />
-            آخر حفظ: {lastSaved.toLocaleTimeString('ar-IQ')}
-          </div>
-        )}
+
       </div>
 
       {/* قوالب سريعة */}
