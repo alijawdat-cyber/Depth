@@ -623,7 +623,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 5:
         if (!formData.availability.availability) errors.push('نوع التوفر مطلوب');
         if (formData.availability.weeklyHours <= 0) errors.push('عدد الساعات الأسبوعية مطلوب');
-        if (formData.availability.preferredWorkdays.length === 0) errors.push('يجب اختيار يوم واحد على الأقل للعمل');
+        
+        // التحقق من التوفر الأسبوعي أو الأيام المفضلة
+        const hasWeeklyAvailability = formData.availability.weeklyAvailability && 
+          formData.availability.weeklyAvailability.some(day => day.available);
+        const hasPreferredWorkdays = formData.availability.preferredWorkdays.length > 0;
+        
+        if (!hasWeeklyAvailability && !hasPreferredWorkdays) {
+          errors.push('يجب اختيار يوم واحد على الأقل للعمل');
+        }
         break;
     }
     

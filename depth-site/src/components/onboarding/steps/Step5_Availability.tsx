@@ -189,7 +189,16 @@ export default function Step5_Availability() {
         <div>
           <EnhancedAvailabilityGrid
             value={availability.weeklyAvailability || []}
-            onChange={(weeklyAvailability) => updateAvailability({ weeklyAvailability })}
+            onChange={(weeklyAvailability) => {
+              // تحديث البيانات الجديدة
+              updateAvailability({ weeklyAvailability });
+              
+              // تحديث الأيام المفضلة للتوافق مع النظام القديم
+              const preferredWorkdays = weeklyAvailability
+                .filter(day => day.available)
+                .map(day => day.day);
+              updateAvailability({ preferredWorkdays });
+            }}
             error={getFieldError('التوفر')}
             disabled={false}
           />
