@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // التحقق من وجود المستخدم مسبقاً
+    // التحقق من وجود المستخدم مسبقاً في Firebase Auth
     try {
       const existingUser = await adminAuth.getUserByEmail(email);
       if (existingUser) {
@@ -43,11 +43,26 @@ export async function POST(req: NextRequest) {
           { status: 409 }
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // إذا لم يجد المستخدم، هذا جيد (نريد إنشاء حساب جديد)
-      if (error.code !== 'auth/user-not-found') {
+      const authError = error as { code?: string };
+      if (authError.code !== 'auth/user-not-found') {
+        console.error('Error checking existing user:', error);
         throw error;
       }
+    }
+
+    // التحقق من وجود المستخدم في Firestore أيضاً
+    try {
+      const existingCreator = await adminDb.collection('creators').where('email', '==', email).limit(1).get();
+      if (!existingCreator.empty) {
+        return NextResponse.json(
+          { error: 'البريد الإلكتروني مستخدم مسبقاً' },
+          { status: 409 }
+        );
+      }
+    } catch (error) {
+      console.error('Error checking existing creator in Firestore:', error);
     }
 
     // تشفير كلمة المرور
@@ -105,13 +120,16 @@ export async function POST(req: NextRequest) {
 
     await adminDb.collection('creators').doc(userRecord.uid).set(creatorData);
 
+    console.log('Account and creator profile created successfully for:', email);
+    
     return NextResponse.json({
       success: true,
       message: 'تم إنشاء الحساب بنجاح',
       data: {
         uid: userRecord.uid,
         email,
-        fullName
+        fullName,
+        status: 'onboarding_started'
       }
     });
 

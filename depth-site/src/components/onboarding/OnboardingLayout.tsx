@@ -164,7 +164,7 @@ export default function OnboardingLayout({
               <div className="hidden md:block">
                 <div className="flex items-center justify-between mb-4">
                   {STEPS_CONFIG.map((step) => {
-                    const isCompleted = progress.completedSteps.includes(step.id as any);
+                    const isCompleted = progress.completedSteps.includes(step.id as 1 | 2 | 3 | 4 | 5);
                     const isCurrent = formData.currentStep === step.id;
                     const isAccessible = step.id <= formData.currentStep || isCompleted;
                     
@@ -177,7 +177,7 @@ export default function OnboardingLayout({
                         className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${
                           isAccessible ? 'hover:scale-105 active:scale-95' : 'opacity-50 cursor-not-allowed'
                         }`}
-                        onClick={() => isAccessible && formData.currentStep !== step.id && goToStep(step.id as any)}
+                        onClick={() => isAccessible && formData.currentStep !== step.id && goToStep(step.id as 1 | 2 | 3 | 4 | 5)}
                       >
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
                           isCompleted 
@@ -287,6 +287,18 @@ export default function OnboardingLayout({
             )}
           </AnimatePresence>
 
+          {/* Debug Info (في بيئة التطوير فقط) */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-4 p-3 bg-gray-100 rounded-lg text-xs font-mono">
+              <div>Step: {formData.currentStep}</div>
+              <div>Can Proceed: {state.canProceed ? 'Yes' : 'No'}</div>
+              <div>Has Interacted: {formData.hasInteracted ? 'Yes' : 'No'}</div>
+              <div>Loading: {state.loading ? 'Yes' : 'No'}</div>
+              <div>Show Validation: {state.showValidation ? 'Yes' : 'No'}</div>
+              <div>Errors: {errors.length}</div>
+            </div>
+          )}
+
           {/* Step Content */}
           <motion.div
             key={formData.currentStep}
@@ -367,7 +379,7 @@ export default function OnboardingLayout({
                 {/* Next/Submit Button */}
                 <Button
                   onClick={handleNext}
-                  disabled={!state.canProceed || state.saving || state.loading}
+                  disabled={(!state.canProceed && formData.hasInteracted) || state.saving || state.loading}
                   className="flex items-center gap-2 px-8 py-3 min-w-[140px]"
                   variant={formData.currentStep === 5 ? "primary" : "secondary"}
                 >
@@ -461,7 +473,7 @@ export function StepHeader({
 }: {
   title: string;
   subtitle: string;
-  icon: any;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   step: number;
   totalSteps: number;
 }) {

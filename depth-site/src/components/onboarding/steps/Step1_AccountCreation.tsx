@@ -58,6 +58,7 @@ export default function Step1_AccountCreation() {
           type="tel"
           value={account.phone}
           onChange={(value) => updateAccountData({ phone: value })}
+          onBlur={() => markFieldTouched('الهاتف')}
           placeholder="+964 770 123 4567"
           icon={<Phone size={18} />}
           required
@@ -73,6 +74,7 @@ export default function Step1_AccountCreation() {
               type="password"
               value={account.password}
               onChange={(value) => updateAccountData({ password: value })}
+              onBlur={() => markFieldTouched('كلمة المرور')}
               placeholder="كلمة مرور قوية"
               icon={<Lock size={18} />}
               showPasswordToggle
@@ -88,6 +90,7 @@ export default function Step1_AccountCreation() {
               type="password"
               value={account.confirmPassword}
               onChange={(value) => updateAccountData({ confirmPassword: value })}
+              onBlur={() => markFieldTouched('متطابقة')}
               placeholder="إعادة كتابة كلمة المرور"
               icon={<Lock size={18} />}
               showPasswordToggle
@@ -102,7 +105,10 @@ export default function Step1_AccountCreation() {
         <CheckboxField
           label="أوافق على شروط الخدمة وسياسة الخصوصية"
           value={account.agreeToTerms}
-          onChange={(checked) => updateAccountData({ agreeToTerms: checked })}
+          onChange={(checked) => {
+            updateAccountData({ agreeToTerms: checked });
+            markFieldTouched('الشروط');
+          }}
           required
           error={getFieldError('الشروط')}
           description={

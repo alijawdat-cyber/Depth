@@ -286,7 +286,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // حفظ التقدم تلقائياً
   const saveProgress = useCallback(async (): Promise<boolean> => {
-    // للمستخدمين الجدد، لا نحفظ التقدم حتى يتم إنشاء الحساب
+    // للمستخدمين الجدد في الخطوة الأولى، لا نحفظ التقدم حتى يتم إنشاء الحساب
+    if (formData.currentStep === 1 && !session?.user?.email) {
+      return true; // لا نحفظ في الخطوة الأولى للمستخدمين الجدد
+    }
+    
     if (!session?.user?.email || !uiState.autoSaveEnabled) return true;
     
     dispatch({ type: 'SET_SAVING', payload: true });
@@ -303,6 +307,19 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       });
       
       if (response.ok) {
+        const result = await response.json();
+        if (result.data?.lastSavedAt) {
+          // تحديث lastSavedAt في metadata
+          dispatch({ 
+            type: 'LOAD_SAVED_DATA', 
+            payload: { 
+              metadata: { 
+                ...formData.metadata, 
+                lastSavedAt: result.data.lastSavedAt 
+              } 
+            } 
+          });
+        }
         dispatch({ type: 'SET_ERROR', payload: null });
         return true;
       } else {
@@ -343,12 +360,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 3: // Experience
         return !!(
           formData.experience.experienceLevel &&
-          formData.experience.experienceYears &&
-          (formData.experience.skills?.length > 0 || (formData.experience.specializations?.length || 0) > 0)
+          formData.experience.experienceYears
+          // المهارات اختيارية - لا نتطلبها للانتقال
         );
       
       case 4: // Portfolio
-        return formData.portfolio.workSamples.length >= 2;
+        return true; // خطوة اختيارية بالكامل
       
       case 5: // Availability
         return !!(
@@ -365,10 +382,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {
+    console.log(`[nextStep] Starting step transition from ${formData.currentStep}`);
+    console.log(`[nextStep] Current session:`, session?.user ? 'logged in' : 'not logged in');
+    console.log(`[nextStep] Form data validation:`, validateCurrentStep());
+    
     // تفعيل عرض الأخطاء عند محاولة الانتقال
     dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
     
     if (!validateCurrentStep()) {
+      console.log(`[nextStep] Validation failed for step ${formData.currentStep}`);
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
       return false;
     }
@@ -395,11 +417,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         console.log('Account created successfully:', result);
         
         // انتظار قصير للتأكد من حفظ البيانات
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // تسجيل دخول تلقائي مع retry
+        // تسجيل دخول تلقائي مع retry محسن
         let signInResult;
-        for (let attempt = 1; attempt <= 3; attempt++) {
+        let lastError = '';
+        
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          console.log(`Attempting sign in - attempt ${attempt}`);
+          
           signInResult = await signIn('credentials', {
             email: formData.account.email,
             password: formData.account.password,
@@ -408,37 +434,47 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           
           if (signInResult?.ok) {
             console.log(`Sign in successful on attempt ${attempt}`);
-            break;
+            
+            // انتظار إضافي للتأكد من تحديث الجلسة
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // تسجيل إكمال الخطوة الأولى
+            dispatch({ type: 'COMPLETE_STEP', payload: 1 });
+            
+            // الانتقال للخطوة التالية
+            dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+            dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+            dispatch({ type: 'SET_SUCCESS', payload: false }); // إعادة تعيين success
+            dispatch({ type: 'SET_LOADING', payload: false });
+            
+            return true;
           }
           
-          if (attempt < 3) {
-            console.log(`Sign in attempt ${attempt} failed, retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+          lastError = signInResult?.error || 'فشل في تسجيل الدخول';
+          
+          if (attempt < 5) {
+            console.log(`Sign in attempt ${attempt} failed: ${lastError}, retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 2000 * attempt)); // تأخير متزايد
           }
         }
         
-        if (signInResult?.error) {
-          console.error('Sign in error after retries:', signInResult.error);
-          throw new Error(`فشل تسجيل الدخول: ${signInResult.error}`);
-        }
-        
-        if (!signInResult?.ok) {
-          throw new Error('تم إنشاء الحساب لكن فشل تسجيل الدخول - يرجى تسجيل الدخول يدوياً');
-        }
+        // إذا فشل تسجيل الدخول بعد كل المحاولات
+        console.error('Sign in failed after all retries:', lastError);
+        throw new Error(`تم إنشاء الحساب بنجاح، لكن فشل تسجيل الدخول التلقائي. يرجى تسجيل الدخول يدوياً.`);
         
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'حدث خطأ في إنشاء الحساب';
         dispatch({ type: 'SET_ERROR', payload: errorMessage });
         dispatch({ type: 'SET_LOADING', payload: false });
         return false;
-      } finally {
-        dispatch({ type: 'SET_LOADING', payload: false });
       }
     }
     
-    // حفظ التقدم قبل الانتقال
-    const saved = await saveProgress();
-    if (!saved) return false;
+    // للخطوات الأخرى: حفظ التقدم قبل الانتقال
+    if (formData.currentStep > 1) {
+      const saved = await saveProgress();
+      if (!saved) return false;
+    }
     
     // تسجيل إكمال الخطوة
     dispatch({ type: 'COMPLETE_STEP', payload: formData.currentStep });
@@ -618,7 +654,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const canProceed = validateCurrentStep();
     dispatch({ type: 'SET_CAN_PROCEED', payload: canProceed });
-  }, [validateCurrentStep]);
+  }, [formData.account, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, formData.currentStep, validateCurrentStep]);
 
   // دالة لتحديد إذا كان الحقل تم لمسه
   const markFieldTouched = useCallback((field: string) => {
