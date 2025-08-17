@@ -63,6 +63,11 @@ export interface AuditLogEntry {
     reason?: string;
     oldValue?: unknown;
     newValue?: unknown;
+    syncResult?: {
+      success: boolean;
+      operationalVersionId?: string;
+      error?: string;
+    };
   };
   metadata?: Record<string, unknown>;
 }

@@ -9,6 +9,7 @@ import {
   GovernanceStats,
   AuditLogEntry
 } from '@/types/governance';
+import { syncGovernanceToOperational } from '@/lib/governance/sync';
 
 // Validation schemas
 const VersionListSchema = z.object({
@@ -261,6 +262,16 @@ export async function PUT(request: NextRequest) {
 
     await versionDoc.ref.update(updateData);
 
+    // إذا كان التفعيل، قم بمزامنة النظام التشغيلي
+    let syncResult = null;
+    if (validatedData.status === 'active') {
+      syncResult = await syncGovernanceToOperational(validatedData.id);
+      if (!syncResult.success) {
+        console.warn('[governance/versions] Sync to operational failed:', syncResult.error);
+        // لا نفشل العملية بسبب فشل المزامنة، لكن نسجلها
+      }
+    }
+
     // Log audit entry
     await createAuditLog({
       action: 'version_publish',
@@ -272,14 +283,22 @@ export async function PUT(request: NextRequest) {
         versionId: versionData.versionId,
         oldValue: versionData.status,
         newValue: validatedData.status,
-        reason: validatedData.reason
+        reason: validatedData.reason,
+        ...(syncResult && {
+          syncResult: {
+            success: syncResult.success,
+            operationalVersionId: syncResult.operationalVersionId,
+            error: syncResult.error
+          }
+        })
       }
     });
 
     return NextResponse.json({
       ...versionData,
       ...updateData,
-      id: validatedData.id
+      id: validatedData.id,
+      syncResult
     });
 
   } catch (error) {

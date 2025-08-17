@@ -151,10 +151,15 @@ export default function CompleteCreatorIntakePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get('welcome') === 'true';
-  const [currentStep, setCurrentStep] = useState(1);
+  const startStep = searchParams.get('step') === 'professional' ? 2 : 1; // البدء من المهارات إذا جاء من النموذج البسيط
+  const [currentStep, setCurrentStep] = useState(startStep);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  
+  // حالة البيانات الأساسية المحملة مسبقاً
+  const [basicDataLoaded, setBasicDataLoaded] = useState(false);
+  const [hasBasicData, setHasBasicData] = useState(false);
   
   // بيانات الكتالوج من قاعدة البيانات
   const [subcategories, setSubcategories] = useState<SubcategoryItem[]>([]);
@@ -304,7 +309,67 @@ export default function CompleteCreatorIntakePage() {
     // تحميل بيانات الكتالوج وبيانات المستخدم
     loadCatalogData();
     loadExistingData();
-  }, [session, status, router, loadExistingData, loadCatalogData]);
+    
+    // تحميل البيانات الأساسية إذا كان قادماً من النموذج البسيط
+    if (startStep === 2) {
+      loadBasicDataAndPrefill();
+    }
+  }, [session, status, router, loadExistingData, loadCatalogData, startStep]);
+
+  // تحميل البيانات الأساسية وملء النموذج المتقدم
+  const loadBasicDataAndPrefill = async () => {
+    try {
+      setBasicDataLoaded(false);
+      const response = await fetch('/api/creators/intake-basic', {
+        headers: {
+          'Authorization': `Bearer ${await (session?.user as { getIdToken?: () => Promise<string> })?.getIdToken?.()}`
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.exists && result.data) {
+          setHasBasicData(true);
+          
+          // ملء البيانات الأساسية في النموذج المتقدم
+          setFormData(prev => ({
+            ...prev,
+            personalInfo: {
+              ...prev.personalInfo,
+              fullName: session?.user?.name || '',
+              role: result.data.role,
+              city: result.data.city,
+              canTravel: result.data.canTravel,
+              contact: {
+                ...prev.personalInfo.contact,
+                email: session?.user?.email || '',
+                whatsapp: result.data.contact?.whatsapp || '',
+                instagram: result.data.contact?.instagram || ''
+              }
+            },
+            portfolio: {
+              ...prev.portfolio,
+              portfolioLinks: result.data.portfolioUrl ? [result.data.portfolioUrl] : [],
+              samples: result.data.workSamples?.map((url: string, index: number) => ({
+                url,
+                description: `عينة عمل ${index + 1}`,
+                category: result.data.primaryCategories?.[0] || 'general'
+              })) || []
+            }
+          }));
+          
+          setError(null);
+          setSuccess(true);
+          setTimeout(() => setSuccess(false), 3000);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading basic data:', error);
+      setError('فشل في تحميل البيانات الأساسية');
+    } finally {
+      setBasicDataLoaded(true);
+    }
+  };
 
   const nextStep = () => {
     if (currentStep < STEPS.length) {

@@ -197,6 +197,29 @@
         { "fieldPath": "targetRole", "order": "ASCENDING" },
         { "fieldPath": "nameAr", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "governance_versions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "governance_versions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "versionId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "pricing_rate_card",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

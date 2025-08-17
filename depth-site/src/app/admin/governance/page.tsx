@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import Loader from "@/components/loaders/Loader";
+import { useSession } from "next-auth/react";
 import { 
   GitBranch, 
   Calendar, 
@@ -22,6 +23,7 @@ import {
   VersionDiff,
   AuditLogEntry 
 } from "@/types/governance";
+import CreateVersionModal from "@/components/governance/CreateVersionModal";
 
 interface GovernancePageState {
   versions: RateCardVersion[];
@@ -35,6 +37,7 @@ interface GovernancePageState {
 }
 
 export default function GovernancePage() {
+  const { data: session, status } = useSession();
   const [state, setState] = useState<GovernancePageState>({
     versions: [],
     stats: null,
@@ -45,6 +48,9 @@ export default function GovernancePage() {
     error: null,
     showCreateForm: false
   });
+
+  const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
+  const isAdmin = userRole === 'admin';
 
   // Load data on mount
   useEffect(() => {
@@ -59,10 +65,13 @@ export default function GovernancePage() {
       const versionsResponse = await fetch('/api/governance/versions');
       if (!versionsResponse.ok) {
         if (versionsResponse.status === 401) {
-          throw new Error('غير مصرح لك بالوصول إلى صفحة الحوكمة');
+          throw new Error('صلاحيات غير كافية للوصول إلى صفحة الحوكمة');
+        } else if (versionsResponse.status === 500) {
+          const errorData = await versionsResponse.json().catch(() => ({}));
+          throw new Error(`خطأ في الخادم: ${errorData.error || 'مشكلة تقنية'}`);
         }
         const errorData = await versionsResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || 'فشل في تحميل الإصدارات');
+        throw new Error(errorData.error || `خطأ HTTP ${versionsResponse.status}`);
       }
       const versionsData = await versionsResponse.json();
 
@@ -185,6 +194,42 @@ export default function GovernancePage() {
       default: return <AlertCircle size={16} />;
     }
   };
+
+  // تحقق من حالة تسجيل الدخول والصلاحيات
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader />
+          <p className="mt-4 text-[var(--muted)]">جاري التحقق من الصلاحيات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status !== 'authenticated') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-[var(--text)] mb-2">تسجيل الدخول مطلوب</h2>
+          <p className="text-[var(--muted)]">يجب تسجيل الدخول للوصول إلى صفحة الحوكمة</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-[var(--text)] mb-2">غير مسموح</h2>
+          <p className="text-[var(--muted)]">هذه الصفحة مخصصة للإدمن فقط</p>
+        </div>
+      </div>
+    );
+  }
 
   if (state.loading && state.versions.length === 0) {
     return (
@@ -436,6 +481,13 @@ export default function GovernancePage() {
           </div>
         )}
       </div>
+
+      {/* Create Version Modal */}
+      <CreateVersionModal
+        isOpen={state.showCreateForm}
+        onClose={() => setState(prev => ({ ...prev, showCreateForm: false }))}
+        onSuccess={loadData}
+      />
     </div>
   );
 }

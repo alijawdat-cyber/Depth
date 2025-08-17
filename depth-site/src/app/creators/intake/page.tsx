@@ -1,54 +1,50 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import Dropdown from '@/components/ui/Dropdown';
-import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { 
-  Settings, 
-  CheckCircle,
-  ArrowLeft,
-  ArrowRight,
+import Dropdown from '@/components/ui/Dropdown';
+import PageLayout from '@/components/layout/PageLayout';
+import Loader from '@/components/loaders/Loader';
+import {
   User,
-  Briefcase,
   Award,
   FileText,
+  CheckCircle,
   AlertCircle
 } from 'lucide-react';
 
-import { CreatorEquipmentItem, EquipmentCatalogItem, EquipmentPresetKit, WeeklyAvailability } from '@/types/creators';
-
-interface IntakeFormData {
-  // معلومات إضافية
-  bio: string;
-  experience: string;
-  equipment: CreatorEquipmentItem[]; // محدث: مرتبط بالكتالوج
-  skills: string[];
-  portfolio: string;
+// النموذج البسيط - الأساسيات فقط للتسجيل الأولي
+interface BasicIntakeFormData {
+  // المعلومات الأساسية فقط
+  role: 'photographer' | 'videographer' | 'designer' | 'producer';
+  primaryCategories: ('photo' | 'video' | 'design')[]; // الفئات الرئيسية
+  city: string;
+  canTravel: boolean;
   
-  // التوفر - محدث ليتطابق مع WeeklyAvailability
-  availability: string;
-  weeklyAvailability: WeeklyAvailability[];
-  workingHours: string; // مؤقت حتى يتم الانتقال لـ WeeklyAvailability
+  // خبرة أساسية
+  experienceLevel: 'beginner' | 'intermediate' | 'professional';
+  experienceYears: string; // '0-1', '2-3', '4-7', '8+'
   
-  // معلومات إضافية
-  languages: string[];
-  specializations: string[];
+  // معرض أعمال بسيط
+  portfolioUrl?: string;
+  workSamples: string[]; // روابط مباشرة لعينات العمل (3-5 عينات)
   
-  // حقول إضافية (مؤقتة للتوافق مع الكود الحالي)
-  hourlyRate?: number;
-  dayRate?: number;
+  // التوفر الأساسي
+  availability: 'full-time' | 'part-time' | 'weekends' | 'flexible';
+  
+  // معلومات التواصل المحدثة (اختيارية)
+  whatsapp?: string;
+  instagram?: string;
 }
 
-const STEPS = [
-  { id: 1, title: 'المعلومات الشخصية', icon: User },
-  { id: 2, title: 'الخبرة والمهارات', icon: Award },
-  { id: 3, title: 'المعدات والأدوات', icon: Settings },
-  { id: 4, title: 'التوفر والتخصص', icon: Briefcase },
-  { id: 5, title: 'المراجعة والإرسال', icon: CheckCircle }
+// خطوات مبسطة للتسجيل الأولي
+const SIMPLE_STEPS = [
+  { id: 1, title: 'المعلومات الأساسية', icon: User },
+  { id: 2, title: 'التخصص والخبرة', icon: Award },
+  { id: 3, title: 'معرض الأعمال', icon: FileText },
+  { id: 4, title: 'التوفر والإرسال', icon: CheckCircle }
 ];
 
 export default function CreatorIntakePage() {
@@ -57,34 +53,27 @@ export default function CreatorIntakePage() {
   const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<IntakeFormData>({
-    bio: '',
-    experience: '',
-    equipment: [],
-    skills: [],
-    portfolio: '',
-    availability: '',
-    weeklyAvailability: [
-      { day: 'sunday', available: false },
-      { day: 'monday', available: false },
-      { day: 'tuesday', available: false },
-      { day: 'wednesday', available: false },
-      { day: 'thursday', available: false },
-      { day: 'friday', available: false },
-      { day: 'saturday', available: false }
-    ],
-    workingHours: '',
-    languages: ['العربية'],
-    specializations: []
+  const [formData, setFormData] = useState<BasicIntakeFormData>({
+    role: (session?.user?.role as BasicIntakeFormData['role']) || 'photographer',
+    primaryCategories: [],
+    city: '',
+    canTravel: false,
+    experienceLevel: 'beginner',
+    experienceYears: '0-1',
+    portfolioUrl: '',
+    workSamples: [],
+    availability: 'flexible',
+    whatsapp: '',
+    instagram: ''
   });
 
   const isWelcome = searchParams?.get('welcome') === 'true';
 
   useEffect(() => {
     if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/auth/signin?from=creators');
+
+    if (!session?.user) {
+      router.push('/auth/signin');
       return;
     }
 
@@ -95,7 +84,7 @@ export default function CreatorIntakePage() {
   }, [session, status, router]);
 
   const nextStep = () => {
-    if (currentStep < STEPS.length) {
+    if (currentStep < SIMPLE_STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -109,224 +98,154 @@ export default function CreatorIntakePage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/creators/intake', {
+      const token = await (session?.user as { getIdToken?: () => Promise<string> })?.getIdToken?.();
+      const response = await fetch('/api/creators/intake-basic', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       });
 
       if (response.ok) {
-        router.push('/creators?intake=completed');
+        // توجيه للنموذج المتقدم لاستكمال التفاصيل
+        router.push('/creators/intake-complete?step=professional');
       } else {
         throw new Error('فشل في إرسال النموذج');
       }
     } catch (error) {
-      console.error('Intake submission error:', error);
+      console.error('Basic intake submission error:', error);
       alert('حدث خطأ أثناء إرسال النموذج. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
   };
 
-  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[] | CreatorEquipmentItem[] | WeeklyAvailability[]) => {
+  const updateFormData = (field: keyof BasicIntakeFormData, value: BasicIntakeFormData[keyof BasicIntakeFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addToArray = (field: keyof IntakeFormData, value: string) => {
-    const currentArray = formData[field] as string[];
-    if (!currentArray.includes(value) && value.trim()) {
-      updateFormData(field, [...currentArray, value.trim()]);
+  const addWorkSample = (url: string) => {
+    if (url.trim() && !formData.workSamples.includes(url.trim()) && formData.workSamples.length < 5) {
+      updateFormData('workSamples', [...formData.workSamples, url.trim()]);
     }
   };
 
-  const removeFromArray = (field: keyof IntakeFormData, value: string) => {
-    const currentArray = formData[field] as string[];
-    updateFormData(field, currentArray.filter(item => item !== value));
+  const removeWorkSample = (url: string) => {
+    updateFormData('workSamples', formData.workSamples.filter(item => item !== url));
   };
 
-  // وظائف إدارة المعدات الجديدة
-  const addEquipmentItem = (catalogId: string) => {
-    const catalogItem = equipmentCatalog.find(item => item.id === catalogId);
-    if (!catalogItem) return;
+  const handleCategoryChange = (categoryId: 'photo' | 'video' | 'design', checked: boolean) => {
+    const newCategories = checked 
+      ? [...formData.primaryCategories, categoryId]
+      : formData.primaryCategories.filter(id => id !== categoryId);
+    updateFormData('primaryCategories', newCategories);
+  };
 
-    // تحقق من عدم الإضافة المكررة
-    const exists = formData.equipment.find(item => item.catalogId === catalogId);
-    if (exists) return;
-
-    const newItem: CreatorEquipmentItem = {
-      catalogId,
-      owned: true,
-      condition: 'excellent',
-      quantity: 1,
-      notes: ''
+  // دالة مساعدة لأسماء الفئات
+  const getCategoryName = (categoryId: string) => {
+    const names = {
+      photo: 'التصوير الفوتوغرافي',
+      video: 'إنتاج الفيديو',
+      design: 'التصميم الجرافيكي'
     };
-
-    updateFormData('equipment', [...formData.equipment, newItem]);
+    return names[categoryId as keyof typeof names] || categoryId;
   };
 
-  const removeEquipmentItem = (catalogId: string) => {
-    updateFormData('equipment', formData.equipment.filter(item => item.catalogId !== catalogId));
-  };
-
-  const updateEquipmentItem = (catalogId: string, updates: Partial<CreatorEquipmentItem>) => {
-    const updatedEquipment = formData.equipment.map(item =>
-      item.catalogId === catalogId ? { ...item, ...updates } : item
-    );
-    updateFormData('equipment', updatedEquipment);
-  };
-
-  const loadPresetKit = (presetId: string) => {
-    const preset = equipmentPresets.find(p => p.id === presetId);
-    if (!preset) return;
-
-    const newItems: CreatorEquipmentItem[] = preset.items
-      .filter(catalogId => !formData.equipment.find(item => item.catalogId === catalogId))
-      .map(catalogId => ({
-        catalogId,
-        owned: true,
-        condition: 'excellent' as const,
-        quantity: 1,
-        notes: `من ${preset.nameAr}`
-      }));
-
-    updateFormData('equipment', [...formData.equipment, ...newItems]);
-  };
-
-  // تصفية المعدات حسب الفئة
-  const getFilteredEquipment = () => {
-    if (!selectedCategory) return equipmentCatalog;
-    return equipmentCatalog.filter(item => item.category === selectedCategory);
-  };
-
-  // التحقق من متطلبات المعدات
-  const checkEquipmentRequirements = () => {
-    // الحصول على دور المبدع (من session أو تخمين)
-    const creatorRole = session?.user.role || 'photographer'; // افتراضي
-    
-    // متطلبات أساسية
-    const requirements = {
-      photographer: {
-        camera: 1,
-        lens: 1
-      },
-      videographer: {
-        camera: 1,
-        audio: 1
-      },
-      designer: {},
-      producer: {}
-    };
-
-    const currentCounts = formData.equipment.reduce((counts, item) => {
-      const catalogItem = equipmentCatalog.find(eq => eq.id === item.catalogId);
-      if (catalogItem) {
-        counts[catalogItem.category] = (counts[catalogItem.category] || 0) + item.quantity;
-      }
-      return counts;
-    }, {} as Record<string, number>);
-
-    const roleRequirements = requirements[creatorRole as keyof typeof requirements] || {};
-    const missingRequirements: string[] = [];
-
-    Object.entries(roleRequirements).forEach(([category, required]) => {
-      const current = currentCounts[category] || 0;
-      const requiredCount = typeof required === 'number' ? required : 0;
-      if (current < requiredCount) {
-        missingRequirements.push(`${category}: ${requiredCount - current} مطلوب`);
-      }
-    });
-
-    return missingRequirements;
-  };
-
-  // مصادر اختيار ثابتة محسّنة (سيتم استخدامها لاحقاً)
-  // const LANGUAGE_OPTIONS = ['ar', 'en', 'fr', 'tr', 'ku'];
-
-  // جلب فئات فرعية (skills) + معدات (equipment) من الكتالوج الحقيقي
-  const [skillsOptions, setSkillsOptions] = useState<Array<{ id: string; nameAr: string }>>([]);
-  const [equipmentCatalog, setEquipmentCatalog] = useState<EquipmentCatalogItem[]>([]);
-  const [equipmentPresets, setEquipmentPresets] = useState<EquipmentPresetKit[]>([]);
-  // Loading states
-  const [equipmentLoading, setEquipmentLoading] = useState(false);
-  const [dataError, setDataError] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
-    setEquipmentLoading(true);
-    setDataError('');
-    
-    try {
-      const [subsRes, eqRes] = await Promise.all([
-        fetch('/api/catalog/subcategories?includeDefaults=true'),
-        fetch('/api/catalog/equipment?includePresets=true&limit=100'),
-      ]);
-      
-      if (subsRes.ok) {
-        const data = await subsRes.json();
-        setSkillsOptions((data.items || []).map((i: { id: string; nameAr: string }) => ({ id: i.id, nameAr: i.nameAr })));
-      } else {
-        console.warn('Failed to load skills options:', subsRes.status);
-      }
-      
-      if (eqRes.ok) {
-        const data = await eqRes.json();
-        setEquipmentCatalog(data.items || []);
-        setEquipmentPresets(data.presets || []);
-        
-        // التحقق من وجود البيانات
-        if (!data.items || data.items.length === 0) {
-          setDataError('لا توجد معدات في الكتالوج. يرجى تحميل البيانات الأولية أولاً.');
-        }
-      } else {
-        setDataError(`فشل في تحميل كتالوج المعدات: ${eqRes.status}`);
-        console.error('Equipment API error:', eqRes.status, await eqRes.text());
-      }
-    } catch (error) {
-      console.error('Failed to load initial data:', error);
-      setDataError('خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.');
-    } finally {
-      setEquipmentLoading(false);
+  // التحقق من صحة البيانات حسب الخطوة
+  const validateStep = (stepId: number): boolean => {
+    switch (stepId) {
+      case 1:
+        return !!formData.role && !!formData.city.trim() && formData.primaryCategories.length > 0;
+      case 2:
+        return !!formData.experienceLevel && !!formData.experienceYears;
+      case 3:
+        return formData.workSamples.length >= 2; // على الأقل عينتان من العمل
+      case 4:
+        return !!formData.availability;
+      default:
+        return true;
     }
   };
 
-  // إزالة التكرار غير المقصود أعلاه
+  // دالة لإضافة عينة عمل جديدة
+  const [newSampleUrl, setNewSampleUrl] = useState('');
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">المعلومات الشخصية</h2>
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">المعلومات الأساسية</h2>
             
+            {/* دور المبدع */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                نبذة عنك *
+                دورك الأساسي *
               </label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => updateFormData('bio', e.target.value)}
+              <Dropdown
+                value={formData.role}
+                onChange={(v: string) => updateFormData('role', v as BasicIntakeFormData['role'])}
+                options={[
+                  { value: 'photographer', label: 'مصور فوتوغرافي' },
+                  { value: 'videographer', label: 'مصور فيديو' },
+                  { value: 'designer', label: 'مصمم جرافيكي' },
+                  { value: 'producer', label: 'منتج محتوى' }
+                ]}
+                placeholder="اختر دورك"
+              />
+            </div>
+
+            {/* الفئات الرئيسية */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                مجالات عملك الرئيسية * (يمكن اختيار أكثر من مجال)
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {(['photo', 'video', 'design'] as const).map(categoryId => (
+                  <label key={categoryId} className="flex items-center gap-3 p-3 border border-[var(--border)] rounded-lg hover:bg-[var(--bg-alt)] cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.primaryCategories.includes(categoryId)}
+                      onChange={(e) => handleCategoryChange(categoryId, e.target.checked)}
+                      className="w-4 h-4 text-[var(--accent-500)] rounded"
+                    />
+                    <span className="text-[var(--text)]">{getCategoryName(categoryId)}</span>
+                  </label>
+                ))}
+              </div>
+              {formData.primaryCategories.length === 0 && (
+                <p className="text-sm text-[var(--error-fg)] mt-1">يجب اختيار مجال واحد على الأقل</p>
+              )}
+            </div>
+
+            {/* الموقع */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                المدينة *
+              </label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => updateFormData('city', e.target.value)}
                 className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                rows={4}
-                placeholder="اكتب نبذة مختصرة عن نفسك وخبرتك في مجال عملك..."
+                placeholder="مثال: بغداد"
                 required
               />
             </div>
 
+            {/* السفر */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                رابط معرض الأعمال (Portfolio)
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.canTravel}
+                  onChange={(e) => updateFormData('canTravel', e.target.checked)}
+                  className="w-4 h-4 text-[var(--accent-500)] rounded"
+                />
+                <span className="text-[var(--text)]">أستطيع السفر لمواقع التصوير</span>
               </label>
-              <input
-                type="url"
-                value={formData.portfolio}
-                onChange={(e) => updateFormData('portfolio', e.target.value)}
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="https://behance.net/yourusername"
-              />
             </div>
           </div>
         );
@@ -334,44 +253,69 @@ export default function CreatorIntakePage() {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">الخبرة والمهارات</h2>
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">التخصص والخبرة</h2>
             
+            {/* مستوى الخبرة */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                سنوات الخبرة *
+                مستوى خبرتك *
               </label>
               <Dropdown
-                value={formData.experience || ''}
-                onChange={(v) => updateFormData('experience', String(v))}
+                value={formData.experienceLevel}
+                onChange={(v: string) => updateFormData('experienceLevel', v as BasicIntakeFormData['experienceLevel'])}
                 options={[
-                  { value: 'less-than-1', label: 'أقل من سنة' },
-                  { value: '1-2', label: '1-2 سنة' },
-                  { value: '3-5', label: '3-5 سنوات' },
-                  { value: '6-10', label: '6-10 سنوات' },
-                  { value: 'more-than-10', label: 'أكثر من 10 سنوات' },
+                  { value: 'beginner', label: 'مبتدئ - بدأت حديثاً' },
+                  { value: 'intermediate', label: 'متوسط - لدي خبرة جيدة' },
+                  { value: 'professional', label: 'محترف - خبرة واسعة' }
                 ]}
-                placeholder="اختر سنوات الخبرة"
+                placeholder="اختر مستوى خبرتك"
               />
             </div>
 
+            {/* سنوات الخبرة */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">المهارات الأساسية (من الكتالوج)</label>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                عدد سنوات الخبرة *
+              </label>
               <Dropdown
-                value={''}
-                onChange={(id) => {
-                  const name = skillsOptions.find((s) => s.id === id)?.nameAr || String(id);
-                  if (id) addToArray('skills', name);
-                }}
-                options={skillsOptions.map((s) => ({ value: s.id, label: s.nameAr }))}
-                placeholder="اختر مهارة من الفئات الفرعية"
+                value={formData.experienceYears}
+                onChange={(v: string) => updateFormData('experienceYears', v)}
+                options={[
+                  { value: '0-1', label: 'أقل من سنتين' },
+                  { value: '2-3', label: '2-3 سنوات' },
+                  { value: '4-7', label: '4-7 سنوات' },
+                  { value: '8+', label: '8 سنوات أو أكثر' }
+                ]}
+                placeholder="اختر عدد سنوات الخبرة"
               />
-              <div className="flex flex-wrap gap-2 mt-3">
-                {formData.skills.map((skill, index) => (
-                  <span key={index} className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    {skill}
-                    <button type="button" onClick={() => removeFromArray('skills', skill)} className="text-red-500 hover:text-red-700">×</button>
-                  </span>
-                ))}
+            </div>
+
+            {/* معلومات التواصل الإضافية */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  رقم الواتساب (اختياري)
+                </label>
+                <input
+                  type="tel"
+                  value={formData.whatsapp || ''}
+                  onChange={(e) => updateFormData('whatsapp', e.target.value)}
+                  className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
+                  placeholder="مثال: +964 770 123 4567"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                  حساب الإنستقرام (اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={formData.instagram || ''}
+                  onChange={(e) => updateFormData('instagram', e.target.value)}
+                  className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
+                  placeholder="مثال: @yourusername"
+                />
               </div>
             </div>
           </div>
@@ -380,348 +324,155 @@ export default function CreatorIntakePage() {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">المعدات والأدوات</h2>
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">معرض الأعمال</h2>
             
-            {/* المجموعات الجاهزة */}
-            {equipmentPresets.length > 0 && (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
-                <h3 className="font-semibold text-[var(--text)] mb-3">مجموعات جاهزة لدورك</h3>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {equipmentPresets
-                    .filter(preset => !session?.user.role || preset.targetRole === session.user.role)
-                    .map(preset => (
-                      <button
-                        key={preset.id}
-                        onClick={() => loadPresetKit(preset.id)}
-                        className="p-3 text-left border border-[var(--border)] rounded-lg hover:bg-[var(--accent-50)] transition-colors"
-                      >
-                        <div className="font-medium text-[var(--text)]">{preset.nameAr}</div>
-                        <div className="text-sm text-[var(--muted)] mt-1">
-                          {preset.capabilities.slice(0, 3).join(', ')}
-                          {preset.capabilities.length > 3 && '...'}
-                        </div>
-                        <div className="text-xs text-[var(--accent-600)] mt-2">
-                          {preset.items.length} قطعة
-                        </div>
-                      </button>
-                    ))}
-                </div>
-              </div>
-            )}
-
-            {/* فلترة بالفئة */}
+            {/* رابط المعرض الرئيسي */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">فلترة حسب الفئة</label>
-              <Dropdown
-                value={selectedCategory}
-                onChange={(v) => setSelectedCategory(String(v))}
-                options={[
-                  { value: '', label: 'جميع الفئات' },
-                  { value: 'camera', label: '📷 كاميرات' },
-                  { value: 'lens', label: '🔍 عدسات' },
-                  { value: 'lighting', label: '💡 إضاءة' },
-                  { value: 'audio', label: '🎤 صوتيات' },
-                  { value: 'accessory', label: '🛠️ إكسسوارات' },
-                  { value: 'special_setup', label: '⚙️ تجهيزات خاصة' }
-                ]}
-                placeholder="اختر فئة"
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                رابط معرض أعمالك (Portfolio)
+              </label>
+              <input
+                type="url"
+                value={formData.portfolioUrl || ''}
+                onChange={(e) => updateFormData('portfolioUrl', e.target.value)}
+                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
+                placeholder="https://behance.net/yourusername"
               />
+              <p className="text-sm text-[var(--muted)] mt-1">
+                اختياري - يمكنك إضافة رابط لمعرض أعمالك على Behance، Instagram، أو موقعك الشخصي
+              </p>
             </div>
 
-            {/* اختيار المعدات */}
+            {/* عينات العمل */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">إضافة معدات من الكتالوج</label>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                عينات من أعمالك * (2-5 عينات)
+              </label>
               
-              {/* رسائل الخطأ والتحميل */}
-              {equipmentLoading && (
-                <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-4 mb-4">
-                  <div className="flex items-center gap-2 text-[var(--accent-fg)]">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--accent-fg)]" />
-                    <span>جاري تحميل كتالوج المعدات...</span>
-                  </div>
+              {/* إضافة عينة جديدة */}
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="url"
+                  value={newSampleUrl}
+                  onChange={(e) => setNewSampleUrl(e.target.value)}
+                  className="flex-1 p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
+                  placeholder="الصق رابط عينة من عملك هنا..."
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addWorkSample(newSampleUrl);
+                      setNewSampleUrl('');
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    addWorkSample(newSampleUrl);
+                    setNewSampleUrl('');
+                  }}
+                  disabled={!newSampleUrl.trim() || formData.workSamples.length >= 5}
+                >
+                  إضافة
+                </Button>
+              </div>
+
+              {/* عرض العينات المضافة */}
+              {formData.workSamples.length > 0 && (
+                <div className="space-y-2">
+                  {formData.workSamples.map((url, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-[var(--bg-alt)] rounded-lg">
+                      <FileText size={16} className="text-[var(--accent-500)]" />
+                      <a 
+                        href={url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex-1 text-sm text-[var(--accent-600)] hover:underline truncate"
+                      >
+                        {url}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => removeWorkSample(url)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
-              
-              {dataError && (
-                <div className="bg-[var(--error-bg)] border border-[var(--error-border)] rounded-lg p-4 mb-4">
-                  <div className="flex items-center gap-2 text-[var(--error-fg)] mb-2">
-                    <AlertCircle size={20} />
-                    <span className="font-medium">خطأ في تحميل البيانات</span>
-                  </div>
-                  <p className="text-sm text-[var(--error-fg)] mb-3">{dataError}</p>
-                  <button
-                    onClick={loadInitialData}
-                    className="px-3 py-1 bg-[var(--error-fg)] text-[var(--error-bg)] text-sm rounded hover:opacity-90"
-                  >
-                    إعادة المحاولة
-                  </button>
-                </div>
-              )}
-              
-              <div className="max-h-64 overflow-y-auto border border-[var(--border)] rounded-lg">
-                {equipmentLoading ? (
-                  <div className="p-8 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent-500)] mx-auto mb-2" />
-                    <p className="text-[var(--muted)]">جاري التحميل...</p>
-                  </div>
-                ) : getFilteredEquipment().length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Settings size={48} className="mx-auto mb-4 text-[var(--muted)]" />
-                    <p className="text-[var(--muted)] mb-2">
-                      {dataError ? 'فشل في تحميل المعدات' : 'لا توجد معدات متاحة'}
-                    </p>
-                    {!dataError && (
-                      <p className="text-sm text-[var(--muted)]">
-                        يرجى التواصل مع الإدارة لتحميل كتالوج المعدات
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  getFilteredEquipment().map(item => (
-                    <div key={item.id} className="p-3 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-alt)] transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium text-[var(--text)]">
-                            {item.brand} {item.model}
-                          </div>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {item.capabilities.slice(0, 4).map(cap => (
-                              <span key={cap} className="px-2 py-0.5 bg-[var(--accent-100)] text-[var(--accent-700)] text-xs rounded">
-                                {cap}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => addEquipmentItem(item.id)}
-                          disabled={formData.equipment.some(eq => eq.catalogId === item.id)}
-                          className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)] disabled:bg-gray-300 disabled:cursor-not-allowed"
-                        >
-                          {formData.equipment.some(eq => eq.catalogId === item.id) ? 'مضاف' : 'إضافة'}
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
 
-            {/* المعدات المختارة */}
-            {formData.equipment.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-[var(--text)] mb-3">المعدات المختارة ({formData.equipment.length})</h3>
-                <div className="space-y-3">
-                  {formData.equipment.map(item => {
-                    const catalogItem = equipmentCatalog.find(eq => eq.id === item.catalogId);
-                    if (!catalogItem) return null;
-                    
-                    return (
-                      <div key={item.catalogId} className="p-3 border border-[var(--border)] rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <div className="font-medium text-[var(--text)]">
-                              {catalogItem.brand} {catalogItem.model}
-                            </div>
-                            <div className="text-sm text-[var(--muted)]">{catalogItem.category}</div>
-                          </div>
-                          <button
-                            onClick={() => removeEquipmentItem(item.catalogId)}
-                            className="text-red-500 hover:text-red-700 text-sm"
-                          >
-                            إزالة
-                          </button>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                          <div>
-                            <label className="block text-[var(--muted)] mb-1">الكمية</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) => updateEquipmentItem(item.catalogId, { quantity: parseInt(e.target.value) || 1 })}
-                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-[var(--muted)] mb-1">الحالة</label>
-                            <Dropdown
-                              value={item.condition}
-                              onChange={(v) => updateEquipmentItem(item.catalogId, { condition: String(v) as 'excellent' | 'good' | 'fair' | 'poor' })}
-                              options={[
-                                { value: 'excellent', label: 'ممتاز' },
-                                { value: 'good', label: 'جيد' },
-                                { value: 'fair', label: 'مقبول' },
-                                { value: 'poor', label: 'ضعيف' },
-                              ]}
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-[var(--muted)] mb-1">الملكية</label>
-                            <Dropdown
-                              value={item.owned ? 'owned' : 'borrowed'}
-                              onChange={(v) => updateEquipmentItem(item.catalogId, { owned: String(v) === 'owned' })}
-                              options={[
-                                { value: 'owned', label: 'ملكي' },
-                                { value: 'borrowed', label: 'مستعار' },
-                              ]}
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-[var(--muted)] mb-1">ملاحظات</label>
-                            <input
-                              type="text"
-                              value={item.notes || ''}
-                              onChange={(e) => updateEquipmentItem(item.catalogId, { notes: e.target.value })}
-                              placeholder="اختياري"
-                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* تحذيرات المتطلبات */}
-            {(() => {
-              const missingRequirements = checkEquipmentRequirements();
-              if (missingRequirements.length > 0) {
-                return (
-                  <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-[var(--warning-fg)] mb-2">
-                      <AlertCircle size={20} />
-                      <span className="font-medium">متطلبات ناقصة</span>
-                    </div>
-                    <ul className="text-sm text-[var(--warning-fg)] list-disc list-inside">
-                      {missingRequirements.map((req, index) => (
-                        <li key={index}>{req}</li>
-                      ))}
+              <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-4 mt-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={20} className="text-[var(--accent-fg)] mt-0.5" />
+                  <div className="text-sm text-[var(--accent-fg)]">
+                    <p className="font-medium mb-1">نصائح لعينات العمل:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>استخدم روابط من Instagram، Behance، أو Google Drive</li>
+                      <li>تأكد أن الروابط تعمل ويمكن عرضها</li>
+                      <li>اختر أفضل أعمالك التي تمثل مهاراتك</li>
                     </ul>
                   </div>
-                );
-              }
-              return null;
-            })()}
+                </div>
+              </div>
+
+              {formData.workSamples.length < 2 && (
+                <p className="text-sm text-[var(--error-fg)] mt-1">يجب إضافة عينتين على الأقل من أعمالك</p>
+              )}
+            </div>
           </div>
         );
 
       case 4:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">التوفر والتخصص</h2>
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">التوفر والإرسال</h2>
             
+            {/* التوفر الأساسي */}
             <div>
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                التوفر العام
+                مدى توفرك للعمل *
               </label>
               <Dropdown
-                value={formData.availability || ''}
-                onChange={(v) => updateFormData('availability', String(v))}
+                value={formData.availability}
+                onChange={(v: string) => updateFormData('availability', v as BasicIntakeFormData['availability'])}
                 options={[
-                  { value: 'full-time', label: 'متفرغ بدوام كامل' },
-                  { value: 'part-time', label: 'بدوام جزئي' },
-                  { value: 'weekends', label: 'عطل نهاية الأسبوع فقط' },
-                  { value: 'flexible', label: 'مرن حسب المشروع' },
+                  { value: 'full-time', label: 'دوام كامل - متاح يومياً' },
+                  { value: 'part-time', label: 'دوام جزئي - عدة أيام بالأسبوع' },
+                  { value: 'weekends', label: 'نهايات الأسبوع فقط' },
+                  { value: 'flexible', label: 'مرن - حسب المشروع' }
                 ]}
-                placeholder="اختر مستوى التوفر"
+                placeholder="اختر مدى توفرك"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">ساعات العمل (تبسيط مبدئي)</label>
-              <input
-                type="text"
-                value={formData.workingHours}
-                onChange={(e) => updateFormData('workingHours', e.target.value)}
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="مثال: 09:00-17:00 | سيتم استبداله بواجهة أسبوعية لاحقاً"
-              />
+            {/* ملخص البيانات */}
+            <div className="bg-[var(--bg-alt)] border border-[var(--border)] rounded-lg p-4">
+              <h3 className="font-semibold text-[var(--text)] mb-3">ملخص بياناتك:</h3>
+              <div className="space-y-2 text-sm">
+                <p><span className="font-medium">الدور:</span> {formData.role === 'photographer' ? 'مصور فوتوغرافي' : formData.role === 'videographer' ? 'مصور فيديو' : formData.role === 'designer' ? 'مصمم جرافيكي' : 'منتج محتوى'}</p>
+                <p><span className="font-medium">المجالات:</span> {formData.primaryCategories.map(getCategoryName).join(', ')}</p>
+                <p><span className="font-medium">المدينة:</span> {formData.city}</p>
+                <p><span className="font-medium">الخبرة:</span> {formData.experienceLevel === 'beginner' ? 'مبتدئ' : formData.experienceLevel === 'intermediate' ? 'متوسط' : 'محترف'} ({formData.experienceYears})</p>
+                <p><span className="font-medium">عينات العمل:</span> {formData.workSamples.length} عينة</p>
+                <p><span className="font-medium">التوفر:</span> {formData.availability === 'full-time' ? 'دوام كامل' : formData.availability === 'part-time' ? 'دوام جزئي' : formData.availability === 'weekends' ? 'نهايات الأسبوع' : 'مرن'}</p>
+              </div>
             </div>
-            
-            <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-4">
+
+            <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <AlertCircle size={20} className="text-[var(--accent-fg)] mt-0.5" />
-                <div className="text-sm text-[var(--accent-fg)]">
-                  <p className="font-medium mb-1">ملاحظة مهمة حول التسعير</p>
-                  <p>التسعير يتم تحديده تلقائياً حسب التخصصات والمهارات المختارة. الإدارة ستراجع وتعتمد الأسعار النهائية حسب الخبرة والمعدات.</p>
+                <CheckCircle size={20} className="text-[var(--success-fg)] mt-0.5" />
+                <div className="text-sm text-[var(--success-fg)]">
+                  <p className="font-medium mb-1">الخطوات التالية:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>بعد الإرسال، ستنتقل لاستكمال التفاصيل المهنية</li>
+                    <li>سيتم مراجعة طلبك خلال 24-48 ساعة</li>
+                    <li>ستحصل على تأكيد القبول عبر البريد الإلكتروني</li>
+                  </ul>
                 </div>
               </div>
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">مراجعة البيانات</h2>
-            
-            <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                التوفر العام
-              </label>
-              <Dropdown
-                value={formData.availability || ''}
-                onChange={(v) => updateFormData('availability', String(v))}
-                options={[
-                  { value: 'full-time', label: 'متفرغ بدوام كامل' },
-                  { value: 'part-time', label: 'بدوام جزئي' },
-                  { value: 'weekends', label: 'عطل نهاية الأسبوع فقط' },
-                  { value: 'flexible', label: 'مرن حسب المشروع' },
-                ]}
-                placeholder="اختر مستوى التوفر"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">ساعات العمل (تبسيط مبدئي)</label>
-              <input
-                type="text"
-                value={formData.workingHours}
-                onChange={(e) => updateFormData('workingHours', e.target.value)}
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="مثال: 09:00-17:00 | سيتم استبداله بواجهة أسبوعية لاحقاً"
-              />
-            </div>
-          </div>
-        );
-
-      case 6: // حذف هذه الخطوة - دمجت مع case 5
-        return null;
-
-      case 7:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">مراجعة البيانات</h2>
-            
-            <div className="bg-[var(--card)] p-6 rounded-xl border border-[var(--border)]">
-              <h3 className="font-semibold text-[var(--text)] mb-4">ملخص المعلومات:</h3>
-              
-              <div className="space-y-3 text-sm">
-                <div><strong>النبذة:</strong> {formData.bio || 'غير محدد'}</div>
-                <div><strong>الخبرة:</strong> {formData.experience || 'غير محدد'}</div>
-                <div><strong>المهارات:</strong> {formData.skills.join(', ') || 'غير محدد'}</div>
-                <div><strong>المعدات:</strong> {formData.equipment.length > 0 ? `${formData.equipment.length} قطعة` : 'غير محدد'}</div>
-                <div><strong>السعر بالساعة:</strong> {formData.hourlyRate ? `$${formData.hourlyRate}` : 'سيتم تحديده لاحقاً'}</div>
-                <div><strong>السعر باليوم:</strong> {formData.dayRate ? `$${formData.dayRate}` : 'سيتم تحديده لاحقاً'}</div>
-                <div><strong>التوفر:</strong> {formData.availability || 'غير محدد'}</div>
-              </div>
-            </div>
-
-            <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
-              <div className="flex items-center gap-2 text-[var(--text)] mb-2">
-                <AlertCircle size={20} />
-                <span className="font-medium">ملاحظة مهمة</span>
-              </div>
-              <p className="text-[var(--text)] text-sm">
-                بعد إرسال النموذج، سيتم مراجعة طلبك من قبل فريقنا خلال 2-3 أيام عمل. 
-                سنتواصل معك عبر البريد الإلكتروني لإعلامك بنتيجة المراجعة.
-              </p>
             </div>
           </div>
         );
@@ -731,140 +482,89 @@ export default function CreatorIntakePage() {
     }
   };
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-500)]" />
-      </div>
-    );
-  }
-
   return (
-    <Container>
-      <div className="p-6">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-8"
-          >
-            {isWelcome && (
-              <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-6">
-                <CheckCircle size={24} className="text-[var(--success-fg)] mx-auto mb-2" />
-                <h2 className="text-lg font-semibold text-[var(--success-fg)] mb-1">🎉 مرحباً بك!</h2>
-                <p className="text-[var(--success-fg)] text-sm">
-                  تم إنشاء حسابك بنجاح. الآن أكمل نموذج التفاصيل المهنية للبدء في استلام المشاريع.
-                </p>
-              </div>
-            )}
-            
-            <h1 className="text-3xl font-bold text-[var(--text)] mb-2">نموذج التفاصيل المهنية</h1>
-            <p className="text-[var(--muted)]">
-              أكمل معلوماتك المهنية لنتمكن من ربطك بالمشاريع المناسبة
+    <PageLayout>
+      <div className="min-h-screen bg-[var(--bg)] py-8">
+        <div className="max-w-2xl mx-auto px-4">
+          
+          {/* رأس الصفحة */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-[var(--text)] mb-2">
+              {isWelcome ? 'مرحباً! لنبدأ رحلتك معنا' : 'تسجيل المبدع - النموذج البسيط'}
+            </h1>
+            <p className="text-[var(--muted)] max-w-md mx-auto">
+              سجل المعلومات الأساسية للبدء، ويمكنك استكمال التفاصيل المهنية لاحقاً
             </p>
-          </motion.div>
+          </div>
 
-          {/* Progress Steps */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-8"
-          >
+          {/* مؤشر التقدم */}
+          <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              {STEPS.map((step, index) => (
+              {SIMPLE_STEPS.map((step) => (
                 <div
                   key={step.id}
-                  className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1' : ''}`}
+                  className={`flex items-center gap-2 ${
+                    currentStep >= step.id ? 'text-[var(--accent-500)]' : 'text-[var(--muted)]'
+                  }`}
                 >
-                  <div className={`
-                    w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
-                    ${currentStep >= step.id 
-                      ? 'bg-[var(--accent-500)] text-white' 
-                      : 'bg-[var(--border)] text-[var(--muted)]'
-                    }
-                  `}>
-                    {currentStep > step.id ? (
-                      <CheckCircle size={20} />
-                    ) : (
-                      <step.icon size={20} />
-                    )}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 ${
+                    currentStep >= step.id 
+                      ? 'bg-[var(--accent-500)] text-white border-[var(--accent-500)]'
+                      : 'border-[var(--border)] text-[var(--muted)]'
+                  }`}>
+                    {currentStep > step.id ? <CheckCircle size={16} /> : step.id}
                   </div>
-                  {index < STEPS.length - 1 && (
-                    <div className={`
-                      flex-1 h-0.5 mx-2
-                      ${currentStep > step.id ? 'bg-[var(--accent-500)]' : 'bg-[var(--border)]'}
-                    `} />
-                  )}
+                  <span className="text-sm font-medium hidden md:block">{step.title}</span>
                 </div>
               ))}
             </div>
-            <div className="text-center">
-              <span className="text-sm text-[var(--muted)]">
-                الخطوة {currentStep} من {STEPS.length}: {STEPS[currentStep - 1].title}
-              </span>
+            <div className="w-full bg-[var(--border)] rounded-full h-2">
+              <div 
+                className="bg-[var(--accent-500)] h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / SIMPLE_STEPS.length) * 100}%` }}
+              />
             </div>
-          </motion.div>
+          </div>
 
-          {/* Form Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-[var(--card)] p-8 rounded-2xl border border-[var(--border)] shadow-lg mb-8"
-          >
+          {/* محتوى النموذج */}
+          <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6 mb-6">
             {renderStep()}
-          </motion.div>
+          </div>
 
-          {/* Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex items-center justify-between"
-          >
+          {/* أزرار التنقل */}
+          <div className="flex justify-between">
             <Button
+              type="button"
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 1}
-              className="flex items-center gap-2"
             >
-              <ArrowLeft size={16} />
               السابق
             </Button>
-
-            {currentStep === STEPS.length ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                    جاري الإرسال...
-                  </>
-                ) : (
-                  <>
-                    <FileText size={16} />
-                    إرسال النموذج
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                onClick={nextStep}
-                className="flex items-center gap-2"
-              >
-                التالي
-                <ArrowRight size={16} />
-              </Button>
-            )}
-          </motion.div>
+            
+            <div className="flex gap-2">
+              {currentStep < SIMPLE_STEPS.length ? (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={!validateStep(currentStep)}
+                >
+                  التالي
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading || !validateStep(currentStep)}
+                  className="min-w-[120px]"
+                >
+                  {loading ? <Loader /> : 'إرسال والمتابعة'}
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </Container>
+    </PageLayout>
   );
 }
