@@ -144,7 +144,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             onChange={(e) => onChange(e.target.value)}
             onBlur={onBlur}
             className={`
-              w-full px-3 sm:px-4 py-3 rounded-xl border transition-all duration-200
+              w-full px-3 sm:px-4 py-4 h-14 rounded-xl border transition-all duration-200 leading-none
               ${icon ? 'pr-12' : ''}
               ${showPasswordToggle ? 'pl-12' : ''}
               ${error 
@@ -205,7 +205,7 @@ export function TextareaField({
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         className={`
-          w-full px-4 py-3 rounded-xl border transition-all duration-200 resize-none
+          w-full px-4 py-4 rounded-xl border transition-all duration-200 resize-none leading-relaxed min-h-[140px]
           ${error 
             ? 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500' 
             : success
@@ -348,7 +348,7 @@ export function SelectField({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         className={`
-          w-full px-4 py-3 rounded-xl border transition-all duration-200 appearance-none
+          w-full px-4 py-4 h-14 rounded-xl border transition-all duration-200 appearance-none leading-none
           ${error 
             ? 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500' 
             : success

@@ -358,8 +358,8 @@ export default function OnboardingLayout({
                   </div>
                 )}
 
-                {/* Validation status */}
-                {!state.canProceed && errors.length > 0 && (
+                {/* Validation status - يظهر فقط بعد التفاعل */}
+                {!state.canProceed && errors.length > 0 && formData.hasInteracted && (
                   <div className="text-sm text-red-600 max-w-xs">
                     {errors.length} خطأ يجب إصلاحه
                   </div>

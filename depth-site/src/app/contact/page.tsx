@@ -45,6 +45,9 @@ export default function ContactPage() {
   const watchName = watch("name");
   const watchEmail = watch("email");
   const watchMessage = watch("message");
+  
+  // تتبع التفاعل مع النموذج
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Network status monitoring
   useEffect(() => {
@@ -258,15 +261,22 @@ export default function ContactPage() {
 
             {/* Name Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label htmlFor="name" className="block text-base font-medium text-[var(--text)]">
-                الاسم <span className="text-red-500">*</span>
+              <label htmlFor="name" className="block text-base font-medium text-[var(--text)] flex items-center justify-between">
+                <span>
+                  الاسم <span className="text-red-500">*</span>
+                </span>
                 {watchName && watchName.length >= 2 && (
-                  <span className="text-green-600 text-sm ml-2">✓</span>
+                  <span className="text-green-600 text-sm flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    صحيح
+                  </span>
                 )}
               </label>
               <input 
                 className={clsx(
-                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base",
+                  "w-full max-w-full h-14 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base leading-none",
                   errors.name ? "border-red-500" : 
                   watchName && watchName.length >= 2 ? "border-green-500" : "border-[var(--elev)]"
                 )}
@@ -275,9 +285,10 @@ export default function ContactPage() {
                 aria-invalid={!!errors.name}
                 aria-describedby={errors.name ? "name-error" : undefined}
                 required
+                onFocus={() => setHasInteracted(true)}
                 {...register("name")} 
               />
-              {errors.name && <p id="name-error" role="alert" className="text-red-500 text-sm break-words">{errors.name.message}</p>}
+              {errors.name && hasInteracted && <p id="name-error" role="alert" className="text-red-500 text-sm break-words">{errors.name.message}</p>}
               <p className="text-xs text-[var(--slate-600)]">
                 {watchName ? `${watchName.length}/100` : "2-100 حرف"}
               </p>
@@ -294,7 +305,7 @@ export default function ContactPage() {
               <input 
                 type="email" 
                 className={clsx(
-                  "w-full max-w-full h-12 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base",
+                  "w-full max-w-full h-14 px-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] box-border text-base leading-none",
                   errors.email ? "border-red-500" : 
                   watchEmail && isValidEmail(watchEmail) ? "border-green-500" : "border-[var(--elev)]"
                 )}
@@ -303,9 +314,10 @@ export default function ContactPage() {
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
                 required
+                onFocus={() => setHasInteracted(true)}
                 {...register("email")} 
               />
-              {errors.email && <p id="email-error" role="alert" className="text-red-500 text-sm break-words">{errors.email.message}</p>}
+              {errors.email && hasInteracted && <p id="email-error" role="alert" className="text-red-500 text-sm break-words">{errors.email.message}</p>}
             </div>
 
             {/* Message Field with Real-time Validation */}
@@ -319,7 +331,7 @@ export default function ContactPage() {
               <textarea 
                 rows={6} 
                 className={clsx(
-                  "w-full max-w-full px-4 py-3 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] resize-none box-border text-base",
+                  "w-full max-w-full px-4 py-4 rounded-xl border bg-[var(--card)] transition-all duration-200 focus:ring-2 focus:ring-[#621cf0] focus:border-[#621cf0] resize-none box-border text-base leading-relaxed min-h-[140px]",
                   errors.message ? "border-red-500" : 
                   watchMessage && watchMessage.length >= 10 ? "border-green-500" : "border-[var(--elev)]"
                 )}
@@ -328,9 +340,10 @@ export default function ContactPage() {
                 aria-invalid={!!errors.message}
                 aria-describedby={errors.message ? "message-error" : undefined}
                 required
+                onFocus={() => setHasInteracted(true)}
                 {...register("message")} 
               />
-              {errors.message && <p id="message-error" role="alert" className="text-red-500 text-sm break-words">{errors.message.message}</p>}
+              {errors.message && hasInteracted && <p id="message-error" role="alert" className="text-red-500 text-sm break-words">{errors.message.message}</p>}
               <p className="text-xs text-[var(--slate-600)]">
                 {watchMessage ? `${watchMessage.length}/1500` : "10-1500 حرف"}
               </p>
@@ -342,7 +355,7 @@ export default function ContactPage() {
               disabled={isSubmitting || !isOnline} 
               className={clsx(
                 buttonStyles({ variant: "primary" }), 
-                "w-full max-w-full h-12 text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.01] disabled:hover:scale-100 touch-manipulation box-border",
+                "w-full max-w-full h-14 text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.01] disabled:hover:scale-100 touch-manipulation box-border",
                 (isSubmitting || !isOnline) && "cursor-wait"
               )}
               aria-live="polite" 

@@ -22,6 +22,7 @@ import type { EquipmentInventory } from '@/types/creators';
 const initialFormData: OnboardingFormData = {
   currentStep: 1,
   completedSteps: [],
+  hasInteracted: false, // متغير لتتبع التفاعل مع النموذج
   account: {
     fullName: '',
     email: '',
@@ -98,6 +99,7 @@ type OnboardingAction =
   | { type: 'UPDATE_EQUIPMENT'; payload: Partial<EquipmentInventory> }
   | { type: 'SET_CURRENT_STEP'; payload: OnboardingStep }
   | { type: 'COMPLETE_STEP'; payload: OnboardingStep }
+  | { type: 'SET_HAS_INTERACTED'; payload: boolean }
   | { type: 'RESET_FORM' }
   | { type: 'LOAD_SAVED_DATA'; payload: Partial<OnboardingFormData> };
 
@@ -214,6 +216,12 @@ function onboardingReducer(
           ...state.formData,
           completedSteps: completedSteps.sort()
         }
+      };
+    
+    case 'SET_HAS_INTERACTED':
+      return {
+        ...state,
+        formData: { ...state.formData, hasInteracted: action.payload }
       };
     
     case 'RESET_FORM':
@@ -474,30 +482,43 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [formData, router]);
 
+  // دالة لتحديث حالة التفاعل
+  const setHasInteracted = useCallback(() => {
+    if (!formData.hasInteracted) {
+      dispatch({ type: 'SET_HAS_INTERACTED', payload: true });
+    }
+  }, [formData.hasInteracted]);
+
   // دوال التحديث لكل قسم
   const updateAccountData = useCallback((data: Partial<AccountCreationData>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_ACCOUNT', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   const updateBasicInfo = useCallback((data: Partial<BasicInfoData>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_BASIC_INFO', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   const updateExperience = useCallback((data: Partial<ExperienceData>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_EXPERIENCE', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   const updatePortfolio = useCallback((data: Partial<PortfolioData>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_PORTFOLIO', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   const updateAvailability = useCallback((data: Partial<AvailabilityData>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_AVAILABILITY', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   const updateEquipment = useCallback((data: Partial<EquipmentInventory>) => {
+    setHasInteracted();
     dispatch({ type: 'UPDATE_EQUIPMENT', payload: data });
-  }, []);
+  }, [setHasInteracted]);
 
   // إعادة تعيين النموذج
   const resetForm = useCallback(() => {

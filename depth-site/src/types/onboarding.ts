@@ -69,6 +69,7 @@ export interface OnboardingFormData {
   // معلومات الخطوة الحالية
   currentStep: OnboardingStep;
   completedSteps: OnboardingStep[];
+  hasInteracted?: boolean; // متغير لتتبع التفاعل مع النموذج
   
   // بيانات كل مرحلة
   account: AccountCreationData;
