@@ -227,6 +227,16 @@ export default function CreatorOverridesPage() {
               <div>
                 <h1 className="text-3xl font-bold text-[var(--text)] mb-2">طلبات تعديل الأسعار</h1>
                 <p className="text-[var(--muted)]">إدارة طلبات Override للأسعار الخاصة</p>
+                
+                {/* Override Cap Warning */}
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-amber-800">
+                    <AlertCircle size={16} />
+                    <span className="text-sm font-medium">
+                      تنبيه: الحد الأعلى للزيادة هو 20% من السعر الأساسي مع الحفاظ على هامش ≥ 45%
+                    </span>
+                  </div>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Button

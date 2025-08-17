@@ -3,6 +3,109 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// دوال حساب Speed Bonus حسب الوثائق
+function calculateSpeedBonus(projectData: any, creatorId: string): number {
+  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
+  const completedTasks = creatorTasks.filter((task: any) => task.status === 'completed' && task.quality === 'approved');
+  
+  if (completedTasks.length === 0) return 0;
+  
+  let totalBonus = 0;
+  const slaHours = projectData.slaHours || 48;
+  
+  completedTasks.forEach((task: any) => {
+    if (task.completedAt && task.assignedAt) {
+      const completionTime = new Date(task.completedAt).getTime() - new Date(task.assignedAt).getTime();
+      const completionHours = completionTime / (1000 * 60 * 60);
+      const slaDeadline = slaHours;
+      
+      if (completionHours < slaDeadline * 0.75) { // إنجاز في أقل من 75% من الوقت المحدد
+        const bonusPercentage = Math.min(20, (slaDeadline - completionHours) / slaDeadline * 100);
+        const taskRate = task.rate || 0;
+        totalBonus += taskRate * (bonusPercentage / 100);
+      }
+    }
+  });
+  
+  return Math.round(totalBonus);
+}
+
+function isDeliveredEarly(projectData: any, creatorId: string): boolean {
+  const creatorTasks = (projectData.tasks || []).filter((task: any) => 
+    task.assignedTo === creatorId && task.status === 'completed'
+  );
+  
+  return creatorTasks.some((task: any) => {
+    if (task.completedAt && task.deadline) {
+      return new Date(task.completedAt) < new Date(task.deadline);
+    }
+    return false;
+  });
+}
+
+// حساب نقاط الجودة حسب الوثائق
+function calculateQualityScore(projectData: any, creatorId: string): number {
+  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
+  if (creatorTasks.length === 0) return 0;
+  
+  let totalScore = 0;
+  let scoredTasks = 0;
+  
+  creatorTasks.forEach((task: any) => {
+    if (task.quality) {
+      switch (task.quality) {
+        case 'excellent': totalScore += 5; break;
+        case 'good': totalScore += 4; break;
+        case 'acceptable': totalScore += 3; break;
+        case 'needs_improvement': totalScore += 2; break;
+        case 'poor': totalScore += 1; break;
+        default: totalScore += 3; break;
+      }
+      scoredTasks++;
+    }
+  });
+  
+  return scoredTasks > 0 ? Math.round((totalScore / scoredTasks) * 20) : 0; // تحويل إلى نسبة مئوية
+}
+
+// حساب مقاييس الأداء
+function calculatePerformanceMetrics(projectData: any, creatorId: string): any {
+  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
+  if (creatorTasks.length === 0) return null;
+  
+  const completedTasks = creatorTasks.filter((task: any) => task.status === 'completed');
+  const onTimeTasks = completedTasks.filter((task: any) => {
+    if (task.completedAt && task.deadline) {
+      return new Date(task.completedAt) <= new Date(task.deadline);
+    }
+    return false;
+  });
+  
+  const firstPassTasks = completedTasks.filter((task: any) => 
+    task.revisionCount === 0 || task.revisionCount === undefined
+  );
+  
+  return {
+    onTimePercentage: completedTasks.length > 0 ? Math.round((onTimeTasks.length / completedTasks.length) * 100) : 0,
+    firstPassPercentage: completedTasks.length > 0 ? Math.round((firstPassTasks.length / completedTasks.length) * 100) : 0,
+    averageCompletionTime: calculateAverageCompletionTime(completedTasks),
+    totalCompletedTasks: completedTasks.length
+  };
+}
+
+function calculateAverageCompletionTime(tasks: any[]): number {
+  const timesInHours = tasks
+    .filter((task: any) => task.assignedAt && task.completedAt)
+    .map((task: any) => {
+      const assignedTime = new Date(task.assignedAt).getTime();
+      const completedTime = new Date(task.completedAt).getTime();
+      return (completedTime - assignedTime) / (1000 * 60 * 60); // ساعات
+    });
+  
+  if (timesInHours.length === 0) return 0;
+  return Math.round(timesInHours.reduce((sum, time) => sum + time, 0) / timesInHours.length);
+}
+
 // GET /api/creators/projects
 // جلب المشاريع المُسندة للمبدع المسجل دخوله
 export async function GET(req: NextRequest) {
@@ -121,17 +224,23 @@ export async function GET(req: NextRequest) {
         completedTasks: completedTasks.length,
         pendingTasks: creatorTasks.length - completedTasks.length,
         
-        // معلومات الدفع (إذا متوفرة)
-        budget: projectData.budget || null,
-        creatorEarnings: projectData.creatorPayments?.[creatorId] || null,
+        // معلومات الدفع - السعر الصافي للمبدع فقط (حسب سياسة الشفافية)
+        creatorNetRate: projectData.creatorRates?.[creatorId] || null,
+        // budget و creatorEarnings مخفيان حسب الوثائق
         
         // SLA والمواعيد
         slaHours: projectData.slaHours || 48,
         isRush: projectData.priority === 'rush',
         
-        // التقييم
+        // Speed Bonus (حسب الوثائق - إذا أنجز قبل SLA بجودة معتمدة)
+        speedBonus: calculateSpeedBonus(projectData, creatorId),
+        isEarlyDelivery: isDeliveredEarly(projectData, creatorId),
+        
+        // التقييم المحسن
         rating: projectData.creatorRatings?.[creatorId] || null,
-        feedback: projectData.creatorFeedback?.[creatorId] || null
+        feedback: projectData.creatorFeedback?.[creatorId] || null,
+        qualityScore: calculateQualityScore(projectData, creatorId),
+        performanceMetrics: calculatePerformanceMetrics(projectData, creatorId)
       });
     }
 

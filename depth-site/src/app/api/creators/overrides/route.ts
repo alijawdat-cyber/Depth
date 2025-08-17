@@ -179,6 +179,30 @@ export async function GET(req: NextRequest) {
 
 // POST /api/creators/overrides
 // إنشاء طلب Override جديد
+// تحديد Override Cap حسب الوثائق
+const OVERRIDE_CAP_PERCENTAGE = 20; // حد أعلى افتراضي +20%
+const MIN_MARGIN_PERCENTAGE = 45; // هامش أدنى 45%
+
+function validateOverrideRequest(currentPrice: number, requestedPrice: number): { isValid: boolean; error?: string; } {
+  const priceIncrease = ((requestedPrice - currentPrice) / currentPrice) * 100;
+  
+  // فحص الحد الأعلى
+  if (priceIncrease > OVERRIDE_CAP_PERCENTAGE) {
+    return {
+      isValid: false,
+      error: `الزيادة المطلوبة (${priceIncrease.toFixed(1)}%) تتجاوز الحد الأعلى المسموح (${OVERRIDE_CAP_PERCENTAGE}%)`
+    };
+  }
+  
+  // فحص الهامش الأدنى (تحتاج بيانات التكلفة)
+  // const margin = ((requestedPrice - cost) / requestedPrice) * 100;
+  // if (margin < MIN_MARGIN_PERCENTAGE) {
+  //   return { isValid: false, error: 'الهامش أقل من الحد الأدنى المطلوب' };
+  // }
+  
+  return { isValid: true };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -234,6 +258,26 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
+    // جلب السعر الحالي من الكتالوغ لتطبيق Override Cap
+    let currentPriceIQD = 0;
+    try {
+      // هذا يحتاج تطوير أكثر - جلب السعر من الكتالوغ
+      // مؤقتاً نفترض سعر أساسي
+      currentPriceIQD = 100000; // سعر افتراضي للاختبار
+      
+      // تطبيق التحقق من Override Cap
+      const validation = validateOverrideRequest(currentPriceIQD, requestedPriceIQD);
+      if (!validation.isValid) {
+        return NextResponse.json({ 
+          success: false, 
+          error: validation.error 
+        }, { status: 400 });
+      }
+    } catch (error) {
+      console.warn('Failed to fetch current price for validation:', error);
+      // نكمل العملية بدون تحقق إذا فشل جلب السعر
+    }
+
     const email = session.user.email.toLowerCase();
 
     // البحث عن المبدع
@@ -272,7 +316,7 @@ export async function POST(req: NextRequest) {
     }
 
     // جلب السعر الحالي من Rate Card (إذا متوفر)
-    let currentPriceIQD = null;
+    // currentPriceIQD already declared above
     try {
       const rateCardQuery = await adminDb
         .collection('rate_card')

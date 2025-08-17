@@ -39,12 +39,20 @@ interface CreatorProject {
   totalTasks: number;
   completedTasks: number;
   pendingTasks: number;
-  budget: number | null;
-  creatorEarnings: number | null;
+  creatorNetRate: number | null; // السعر الصافي للمبدع فقط
   slaHours: number;
   isRush: boolean;
+  speedBonus: number; // مكافأة السرعة
+  isEarlyDelivery: boolean; // تسليم مبكر
   rating: number | null;
   feedback: string | null;
+  qualityScore: number; // نقاط الجودة
+  performanceMetrics: {
+    onTimePercentage: number;
+    firstPassPercentage: number;
+    averageCompletionTime: number;
+    totalCompletedTasks: number;
+  } | null;
 }
 
 interface ProjectStats {
@@ -193,6 +201,14 @@ export default function CreatorProjectsPage() {
     return new Date(deadline) < new Date();
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('ar-IQ', {
+      style: 'currency',
+      currency: 'IQD',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('ar-EG', {
       year: 'numeric',
@@ -203,9 +219,7 @@ export default function CreatorProjectsPage() {
     }).format(new Date(dateString));
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-EG').format(amount) + ' د.ع';
-  };
+
 
   if (loading) {
     return (
@@ -404,10 +418,10 @@ export default function CreatorProjectsPage() {
                           SLA: {project.slaHours}ساعة
                         </div>
 
-                        {project.creatorEarnings && (
+                        {project.creatorNetRate && (
                           <div className="flex items-center gap-1">
                             <DollarSign size={16} />
-                            {formatCurrency(project.creatorEarnings)}
+                            {formatCurrency(project.creatorNetRate)} (سعر صافي)
                           </div>
                         )}
                       </div>
@@ -441,6 +455,62 @@ export default function CreatorProjectsPage() {
                       ></div>
                     </div>
                   </div>
+
+                  {/* Performance Metrics */}
+                  {(project.speedBonus > 0 || project.qualityScore > 0 || project.performanceMetrics) && (
+                    <div className="mb-4 p-3 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        
+                        {/* Speed Bonus */}
+                        {project.speedBonus > 0 && (
+                          <div className="flex items-center gap-2">
+                            <TrendingUp size={16} className="text-green-500" />
+                            <div>
+                              <div className="text-[var(--muted)]">مكافأة السرعة</div>
+                              <div className="text-green-600 font-medium">
+                                {project.speedBonus.toLocaleString('ar-IQ')} د.ع
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Early Delivery Badge */}
+                        {project.isEarlyDelivery && (
+                          <div className="flex items-center gap-2">
+                            <Clock size={16} className="text-blue-500" />
+                            <div>
+                              <div className="text-blue-600 font-medium">تسليم مبكر</div>
+                              <div className="text-[var(--muted)]">قبل الموعد</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Quality Score */}
+                        {project.qualityScore > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Star size={16} className="text-yellow-500" />
+                            <div>
+                              <div className="text-[var(--muted)]">نقاط الجودة</div>
+                              <div className="text-yellow-600 font-medium">{project.qualityScore}%</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Performance Metrics */}
+                        {project.performanceMetrics && (
+                          <div className="flex items-center gap-2">
+                            <Target size={16} className="text-purple-500" />
+                            <div>
+                              <div className="text-[var(--muted)]">في الوقت المحدد</div>
+                              <div className="text-purple-600 font-medium">
+                                {project.performanceMetrics.onTimePercentage}%
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex items-center gap-2">
