@@ -56,13 +56,22 @@ export async function POST(req: NextRequest) {
     // حفظ البيانات الأساسية
     await adminDb.collection('creators_basic').doc(userId).set(basicIntakeData);
 
-    // تحديث ملف المستخدم الأساسي
-    await adminDb.collection('users').doc(userId).update({
-      role: basicData.role,
-      onboardingStatus: 'basic_completed',
-      primaryCategories: basicData.primaryCategories,
-      updatedAt: FieldValue.serverTimestamp()
-    });
+    // تحديث ملف المستخدم الأساسي (فقط إذا لم يكتمل المعقد)
+    const userDoc = await adminDb.collection('users').doc(userId).get();
+    const userData = userDoc.data();
+    
+    // تحقق من أن المستخدم لم يكمل النموذج المعقد
+    if (!userData?.onboardingStatus || userData.onboardingStatus !== 'complete_submitted') {
+      await adminDb.collection('users').doc(userId).update({
+        role: basicData.role,
+        onboardingStatus: 'basic_completed',
+        primaryCategories: basicData.primaryCategories,
+        updatedAt: FieldValue.serverTimestamp()
+      });
+    } else {
+      // إذا كان المعقد مكتمل، لا نعيد كتابة role
+      console.log('[intake-basic] Skipping users update - complete form already submitted');
+    }
 
     // إنشاء سجل في audit log
     await adminDb.collection('audit_log').add({

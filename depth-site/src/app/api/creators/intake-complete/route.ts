@@ -174,6 +174,34 @@ export async function POST(req: NextRequest) {
 
     await creatorDoc.ref.update(updateData);
 
+    // مزامنة مع users collection (مصدر الحقيقة الموحد)
+    await adminDb.collection('users').doc(session.user.uid || email).update({
+      role: personalInfo.role,
+      onboardingStatus: 'complete_submitted',
+      fullName: personalInfo.fullName.trim(),
+      city: personalInfo.city.trim(),
+      canTravel: personalInfo.canTravel || false,
+      updatedAt: now
+    });
+
+    // وضع علامة migration على البيانات الأساسية
+    try {
+      const basicDocRef = adminDb.collection('creators_basic').doc(session.user.uid || email);
+      const basicDoc = await basicDocRef.get();
+      
+      if (basicDoc.exists) {
+        await basicDocRef.update({
+          status: 'migrated',
+          migratedAt: now,
+          migratedToCreatorId: creatorDoc.id,
+          updatedAt: now
+        });
+      }
+    } catch (migrationError) {
+      console.warn('[intake-complete] Failed to mark basic as migrated:', migrationError);
+      // لا نفشل العملية كاملة إذا فشلت المزامنة
+    }
+
     // تسجيل العملية في audit log
     await adminDb.collection('audit_log').add({
       action: 'creator_intake_complete_submitted',

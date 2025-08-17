@@ -160,11 +160,16 @@ export default function CompleteCreatorIntakePage() {
   // حالة البيانات الأساسية المحملة مسبقاً
   const [basicDataLoaded, setBasicDataLoaded] = useState(false);
   const [hasBasicData, setHasBasicData] = useState(false);
+  const [editingPersonalInfo, setEditingPersonalInfo] = useState(false);
   
   // بيانات الكتالوج من قاعدة البيانات
   const [subcategories, setSubcategories] = useState<SubcategoryItem[]>([]);
   const [verticals, setVerticals] = useState<VerticalItem[]>([]);
   const [equipmentCatalog, setEquipmentCatalog] = useState<EquipmentCatalogItemLite[]>([]);
+  
+  // فلترة حسب الفئات المختارة في النموذج البسيط
+  const [skillsFilter, setSkillsFilter] = useState<string[]>([]);
+  const [verticalsFilter, setVerticalsFilter] = useState<string[]>([]);
 
   // بيانات النموذج الكاملة
   const [formData, setFormData] = useState<IntakeFormData>({
@@ -316,6 +321,48 @@ export default function CompleteCreatorIntakePage() {
     }
   }, [session, status, router, loadExistingData, loadCatalogData, startStep]);
 
+  // دالة تحويل availability البسيط إلى weeklyAvailability مفصل
+  const mapBasicAvailabilityToWeekly = (basicAvailability: string): WeeklyAvailability[] => {
+    const allDays: WeeklyAvailability['day'][] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    
+    switch (basicAvailability) {
+      case 'full-time':
+        // دوام كامل: كل الأيام من 9 إلى 5
+        return allDays.map(day => ({
+          day,
+          available: true,
+          startTime: '09:00',
+          endTime: '17:00'
+        }));
+        
+      case 'part-time':
+        // دوام جزئي: 4 أيام فقط (أحد-أربعاء)
+        return allDays.map(day => ({
+          day,
+          available: ['sunday', 'monday', 'tuesday', 'wednesday'].includes(day),
+          startTime: ['sunday', 'monday', 'tuesday', 'wednesday'].includes(day) ? '09:00' : undefined,
+          endTime: ['sunday', 'monday', 'tuesday', 'wednesday'].includes(day) ? '17:00' : undefined
+        }));
+        
+      case 'weekends':
+        // نهايات الأسبوع: الجمعة والسبت فقط
+        return allDays.map(day => ({
+          day,
+          available: ['friday', 'saturday'].includes(day),
+          startTime: ['friday', 'saturday'].includes(day) ? '10:00' : undefined,
+          endTime: ['friday', 'saturday'].includes(day) ? '18:00' : undefined
+        }));
+        
+      case 'flexible':
+      default:
+        // مرن: نترك التحديد للمستخدم (كل الأيام متاحة بدون أوقات محددة)
+        return allDays.map(day => ({
+          day,
+          available: false
+        }));
+    }
+  };
+
   // تحميل البيانات الأساسية وملء النموذج المتقدم
   const loadBasicDataAndPrefill = async () => {
     try {
@@ -355,8 +402,34 @@ export default function CompleteCreatorIntakePage() {
                 description: `عينة عمل ${index + 1}`,
                 category: result.data.primaryCategories?.[0] || 'general'
               })) || []
+            },
+            capacity: {
+              ...prev.capacity,
+              // تحويل availability البسيط إلى weeklyAvailability مفصل
+              weeklyAvailability: result.data.availability ? 
+                mapBasicAvailabilityToWeekly(result.data.availability) : 
+                prev.capacity.weeklyAvailability
             }
           }));
+          
+          // تطبيق فلترة المهارات/المحاور حسب الفئات الأساسية
+          if (result.data.primaryCategories && result.data.primaryCategories.length > 0) {
+            const categoryMappings = {
+              'photo': ['photography', 'photo', 'صور', 'تصوير'],
+              'video': ['video', 'videography', 'فيديو', 'مرئي'],
+              'design': ['design', 'graphic', 'تصميم', 'جرافيك']
+            };
+            
+            const relevantKeywords: string[] = [];
+            result.data.primaryCategories.forEach((cat: string) => {
+              if (categoryMappings[cat as keyof typeof categoryMappings]) {
+                relevantKeywords.push(...categoryMappings[cat as keyof typeof categoryMappings]);
+              }
+            });
+            
+            setSkillsFilter(relevantKeywords);
+            setVerticalsFilter(relevantKeywords);
+          }
           
           setError(null);
           setSuccess(true);
@@ -442,14 +515,108 @@ export default function CompleteCreatorIntakePage() {
   };
 
   // 1) الهوية والتواصل
-  const renderPersonalInfoStep = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الهوية والتواصل</h2>
-        <p className="text-[var(--muted)]">المعلومات الشخصية وبيانات التواصل</p>
-      </div>
+  const renderPersonalInfoStep = () => {
+    // إذا جاء من النموذج البسيط ولم يطلب التحرير، اعرض ملخص للقراءة فقط
+    if (hasBasicData && startStep === 2 && !editingPersonalInfo) {
+      return (
+        <div className="space-y-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الهوية والتواصل</h2>
+            <p className="text-[var(--muted)]">تم استيراد هذه البيانات من التسجيل الأولي</p>
+          </div>
 
-      <div className="space-y-4">
+          <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 text-[var(--success-fg)] mb-3">
+              <CheckCircle size={20} />
+              <span className="font-medium">تم الاستيراد من النموذج البسيط</span>
+            </div>
+            <p className="text-sm text-[var(--success-fg)]">
+              يمكنك تعديل هذه المعلومات أو الانتقال مباشرة للخطوة التالية
+            </p>
+          </div>
+
+          {/* عرض البيانات المستوردة في بطاقات للقراءة */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">الاسم الكامل</label>
+              <p className="text-[var(--text)] font-medium">{formData.personalInfo.fullName || session?.user?.name || 'غير محدد'}</p>
+            </div>
+            
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">التخصص</label>
+              <p className="text-[var(--text)] font-medium">
+                {formData.personalInfo.role === 'photographer' ? '📸 مصور' : 
+                 formData.personalInfo.role === 'videographer' ? '🎥 مصور فيديو' : 
+                 formData.personalInfo.role === 'designer' ? '🎨 مصمم' : '⚙️ منتج'}
+              </p>
+            </div>
+            
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">المدينة</label>
+              <p className="text-[var(--text)] font-medium">{formData.personalInfo.city}</p>
+            </div>
+            
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">السفر</label>
+              <p className="text-[var(--text)] font-medium">
+                {formData.personalInfo.canTravel ? '✅ يستطيع السفر' : '❌ لا يسافر'}
+              </p>
+            </div>
+            
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">رقم الواتساب</label>
+              <p className="text-[var(--text)] font-medium">{formData.personalInfo.contact.whatsapp || 'غير محدد'}</p>
+            </div>
+            
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+              <label className="block text-sm font-medium text-[var(--muted)] mb-1">الإنستغرام</label>
+              <p className="text-[var(--text)] font-medium">{formData.personalInfo.contact.instagram || 'غير محدد'}</p>
+            </div>
+          </div>
+
+          {/* زر للتحرير الاختياري */}
+          <div className="text-center">
+            <Button
+              variant="outline"
+              onClick={() => {
+                // تفعيل وضع التحرير
+                setEditingPersonalInfo(true);
+              }}
+              className="min-w-[200px]"
+            >
+              ✏️ تعديل هذه المعلومات
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // النموذج العادي للتحرير
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الهوية والتواصل</h2>
+          <p className="text-[var(--muted)]">المعلومات الشخصية وبيانات التواصل</p>
+          {hasBasicData && editingPersonalInfo && (
+            <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-3 mt-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-[var(--accent-fg)]">
+                  🔄 وضع التحرير - يمكنك تعديل البيانات المستوردة
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingPersonalInfo(false)}
+                  className="text-xs"
+                >
+                  ❌ إلغاء التحرير
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-[var(--text)] mb-2">
             الاسم الكامل *
@@ -564,8 +731,15 @@ export default function CompleteCreatorIntakePage() {
 
   // 2) Skills Matrix - مربوط بالكتالوج
   const renderSkillsMatrixStep = () => {
+    // فلترة الفئات الفرعية حسب الفلتر المطبق
+    const filteredSubcategories = skillsFilter.length > 0 ? 
+      subcategories.filter(subcat => {
+        const searchText = (subcat.nameAr + ' ' + (subcat.description || '') + ' ' + (subcat.category?.nameAr || '')).toLowerCase();
+        return skillsFilter.some(keyword => searchText.includes(keyword.toLowerCase()));
+      }) : subcategories;
+    
     // تجميع الفئات الفرعية حسب الفئة الرئيسية
-    const categorizedSubcategories = subcategories.reduce((acc: Record<string, SubcategoryItem[]>, subcat: SubcategoryItem) => {
+    const categorizedSubcategories = filteredSubcategories.reduce((acc: Record<string, SubcategoryItem[]>, subcat: SubcategoryItem) => {
       const categoryName = subcat.category?.nameAr || 'أخرى';
       if (!acc[categoryName]) acc[categoryName] = [];
       acc[categoryName].push(subcat);
@@ -683,6 +857,13 @@ export default function CompleteCreatorIntakePage() {
 
   // 3) المحاور المفضلة - مربوط بقاعدة البيانات
   const renderVerticalsStep = () => {
+    // فلترة المحاور حسب الفلتر المطبق
+    const filteredVerticals = verticalsFilter.length > 0 ? 
+      verticals.filter(vertical => {
+        const searchText = (vertical.nameAr + ' ' + (vertical.description || '')).toLowerCase();
+        return verticalsFilter.some(keyword => searchText.includes(keyword.toLowerCase()));
+      }) : verticals;
+    
     const handleVerticalToggle = (verticalId: string) => {
       setFormData(prev => ({
         ...prev,
@@ -708,8 +889,29 @@ export default function CompleteCreatorIntakePage() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* مؤشر الفلترة إذا كان مطبق */}
+            {verticalsFilter.length > 0 && (
+              <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[var(--accent-fg)]">
+                      🎯 مفلترة حسب اختياراتك السابقة ({filteredVerticals.length} محور)
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setVerticalsFilter([])}
+                    className="text-xs"
+                  >
+                    عرض الكل
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {verticals.map((vertical: any) => (
+              {filteredVerticals.map((vertical: any) => (
                 <div
                   key={vertical.id}
                   className={`border rounded-lg p-4 cursor-pointer transition-all ${
@@ -1482,6 +1684,19 @@ export default function CompleteCreatorIntakePage() {
         <p className="text-[var(--muted)]">Portfolio والشهادات</p>
       </div>
       
+      {/* مؤشر البيانات المستوردة */}
+      {hasBasicData && formData.portfolio.samples.length > 0 && (
+        <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4">
+          <div className="flex items-center gap-2 text-[var(--success-fg)] mb-2">
+            <CheckCircle size={20} />
+            <span className="font-medium">تم استيراد عينات من التسجيل الأولي</span>
+          </div>
+          <p className="text-sm text-[var(--success-fg)]">
+            تم استيراد {formData.portfolio.samples.length} عينة من النموذج البسيط. يمكنك إضافة المزيد أو تعديل التفاصيل.
+          </p>
+        </div>
+      )}
+      
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-[var(--text)] mb-2">
@@ -1655,5 +1870,5 @@ export default function CompleteCreatorIntakePage() {
           </div>
         </div>
       </div>
+    </div>
   );
-}
