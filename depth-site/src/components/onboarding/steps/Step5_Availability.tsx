@@ -6,6 +6,7 @@ import { Calendar, Clock, Zap, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { SelectField, InputField, CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
+import WeeklyAvailabilityGrid from '../shared/WeeklyAvailabilityGrid';
 
 export default function Step5_Availability() {
   const { formData, updateAvailability, getStepErrors } = useOnboarding();
@@ -209,75 +210,14 @@ export default function Step5_Availability() {
           />
         </div>
 
-        {/* أيام العمل المفضلة */}
+        {/* جدول التوفر الأسبوعي المفصل */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-[var(--text)]">
-              أيام العمل المفضلة *
-            </h3>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={selectAllWorkdays}
-                className="text-sm text-[var(--accent-600)] hover:underline"
-              >
-                اختيار الكل
-              </button>
-              <button
-                type="button"
-                onClick={clearAllWorkdays}
-                className="text-sm text-red-600 hover:underline"
-              >
-                مسح الكل
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-            {WORKDAYS.map((day, index) => {
-              const isSelected = availability.preferredWorkdays.includes(day.id);
-              
-              return (
-                <motion.div
-                  key={day.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`
-                    relative cursor-pointer transition-all duration-200
-                    ${isSelected ? 'scale-105' : 'hover:scale-105'}
-                  `}
-                  onClick={() => toggleWorkday(day.id)}
-                >
-                  <div className={`
-                    p-4 rounded-xl border-2 text-center transition-all
-                    ${isSelected 
-                      ? 'border-[var(--accent-500)] bg-[var(--accent-50)] text-[var(--accent-700)]' 
-                      : 'border-[var(--border)] bg-[var(--card)] text-[var(--muted)] hover:border-[var(--accent-300)]'
-                    }
-                  `}>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"
-                      >
-                        <CheckCircle size={12} className="text-white" />
-                      </motion.div>
-                    )}
-                    <div className="text-lg mb-1">
-                      {['🌞', '💼', '📅', '⭐', '🎯', '🕌', '🎉'][index]}
-                    </div>
-                    <div className="text-sm font-medium">{day.label}</div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {getFieldError('يوم') && (
-            <p className="text-sm text-red-600 mt-2">{getFieldError('يوم')}</p>
-          )}
+          <WeeklyAvailabilityGrid
+            value={availability.weeklyAvailability || []}
+            onChange={(weeklyAvailability) => updateAvailability({ weeklyAvailability })}
+            error={getFieldError('التوفر')}
+            disabled={false}
+          />
         </div>
 
         {/* العمل العاجل */}

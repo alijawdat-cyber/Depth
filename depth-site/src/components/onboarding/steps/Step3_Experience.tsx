@@ -2,37 +2,24 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Award, TrendingUp, Users, Star, Plus, X } from 'lucide-react';
+import { Award, TrendingUp, Users, Plus, X, Package } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { SelectField, InputField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
+import SubcategorySelector from '../shared/SubcategorySelector';
+import EquipmentSelector from '../shared/EquipmentSelector';
 import { useState } from 'react';
+import type { ExperienceLevel } from '@/types/onboarding';
 
 export default function Step3_Experience() {
-  const { formData, updateExperience, getStepErrors } = useOnboarding();
+  const { formData, updateExperience, updateEquipment, getStepErrors } = useOnboarding();
   const { experience } = formData;
   const errors = getStepErrors(3);
   
-  const [newSpecialization, setNewSpecialization] = useState('');
   const [newClient, setNewClient] = useState('');
 
   const getFieldError = (field: string) => {
     return errors.find(error => error.includes(field)) || undefined;
-  };
-
-  const addSpecialization = () => {
-    if (newSpecialization.trim() && !experience.specializations.includes(newSpecialization.trim())) {
-      updateExperience({
-        specializations: [...experience.specializations, newSpecialization.trim()]
-      });
-      setNewSpecialization('');
-    }
-  };
-
-  const removeSpecialization = (spec: string) => {
-    updateExperience({
-      specializations: experience.specializations.filter(s => s !== spec)
-    });
   };
 
   const addPreviousClient = () => {
@@ -54,8 +41,8 @@ export default function Step3_Experience() {
     <div className="space-y-8">
       {/* Header */}
       <StepHeader
-        title="خبرتك ومهاراتك"
-        subtitle="أخبرنا عن مستوى خبرتك والمجالات التي تتخصص بها"
+        title="خبرتك ومهاراتك والمعدات"
+        subtitle="أخبرنا عن مستوى خبرتك والتخصصات والمعدات التي تملكها"
         icon={Award}
         step={3}
         totalSteps={5}
@@ -67,7 +54,7 @@ export default function Step3_Experience() {
           <SelectField
             label="مستوى خبرتك"
             value={experience.experienceLevel}
-            onChange={(value) => updateExperience({ experienceLevel: value as any })}
+            onChange={(value) => updateExperience({ experienceLevel: value as ExperienceLevel })}
             options={[
               { value: 'beginner', label: '🌱 مبتدئ - أقل من سنتين' },
               { value: 'intermediate', label: '💼 متوسط - 2-5 سنوات' },
@@ -94,81 +81,42 @@ export default function Step3_Experience() {
           />
         </div>
 
-        {/* التخصصات المفصلة */}
+        {/* التخصصات والمهارات */}
         <div>
-          <h3 className="text-lg font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-            <Star size={20} />
-            تخصصاتك المفصلة
-          </h3>
-          
-          {/* إضافة تخصص جديد */}
-          <div className="flex gap-2 mb-4">
-            <InputField
-              label=""
-              value={newSpecialization}
-              onChange={setNewSpecialization}
-              placeholder="مثال: تصوير المنتجات، بورتريه، فيديو تسويقي..."
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addSpecialization();
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={addSpecialization}
-              disabled={!newSpecialization.trim()}
-              className="px-4 py-3 bg-[var(--accent-500)] text-white rounded-xl hover:bg-[var(--accent-600)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <Plus size={18} />
-            </button>
+          <SubcategorySelector
+            selectedCategories={formData.basicInfo.primaryCategories}
+            value={experience.skills || []}
+            onChange={(skills) => updateExperience({ skills })}
+            error={getFieldError('تخصص')}
+            disabled={formData.basicInfo.primaryCategories.length === 0}
+          />
+        </div>
+
+        {/* المعدات والأدوات */}
+        <div>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+              <Package size={20} />
+              معداتك وأدواتك
+            </h3>
+            <p className="text-sm text-[var(--muted)]">
+              أضف المعدات التي تملكها لتحسين فرص المطابقة مع المشاريع المناسبة
+            </p>
           </div>
-
-          {/* التخصصات المضافة */}
-          {experience.specializations.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-2"
-            >
-              <p className="text-sm font-medium text-[var(--text)]">
-                تخصصاتك ({experience.specializations.length}):
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {experience.specializations.map((spec, index) => (
-                  <motion.div
-                    key={spec}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--accent-100)] text-[var(--accent-700)] rounded-full text-sm"
-                  >
-                    <span>{spec}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeSpecialization(spec)}
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* رسالة إذا لم تكن هناك تخصصات */}
-          {experience.specializations.length === 0 && (
-            <div className="text-center py-8 text-[var(--muted)]">
-              <Star size={48} className="mx-auto mb-3 opacity-50" />
-              <p>أضف تخصصاتك المفصلة لتحسين فرص الحصول على مشاريع مناسبة</p>
-            </div>
-          )}
-
-          {getFieldError('تخصص') && (
-            <p className="text-sm text-red-600 mt-2">{getFieldError('تخصص')}</p>
-          )}
+          
+          <EquipmentSelector
+            value={formData.equipment || {
+              cameras: [],
+              lenses: [],
+              lighting: [],
+              audio: [],
+              accessories: [],
+              specialSetups: []
+            }}
+            onChange={updateEquipment}
+            selectedCategories={formData.basicInfo.primaryCategories}
+            disabled={formData.basicInfo.primaryCategories.length === 0}
+          />
         </div>
 
         {/* العملاء السابقون (اختياري) */}

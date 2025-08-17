@@ -16,6 +16,7 @@ import type {
   AvailabilityData,
   OnboardingProgress
 } from '@/types/onboarding';
+import type { EquipmentInventory } from '@/types/creators';
 
 // الحالة الأولية للنموذج
 const initialFormData: OnboardingFormData = {
@@ -39,7 +40,8 @@ const initialFormData: OnboardingFormData = {
   experience: {
     experienceLevel: 'beginner',
     experienceYears: '0-1',
-    specializations: [],
+    skills: [],
+    specializations: [], // احتفظ للتوافق المؤقت
     previousClients: []
   },
   portfolio: {
@@ -50,8 +52,17 @@ const initialFormData: OnboardingFormData = {
     availability: 'flexible',
     weeklyHours: 20,
     preferredWorkdays: [],
+    weeklyAvailability: [], // الجدول الأسبوعي المفصل
     timeZone: 'Asia/Baghdad',
     urgentWork: false
+  },
+  equipment: {
+    cameras: [],
+    lenses: [],
+    lighting: [],
+    audio: [],
+    accessories: [],
+    specialSetups: []
   },
   metadata: {
     startedAt: new Date().toISOString(),
@@ -80,6 +91,7 @@ type OnboardingAction =
   | { type: 'UPDATE_EXPERIENCE'; payload: Partial<ExperienceData> }
   | { type: 'UPDATE_PORTFOLIO'; payload: Partial<PortfolioData> }
   | { type: 'UPDATE_AVAILABILITY'; payload: Partial<AvailabilityData> }
+  | { type: 'UPDATE_EQUIPMENT'; payload: Partial<EquipmentInventory> }
   | { type: 'SET_CURRENT_STEP'; payload: OnboardingStep }
   | { type: 'COMPLETE_STEP'; payload: OnboardingStep }
   | { type: 'RESET_FORM' }
@@ -148,6 +160,24 @@ function onboardingReducer(
         formData: {
           ...state.formData,
           availability: { ...state.formData.availability, ...action.payload }
+        }
+      };
+    
+    case 'UPDATE_EQUIPMENT':
+      return {
+        ...state,
+        formData: {
+          ...state.formData,
+          equipment: { 
+            cameras: [],
+            lenses: [],
+            lighting: [],
+            audio: [],
+            accessories: [],
+            specialSetups: [],
+            ...state.formData.equipment, 
+            ...action.payload 
+          }
         }
       };
     
@@ -290,7 +320,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         return !!(
           formData.experience.experienceLevel &&
           formData.experience.experienceYears &&
-          formData.experience.specializations.length > 0
+          (formData.experience.skills?.length > 0 || (formData.experience.specializations?.length || 0) > 0)
         );
       
       case 4: // Portfolio
@@ -300,7 +330,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         return !!(
           formData.availability.availability &&
           formData.availability.weeklyHours > 0 &&
-          formData.availability.preferredWorkdays.length > 0
+          (formData.availability.preferredWorkdays.length > 0 || 
+           formData.availability.weeklyAvailability?.some(day => day.available))
         );
       
       default:
@@ -443,6 +474,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: 'UPDATE_AVAILABILITY', payload: data });
   }, []);
 
+  const updateEquipment = useCallback((data: Partial<EquipmentInventory>) => {
+    dispatch({ type: 'UPDATE_EQUIPMENT', payload: data });
+  }, []);
+
   // إعادة تعيين النموذج
   const resetForm = useCallback(() => {
     dispatch({ type: 'RESET_FORM' });
@@ -473,7 +508,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 3:
         if (!formData.experience.experienceLevel) errors.push('مستوى الخبرة مطلوب');
         if (!formData.experience.experienceYears) errors.push('سنوات الخبرة مطلوبة');
-        if (formData.experience.specializations.length === 0) errors.push('يجب اختيار تخصص واحد على الأقل');
+        if ((formData.experience.skills?.length || 0) === 0 && (formData.experience.specializations?.length || 0) === 0) {
+          errors.push('يجب اختيار تخصص واحد على الأقل');
+        }
         break;
       
       case 4:
@@ -527,6 +564,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     updateExperience,
     updatePortfolio,
     updateAvailability,
+    updateEquipment,
     
     // Navigation
     nextStep,

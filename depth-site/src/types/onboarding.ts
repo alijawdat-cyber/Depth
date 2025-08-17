@@ -1,6 +1,8 @@
 // Types موحدة لنظام الـ Onboarding الاحترافي
 // تجمع كل البيانات المطلوبة في هيكل منطقي ومتدرج
 
+import type { CreatorSkill, EquipmentInventory, WeeklyAvailability } from './creators';
+
 export type CreatorRole = 'photographer' | 'videographer' | 'designer' | 'producer';
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'professional';
 export type AvailabilityType = 'full-time' | 'part-time' | 'weekends' | 'flexible';
@@ -29,7 +31,8 @@ export interface BasicInfoData {
 export interface ExperienceData {
   experienceLevel: ExperienceLevel;
   experienceYears: string;
-  specializations: string[];
+  skills: CreatorSkill[]; // استبدل specializations بـ skills مع subcategoryId
+  specializations?: string[]; // احتفظ بالقديم للتوافق المؤقت
   previousClients?: string[];
 }
 
@@ -55,7 +58,8 @@ export interface WorkSample {
 export interface AvailabilityData {
   availability: AvailabilityType;
   weeklyHours: number;
-  preferredWorkdays: string[];
+  preferredWorkdays: string[]; // احتفظ للتوافق المؤقت
+  weeklyAvailability?: WeeklyAvailability[]; // الجدول المفصل الجديد
   timeZone: string;
   urgentWork: boolean;
 }
@@ -72,6 +76,9 @@ export interface OnboardingFormData {
   experience: ExperienceData;
   portfolio: PortfolioData;
   availability: AvailabilityData;
+  
+  // معدات المبدع (جديد)
+  equipment?: EquipmentInventory;
   
   // معلومات إضافية
   metadata: {
@@ -103,6 +110,7 @@ export interface OnboardingContextType {
   updateExperience: (data: Partial<ExperienceData>) => void;
   updatePortfolio: (data: Partial<PortfolioData>) => void;
   updateAvailability: (data: Partial<AvailabilityData>) => void;
+  updateEquipment: (data: Partial<EquipmentInventory>) => void;
   
   // Navigation
   nextStep: () => Promise<boolean>;
