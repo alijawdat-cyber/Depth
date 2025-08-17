@@ -38,6 +38,11 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'التسعير', href: '/admin/pricing' }
     ],
+    '/admin/pricing/rate-card': [
+      { label: 'لوحة التحكم', href: '/admin', icon: Home },
+      { label: 'التسعير', href: '/admin/pricing' },
+      { label: 'محرر جدول الأسعار', href: '/admin/pricing/rate-card' }
+    ],
     '/admin/quotes': [
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'العروض', href: '/admin/quotes' }

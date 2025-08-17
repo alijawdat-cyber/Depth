@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Dropdown from '@/components/ui/Dropdown';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { 
@@ -137,6 +138,34 @@ export default function CreatorIntakePage() {
     updateFormData(field, currentArray.filter(item => item !== value));
   };
 
+  // مصادر اختيار ثابتة محسّنة
+  const LANGUAGE_OPTIONS = ['ar', 'en', 'fr', 'tr', 'ku'];
+
+  // جلب فئات فرعية (skills) + معدات (equipment)
+  const [skillsOptions, setSkillsOptions] = useState<Array<{ id: string; nameAr: string }>>([]);
+  const [equipmentOptions, setEquipmentOptions] = useState<Record<string, Array<{ id: string; name: string }>>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [subsRes, eqRes] = await Promise.all([
+          fetch('/api/catalog/subcategories?includeDefaults=true'),
+          fetch('/api/catalog/equipment'),
+        ]);
+        if (subsRes.ok) {
+          const data = await subsRes.json();
+          setSkillsOptions((data.items || []).map((i: any) => ({ id: i.id, nameAr: i.nameAr })));
+        }
+        if (eqRes.ok) {
+          const data = await eqRes.json();
+          setEquipmentOptions(data.items || {});
+        }
+      } catch {}
+    })();
+  }, []);
+
+  // إزالة التكرار غير المقصود أعلاه
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -182,54 +211,39 @@ export default function CreatorIntakePage() {
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
                 سنوات الخبرة *
               </label>
-              <select
-                value={formData.experience}
-                onChange={(e) => updateFormData('experience', e.target.value)}
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                required
-              >
-                <option value="">اختر سنوات الخبرة</option>
-                <option value="less-than-1">أقل من سنة</option>
-                <option value="1-2">1-2 سنة</option>
-                <option value="3-5">3-5 سنوات</option>
-                <option value="6-10">6-10 سنوات</option>
-                <option value="more-than-10">أكثر من 10 سنوات</option>
-              </select>
+              <Dropdown
+                value={formData.experience || ''}
+                onChange={(v) => updateFormData('experience', String(v))}
+                options={[
+                  { value: 'less-than-1', label: 'أقل من سنة' },
+                  { value: '1-2', label: '1-2 سنة' },
+                  { value: '3-5', label: '3-5 سنوات' },
+                  { value: '6-10', label: '6-10 سنوات' },
+                  { value: 'more-than-10', label: 'أكثر من 10 سنوات' },
+                ]}
+                placeholder="اختر سنوات الخبرة"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                المهارات الأساسية
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">المهارات الأساسية (من الكتالوج)</label>
+              <Dropdown
+                value={''}
+                onChange={(id) => {
+                  const name = skillsOptions.find((s) => s.id === id)?.nameAr || String(id);
+                  if (id) addToArray('skills', name);
+                }}
+                options={skillsOptions.map((s) => ({ value: s.id, label: s.nameAr }))}
+                placeholder="اختر مهارة من الفئات الفرعية"
+              />
+              <div className="flex flex-wrap gap-2 mt-3">
                 {formData.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2"
-                  >
+                  <span key={index} className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2">
                     {skill}
-                    <button
-                      type="button"
-                      onClick={() => removeFromArray('skills', skill)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => removeFromArray('skills', skill)} className="text-red-500 hover:text-red-700">×</button>
                   </span>
                 ))}
               </div>
-              <input
-                type="text"
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="اكتب مهارة واضغط Enter"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addToArray('skills', e.currentTarget.value);
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
             </div>
           </div>
         );
@@ -240,38 +254,32 @@ export default function CreatorIntakePage() {
             <h2 className="text-2xl font-bold text-[var(--text)] mb-4">المعدات والأدوات</h2>
             
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                المعدات المتوفرة لديك
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">المعدات المتوفرة لديك (قائمة قياسية)</label>
+              <div className="grid md:grid-cols-2 gap-3">
+                {Object.entries(equipmentOptions).map(([cat, items]) => (
+                  <div key={cat}>
+                    <div className="text-sm text-[var(--muted)] mb-1">{cat}</div>
+                    <Dropdown
+                      value={''}
+                      onChange={(v) => {
+                        const name = (items || []).find((it: any) => String(it.id) === String(v))?.name || String(v);
+                        if (name) addToArray('equipment', name);
+                      }}
+                      options={(items || []).map((it: any) => ({ value: it.id, label: it.name }))}
+                      placeholder={`اختر من ${cat}`}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2 mt-3">
                 {formData.equipment.map((item, index) => (
-                  <span
-                    key={index}
-                    className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2"
-                  >
+                  <span key={index} className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2">
                     {item}
-                    <button
-                      type="button"
-                      onClick={() => removeFromArray('equipment', item)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => removeFromArray('equipment', item)} className="text-red-500 hover:text-red-700">×</button>
                   </span>
                 ))}
               </div>
-              <input
-                type="text"
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="مثال: Canon 5D Mark IV, Adobe Photoshop, إلخ..."
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addToArray('equipment', e.currentTarget.value);
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
+              <div className="text-xs text-[var(--muted)] mt-2">لا ترى معدّة؟ يمكنك اقتراح عنصر جديد وسيتم اعتماده من الإدارة.</div>
             </div>
           </div>
         );
@@ -333,29 +341,27 @@ export default function CreatorIntakePage() {
               <label className="block text-sm font-medium text-[var(--text)] mb-2">
                 التوفر العام
               </label>
-              <select
-                value={formData.availability}
-                onChange={(e) => updateFormData('availability', e.target.value)}
-                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-              >
-                <option value="">اختر مستوى التوفر</option>
-                <option value="full-time">متفرغ بدوام كامل</option>
-                <option value="part-time">بدوام جزئي</option>
-                <option value="weekends">عطل نهاية الأسبوع فقط</option>
-                <option value="flexible">مرن حسب المشروع</option>
-              </select>
+              <Dropdown
+                value={formData.availability || ''}
+                onChange={(v) => updateFormData('availability', String(v))}
+                options={[
+                  { value: 'full-time', label: 'متفرغ بدوام كامل' },
+                  { value: 'part-time', label: 'بدوام جزئي' },
+                  { value: 'weekends', label: 'عطل نهاية الأسبوع فقط' },
+                  { value: 'flexible', label: 'مرن حسب المشروع' },
+                ]}
+                placeholder="اختر مستوى التوفر"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                ساعات العمل المفضلة
-              </label>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">ساعات العمل (تبسيط مبدئي)</label>
               <input
                 type="text"
                 value={formData.workingHours}
                 onChange={(e) => updateFormData('workingHours', e.target.value)}
                 className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                placeholder="مثال: 9 صباحاً - 5 مساءً"
+                placeholder="مثال: 09:00-17:00 | سيتم استبداله بواجهة أسبوعية لاحقاً"
               />
             </div>
           </div>

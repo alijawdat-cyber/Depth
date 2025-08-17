@@ -70,20 +70,49 @@ export default function ClientDocumentsPage() {
     }
   };
 
+  const signDocument = async (sowId: string) => {
+    try {
+      setError(null);
+      const response = await fetch('/api/contracts/sow/sign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sowId })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'فشل في توقيع المستند');
+      }
+
+      await response.json();
+      // إعادة تحميل البيانات لإظهار التحديث
+      await loadData();
+      
+      alert('تم توقيع المستند بنجاح! سيتم إشعار الفريق بالتوقيع.');
+    } catch (err) {
+      console.error('خطأ في توقيع المستند:', err);
+      setError(err instanceof Error ? err.message : 'فشل في توقيع المستند');
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'generated': return 'bg-blue-100 text-blue-800';
       case 'sent': return 'bg-yellow-100 text-yellow-800';
       case 'signed': return 'bg-green-100 text-green-800';
+      case 'pending_signature': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'generated': return 'جاهز';
+      case 'generated': return 'جاهز للتوقيع';
       case 'sent': return 'مُرسل';
       case 'signed': return 'موقع';
+      case 'pending_signature': return 'في انتظار التوقيع';
       default: return status;
     }
   };
@@ -235,6 +264,32 @@ export default function ClientDocumentsPage() {
                             </svg>
                             معاينة
                           </Button>
+
+                          {/* زر التوقيع الإلكتروني */}
+                          {sow.status === 'generated' && (
+                            <Button
+                              onClick={() => {
+                                if (window.confirm('هل أنت متأكد من توقيع هذا المستند؟ لا يمكن التراجع عن التوقيع بعد تأكيده.')) {
+                                  signDocument(sow.id!);
+                                }
+                              }}
+                              className="bg-green-600 hover:bg-green-700 text-sm px-4 py-2"
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                              توقيع إلكتروني
+                            </Button>
+                          )}
+
+                          {sow.status === 'signed' && (
+                            <div className="flex items-center text-green-600 text-sm px-4 py-2">
+                              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              تم التوقيع
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

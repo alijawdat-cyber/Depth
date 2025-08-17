@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
+import { getCurrentFXRate as getFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
 
 // POST /api/admin/projects/[id]/approve
 // اعتماد المشروع وإنشاء Version Snapshot - حسب الوثائق
@@ -52,26 +54,27 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // جلب الإصدار الحالي من الكتالوغ والأسعار
+    // جلب الإصدار الحالي من الحوكمة/الكتالوج والتسعير
     const currentVersion = await getCurrentVersion();
-    
-    // جلب سعر الصرف الحالي
-    const currentFX = await getCurrentFXRate();
+    const activeRateCard = await getActiveRateCard();
+    const fxRate = getFXRate(activeRateCard?.fxPolicy || undefined);
+    const fxSnapshot = createFXSnapshot(Number(projectData.totalIQD || 0), fxRate, 'admin');
 
     // إنشاء Version Snapshot - حسب الوثائق
     const snapshot = {
       version: currentVersion.version,
-      fxRate: currentFX.rate,
-      fxDate: currentFX.date,
-      fxSource: currentFX.source,
+      fxRate: fxSnapshot.rate,
+      fxDate: fxSnapshot.date,
+      fxSource: fxSnapshot.source,
       catalogVersion: currentVersion.catalogVersion,
       pricingVersion: currentVersion.pricingVersion,
+      rateCardVersionId: activeRateCard?.versionId || null,
       createdAt: new Date().toISOString(),
       createdBy: session.user.email,
       // حفظ نسخة من التسليمات والأسعار
       deliverables: projectData.deliverables,
       totalIQD: projectData.totalIQD,
-      totalUSD: projectData.totalUSD,
+      totalUSD: fxSnapshot.quotedUSD,
       margin: projectData.margin
     };
 
@@ -99,7 +102,7 @@ export async function POST(
           projectTitle: projectData.title,
           clientEmail: projectData.clientEmail,
           totalIQD: projectData.totalIQD,
-          totalUSD: projectData.totalUSD,
+          totalUSD: fxSnapshot.quotedUSD,
           margin: projectData.margin,
           snapshot: {
             version: snapshot.version,

@@ -107,7 +107,21 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: '/admin/pricing',
     label: 'التسعير',
     icon: Calculator,
-    description: 'إدارة الأسعار وحاسبة التكلفة'
+    description: 'إدارة الأسعار وحاسبة التكلفة',
+    children: [
+      {
+        href: '/admin/pricing',
+        label: 'محرك التسعير',
+        icon: Calculator,
+        description: 'حاسبة الأسعار ومعاينة النتائج'
+      },
+      {
+        href: '/admin/pricing/rate-card',
+        label: 'محرر جدول الأسعار',
+        icon: Settings,
+        description: 'تعديل الأسعار الأساسية والحواجز'
+      }
+    ]
   },
   {
     href: '/admin/quotes',

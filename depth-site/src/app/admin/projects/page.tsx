@@ -65,10 +65,10 @@ interface Deliverable {
   subcategory: string;
   subcategoryNameAr: string;
   quantity: number;
-  processing: 'raw_only' | 'raw_color' | 'full_retouch';
+  processing: 'raw_only' | 'raw_basic' | 'full_retouch';
   conditions: {
     isRush: boolean;
-    location: 'studio' | 'outdoor_baghdad' | 'provinces';
+    locationZone?: 'baghdad_center' | 'baghdad_outer' | 'provinces_near' | 'provinces_far';
     speedBonus: boolean;
   };
   assignedTo?: string; // Creator/Employee ID
@@ -134,9 +134,9 @@ export default function AdminProjectsPage() {
   const [deliverableData, setDeliverableData] = useState({
     subcategory: '',
     quantity: 1,
-    processing: 'raw_color' as 'raw_only' | 'raw_color' | 'full_retouch',
+    processing: 'raw_basic' as 'raw_only' | 'raw_basic' | 'full_retouch',
     isRush: false,
-    location: 'studio' as 'studio' | 'outdoor_baghdad' | 'provinces',
+    locationZone: 'baghdad_center' as 'baghdad_center' | 'baghdad_outer' | 'provinces_near' | 'provinces_far',
     assignedTo: ''
   });
   
@@ -252,9 +252,9 @@ export default function AdminProjectsPage() {
         setDeliverableData({
           subcategory: '',
           quantity: 1,
-          processing: 'raw_color',
+          processing: 'raw_basic',
           isRush: false,
-          location: 'studio',
+          locationZone: 'baghdad_center',
           assignedTo: ''
         });
         toast.success('تمت إضافة التسليمة وحساب الأسعار');
@@ -793,10 +793,15 @@ export default function AdminProjectsPage() {
                   className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
                 >
                   <option value="fashion">Fashion</option>
-                  <option value="beauty">Beauty</option>
-                  <option value="food">Food & Beverage</option>
-                  <option value="clinics">Clinics</option>
-                  <option value="corporate">Corporate</option>
+                  <option value="beauty">Beauty/Clinics</option>
+                  <option value="fnb">F&B</option>
+                  <option value="furniture">Furniture/Decor</option>
+                  <option value="sports">Sports/Retail</option>
+                  <option value="b2b">B2B/Offices</option>
+                  <option value="restaurants">Restaurants/Cafes</option>
+                  <option value="ecom">E-commerce</option>
+                  <option value="events">Events/Coverage</option>
+                  <option value="influencer">Influencers/UGC</option>
                 </select>
               </div>
 
@@ -878,13 +883,14 @@ export default function AdminProjectsPage() {
                   className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
                 >
                   <option value="">اختر الفئة الفرعية</option>
-                  <option value="photo-flat-lay">Photo — Flat Lay</option>
-                  <option value="photo-lifestyle">Photo — Lifestyle</option>
-                  <option value="photo-portrait">Photo — Portrait</option>
-                  <option value="reel-try-on">Reel — Try-On</option>
-                  <option value="reel-lifestyle">Reel — Lifestyle</option>
-                  <option value="design-carousel">Design — Carousel</option>
-                  <option value="design-story">Design — Story</option>
+                  <option value="photo_flat_lay">Photo — Flat Lay</option>
+                  <option value="photo_lifestyle">Photo — Lifestyle</option>
+                  <option value="photo_on_model">Photo — On-Model</option>
+                  <option value="photo_ghost">Photo — Ghost Mannequin</option>
+                  <option value="reel_try_on">Reel — Try-On</option>
+                  <option value="reel_bts">Reel — BTS</option>
+                  <option value="design_carousel">Design — Carousel</option>
+                  <option value="design_story_cover">Design — Story Cover</option>
                 </select>
               </div>
 
@@ -907,27 +913,28 @@ export default function AdminProjectsPage() {
                 </label>
                 <select
                   value={deliverableData.processing}
-                  onChange={(e) => setDeliverableData(prev => ({ ...prev, processing: e.target.value as 'raw_only' | 'raw_color' | 'full_retouch' }))}
+                  onChange={(e) => setDeliverableData(prev => ({ ...prev, processing: e.target.value as 'raw_only' | 'raw_basic' | 'full_retouch' }))}
                   className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
                 >
                   <option value="raw_only">RAW Only (-10%)</option>
-                  <option value="raw_color">RAW + Color (0%)</option>
+                  <option value="raw_basic">RAW + Basic Color (0%)</option>
                   <option value="full_retouch">Full Retouch (+30-40%)</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  الموقع
+                  منطقة الموقع (Location Zone)
                 </label>
                 <select
-                  value={deliverableData.location}
-                  onChange={(e) => setDeliverableData(prev => ({ ...prev, location: e.target.value as 'studio' | 'outdoor_baghdad' | 'provinces' }))}
+                  value={deliverableData.locationZone}
+                  onChange={(e) => setDeliverableData(prev => ({ ...prev, locationZone: e.target.value as 'baghdad_center' | 'baghdad_outer' | 'provinces_near' | 'provinces_far' }))}
                   className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
                 >
-                  <option value="studio">الاستوديو (0 رسوم)</option>
-                  <option value="outdoor_baghdad">خارجي - بغداد</option>
-                  <option value="provinces">المحافظات</option>
+                  <option value="baghdad_center">بغداد - مركز (+5,000)</option>
+                  <option value="baghdad_outer">بغداد - أطراف (+10,000)</option>
+                  <option value="provinces_near">محافظات قريبة (+25,000)</option>
+                  <option value="provinces_far">محافظات بعيدة (+50,000)</option>
                 </select>
               </div>
 

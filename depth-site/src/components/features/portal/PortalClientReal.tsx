@@ -38,6 +38,7 @@ import PendingApprovalScreen from "./PendingApprovalScreen";
 import WelcomeOnboarding from "./WelcomeOnboarding";
 import InteractiveOnboarding from "@/components/ui/InteractiveOnboarding";
 import { StateLoading, StateError, StateEmpty, StatCardSkeleton, FileCardSkeleton } from "@/components/ui/States";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { useProjects, useFiles, useApprovals } from "@/hooks/usePortalData";
 import NotificationBell from "@/components/ui/NotificationBell";
 import { BRAND } from "@/lib/constants/brand";
@@ -260,6 +261,7 @@ export default function PortalClientReal() {
     : 0;
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Interactive Onboarding */}
       <InteractiveOnboarding
@@ -423,37 +425,100 @@ export default function PortalClientReal() {
             <div className="space-y-6">
               {activeProject ? (
                 <>
-                  {/* Project Overview */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
+                  {/* Project Overview Enhanced */}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2">
                       <h3 className="text-lg font-semibold text-[var(--text)] mb-4">تفاصيل المشروع</h3>
-                      <div className="space-y-3">
+                      <div className="bg-[var(--bg)] p-4 rounded-[var(--radius)] space-y-3">
                         <div className="flex justify-between">
                           <span className="text-[var(--slate-600)]">اسم المشروع:</span>
                           <span className="font-medium text-[var(--text)]">{activeProject.name}</span>
                         </div>
                         <div className="flex justify-between">
+                          <span className="text-[var(--slate-600)]">رقم المشروع:</span>
+                          <span className="font-medium text-[var(--text)]">#{activeProject.id?.slice(-8)}</span>
+                        </div>
+                        <div className="flex justify-between">
                           <span className="text-[var(--slate-600)]">الحالة:</span>
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activeProject.status)}`}>
-                            {activeProject.status === 'active' ? 'نشط' : activeProject.status}
+                            {activeProject.status === 'active' ? 'نشط' : 
+                             activeProject.status === 'completed' ? 'مكتمل' :
+                             activeProject.status === 'pending' ? 'قيد الانتظار' : activeProject.status}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-[var(--slate-600)]">الميزانية:</span>
+                          <span className="text-[var(--slate-600)]">الميزانية الإجمالية:</span>
                           <span className="font-medium text-[var(--text)]">{formatCurrency(activeProject.budget)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[var(--slate-600)]">المبلغ المستخدم:</span>
+                          <span className="font-medium text-[var(--text)]">{formatCurrency(activeProject.budget * (activeProject.progress / 100))}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-[var(--slate-600)]">تاريخ البداية:</span>
                           <span className="font-medium text-[var(--text)]">{formatDate(activeProject.createdAt)}</span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-[var(--slate-600)]">آخر تحديث:</span>
+                          <span className="font-medium text-[var(--text)]">{formatDate(activeProject.updatedAt)}</span>
+                        </div>
+                        {(activeProject as any).estimatedDays && (
+                          <div className="flex justify-between">
+                            <span className="text-[var(--slate-600)]">المدة المتوقعة:</span>
+                            <span className="font-medium text-[var(--text)]">{(activeProject as any).estimatedDays} يوم</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-[var(--text)] mb-4">وصف المشروع</h3>
-                      <p className="text-[var(--slate-600)] leading-relaxed">
+                      <h3 className="text-lg font-semibold text-[var(--text)] mb-4">معلومات إضافية</h3>
+                      <div className="space-y-4">
+                        {/* وصف المشروع */}
+                        <div className="bg-[var(--bg)] p-4 rounded-[var(--radius)]">
+                          <h4 className="font-medium text-[var(--text)] mb-2">الوصف:</h4>
+                          <p className="text-[var(--slate-600)] text-sm leading-relaxed">
                         {activeProject.description || 'لا يوجد وصف متاح للمشروع'}
                       </p>
+                        </div>
+
+                        {/* إحصائيات سريعة */}
+                        <div className="bg-[var(--bg)] p-4 rounded-[var(--radius)]">
+                          <h4 className="font-medium text-[var(--text)] mb-3">إحصائيات سريعة:</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-[var(--slate-600)]">الملفات:</span>
+                              <span className="font-medium">{files.length}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-[var(--slate-600)]">الموافقات:</span>
+                              <span className="font-medium">{approvals.length}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-[var(--slate-600)]">المعلقة:</span>
+                              <span className="font-medium text-orange-600">{approvals.filter(a => a.status === 'pending').length}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* أعضاء الفريق */}
+                        {(activeProject as any).team && (activeProject as any).team.length > 0 && (
+                          <div className="bg-[var(--bg)] p-4 rounded-[var(--radius)]">
+                            <h4 className="font-medium text-[var(--text)] mb-3">فريق العمل:</h4>
+                            <div className="space-y-2">
+                              {(activeProject as any).team.map((member: { name?: string; role?: string }, index: number) => (
+                                <div key={index} className="flex items-center gap-2 text-sm">
+                                  <div className="w-6 h-6 bg-[var(--accent-500)] rounded-full flex items-center justify-center text-white text-xs">
+                                    {member.name?.charAt(0) || 'م'}
+                                  </div>
+                                  <span className="text-[var(--text)]">{member.name}</span>
+                                  <span className="text-[var(--slate-500)] text-xs">({member.role})</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -762,18 +827,160 @@ export default function PortalClientReal() {
 
           {/* Reports Tab */}
           {tab === "reports" && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-[var(--text)]">التقارير والتحليلات</h3>
-              
+                <div className="flex gap-2">
+                  <Button 
+                    variant="primary" 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/portal/reports/export', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            type: 'project_summary',
+                            projectId: activeProject?.id,
+                            format: 'pdf'
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `تقرير_المشروع_${activeProject?.name || 'الحالي'}_${new Date().toISOString().split('T')[0]}.pdf`;
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                        } else {
+                          alert('فشل في تصدير التقرير. يرجى المحاولة مرة أخرى.');
+                        }
+                      } catch (error) {
+                        console.error('Export error:', error);
+                        alert('حدث خطأ أثناء تصدير التقرير.');
+                      }
+                    }}
+                    className="flex items-center gap-2"
+                    disabled={!activeProject}
+                  >
+                    <Download size={16} />
+                    تصدير PDF
+                  </Button>
+                </div>
+              </div>
+
+              {/* تقارير المشروع */}
+              {activeProject ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* ملخص الأداء */}
+                  <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
+                    <h4 className="text-lg font-semibold text-[var(--text)] mb-4">ملخص الأداء</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">التقدم الحالي:</span>
+                        <span className="font-medium text-[var(--text)]">{activeProject.progress}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الميزانية المستخدمة:</span>
+                        <span className="font-medium text-[var(--text)]">{formatCurrency(activeProject.budget * (activeProject.progress / 100))}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الملفات المسلمة:</span>
+                        <span className="font-medium text-[var(--text)]">{files.filter(f => f.status === 'uploaded').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الموافقات المعلقة:</span>
+                        <span className="font-medium text-[var(--text)]">{approvals.filter(a => a.status === 'pending').length}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* الجدول الزمني */}
+                  <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
+                    <h4 className="text-lg font-semibold text-[var(--text)] mb-4">الجدول الزمني</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">تاريخ البداية:</span>
+                        <span className="font-medium text-[var(--text)]">{formatDate(activeProject.createdAt)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">المدة المقدرة:</span>
+                                                    <span className="font-medium text-[var(--text)]">{(activeProject as any).estimatedDays || 'غير محدد'} يوم</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الوقت المنقضي:</span>
+                        <span className="font-medium text-[var(--text)]">
+                          {activeProject.createdAt ? Math.ceil((Date.now() - new Date(activeProject.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0} يوم
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الحالة:</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activeProject.status)}`}>
+                          {activeProject.status === 'active' ? 'نشط' : activeProject.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* احصائيات الملفات */}
+                  <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
+                    <h4 className="text-lg font-semibold text-[var(--text)] mb-4">احصائيات الملفات</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">إجمالي الملفات:</span>
+                        <span className="font-medium text-[var(--text)]">{files.length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الصور:</span>
+                        <span className="font-medium text-[var(--text)]">{files.filter(f => f.type === 'image').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">الفيديوهات:</span>
+                        <span className="font-medium text-[var(--text)]">{files.filter(f => f.type === 'video').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">المستندات:</span>
+                        <span className="font-medium text-[var(--text)]">{files.filter(f => f.type === 'document').length}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* حالة الموافقات */}
+                  <div className="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] border border-[var(--elev)]">
+                    <h4 className="text-lg font-semibold text-[var(--text)] mb-4">حالة الموافقات</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">إجمالي الموافقات:</span>
+                        <span className="font-medium text-[var(--text)]">{approvals.length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">معتمدة:</span>
+                        <span className="font-medium text-green-600">{approvals.filter(a => a.status === 'approved').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">قيد الانتظار:</span>
+                        <span className="font-medium text-yellow-600">{approvals.filter(a => a.status === 'pending').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[var(--slate-600)]">مرفوضة:</span>
+                        <span className="font-medium text-red-600">{approvals.filter(a => a.status === 'rejected').length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
               <div className="text-center py-8 text-[var(--slate-600)]">
                 <BarChart3 size={48} className="mx-auto mb-4 text-[var(--slate-400)]" />
-                <p>التقارير قيد التطوير</p>
-                <p className="text-sm mt-2">سيتم إضافة التقارير والتحليلات قريباً</p>
+                  <p>لا توجد مشاريع لعرض التقارير</p>
+                  <p className="text-sm mt-2">سيتم عرض التقارير التفصيلية هنا عند وجود مشاريع نشطة</p>
               </div>
+              )}
             </div>
           )}
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

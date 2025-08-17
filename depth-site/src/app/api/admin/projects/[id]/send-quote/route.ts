@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
+import { getCurrentFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
 
 // POST /api/admin/projects/[id]/send-quote
 // إرسال العرض مع فحص Guardrails - حسب الوثائق
@@ -93,8 +95,24 @@ export async function POST(
       }
     }
 
-    // إنشاء محتوى العرض
-    const quoteContent = generateQuoteContent(projectData, clientData);
+    // جلب الـ Rate Card الفعّالة لمعرفة سياسة FX
+    const activeRateCard = await getActiveRateCard();
+    const fxRate = getCurrentFXRate(activeRateCard?.fxPolicy || undefined);
+
+    // إنشاء FX Snapshot للإجمالي بالدينار
+    const totalIQD = Number(projectData.totalIQD || 0);
+    const fxSnapshot = createFXSnapshot(totalIQD, fxRate, 'admin');
+
+    // إعادة حساب الإجمالي بالدولار حسب الـ snapshot (تثبيت)
+    const totalUSD = fxSnapshot.quotedUSD;
+
+    // إنشاء محتوى العرض (يعتمد على locationZone و processing الموحّد)
+    const quoteContent = generateQuoteContent({
+      ...projectData,
+      totalIQD,
+      totalUSD,
+      fxSnapshot,
+    }, clientData);
 
     // إرسال العرض حسب الطريقة المحددة
     let sendResult;
@@ -116,7 +134,7 @@ export async function POST(
       }, { status: 500 });
     }
 
-    // تحديث حالة المشروع
+    // تحديث حالة المشروع + حفظ FX Snapshot ومرجع نسخة التسعير
     await adminDb
       .collection('projects')
       .doc(projectId)
@@ -125,6 +143,12 @@ export async function POST(
         quoteSentAt: new Date().toISOString(),
         quoteSentBy: session.user.email,
         quoteSentMethod: method,
+        totalUSD,
+        snapshot: {
+          ...(projectData.snapshot || {}),
+          rateCardVersionId: activeRateCard?.versionId || null,
+          fx: fxSnapshot,
+        },
         updatedAt: new Date().toISOString()
       });
 
@@ -140,8 +164,8 @@ export async function POST(
           method,
           projectTitle: projectData.title,
           clientEmail: projectData.clientEmail,
-          totalIQD: projectData.totalIQD,
-          totalUSD: projectData.totalUSD,
+          totalIQD,
+          totalUSD,
           margin: projectMargin
         },
         timestamp: new Date().toISOString()
@@ -174,9 +198,9 @@ function generateQuoteContent(projectData: any, clientData: any) {
 ${index + 1}. ${del.subcategoryNameAr || del.subcategory}
    - الكمية: ${del.quantity}
    - المعالجة: ${getProcessingText(del.processing)}
-   - السعر: ${formatCurrency(del.totalIQD)} (${formatCurrency(del.totalUSD, 'USD')})
-   ${del.conditions.isRush ? '   - عاجل (Rush)' : ''}
-   ${del.conditions.location !== 'studio' ? `   - الموقع: ${getLocationText(del.conditions.location)}` : ''}
+   - السعر: ${formatCurrencyUnified(del.totalIQD)} (${formatCurrencyUnified(del.totalUSD, 'USD')})
+   ${del.conditions?.isRush ? '   - عاجل (Rush)' : ''}
+   ${del.conditions?.locationZone ? `   - المنطقة: ${getLocationZoneText(del.conditions.locationZone)}` : ''}
 `;
   });
 
@@ -189,8 +213,8 @@ ${index + 1}. ${del.subcategoryNameAr || del.subcategory}
 ${deliverablesList}
 
 الإجمالي:
-- بالدينار العراقي: ${formatCurrency(projectData.totalIQD)}
-- بالدولار الأمريكي: ${formatCurrency(projectData.totalUSD, 'USD')}
+- بالدينار العراقي: ${formatCurrencyUnified(projectData.totalIQD)}
+- بالدولار الأمريكي: ${formatCurrencyUnified(projectData.totalUSD, 'USD')} (مثبّت بسعر صرف ${projectData?.fxSnapshot?.rate || '1300'})
 
 ملاحظات:
 - الأسعار شاملة جميع الخدمات المذكورة
@@ -251,25 +275,18 @@ async function sendWhatsAppQuote(projectData: any, clientData: any, content: str
 function getProcessingText(processing: string) {
   switch (processing) {
     case 'raw_only': return 'RAW Only';
-    case 'raw_color': return 'RAW + Color';
+    case 'raw_basic': return 'RAW + Basic Color';
     case 'full_retouch': return 'Full Retouch';
     default: return processing;
   }
 }
 
-function getLocationText(location: string) {
-  switch (location) {
-    case 'studio': return 'الاستوديو';
-    case 'outdoor_baghdad': return 'خارجي - بغداد';
-    case 'provinces': return 'المحافظات';
-    default: return location;
-  }
-}
-
-function formatCurrency(amount: number, currency: 'IQD' | 'USD' = 'IQD') {
-  if (currency === 'IQD') {
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
-  } else {
-    return '$' + new Intl.NumberFormat('en-US').format(amount);
+function getLocationZoneText(zone: string) {
+  switch (zone) {
+    case 'baghdad_center': return 'بغداد — مركز';
+    case 'baghdad_outer': return 'بغداد — أطراف';
+    case 'provinces_near': return 'محافظات — قريبة';
+    case 'provinces_far': return 'محافظات — بعيدة';
+    default: return zone;
   }
 }

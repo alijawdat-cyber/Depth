@@ -32,14 +32,14 @@ export interface PricingValidationResult {
 
 export const DEFAULT_GUARDRAILS: GuardrailsConfig = {
   profitMargins: {
-    minimum: 0.35,    // 35%
-    standard: 0.50,   // 50%
+    minimum: 0.45,    // 45% (Hard Stop)
+    standard: 0.50,   // 50% (Target)
     premium: 0.65,    // 65%
     luxury: 0.80      // 80%
   },
   discountLimits: {
-    maxDiscountPercent: 0.20,      // 20%
-    requiresApproval: 0.15,        // 15%
+    maxDiscountPercent: 0.10,      // 10% (عقود طويلة/مجمّع)
+    requiresApproval: 0.05,        // 5% (تخفيض يتطلب موافقة)
     emergencyDiscount: 0.30        // 30%
   },
   priceFloors: {

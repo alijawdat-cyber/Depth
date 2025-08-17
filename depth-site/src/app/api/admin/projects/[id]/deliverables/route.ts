@@ -34,7 +34,7 @@ export async function POST(
       quantity,
       processing,
       isRush,
-      location,
+      locationZone,
       assignedTo
     } = body;
 
@@ -108,7 +108,7 @@ export async function POST(
       case 'raw_only':
         processingMultiplier = 0.9; // -10%
         break;
-      case 'raw_color':
+      case 'raw_basic':
         processingMultiplier = 1.0; // 0%
         break;
       case 'full_retouch':
@@ -127,16 +127,14 @@ export async function POST(
 
     // تطبيق رسوم الموقع (Location Zones)
     let locationFeeIQD = 0;
-    switch (location) {
-      case 'studio':
-        locationFeeIQD = 0; // بدون رسوم
-        break;
-      case 'outdoor_baghdad':
-        locationFeeIQD = 5000; // 5000 د.ع لكل جلسة
-        break;
-      case 'provinces':
-        locationFeeIQD = 15000; // 15000 د.ع لكل جلسة
-        break;
+    const zoneMap: Record<string, number> = {
+      baghdad_center: 5000,
+      baghdad_outer: 10000,
+      provinces_near: 25000,
+      provinces_far: 50000
+    };
+    if (locationZone && zoneMap[locationZone]) {
+      locationFeeIQD = zoneMap[locationZone];
     }
 
     // إضافة رسوم الموقع للسعر الإجمالي (ليس لكل وحدة)
@@ -178,7 +176,7 @@ export async function POST(
       processing,
       conditions: {
         isRush,
-        location,
+        locationZone: locationZone || null,
         speedBonus: false // سيتم تحديثه لاحقاً حسب الأداء
       },
       assignedTo: assignedTo || null,
@@ -220,6 +218,12 @@ export async function POST(
     }
 
     // تحديث المشروع في قاعدة البيانات
+    // بناء فهرس معياري للمعيّنين على مستوى المشروع لتمكين استعلامات القيود لاحقاً
+    const assignedMemberIds = Array.from(new Set(
+      updatedDeliverables
+        .map((del: any) => del.assignedTo)
+        .filter((v: string | null | undefined): v is string => Boolean(v))
+    ));
     await adminDb
       .collection('projects')
       .doc(projectId)
@@ -230,7 +234,8 @@ export async function POST(
         margin: projectAverageMargin,
         guardrailStatus,
         updatedAt: new Date().toISOString(),
-        updatedBy: session.user.email
+        updatedBy: session.user.email,
+        assignedMemberIds
       });
 
     return NextResponse.json({
@@ -254,13 +259,14 @@ export async function POST(
 // دالة للحصول على الأسعار الافتراضية
 function getDefaultPrices(subcategory: string) {
   const defaults: { [key: string]: { iqd: number; usd: number; nameAr: string } } = {
-    'photo-flat-lay': { iqd: 20000, usd: 15, nameAr: 'صورة — فلات لي' },
-    'photo-lifestyle': { iqd: 25000, usd: 19, nameAr: 'صورة — لايف ستايل' },
-    'photo-portrait': { iqd: 30000, usd: 23, nameAr: 'صورة — بورتريه' },
-    'reel-try-on': { iqd: 120000, usd: 92, nameAr: 'ريل — تراي أون' },
-    'reel-lifestyle': { iqd: 150000, usd: 115, nameAr: 'ريل — لايف ستايل' },
-    'design-carousel': { iqd: 15000, usd: 12, nameAr: 'تصميم — كاروسيل' },
-    'design-story': { iqd: 10000, usd: 8, nameAr: 'تصميم — ستوري' }
+    'photo_flat_lay': { iqd: 19500, usd: 15, nameAr: 'صورة — فلات لي' },
+    'photo_lifestyle': { iqd: 23400, usd: 18, nameAr: 'صورة — لايف ستايل' },
+    'photo_on_model': { iqd: 23400, usd: 18, nameAr: 'صورة — أون مودل' },
+    'photo_ghost': { iqd: 26000, usd: 20, nameAr: 'صورة — مانيكان شبح' },
+    'reel_try_on': { iqd: 156000, usd: 120, nameAr: 'ريل — تراي أون' },
+    'reel_bts': { iqd: 143000, usd: 110, nameAr: 'ريل — كواليس' },
+    'design_carousel': { iqd: 58500, usd: 45, nameAr: 'تصميم — كاروسيل' },
+    'design_story_cover': { iqd: 32500, usd: 25, nameAr: 'تصميم — غلاف ستوري' }
   };
 
   return defaults[subcategory] || { iqd: 20000, usd: 15, nameAr: subcategory };
