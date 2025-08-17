@@ -246,9 +246,13 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
     return <>{children}</>;
   }
 
-  // التحقق من الجلسة
-  if (!session || session.user.role !== 'creator') {
-    return null;
+  // التحقق من الجلسة للصفحات الأخرى
+  if (!session) {
+    return null; // سيتم التوجيه في useEffect
+  }
+
+  if (session.user.role !== 'creator') {
+    return null; // سيتم التوجيه في useEffect
   }
 
   return (

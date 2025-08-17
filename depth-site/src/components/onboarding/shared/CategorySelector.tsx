@@ -1,52 +1,81 @@
-// Component مشترك لاختيار المجالات الأساسية
+// Component مشترك لاختيار المجالات الأساسية - محدث ليكون ديناميكي
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Video, Palette, Check, AlertCircle } from 'lucide-react';
+import { Camera, Video, Palette, Check, AlertCircle, Loader2, Mic, Sparkles, Monitor } from 'lucide-react';
 
 interface CategorySelectorProps {
-  value: ('photo' | 'video' | 'design')[];
-  onChange: (categories: ('photo' | 'video' | 'design')[]) => void;
+  value: string[];
+  onChange: (categories: string[]) => void;
   error?: string;
   disabled?: boolean;
   maxSelections?: number;
 }
 
-const CATEGORIES = [
-  {
-    id: 'photo' as const,
-    title: 'التصوير الفوتوغرافي',
-    description: 'صور المنتجات، البورتريه، الفعاليات، والتصوير التجاري',
-    icon: Camera,
-    gradient: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    textColor: 'text-blue-700',
-    examples: ['صور منتجات', 'بورتريه', 'فعاليات', 'تصوير تجاري']
-  },
-  {
-    id: 'video' as const,
-    title: 'إنتاج الفيديو',
-    description: 'ريلز، فيديوهات ترويجية، محتوى اجتماعي، ومونتاج',
-    icon: Video,
-    gradient: 'from-red-500 to-pink-500',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    textColor: 'text-red-700',
-    examples: ['ريلز انستغرام', 'فيديو ترويجي', 'محتوى تيك توك', 'مونتاج']
-  },
-  {
-    id: 'design' as const,
-    title: 'التصميم الجرافيكي',
-    description: 'تصميم الهوية البصرية، الإعلانات، والمحتوى الرقمي',
-    icon: Palette,
-    gradient: 'from-purple-500 to-indigo-500',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    textColor: 'text-purple-700',
-    examples: ['لوغو وهوية', 'إعلانات', 'سوشيال ميديا', 'مطبوعات']
+interface Category {
+  id: string;
+  nameAr: string;
+  nameEn?: string;
+  subcategoryCount?: number;
+}
+
+// أيقونات الفئات
+const getCategoryIcon = (categoryId: string) => {
+  switch (categoryId) {
+    case 'photo': return Camera;
+    case 'video': return Video;
+    case 'design': return Palette;
+    case 'audio': return Mic;
+    case 'interactive': return Monitor;
+    case 'ai_automation': return Sparkles;
+    default: return Camera;
   }
-];
+};
+
+// ألوان الفئات
+const getCategoryStyle = (categoryId: string) => {
+  const styles = {
+    photo: {
+      gradient: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      textColor: 'text-blue-700'
+    },
+    video: {
+      gradient: 'from-red-500 to-pink-500',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
+      textColor: 'text-red-700'
+    },
+    design: {
+      gradient: 'from-purple-500 to-indigo-500',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200',
+      textColor: 'text-purple-700'
+    },
+    audio: {
+      gradient: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200',
+      textColor: 'text-green-700'
+    },
+    interactive: {
+      gradient: 'from-orange-500 to-amber-500',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200',
+      textColor: 'text-orange-700'
+    },
+    ai_automation: {
+      gradient: 'from-violet-500 to-purple-500',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-200',
+      textColor: 'text-violet-700'
+    }
+  };
+  
+  return styles[categoryId as keyof typeof styles] || styles.photo;
+};
 
 export default function CategorySelector({ 
   value, 
@@ -55,8 +84,35 @@ export default function CategorySelector({
   disabled, 
   maxSelections = 3 
 }: CategorySelectorProps) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // جلب الفئات من قاعدة البيانات
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/catalog/categories');
+        const data = await response.json();
+        
+        if (data.success && data.items) {
+          setCategories(data.items);
+        } else {
+          setApiError('فشل في تحميل الفئات');
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setApiError('خطأ في الاتصال بالخادم');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
   
-  const handleToggle = (categoryId: 'photo' | 'video' | 'design') => {
+  const handleToggle = (categoryId: string) => {
     if (disabled) return;
     
     const currentCategories = [...value];
@@ -75,6 +131,30 @@ export default function CategorySelector({
     onChange(currentCategories);
   };
 
+  // عرض التحميل
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader2 size={32} className="animate-spin text-[var(--accent-500)] mx-auto mb-4" />
+          <p className="text-[var(--muted)]">جاري تحميل الفئات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // عرض الخطأ
+  if (apiError) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex items-center gap-2 text-red-700">
+          <AlertCircle size={20} />
+          <span>{apiError}</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* العنوان والوصف */}
@@ -89,10 +169,11 @@ export default function CategorySelector({
 
       {/* الفئات */}
       <div className="grid gap-4">
-        {CATEGORIES.map((category, index) => {
+        {categories.map((category, index) => {
           const isSelected = value.includes(category.id);
           const canSelect = value.length < maxSelections || isSelected;
-          const Icon = category.icon;
+          const Icon = getCategoryIcon(category.id);
+          const style = getCategoryStyle(category.id);
           
           return (
             <motion.div
@@ -111,7 +192,7 @@ export default function CategorySelector({
               <div className={`
                 relative p-6 rounded-2xl border-2 transition-all duration-200
                 ${isSelected 
-                  ? `${category.borderColor} ${category.bgColor} shadow-lg ring-4 ring-opacity-20 ring-current` 
+                  ? `${style.borderColor} ${style.bgColor} shadow-lg ring-4 ring-opacity-20 ring-current` 
                   : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--accent-300)] hover:shadow-md'
                 }
               `}>
@@ -131,7 +212,7 @@ export default function CategorySelector({
                   <div className={`
                     w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200
                     ${isSelected 
-                      ? `bg-gradient-to-br ${category.gradient} text-white shadow-lg` 
+                      ? `bg-gradient-to-br ${style.gradient} text-white shadow-lg` 
                       : 'bg-[var(--bg-alt)] text-[var(--muted)]'
                     }
                   `}>
@@ -141,33 +222,30 @@ export default function CategorySelector({
                   {/* Content */}
                   <div className="flex-1">
                     <h4 className={`text-xl font-bold mb-2 transition-colors ${
-                      isSelected ? category.textColor : 'text-[var(--text)]'
+                      isSelected ? style.textColor : 'text-[var(--text)]'
                     }`}>
-                      {category.title}
+                      {category.nameAr}
                     </h4>
                     
-                    <p className={`text-sm mb-4 leading-relaxed ${
-                      isSelected ? category.textColor : 'text-[var(--muted)]'
+                    <p className={`text-sm mb-2 leading-relaxed ${
+                      isSelected ? style.textColor : 'text-[var(--muted)]'
                     }`}>
-                      {category.description}
+                      {category.nameEn}
                     </p>
 
-                    {/* أمثلة */}
+                    {/* عدد الفئات الفرعية */}
                     <div className="flex flex-wrap gap-2">
-                      {category.examples.map((example, idx) => (
-                        <span
-                          key={idx}
-                          className={`
-                            px-3 py-1 rounded-full text-xs font-medium transition-colors
-                            ${isSelected 
-                              ? `${category.bgColor} ${category.textColor} border ${category.borderColor}` 
-                              : 'bg-[var(--bg-alt)] text-[var(--muted)] border border-[var(--border)]'
-                            }
-                          `}
-                        >
-                          {example}
-                        </span>
-                      ))}
+                      <span
+                        className={`
+                          px-3 py-1 rounded-full text-xs font-medium transition-colors
+                          ${isSelected 
+                            ? `${style.bgColor} ${style.textColor} border ${style.borderColor}` 
+                            : 'bg-[var(--bg-alt)] text-[var(--muted)] border border-[var(--border)]'
+                          }
+                        `}
+                      >
+                        {category.subcategoryCount} تخصص فرعي
+                      </span>
                     </div>
                   </div>
 
@@ -176,7 +254,7 @@ export default function CategorySelector({
                     <div className={`
                       w-6 h-6 rounded-lg border-2 transition-all duration-200 flex items-center justify-center
                       ${isSelected 
-                        ? `bg-gradient-to-br ${category.gradient} border-transparent` 
+                        ? `bg-gradient-to-br ${style.gradient} border-transparent` 
                         : 'border-[var(--border)] bg-[var(--bg)]'
                       }
                     `}>
@@ -215,13 +293,13 @@ export default function CategorySelector({
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {value.map(categoryId => {
-                  const category = CATEGORIES.find(c => c.id === categoryId);
+                  const category = categories.find(c => c.id === categoryId);
                   return (
                     <span
                       key={categoryId}
                       className="px-2 py-1 bg-[var(--accent-100)] text-[var(--accent-700)] rounded-full text-xs font-medium"
                     >
-                      {category?.title}
+                      {category?.nameAr}
                     </span>
                   );
                 })}
