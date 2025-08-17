@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { toast } from 'sonner';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Plus, 
@@ -151,7 +152,8 @@ export default function AdminProjectsPage() {
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/portal/admin/projects');
+      // توحيد المصدر إلى API الأدمن الذي يُعيد schema متوافقاً مع هذه الصفحة
+      const response = await fetch('/api/admin/projects');
       if (response.ok) {
         const data = await response.json();
         setProjects(data.projects || []);
@@ -208,13 +210,16 @@ export default function AdminProjectsPage() {
           deadline: '',
           priority: 'normal'
         });
+        toast.success('تم إنشاء المشروع');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إنشاء المشروع');
+        toast.error(errorData.error || 'فشل في إنشاء المشروع');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Create project error:', err);
+      toast.error('خطأ في الاتصال');
     } finally {
       setSubmitting(false);
     }
@@ -252,13 +257,16 @@ export default function AdminProjectsPage() {
           location: 'studio',
           assignedTo: ''
         });
+        toast.success('تمت إضافة التسليمة وحساب الأسعار');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إضافة التسليمة');
+        toast.error(errorData.error || 'فشل في إضافة التسليمة');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Add deliverable error:', err);
+      toast.error('خطأ في الاتصال');
     } finally {
       setSubmitting(false);
       setCalculating(false);
@@ -283,19 +291,20 @@ export default function AdminProjectsPage() {
             ? { ...p, status: 'quote_sent' as const }
             : p
         ));
-        
-        alert(`تم إرسال العرض بنجاح عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
+        toast.success(`تم إرسال العرض عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
       } else {
         const errorData = await response.json();
         if (errorData.guardrailError) {
-          alert(`⚠️ فحص Guardrails: ${errorData.error}\nالهامش الحالي: ${errorData.currentMargin}%\nالحد الأدنى المطلوب: 45%`);
+          toast.warning(`فحص Guardrails: ${errorData.error}`);
         } else {
           setError(errorData.error || 'فشل في إرسال العرض');
+          toast.error(errorData.error || 'فشل في إرسال العرض');
         }
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Send quote error:', err);
+      toast.error('خطأ في الاتصال');
     } finally {
       setSending(false);
     }
@@ -318,15 +327,16 @@ export default function AdminProjectsPage() {
             ? { ...p, status: 'approved' as const, snapshot: data.snapshot }
             : p
         ));
-        
-        alert('تم اعتماد المشروع وإنشاء Version Snapshot بنجاح');
+        toast.success('تم اعتماد المشروع وإنشاء Snapshot');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في اعتماد المشروع');
+        toast.error(errorData.error || 'فشل في اعتماد المشروع');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Approve project error:', err);
+      toast.error('خطأ في الاتصال');
     }
   };
 
@@ -606,7 +616,7 @@ export default function AdminProjectsPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <FileText size={16} />
-                      {project.deliverables.length} تسليمة
+                      {(project.deliverables || []).length} تسليمة
                     </div>
                     {project.deadline && (
                       <div className="flex items-center gap-1">
@@ -668,7 +678,7 @@ export default function AdminProjectsPage() {
                   <div>
                     <p className="text-sm text-[var(--muted)]">التسليمات</p>
                     <p className="text-lg font-semibold text-[var(--text)]">
-                      {project.deliverables.length}
+                      {(project.deliverables || []).length}
                     </p>
                   </div>
                 </div>
@@ -676,7 +686,7 @@ export default function AdminProjectsPage() {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2">
-                {project.status === 'draft' && project.deliverables.length > 0 && (
+                {project.status === 'draft' && (project.deliverables || []).length > 0 && (
                   <>
                     <Button
                       variant="primary"

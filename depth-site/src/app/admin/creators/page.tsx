@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 import Dropdown from '@/components/ui/Dropdown';
 import Loader from '@/components/loaders/Loader';
 import SectionHeading from '@/components/ui/SectionHeading';
@@ -170,6 +171,7 @@ export default function AdminCreatorsPage() {
         canTravel: false,
         languages: ['ar']
       });
+      toast.success('تم إنشاء المبدع بنجاح');
 
     } catch (err) {
       console.error('خطأ في إنشاء المبدع:', err);
@@ -177,6 +179,7 @@ export default function AdminCreatorsPage() {
         ...prev,
         error: err instanceof Error ? err.message : 'خطأ في الإنشاء'
       }));
+      toast.error('فشل في إنشاء المبدع');
     }
   };
 
@@ -194,6 +197,7 @@ export default function AdminCreatorsPage() {
 
       // إعادة تحميل البيانات
       await loadCreatorsData();
+      toast.success('تم تحديث حالة المبدع');
 
     } catch (err) {
       console.error('خطأ في تحديث حالة المبدع:', err);
@@ -201,6 +205,7 @@ export default function AdminCreatorsPage() {
         ...prev,
         error: err instanceof Error ? err.message : 'خطأ في التحديث'
       }));
+      toast.error('فشل تحديث الحالة');
     }
   };
 
@@ -456,7 +461,7 @@ export default function AdminCreatorsPage() {
                           {getRoleIcon(creator.role)}
                           <div>
                             <div className="font-medium text-[var(--text)]">{creator.fullName}</div>
-                            <div className="text-sm text-[var(--muted)]">{creator.contact.email}</div>
+                            <div className="text-sm text-[var(--muted)]">{creator.contact?.email || '-'}</div>
                           </div>
                         </div>
                       </td>
