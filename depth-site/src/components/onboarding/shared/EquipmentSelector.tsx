@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Camera, 
   Mic, 
@@ -130,6 +130,7 @@ export default function EquipmentSelector({
         catalogId,
         owned: true,
         condition: 'good',
+        quantity: 1,
         ...updates
       });
     }

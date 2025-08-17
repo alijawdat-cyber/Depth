@@ -138,7 +138,7 @@ export default function Step2_BasicInfo() {
           </h3>
           <CategorySelector
             value={basicInfo.primaryCategories}
-            onChange={(categories) => updateBasicInfo({ primaryCategories: categories })}
+            onChange={(categories) => updateBasicInfo({ primaryCategories: categories as ('photo' | 'video' | 'design')[] })}
             error={getFieldError('مجال')}
             maxSelections={2}
           />

@@ -42,13 +42,6 @@ export async function POST(request: NextRequest) {
     console.log(`Generating ${type} report for project ${projectId} in ${format} format`);
 
     // محاكاة إنشاء PDF
-    const reportData = {
-      title: `تقرير المشروع - ${projectId}`,
-      generatedAt: new Date().toISOString(),
-      generatedBy: session.user.email,
-      type,
-      format
-    };
 
     // إنشاء محتوى PDF بسيط للـ MVP
     const pdfContent = `

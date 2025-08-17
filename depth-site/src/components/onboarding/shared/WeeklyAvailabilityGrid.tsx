@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Calendar, ToggleLeft, ToggleRight, AlertCircle, Coffee } from 'lucide-react';
+import { Clock, Calendar, ToggleLeft, ToggleRight, AlertCircle, Coffee, Save, Loader2 } from 'lucide-react';
 import type { WeeklyAvailability } from '@/types/creators';
 
 interface WeeklyAvailabilityGridProps {
@@ -11,6 +11,8 @@ interface WeeklyAvailabilityGridProps {
   onChange: (availability: WeeklyAvailability[]) => void;
   error?: string;
   disabled?: boolean;
+  autoSave?: boolean; // للحفظ التلقائي في لوحة المبدع
+  onSave?: (availability: WeeklyAvailability[]) => Promise<boolean>; // دالة حفظ مخصصة
 }
 
 const DAYS_CONFIG = [
@@ -35,29 +37,79 @@ export default function WeeklyAvailabilityGrid({
   value, 
   onChange, 
   error, 
-  disabled 
+  disabled,
+  autoSave = false,
+  onSave
 }: WeeklyAvailabilityGridProps) {
   const [showBreaks, setShowBreaks] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   // الحصول على بيانات يوم محدد
   const getDayData = (dayId: string): WeeklyAvailability => {
     return value.find(item => item.day === dayId) || {
-      day: dayId as any,
+      day: dayId as WeeklyAvailability['day'],
       available: false,
       startTime: '09:00',
       endTime: '17:00'
     };
   };
 
+  // حفظ البيانات في قاعدة البيانات
+  const saveToDatabase = async (availability: WeeklyAvailability[]) => {
+    if (!autoSave && !onSave) return true;
+    
+    setSaving(true);
+    setSaveError(null);
+    
+    try {
+      if (onSave) {
+        const success = await onSave(availability);
+        if (success) {
+          setLastSaved(new Date());
+        }
+        return success;
+      } else {
+        // الحفظ التلقائي للـ API
+        const response = await fetch('/api/creators/availability', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            weeklyAvailability: availability,
+            timeZone: 'Asia/Baghdad', // يمكن جعلها ديناميكية
+            urgentWork: false // يمكن جعلها ديناميكية
+          })
+        });
+        
+        if (response.ok) {
+          setLastSaved(new Date());
+          return true;
+        } else {
+          const errorData = await response.json();
+          setSaveError(errorData.error || 'فشل في الحفظ');
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error('Error saving availability:', error);
+      setSaveError('خطأ في الاتصال بالخادم');
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // تحديث بيانات يوم
-  const updateDay = (dayId: string, updates: Partial<WeeklyAvailability>) => {
+  const updateDay = async (dayId: string, updates: Partial<WeeklyAvailability>) => {
     const currentData = [...value];
     const existingIndex = currentData.findIndex(item => item.day === dayId);
     
+    const baseDayData = getDayData(dayId);
     const dayData = {
-      day: dayId as any,
-      ...getDayData(dayId),
-      ...updates
+      ...baseDayData,
+      ...updates,
+      day: dayId as WeeklyAvailability['day']
     };
     
     if (existingIndex > -1) {
@@ -67,11 +119,16 @@ export default function WeeklyAvailabilityGrid({
     }
     
     onChange(currentData);
+    
+    // حفظ تلقائي إذا مفعل
+    if (autoSave) {
+      await saveToDatabase(currentData);
+    }
   };
 
   // تطبيق preset على يوم
-  const applyPresetToDay = (dayId: string, preset: typeof TIME_PRESETS[0]) => {
-    updateDay(dayId, {
+  const applyPresetToDay = async (dayId: string, preset: typeof TIME_PRESETS[0]) => {
+    await updateDay(dayId, {
       available: true,
       startTime: preset.start,
       endTime: preset.end
@@ -79,7 +136,7 @@ export default function WeeklyAvailabilityGrid({
   };
 
   // تطبيق preset على جميع الأيام المتاحة
-  const applyPresetToAll = (preset: typeof TIME_PRESETS[0]) => {
+  const applyPresetToAll = async (preset: typeof TIME_PRESETS[0]) => {
     const updatedData = value.map(dayData => ({
       ...dayData,
       ...(dayData.available ? {
@@ -88,17 +145,30 @@ export default function WeeklyAvailabilityGrid({
       } : {})
     }));
     onChange(updatedData);
+    
+    if (autoSave) {
+      await saveToDatabase(updatedData);
+    }
   };
 
   // تفعيل/إلغاء جميع الأيام
-  const toggleAllDays = (available: boolean) => {
+  const toggleAllDays = async (available: boolean) => {
     const updatedData = DAYS_CONFIG.map(day => ({
-      day: day.id as any,
+      day: day.id as WeeklyAvailability['day'],
       available,
       startTime: '09:00',
       endTime: '17:00'
     }));
     onChange(updatedData);
+    
+    if (autoSave) {
+      await saveToDatabase(updatedData);
+    }
+  };
+
+  // حفظ يدوي
+  const handleManualSave = async () => {
+    await saveToDatabase(value);
   };
 
   // حساب إجمالي الساعات الأسبوعية
@@ -136,6 +206,28 @@ export default function WeeklyAvailabilityGrid({
         </div>
         
         <div className="flex items-center gap-3">
+          {/* زر الحفظ اليدوي */}
+          {!autoSave && (
+            <button
+              type="button"
+              onClick={handleManualSave}
+              disabled={saving || disabled}
+              className="flex items-center gap-2 px-3 py-2 bg-[var(--accent-500)] text-white rounded-lg hover:bg-[var(--accent-600)] disabled:opacity-50 transition-all text-sm"
+            >
+              {saving ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>جاري الحفظ...</span>
+                </>
+              ) : (
+                <>
+                  <Save size={14} />
+                  <span>حفظ</span>
+                </>
+              )}
+            </button>
+          )}
+          
           <button
             type="button"
             onClick={() => setShowBreaks(!showBreaks)}
@@ -146,6 +238,44 @@ export default function WeeklyAvailabilityGrid({
           </button>
         </div>
       </div>
+
+      {/* مؤشر الحفظ التلقائي */}
+      {autoSave && (
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2 text-[var(--muted)]">
+            {saving ? (
+              <>
+                <Loader2 size={14} className="animate-spin text-[var(--accent-500)]" />
+                <span>جاري الحفظ التلقائي...</span>
+              </>
+            ) : lastSaved ? (
+              <>
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>آخر حفظ: {lastSaved.toLocaleTimeString('ar-IQ')}</span>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span>لم يتم الحفظ بعد</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* خطأ الحفظ */}
+      {saveError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-3 bg-red-50 border border-red-200 rounded-lg"
+        >
+          <p className="text-sm text-red-600 flex items-center gap-2">
+            <AlertCircle size={16} />
+            خطأ في الحفظ: {saveError}
+          </p>
+        </motion.div>
+      )}
 
       {/* أزرار سريعة */}
       <div className="flex flex-wrap gap-2">

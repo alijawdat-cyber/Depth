@@ -16,7 +16,7 @@ import {
   DollarSign,
   FileText,
   Star,
-  Settings,
+
   MessageSquare,
   Bell,
   LogOut,
@@ -84,16 +84,16 @@ const CREATOR_NAV_ITEMS = [
         description: 'البيانات الشخصية'
       },
       {
+        href: '/creators/profile/availability',
+        label: 'إدارة التوفر',
+        icon: Clock,
+        description: 'جدولك الأسبوعي وأوقات العمل'
+      },
+      {
         href: '/creators/onboarding',
         label: 'الملف المهني الكامل',
         icon: FileText,
         description: 'النموذج التفصيلي'
-      },
-      {
-        href: '/creators/onboarding',
-        label: 'النموذج البسيط',
-        icon: Settings,
-        description: 'النموذج الأساسي'
       }
     ]
   },

@@ -7,6 +7,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import { SelectField, InputField, CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
 import WeeklyAvailabilityGrid from '../shared/WeeklyAvailabilityGrid';
+import type { AvailabilityType } from '@/types/onboarding';
 
 export default function Step5_Availability() {
   const { formData, updateAvailability, getStepErrors } = useOnboarding();
@@ -67,7 +68,7 @@ export default function Step5_Availability() {
   ];
 
   const handleAvailabilityChange = (value: string) => {
-    updateAvailability({ availability: value as any });
+    updateAvailability({ availability: value as AvailabilityType });
     
     // تحديث الساعات الأسبوعية حسب نوع التوفر
     const option = AVAILABILITY_OPTIONS.find(opt => opt.value === value);
@@ -79,28 +80,7 @@ export default function Step5_Availability() {
     }
   };
 
-  const toggleWorkday = (dayId: string) => {
-    const currentDays = [...availability.preferredWorkdays];
-    const index = currentDays.indexOf(dayId);
-    
-    if (index > -1) {
-      currentDays.splice(index, 1);
-    } else {
-      currentDays.push(dayId);
-    }
-    
-    updateAvailability({ preferredWorkdays: currentDays });
-  };
 
-  const selectAllWorkdays = () => {
-    updateAvailability({ 
-      preferredWorkdays: WORKDAYS.map(day => day.id) 
-    });
-  };
-
-  const clearAllWorkdays = () => {
-    updateAvailability({ preferredWorkdays: [] });
-  };
 
   return (
     <div className="space-y-8">

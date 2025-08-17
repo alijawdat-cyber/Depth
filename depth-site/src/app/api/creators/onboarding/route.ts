@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     // التحقق من الخبرة
-    if (!formData.experience.experienceLevel || formData.experience.specializations.length === 0) {
+    if (!formData.experience.experienceLevel || (formData.experience.specializations && formData.experience.specializations.length === 0)) {
       return NextResponse.json({
         success: false,
         error: 'مستوى الخبرة والتخصصات مطلوبة',
@@ -139,7 +139,8 @@ export async function POST(req: NextRequest) {
         // 3) الخبرة والمهارات
         experienceLevel: formData.experience.experienceLevel,
         experienceYears: formData.experience.experienceYears,
-        specializations: formData.experience.specializations,
+        skills: formData.experience.skills || [], // البنية الجديدة
+        specializations: formData.experience.specializations || [], // احتفظ للتوافق
         previousClients: formData.experience.previousClients || [],
 
         // 4) معرض الأعمال
@@ -149,12 +150,30 @@ export async function POST(req: NextRequest) {
           portfolioUrl: formData.portfolio.portfolioUrl
         },
 
-        // 5) التوفر
+        // 5) التوفر والسعة
         availability: formData.availability.availability,
-        weeklyHours: formData.availability.weeklyHours,
-        preferredWorkdays: formData.availability.preferredWorkdays,
         timeZone: formData.availability.timeZone,
         urgentWork: formData.availability.urgentWork,
+        capacity: {
+          weeklyHours: formData.availability.weeklyHours,
+          weeklyAvailability: formData.availability.weeklyAvailability || [],
+          maxAssetsPerDay: 10, // قيمة افتراضية
+          standardSLA: 72, // 3 أيام
+          rushSLA: 24 // يوم واحد
+        },
+        // احتفظ بالقديم للتوافق
+        weeklyHours: formData.availability.weeklyHours,
+        preferredWorkdays: formData.availability.preferredWorkdays,
+
+        // 6) المعدات
+        equipment: formData.equipment || {
+          cameras: [],
+          lenses: [],
+          lighting: [],
+          audio: [],
+          accessories: [],
+          specialSetups: []
+        },
 
         // معلومات النظام
         status: 'intake_submitted',
@@ -367,6 +386,7 @@ export async function GET() {
       experience: {
         experienceLevel: creatorData.experienceLevel || 'beginner',
         experienceYears: creatorData.experienceYears || '0-1',
+        skills: creatorData.skills || [],
         specializations: creatorData.specializations || [],
         previousClients: creatorData.previousClients || []
       },

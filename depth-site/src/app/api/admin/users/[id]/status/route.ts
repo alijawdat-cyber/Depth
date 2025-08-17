@@ -138,7 +138,7 @@ export async function PATCH(
 async function sendStatusChangeNotification(userData: any, newStatus: string, collection: string) {
   try {
     const userRole = getUserRole(collection);
-    const statusText = getStatusText(newStatus);
+
     const userName = userData.name || userData.displayName || 'المستخدم';
     const userEmail = userData.email;
 

@@ -67,7 +67,7 @@ export async function POST(
     // فحص Guardrails - وفق Rate Card
     const activeRateCard = await getActiveRateCard();
     const minMarginHardStop = Math.round((activeRateCard?.guardrails?.minMarginHardStop ?? 0.45) * 100);
-    const minMarginDefault = Math.round((activeRateCard?.guardrails?.minMarginDefault ?? 0.50) * 100);
+
 
     const projectMargin = projectData.margin || 0;
     if (projectMargin < minMarginHardStop) {

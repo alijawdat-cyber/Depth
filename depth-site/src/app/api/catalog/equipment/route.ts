@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { mode = 'equipment', force = false } = body;
+    const { mode = 'equipment' } = body;
 
     // استدعاء دالة السيّد
     const seedModule = await import('@/lib/catalog/seed');

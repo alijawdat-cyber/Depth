@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { getActiveRateCard } from '@/lib/catalog/read';
-import { getCurrentFXRate as getFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
+import { getCurrentFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
 
 // POST /api/admin/projects/[id]/approve
 // اعتماد المشروع وإنشاء Version Snapshot - حسب الوثائق
@@ -57,7 +57,7 @@ export async function POST(
     // جلب الإصدار الحالي من الحوكمة/الكتالوج والتسعير
     const currentVersion = await getCurrentVersion();
     const activeRateCard = await getActiveRateCard();
-    const fxRate = getFXRate(activeRateCard?.fxPolicy || undefined);
+    const fxRate = getCurrentFXRate(activeRateCard?.fxPolicy || undefined);
     const fxSnapshot = createFXSnapshot(Number(projectData.totalIQD || 0), fxRate, 'admin');
 
     // إنشاء Version Snapshot - حسب الوثائق
@@ -178,35 +178,7 @@ async function getCurrentVersion() {
   };
 }
 
-// دالة جلب سعر الصرف الحالي
-async function getCurrentFXRate() {
-  try {
-    // جلب آخر سعر صرف
-    const fxQuery = await adminDb
-      .collection('fx_rates')
-      .orderBy('date', 'desc')
-      .limit(1)
-      .get();
 
-    if (!fxQuery.empty) {
-      const fxData = fxQuery.docs[0].data();
-      return {
-        rate: fxData.rate || 1300,
-        date: fxData.date || new Date().toISOString(),
-        source: fxData.source || 'manual'
-      };
-    }
-  } catch (error) {
-    console.warn('Failed to fetch current FX rate:', error);
-  }
-
-  // سعر صرف افتراضي
-  return {
-    rate: 1300, // د.ع للدولار الواحد
-    date: new Date().toISOString(),
-    source: 'default'
-  };
-}
 
 // دالة إنشاء SOW (Statement of Work)
 async function generateSOW(projectData: any, snapshot: any) {
