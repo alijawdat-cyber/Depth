@@ -75,17 +75,10 @@ export default function AdminCreatorsPage() {
     languages: ['ar'],
     skills: [],
     verticals: [],
-    equipment: {
-      cameras: [],
-      lenses: [],
-      lighting: [],
-      audio: [],
-      accessories: [],
-      specialSetups: []
-    },
+    equipment: [],
     capacity: {
       maxAssetsPerDay: 10,
-      availableDays: [],
+      weeklyAvailability: [],
       standardSLA: 48,
       rushSLA: 24
     },

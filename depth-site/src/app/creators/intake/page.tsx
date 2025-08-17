@@ -15,12 +15,11 @@ import {
   User,
   Briefcase,
   Award,
-  DollarSign,
   FileText,
   AlertCircle
 } from 'lucide-react';
 
-import { CreatorEquipmentItem, EquipmentCatalogItem, EquipmentPresetKit } from '@/types/creators';
+import { CreatorEquipmentItem, EquipmentCatalogItem, EquipmentPresetKit, WeeklyAvailability } from '@/types/creators';
 
 interface IntakeFormData {
   // معلومات إضافية
@@ -30,27 +29,26 @@ interface IntakeFormData {
   skills: string[];
   portfolio: string;
   
-  // معلومات التسعير
-  hourlyRate: number;
-  dayRate: number;
-  travelRate: number;
-  
-  // التوفر
+  // التوفر - محدث ليتطابق مع WeeklyAvailability
   availability: string;
-  workingHours: string;
+  weeklyAvailability: WeeklyAvailability[];
+  workingHours: string; // مؤقت حتى يتم الانتقال لـ WeeklyAvailability
   
   // معلومات إضافية
   languages: string[];
   specializations: string[];
+  
+  // حقول إضافية (مؤقتة للتوافق مع الكود الحالي)
+  hourlyRate?: number;
+  dayRate?: number;
 }
 
 const STEPS = [
   { id: 1, title: 'المعلومات الشخصية', icon: User },
   { id: 2, title: 'الخبرة والمهارات', icon: Award },
   { id: 3, title: 'المعدات والأدوات', icon: Settings },
-  { id: 4, title: 'التسعير', icon: DollarSign },
-  { id: 5, title: 'التوفر والتخصص', icon: Briefcase },
-  { id: 6, title: 'المراجعة والإرسال', icon: CheckCircle }
+  { id: 4, title: 'التوفر والتخصص', icon: Briefcase },
+  { id: 5, title: 'المراجعة والإرسال', icon: CheckCircle }
 ];
 
 export default function CreatorIntakePage() {
@@ -65,10 +63,16 @@ export default function CreatorIntakePage() {
     equipment: [],
     skills: [],
     portfolio: '',
-    hourlyRate: 0,
-    dayRate: 0,
-    travelRate: 0,
     availability: '',
+    weeklyAvailability: [
+      { day: 'sunday', available: false },
+      { day: 'monday', available: false },
+      { day: 'tuesday', available: false },
+      { day: 'wednesday', available: false },
+      { day: 'thursday', available: false },
+      { day: 'friday', available: false },
+      { day: 'saturday', available: false }
+    ],
     workingHours: '',
     languages: ['العربية'],
     specializations: []
@@ -124,7 +128,7 @@ export default function CreatorIntakePage() {
     }
   };
 
-  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[] | CreatorEquipmentItem[]) => {
+  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[] | CreatorEquipmentItem[] | WeeklyAvailability[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -479,28 +483,28 @@ export default function CreatorIntakePage() {
                           
                           <div>
                             <label className="block text-[var(--muted)] mb-1">الحالة</label>
-                            <select
+                            <Dropdown
                               value={item.condition}
-                              onChange={(e) => updateEquipmentItem(item.catalogId, { condition: e.target.value as 'excellent' | 'good' | 'fair' | 'poor' })}
-                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                            >
-                              <option value="excellent">ممتاز</option>
-                              <option value="good">جيد</option>
-                              <option value="fair">مقبول</option>
-                              <option value="poor">ضعيف</option>
-                            </select>
+                              onChange={(v) => updateEquipmentItem(item.catalogId, { condition: String(v) as 'excellent' | 'good' | 'fair' | 'poor' })}
+                              options={[
+                                { value: 'excellent', label: 'ممتاز' },
+                                { value: 'good', label: 'جيد' },
+                                { value: 'fair', label: 'مقبول' },
+                                { value: 'poor', label: 'ضعيف' },
+                              ]}
+                            />
                           </div>
                           
                           <div>
                             <label className="block text-[var(--muted)] mb-1">الملكية</label>
-                            <select
+                            <Dropdown
                               value={item.owned ? 'owned' : 'borrowed'}
-                              onChange={(e) => updateEquipmentItem(item.catalogId, { owned: e.target.value === 'owned' })}
-                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                            >
-                              <option value="owned">ملكي</option>
-                              <option value="borrowed">مستعار</option>
-                            </select>
+                              onChange={(v) => updateEquipmentItem(item.catalogId, { owned: String(v) === 'owned' })}
+                              options={[
+                                { value: 'owned', label: 'ملكي' },
+                                { value: 'borrowed', label: 'مستعار' },
+                              ]}
+                            />
                           </div>
                           
                           <div>
@@ -526,12 +530,12 @@ export default function CreatorIntakePage() {
               const missingRequirements = checkEquipmentRequirements();
               if (missingRequirements.length > 0) {
                 return (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                  <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-[var(--warning-fg)] mb-2">
                       <AlertCircle size={20} />
                       <span className="font-medium">متطلبات ناقصة</span>
                     </div>
-                    <ul className="text-sm text-yellow-700 list-disc list-inside">
+                    <ul className="text-sm text-[var(--warning-fg)] list-disc list-inside">
                       {missingRequirements.map((req, index) => (
                         <li key={index}>{req}</li>
                       ))}
@@ -545,54 +549,6 @@ export default function CreatorIntakePage() {
         );
 
       case 4:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">التسعير</h2>
-            
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  السعر بالساعة (USD)
-                </label>
-                <input
-                  type="number"
-                  value={formData.hourlyRate}
-                  onChange={(e) => updateFormData('hourlyRate', parseInt(e.target.value) || 0)}
-                  className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                  placeholder="50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  السعر باليوم (USD)
-                </label>
-                <input
-                  type="number"
-                  value={formData.dayRate}
-                  onChange={(e) => updateFormData('dayRate', parseInt(e.target.value) || 0)}
-                  className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                  placeholder="300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">
-                  رسوم السفر (USD)
-                </label>
-                <input
-                  type="number"
-                  value={formData.travelRate}
-                  onChange={(e) => updateFormData('travelRate', parseInt(e.target.value) || 0)}
-                  className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
-                  placeholder="100"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 5:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-[var(--text)] mb-4">التوفر والتخصص</h2>
@@ -624,10 +580,58 @@ export default function CreatorIntakePage() {
                 placeholder="مثال: 09:00-17:00 | سيتم استبداله بواجهة أسبوعية لاحقاً"
               />
             </div>
+            
+            <div className="bg-[var(--accent-bg)] border border-[var(--accent-border)] rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle size={20} className="text-[var(--accent-fg)] mt-0.5" />
+                <div className="text-sm text-[var(--accent-fg)]">
+                  <p className="font-medium mb-1">ملاحظة مهمة حول التسعير</p>
+                  <p>التسعير يتم تحديده تلقائياً حسب التخصصات والمهارات المختارة. الإدارة ستراجع وتعتمد الأسعار النهائية حسب الخبرة والمعدات.</p>
+                </div>
+              </div>
+            </div>
           </div>
         );
 
-      case 6:
+      case 5:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[var(--text)] mb-4">مراجعة البيانات</h2>
+            
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                التوفر العام
+              </label>
+              <Dropdown
+                value={formData.availability || ''}
+                onChange={(v) => updateFormData('availability', String(v))}
+                options={[
+                  { value: 'full-time', label: 'متفرغ بدوام كامل' },
+                  { value: 'part-time', label: 'بدوام جزئي' },
+                  { value: 'weekends', label: 'عطل نهاية الأسبوع فقط' },
+                  { value: 'flexible', label: 'مرن حسب المشروع' },
+                ]}
+                placeholder="اختر مستوى التوفر"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">ساعات العمل (تبسيط مبدئي)</label>
+              <input
+                type="text"
+                value={formData.workingHours}
+                onChange={(e) => updateFormData('workingHours', e.target.value)}
+                className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent transition-all"
+                placeholder="مثال: 09:00-17:00 | سيتم استبداله بواجهة أسبوعية لاحقاً"
+              />
+            </div>
+          </div>
+        );
+
+      case 6: // حذف هذه الخطوة - دمجت مع case 5
+        return null;
+
+      case 7:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-[var(--text)] mb-4">مراجعة البيانات</h2>
@@ -639,19 +643,19 @@ export default function CreatorIntakePage() {
                 <div><strong>النبذة:</strong> {formData.bio || 'غير محدد'}</div>
                 <div><strong>الخبرة:</strong> {formData.experience || 'غير محدد'}</div>
                 <div><strong>المهارات:</strong> {formData.skills.join(', ') || 'غير محدد'}</div>
-                <div><strong>المعدات:</strong> {formData.equipment.join(', ') || 'غير محدد'}</div>
-                <div><strong>السعر بالساعة:</strong> ${formData.hourlyRate}</div>
-                <div><strong>السعر باليوم:</strong> ${formData.dayRate}</div>
+                <div><strong>المعدات:</strong> {formData.equipment.length > 0 ? `${formData.equipment.length} قطعة` : 'غير محدد'}</div>
+                <div><strong>السعر بالساعة:</strong> {formData.hourlyRate ? `$${formData.hourlyRate}` : 'سيتم تحديده لاحقاً'}</div>
+                <div><strong>السعر باليوم:</strong> {formData.dayRate ? `$${formData.dayRate}` : 'سيتم تحديده لاحقاً'}</div>
                 <div><strong>التوفر:</strong> {formData.availability || 'غير محدد'}</div>
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-blue-800 mb-2">
+            <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
+              <div className="flex items-center gap-2 text-[var(--text)] mb-2">
                 <AlertCircle size={20} />
                 <span className="font-medium">ملاحظة مهمة</span>
               </div>
-              <p className="text-blue-700 text-sm">
+              <p className="text-[var(--text)] text-sm">
                 بعد إرسال النموذج، سيتم مراجعة طلبك من قبل فريقنا خلال 2-3 أيام عمل. 
                 سنتواصل معك عبر البريد الإلكتروني لإعلامك بنتيجة المراجعة.
               </p>
@@ -684,10 +688,10 @@ export default function CreatorIntakePage() {
             className="text-center mb-8"
           >
             {isWelcome && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <CheckCircle size={24} className="text-green-600 mx-auto mb-2" />
-                <h2 className="text-lg font-semibold text-green-800 mb-1">🎉 مرحباً بك!</h2>
-                <p className="text-green-700 text-sm">
+              <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-6">
+                <CheckCircle size={24} className="text-[var(--success-fg)] mx-auto mb-2" />
+                <h2 className="text-lg font-semibold text-[var(--success-fg)] mb-1">🎉 مرحباً بك!</h2>
+                <p className="text-[var(--success-fg)] text-sm">
                   تم إنشاء حسابك بنجاح. الآن أكمل نموذج التفاصيل المهنية للبدء في استلام المشاريع.
                 </p>
               </div>
@@ -716,7 +720,7 @@ export default function CreatorIntakePage() {
                     w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
                     ${currentStep >= step.id 
                       ? 'bg-[var(--accent-500)] text-white' 
-                      : 'bg-gray-200 text-gray-600'
+                      : 'bg-[var(--border)] text-[var(--muted)]'
                     }
                   `}>
                     {currentStep > step.id ? (
@@ -728,7 +732,7 @@ export default function CreatorIntakePage() {
                   {index < STEPS.length - 1 && (
                     <div className={`
                       flex-1 h-0.5 mx-2
-                      ${currentStep > step.id ? 'bg-[var(--accent-500)]' : 'bg-gray-200'}
+                      ${currentStep > step.id ? 'bg-[var(--accent-500)]' : 'bg-[var(--border)]'}
                     `} />
                   )}
                 </div>

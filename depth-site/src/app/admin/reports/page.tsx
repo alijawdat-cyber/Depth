@@ -8,26 +8,21 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import Dropdown from "@/components/ui/Dropdown";
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
-  TrendingUp, 
-  TrendingDown,
   BarChart3,
-  PieChart,
   LineChart,
   Activity,
-  Clock,
   CheckCircle,
   AlertTriangle,
   DollarSign,
-  Users,
   Target,
   Calendar,
   Download,
   RefreshCw,
   AlertCircle,
   Filter,
-  Search,
   FileText,
   Eye,
   ArrowUp,
@@ -35,9 +30,7 @@ import {
   Minus,
   Star,
   Zap,
-  Timer,
-  Percent,
-  Globe
+  Timer
 } from "lucide-react";
 
 // واجهات البيانات
@@ -59,7 +52,7 @@ interface ReportData {
   title: string;
   period: string;
   generatedAt: string;
-  data: any;
+  data: Record<string, unknown>;
   insights: string[];
   alerts: ReportAlert[];
 }
@@ -253,15 +246,19 @@ export default function AdminReportsPage() {
   // دوال المساعدة
   const getKPIStatusColor = (status: string) => {
     switch (status) {
-      case 'excellent': return 'text-green-600 bg-green-50 border-green-200';
-      case 'good': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'warning': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'critical': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'excellent':
+      case 'good':
+        return 'text-[var(--success-fg)] bg-[var(--success-bg)] border-[var(--success-border)]';
+      case 'warning':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
+      case 'critical':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)] border-[var(--danger-border)]';
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
     }
   };
 
-  const getTrendIcon = (trend: string, trendValue: number) => {
+  const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <ArrowUp size={16} className="text-green-500" />;
     if (trend === 'down') return <ArrowDown size={16} className="text-red-500" />;
     return <Minus size={16} className="text-gray-500" />;
@@ -269,11 +266,15 @@ export default function AdminReportsPage() {
 
   const getAlertSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'critical': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'low':
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
+      case 'medium':
+      case 'high':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
+      case 'critical':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)] border-[var(--danger-border)]';
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
     }
   };
 
@@ -320,16 +321,17 @@ export default function AdminReportsPage() {
           <p className="text-[var(--muted)]">مؤشرات الأداء الرئيسية والتقارير التفصيلية</p>
         </div>
         <div className="flex items-center gap-3">
-          <select
+          <Dropdown
             value={periodFilter}
-            onChange={(e) => setPeriodFilter(e.target.value as 'week' | 'month' | 'quarter' | 'year')}
-            className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-          >
-            <option value="week">أسبوعي</option>
-            <option value="month">شهري</option>
-            <option value="quarter">ربعي</option>
-            <option value="year">سنوي</option>
-          </select>
+            onChange={(v) => setPeriodFilter(String(v) as 'week' | 'month' | 'quarter' | 'year')}
+            options={[
+              { value: 'week', label: 'أسبوعي' },
+              { value: 'month', label: 'شهري' },
+              { value: 'quarter', label: 'ربعي' },
+              { value: 'year', label: 'سنوي' },
+            ]}
+            placeholder="الفترة"
+          />
           <Button 
             variant="secondary" 
             onClick={loadReportsData}
@@ -343,10 +345,10 @@ export default function AdminReportsPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
+            <span className="text-[var(--danger-fg)]">{error}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -431,7 +433,7 @@ export default function AdminReportsPage() {
                   <div key={kpi.id} className={`p-4 rounded-lg border ${getKPIStatusColor(kpi.status)}`}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">{kpi.name}</span>
-                      {getTrendIcon(kpi.trend, kpi.trendValue)}
+                      {getTrendIcon(kpi.trend)}
                     </div>
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-2xl font-bold">
@@ -442,7 +444,7 @@ export default function AdminReportsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-xs">
-                      {getTrendIcon(kpi.trend, kpi.trendValue)}
+                      {getTrendIcon(kpi.trend)}
                       <span className={
                         kpi.trend === 'up' ? 'text-green-600' :
                         kpi.trend === 'down' ? 'text-red-600' : 'text-gray-600'
@@ -627,18 +629,19 @@ export default function AdminReportsPage() {
               {/* Reports Filter */}
               <div className="flex items-center gap-4">
                 <Filter size={16} className="text-[var(--muted)]" />
-                <select
+                <Dropdown
                   value={reportTypeFilter}
-                  onChange={(e) => setReportTypeFilter(e.target.value)}
-                  className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                >
-                  <option value="all">جميع التقارير</option>
-                  <option value="weekly">أسبوعي</option>
-                  <option value="monthly">شهري</option>
-                  <option value="quality">جودة</option>
-                  <option value="financial">مالي</option>
-                  <option value="performance">أداء</option>
-                </select>
+                  onChange={(v) => setReportTypeFilter(String(v))}
+                  options={[
+                    { value: 'all', label: 'جميع التقارير' },
+                    { value: 'weekly', label: 'أسبوعي' },
+                    { value: 'monthly', label: 'شهري' },
+                    { value: 'quality', label: 'جودة' },
+                    { value: 'financial', label: 'مالي' },
+                    { value: 'performance', label: 'أداء' },
+                  ]}
+                  placeholder="نوع التقرير"
+                />
               </div>
 
               {/* Reports List */}
@@ -651,7 +654,7 @@ export default function AdminReportsPage() {
                         <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
                           <span>الفترة: {report.period}</span>
                           <span>تم التوليد: {new Date(report.generatedAt).toLocaleDateString('ar-EG')}</span>
-                          <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs">
+                          <span className="px-2 py-1 bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)] rounded text-xs">
                             {report.type}
                           </span>
                         </div>
@@ -701,7 +704,7 @@ export default function AdminReportsPage() {
                           </span>
                         ))}
                         {report.alerts.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-50 text-gray-600 rounded text-xs">
+                          <span className="px-2 py-1 bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)] rounded text-xs">
                             +{report.alerts.length - 3} تنبيه إضافي
                           </span>
                         )}
@@ -719,18 +722,19 @@ export default function AdminReportsPage() {
               {/* Alerts Filter */}
               <div className="flex items-center gap-4">
                 <Filter size={16} className="text-[var(--muted)]" />
-                <select
+                <Dropdown
                   value={alertFilter}
-                  onChange={(e) => setAlertFilter(e.target.value)}
-                  className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                >
-                  <option value="all">جميع التنبيهات</option>
-                  <option value="unresolved">غير محلولة</option>
-                  <option value="critical">حرجة</option>
-                  <option value="high">عالية</option>
-                  <option value="medium">متوسطة</option>
-                  <option value="low">منخفضة</option>
-                </select>
+                  onChange={(v) => setAlertFilter(String(v))}
+                  options={[
+                    { value: 'all', label: 'جميع التنبيهات' },
+                    { value: 'unresolved', label: 'غير محلولة' },
+                    { value: 'critical', label: 'حرجة' },
+                    { value: 'high', label: 'عالية' },
+                    { value: 'medium', label: 'متوسطة' },
+                    { value: 'low', label: 'منخفضة' },
+                  ]}
+                  placeholder="تصفية التنبيهات"
+                />
               </div>
 
               {/* Alerts List */}

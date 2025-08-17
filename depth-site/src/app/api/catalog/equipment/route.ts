@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     if (includePresets === 'true') {
       let presetsQuery = adminDb.collection('equipment_presets');
       if (targetRole) {
-        presetsQuery = presetsQuery.where('targetRole', '==', targetRole);
+        presetsQuery = presetsQuery.where('targetRole', '==', targetRole) as any;
       }
       const presetsSnapshot = await presetsQuery.get();
       presets = presetsSnapshot.docs.map(doc => ({

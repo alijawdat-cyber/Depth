@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 // motion و Container غير مستخدمين في هذا الإصدار - تم حذفهما
 import { Button } from '@/components/ui/Button';
+import Dropdown from '@/components/ui/Dropdown';
 import { WeeklyAvailability } from '@/types/creators';
 import { 
   User, 
@@ -149,6 +150,11 @@ export default function CompleteCreatorIntakePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  
+  // بيانات الكتالوج من قاعدة البيانات
+  const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [verticals, setVerticals] = useState<any[]>([]);
+  const [equipmentCatalog, setEquipmentCatalog] = useState<any[]>([]);
 
   // بيانات النموذج الكاملة
   const [formData, setFormData] = useState<IntakeFormData>({
@@ -197,6 +203,34 @@ export default function CompleteCreatorIntakePage() {
       samples: []
     }
   });
+
+  // تحميل بيانات الكتالوج من قاعدة البيانات
+  const loadCatalogData = useCallback(async () => {
+    try {
+      const [subcategoriesRes, verticalsRes, equipmentRes] = await Promise.all([
+        fetch('/api/catalog/subcategories'),
+        fetch('/api/catalog/verticals'),
+        fetch('/api/catalog/equipment')
+      ]);
+
+      if (subcategoriesRes.ok) {
+        const subcatData = await subcategoriesRes.json();
+        setSubcategories(subcatData.subcategories || []);
+      }
+
+      if (verticalsRes.ok) {
+        const vertData = await verticalsRes.json();
+        setVerticals(vertData.verticals || []);
+      }
+
+      if (equipmentRes.ok) {
+        const equipData = await equipmentRes.json();
+        setEquipmentCatalog(equipData.equipment || []);
+      }
+    } catch (error) {
+      console.error('Failed to load catalog data:', error);
+    }
+  }, []);
 
   const loadExistingData = useCallback(async () => {
     try {
@@ -262,9 +296,10 @@ export default function CompleteCreatorIntakePage() {
       return;
     }
 
-      // تحميل البيانات الحالية إذا وجدت
-  loadExistingData();
-}, [session, status, router, loadExistingData]);
+    // تحميل بيانات الكتالوج وبيانات المستخدم
+    loadCatalogData();
+    loadExistingData();
+  }, [session, status, router, loadExistingData, loadCatalogData]);
 
   const nextStep = () => {
     if (currentStep < STEPS.length) {
@@ -366,19 +401,20 @@ export default function CompleteCreatorIntakePage() {
           <label className="block text-sm font-medium text-[var(--text)] mb-2">
             التخصص *
           </label>
-          <select
+          <Dropdown
             value={formData.personalInfo.role}
-            onChange={(e) => setFormData(prev => ({
+            onChange={(v: string | number) => setFormData(prev => ({
               ...prev,
-              personalInfo: { ...prev.personalInfo, role: e.target.value as 'photographer' | 'videographer' | 'designer' | 'producer' }
+              personalInfo: { ...prev.personalInfo, role: String(v) as 'photographer' | 'videographer' | 'designer' | 'producer' }
             }))}
-            className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-          >
-            <option value="photographer">📸 مصور</option>
-            <option value="videographer">🎥 مصور فيديو</option>
-            <option value="designer">🎨 مصمم</option>
-            <option value="producer">⚙️ منتج</option>
-          </select>
+            options={[
+              { value: 'photographer', label: '📸 مصور' },
+              { value: 'videographer', label: '🎥 مصور فيديو' },
+              { value: 'designer', label: '🎨 مصمم' },
+              { value: 'producer', label: '⚙️ منتج' },
+            ]}
+            placeholder="اختر التخصص"
+          />
         </div>
 
         <div>
@@ -456,25 +492,126 @@ export default function CompleteCreatorIntakePage() {
     </div>
   );
 
-  // 2) Skills Matrix - سيتم تطويرها لاحقاً مع ربط الكتالوغ
-  const renderSkillsMatrixStep = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-[var(--text)] mb-2">Skills Matrix</h2>
-        <p className="text-[var(--muted)]">اختر المهارات التي تتقنها من الكتالوغ</p>
-      </div>
-      
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-yellow-800">
-          <AlertCircle size={20} />
-          <span className="font-medium">قيد التطوير</span>
+  // 2) Skills Matrix - مربوط بالكتالوج
+  const renderSkillsMatrixStep = () => {
+    // تجميع الفئات الفرعية حسب الفئة الرئيسية
+    const categorizedSubcategories = subcategories.reduce((acc: any, subcat: any) => {
+      const categoryName = subcat.category?.nameAr || 'أخرى';
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(subcat);
+      return acc;
+    }, {});
+
+    const handleSkillChange = (subcategoryId: string, level: string) => {
+      setFormData(prev => ({
+        ...prev,
+        skills: {
+          ...prev.skills,
+          [subcategoryId]: {
+            level: level as 'beginner' | 'intermediate' | 'pro',
+            notes: prev.skills[subcategoryId]?.notes || ''
+          }
+        }
+      }));
+    };
+
+    const handleSkillRemove = (subcategoryId: string) => {
+      setFormData(prev => {
+        const newSkills = { ...prev.skills };
+        delete newSkills[subcategoryId];
+        return { ...prev, skills: newSkills };
+      });
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--text)] mb-2">Skills Matrix</h2>
+          <p className="text-[var(--muted)]">اختر المهارات التي تتقنها من الكتالوغ</p>
         </div>
-        <p className="text-sm text-yellow-700 mt-1">
-          سيتم ربط هذا القسم مع كتالوغ الخدمات لاختيار المهارات المحددة
-        </p>
+        
+        {subcategories.length === 0 ? (
+          <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
+            <div className="flex items-center gap-2 text-[var(--warning-fg)]">
+              <AlertCircle size={20} />
+              <span className="font-medium">جاري تحميل الكتالوج...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Object.entries(categorizedSubcategories).map(([categoryName, subcats]: [string, any]) => (
+              <div key={categoryName} className="border border-[var(--border)] rounded-lg p-4">
+                <h3 className="font-semibold text-[var(--text)] mb-4 text-lg">{categoryName}</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {subcats.map((subcat: any) => (
+                    <div key={subcat.id} className="border border-[var(--border)] rounded p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="font-medium text-[var(--text)]">{subcat.nameAr}</label>
+                        {formData.skills[subcat.id] && (
+                          <button
+                            onClick={() => handleSkillRemove(subcat.id)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            إزالة
+                          </button>
+                        )}
+                      </div>
+                      
+                      {subcat.description && (
+                        <p className="text-xs text-[var(--muted)] mb-3">{subcat.description}</p>
+                      )}
+                      
+                      <Dropdown
+                        value={formData.skills[subcat.id]?.level || ''}
+                        onChange={(level: any) => handleSkillChange(subcat.id, level)}
+                        options={[
+                          { value: '', label: 'اختر المستوى' },
+                          { value: 'beginner', label: '🌱 مبتدئ' },
+                          { value: 'intermediate', label: '💼 متوسط' },
+                          { value: 'pro', label: '🏆 محترف' }
+                        ]}
+                        placeholder="مستوى الإجادة"
+                      />
+                      
+                      {/* عرض السعر الأساسي إذا كان متوفر */}
+                      {subcat.basePrice && (
+                        <div className="mt-2 text-xs text-[var(--muted)]">
+                          💰 السعر الأساسي: {subcat.basePrice.toLocaleString()} د.ع
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            
+            {/* ملخص المهارات المختارة */}
+            {Object.keys(formData.skills).length > 0 && (
+              <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
+                <h4 className="font-medium text-[var(--text)] mb-3">المهارات المختارة ({Object.keys(formData.skills).length})</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(formData.skills).map(([subcatId, skill]) => {
+                    const subcat = subcategories.find((s: any) => s.id === subcatId);
+                    const levelEmoji = skill.level === 'pro' ? '🏆' : skill.level === 'intermediate' ? '💼' : '🌱';
+                    return (
+                      <span 
+                        key={subcatId}
+                        className="px-3 py-1 bg-[var(--accent-100)] text-[var(--accent-700)] rounded-full text-sm"
+                      >
+                        {levelEmoji} {subcat?.nameAr || subcatId}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   // باقي الخطوات - مبسطة مؤقتاً
   const renderVerticalsStep = () => (
@@ -484,12 +621,12 @@ export default function CompleteCreatorIntakePage() {
         <p className="text-[var(--muted)]">اختر المجالات التي تفضل العمل بها</p>
       </div>
       
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-blue-800">
+      <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
+        <div className="flex items-center gap-2 text-[var(--text)]">
           <AlertCircle size={20} />
           <span className="font-medium">قيد التطوير</span>
         </div>
-        <p className="text-sm text-blue-700 mt-1">
+        <p className="text-sm text-[var(--text)] mt-1">
           سيتم إضافة قائمة المحاور: Fashion, Beauty/Clinics, F&B, إلخ...
         </p>
       </div>
@@ -513,12 +650,12 @@ export default function CompleteCreatorIntakePage() {
           <p className="text-[var(--muted)]">Equipment Inventory مفصل</p>
         </div>
         
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-blue-800 mb-2">
+        <div className="bg-[var(--panel)] border border-[var(--elev)] rounded-lg p-4">
+          <div className="flex items-center gap-2 text-[var(--text)] mb-2">
             <Settings size={20} />
             <span className="font-medium">نموذج مطور</span>
           </div>
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-[var(--text)]">
             هذا النموذج المطور يستخدم كتالوج المعدات الجديد. يمكنك إضافة معدات مفصلة لكل فئة.
           </p>
         </div>
@@ -623,22 +760,22 @@ export default function CompleteCreatorIntakePage() {
 
                         <div>
                           <label className="block text-xs text-[var(--muted)] mb-1">الحالة</label>
-                          <select
+                          <Dropdown
                             value={item.condition}
-                            onChange={(e) => {
+                            onChange={(v: string | number) => {
                               const updated = [...categoryEquipment];
-                              updated[index] = { ...updated[index], condition: e.target.value as EquipmentItem['condition'] };
+                              updated[index] = { ...updated[index], condition: String(v) as EquipmentItem['condition'] };
                               setFormData(prev => ({
                                 ...prev,
                                 equipment: { ...prev.equipment, [category.id]: updated }
                               }));
                             }}
-                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
-                          >
-                            <option value="excellent">ممتاز</option>
-                            <option value="good">جيد</option>
-                            <option value="fair">مقبول</option>
-                          </select>
+                            options={[
+                              { value: 'excellent', label: 'ممتاز' },
+                              { value: 'good', label: 'جيد' },
+                              { value: 'fair', label: 'مقبول' },
+                            ]}
+                          />
                         </div>
 
                         <div>
@@ -691,12 +828,12 @@ export default function CompleteCreatorIntakePage() {
           const totalEquipment = Object.values(formData.equipment).flat().length;
           if (totalEquipment === 0) {
             return (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-yellow-800 mb-2">
+              <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-lg p-4">
+                <div className="flex items-center gap-2 text-[var(--warning-fg)] mb-2">
                   <AlertCircle size={20} />
                   <span className="font-medium">لا توجد معدات</span>
                 </div>
-                <p className="text-sm text-yellow-700">
+                <p className="text-sm text-[var(--warning-fg)]">
                   يُنصح بإضافة المعدات الأساسية التي تملكها لتحسين فرص الحصول على مشاريع مناسبة.
                 </p>
               </div>
@@ -720,7 +857,6 @@ export default function CompleteCreatorIntakePage() {
     ];
 
     const addTimeRange = (dayId: string) => {
-      const newRange = { start: '09:00', end: '17:00' };
       const dayAvailability = formData.capacity.weeklyAvailability.find(d => d.day === dayId);
       
       if (dayAvailability) {
@@ -731,7 +867,7 @@ export default function CompleteCreatorIntakePage() {
             ...prev.capacity,
             weeklyAvailability: prev.capacity.weeklyAvailability.map(d =>
               d.day === dayId 
-                ? { ...d, timeRanges: [...d.timeRanges, newRange] }
+                ? { ...d, startTime: '09:00', endTime: '17:00', available: true }
                 : d
             )
           }
@@ -744,28 +880,26 @@ export default function CompleteCreatorIntakePage() {
             ...prev.capacity,
             weeklyAvailability: [...prev.capacity.weeklyAvailability, {
               day: dayId as WeeklyAvailability['day'],
-              timeRanges: [newRange]
+              startTime: '09:00', 
+              endTime: '17:00', 
+              available: true
             }]
           }
         }));
       }
     };
 
-    const removeTimeRange = (dayId: string, rangeIndex: number) => {
+    const removeTimeRange = (dayId: string) => {
       setFormData(prev => ({
         ...prev,
         capacity: {
           ...prev.capacity,
-          weeklyAvailability: prev.capacity.weeklyAvailability.map(d =>
-            d.day === dayId
-              ? { ...d, timeRanges: d.timeRanges.filter((_, i) => i !== rangeIndex) }
-              : d
-          ).filter(d => d.timeRanges.length > 0) // إزالة الأيام الفارغة
+          weeklyAvailability: prev.capacity.weeklyAvailability.filter(d => d.day !== dayId)
         }
       }));
     };
 
-    const updateTimeRange = (dayId: string, rangeIndex: number, field: 'start' | 'end', value: string) => {
+    const updateTimeRange = (dayId: string, field: 'start' | 'end', value: string) => {
       setFormData(prev => ({
         ...prev,
         capacity: {
@@ -774,9 +908,7 @@ export default function CompleteCreatorIntakePage() {
             d.day === dayId
               ? {
                   ...d,
-                  timeRanges: d.timeRanges.map((range, i) =>
-                    i === rangeIndex ? { ...range, [field]: value } : range
-                  )
+                  [field === 'start' ? 'startTime' : 'endTime']: value
                 }
               : d
           )
@@ -786,11 +918,13 @@ export default function CompleteCreatorIntakePage() {
 
     const copyToAllDays = (sourceDay: string) => {
       const sourceAvailability = formData.capacity.weeklyAvailability.find(d => d.day === sourceDay);
-      if (!sourceAvailability || sourceAvailability.timeRanges.length === 0) return;
+      if (!sourceAvailability || !sourceAvailability.available) return;
 
       const newWeeklyAvailability: WeeklyAvailability[] = daysOfWeek.map(day => ({
         day: day.id as WeeklyAvailability['day'],
-        timeRanges: [...sourceAvailability.timeRanges]
+        available: true,
+        startTime: sourceAvailability.startTime,
+        endTime: sourceAvailability.endTime
       }));
 
       setFormData(prev => ({
@@ -913,36 +1047,32 @@ export default function CompleteCreatorIntakePage() {
                       </div>
                     </div>
                     
-                    {dayAvailability && dayAvailability.timeRanges.length > 0 ? (
-                      <div className="space-y-2">
-                        {dayAvailability.timeRanges.map((range, index) => (
-                          <div key={index} className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <label className="text-sm text-[var(--muted)]">من:</label>
-                              <input
-                                type="time"
-                                value={range.start}
-                                onChange={(e) => updateTimeRange(day.id, index, 'start', e.target.value)}
-                                className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                              />
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <label className="text-sm text-[var(--muted)]">إلى:</label>
-                              <input
-                                type="time"
-                                value={range.end}
-                                onChange={(e) => updateTimeRange(day.id, index, 'end', e.target.value)}
-                                className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
-                              />
-                            </div>
-                            <button
-                              onClick={() => removeTimeRange(day.id, index)}
-                              className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                              إزالة
-                            </button>
-                          </div>
-                        ))}
+                    {dayAvailability && dayAvailability.available ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-[var(--muted)]">من:</label>
+                          <input
+                            type="time"
+                            value={dayAvailability.startTime || '09:00'}
+                            onChange={(e) => updateTimeRange(day.id, 'start', e.target.value)}
+                            className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-[var(--muted)]">إلى:</label>
+                          <input
+                            type="time"
+                            value={dayAvailability.endTime || '17:00'}
+                            onChange={(e) => updateTimeRange(day.id, 'end', e.target.value)}
+                            className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+                        <button
+                          onClick={() => removeTimeRange(day.id)}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          إزالة
+                        </button>
                       </div>
                     ) : (
                       <div className="text-center text-[var(--muted)] py-4">
@@ -1252,17 +1382,17 @@ export default function CompleteCreatorIntakePage() {
             
             {/* Welcome Message */}
             {isWelcome && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                <CheckCircle size={20} className="text-green-600 inline mr-2" />
-                <span className="text-green-800">🎉 مرحباً بك! تم إنشاء حسابك بنجاح.</span>
+              <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-4">
+                <CheckCircle size={20} className="text-[var(--success-fg)] inline mr-2" />
+                <span className="text-[var(--success-fg)]">🎉 مرحباً بك! تم إنشاء حسابك بنجاح.</span>
               </div>
             )}
             
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <AlertCircle size={20} className="text-red-600 inline mr-2" />
-                <span className="text-red-800">{error}</span>
+              <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg p-4 mb-4">
+                <AlertCircle size={20} className="text-[var(--danger-fg)] inline mr-2" />
+                <span className="text-[var(--danger-fg)]">{error}</span>
               </div>
             )}
             
@@ -1295,8 +1425,8 @@ export default function CompleteCreatorIntakePage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center gap-2 text-red-800">
+            <div className="mb-6 p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg">
+              <div className="flex items-center gap-2 text-[var(--danger-fg)]">
                 <AlertCircle size={20} />
                 <span className="font-medium">{error}</span>
               </div>

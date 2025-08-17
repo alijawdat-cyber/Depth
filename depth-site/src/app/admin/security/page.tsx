@@ -656,7 +656,7 @@ export default function AdminSecurityPage() {
                             <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(scope.category)}`}>
                               {scope.category}
                             </span>
-                            <span className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-600">
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)]">
                               {scope.level}
                             </span>
                           </div>
@@ -805,7 +805,7 @@ export default function AdminSecurityPage() {
                       </div>
                       
                       {permission.failedAttempts > 0 && (
-                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                        <div className="mt-2 p-2 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded text-sm text-[var(--danger-fg)]">
                           {permission.failedAttempts} محاولة دخول فاشلة
                           {permission.lastFailedAttempt && (
                             <span className="mr-2">
@@ -841,35 +841,39 @@ export default function AdminSecurityPage() {
                 
                 <div className="flex items-center gap-2">
                   <Filter size={16} className="text-[var(--muted)]" />
-                  <select
-                    value={severityFilter}
-                    onChange={(e) => setSeverityFilter(e.target.value)}
-                    className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-                  >
-                    <option value="all">جميع المستويات</option>
-                    <option value="low">منخفض</option>
-                    <option value="medium">متوسط</option>
-                    <option value="high">عالي</option>
-                    <option value="critical">حرج</option>
-                  </select>
+                  <div className="min-w-[180px]">
+                    <Dropdown
+                      value={severityFilter}
+                      onChange={(v) => setSeverityFilter(String(v))}
+                      options={[
+                        { value: 'all', label: 'جميع المستويات' },
+                        { value: 'low', label: 'منخفض' },
+                        { value: 'medium', label: 'متوسط' },
+                        { value: 'high', label: 'عالي' },
+                        { value: 'critical', label: 'حرج' },
+                      ]}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-                  >
-                    <option value="all">جميع الأنواع</option>
-                    <option value="login">تسجيل دخول</option>
-                    <option value="logout">تسجيل خروج</option>
-                    <option value="failed_login">فشل تسجيل الدخول</option>
-                    <option value="permission_change">تغيير صلاحيات</option>
-                    <option value="2fa_enabled">تفعيل 2FA</option>
-                    <option value="2fa_disabled">إلغاء 2FA</option>
-                    <option value="password_reset">إعادة تعيين كلمة المرور</option>
-                    <option value="account_locked">قفل الحساب</option>
-                  </select>
+                  <div className="min-w-[200px]">
+                    <Dropdown
+                      value={typeFilter}
+                      onChange={(v) => setTypeFilter(String(v))}
+                      options={[
+                        { value: 'all', label: 'جميع الأنواع' },
+                        { value: 'login', label: 'تسجيل دخول' },
+                        { value: 'logout', label: 'تسجيل خروج' },
+                        { value: 'failed_login', label: 'فشل تسجيل الدخول' },
+                        { value: 'permission_change', label: 'تغيير صلاحيات' },
+                        { value: '2fa_enabled', label: 'تفعيل 2FA' },
+                        { value: '2fa_disabled', label: 'إلغاء 2FA' },
+                        { value: 'password_reset', label: 'إعادة تعيين كلمة المرور' },
+                        { value: 'account_locked', label: 'قفل الحساب' },
+                      ]}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -889,7 +893,7 @@ export default function AdminSecurityPage() {
                             <span className={`px-2 py-1 rounded text-xs font-medium border ${getSeverityColor(event.severity)}`}>
                               {event.severity}
                             </span>
-                            <span className="px-2 py-1 rounded text-xs font-medium bg-gray-50 text-gray-600">
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)]">
                               {getEventTypeText(event.type)}
                             </span>
                           </div>

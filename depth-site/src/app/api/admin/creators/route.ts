@@ -30,48 +30,23 @@ const CreateCreatorSchema = z.object({
     verified: z.boolean().optional()
   })).optional(),
   verticals: z.array(z.string()).optional(),
-  equipment: z.object({
-    cameras: z.array(z.object({
-      name: z.string(),
-      model: z.string().optional(),
-      quantity: z.number().min(1),
-      condition: z.enum(['excellent', 'good', 'fair']),
-      notes: z.string().optional()
-    })).optional(),
-    lenses: z.array(z.object({
-      name: z.string(),
-      model: z.string().optional(),
-      quantity: z.number().min(1),
-      condition: z.enum(['excellent', 'good', 'fair']),
-      notes: z.string().optional()
-    })).optional(),
-    lighting: z.array(z.object({
-      name: z.string(),
-      model: z.string().optional(),
-      quantity: z.number().min(1),
-      condition: z.enum(['excellent', 'good', 'fair']),
-      notes: z.string().optional()
-    })).optional(),
-    audio: z.array(z.object({
-      name: z.string(),
-      model: z.string().optional(),
-      quantity: z.number().min(1),
-      condition: z.enum(['excellent', 'good', 'fair']),
-      notes: z.string().optional()
-    })).optional(),
-    accessories: z.array(z.object({
-      name: z.string(),
-      model: z.string().optional(),
-      quantity: z.number().min(1),
-      condition: z.enum(['excellent', 'good', 'fair']),
-      notes: z.string().optional()
-    })).optional(),
-    specialSetups: z.array(z.string()).optional()
-  }).optional(),
+  equipment: z.array(z.object({
+    catalogId: z.string(),
+    owned: z.boolean(),
+    quantity: z.number().min(1),
+    condition: z.enum(['excellent', 'good', 'fair', 'poor']),
+    notes: z.string().optional()
+  })).optional(),
   capacity: z.object({
     maxAssetsPerDay: z.number().min(1).optional(),
-    availableDays: z.array(z.string()).optional(),
-    peakHours: z.string().optional(),
+    weeklyAvailability: z.array(z.object({
+      day: z.enum(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']),
+      available: z.boolean(),
+      startTime: z.string().optional(),
+      endTime: z.string().optional(),
+      breakStart: z.string().optional(),
+      breakEnd: z.string().optional()
+    })).optional(),
     standardSLA: z.number().min(1).optional(),
     rushSLA: z.number().min(1).optional()
   }).optional(),
@@ -201,18 +176,10 @@ export async function POST(req: NextRequest) {
       ...validatedData,
       skills: validatedData.skills || [],
       verticals: validatedData.verticals || [],
-      equipment: {
-        cameras: validatedData.equipment?.cameras || [],
-        lenses: validatedData.equipment?.lenses || [],
-        lighting: validatedData.equipment?.lighting || [],
-        audio: validatedData.equipment?.audio || [],
-        accessories: validatedData.equipment?.accessories || [],
-        specialSetups: validatedData.equipment?.specialSetups || []
-      },
+      equipment: validatedData.equipment || [],
       capacity: {
         maxAssetsPerDay: validatedData.capacity?.maxAssetsPerDay || 10,
-        availableDays: validatedData.capacity?.availableDays || [],
-        peakHours: validatedData.capacity?.peakHours,
+        weeklyAvailability: validatedData.capacity?.weeklyAvailability || [],
         standardSLA: validatedData.capacity?.standardSLA || 48,
         rushSLA: validatedData.capacity?.rushSLA || 24
       },

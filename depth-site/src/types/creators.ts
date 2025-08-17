@@ -20,7 +20,7 @@ export interface Creator {
   verticals: string[]; // معرفات المحاور المفضلة
   
   // المعدات
-  equipment: EquipmentInventory;
+  equipment: CreatorEquipmentItem[];
   
   // السعة والزمن
   capacity: {
@@ -113,7 +113,11 @@ export interface EquipmentPresetKit {
 // جدول التوافق الأسبوعي المحدث
 export interface WeeklyAvailability {
   day: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
-  timeRanges: Array<{ start: string; end: string }>; // HH:mm, يدعم أكثر من فترة باليوم
+  available: boolean;
+  startTime?: string; // HH:mm
+  endTime?: string; // HH:mm
+  breakStart?: string; // HH:mm
+  breakEnd?: string; // HH:mm
 }
 
 // نموذج التقييم من الإدارة
@@ -207,7 +211,7 @@ export interface CreateCreatorRequest {
   // باقي الحقول اختيارية في البداية
   skills?: CreatorSkill[];
   verticals?: string[];
-  equipment?: Partial<EquipmentInventory>;
+  equipment?: CreatorEquipmentItem[];
   capacity?: Partial<Creator['capacity']>;
   compliance?: Partial<Creator['compliance']>;
   internalCost?: Partial<Creator['internalCost']>;
