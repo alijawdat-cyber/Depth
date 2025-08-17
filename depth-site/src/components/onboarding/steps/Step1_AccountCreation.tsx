@@ -66,31 +66,36 @@ export default function Step1_AccountCreation() {
         />
 
         {/* كلمات المرور */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputField
-            label="كلمة المرور"
-            type="password"
-            value={account.password}
-            onChange={(value) => updateAccountData({ password: value })}
-            placeholder="كلمة مرور قوية"
-            icon={<Lock size={18} />}
-            showPasswordToggle
-            required
-            error={getFieldError('كلمة المرور') || getFieldError('قصيرة')}
-            description="8 أحرف على الأقل"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="w-full">
+            <InputField
+              label="كلمة المرور"
+              type="password"
+              value={account.password}
+              onChange={(value) => updateAccountData({ password: value })}
+              placeholder="كلمة مرور قوية"
+              icon={<Lock size={18} />}
+              showPasswordToggle
+              required
+              error={getFieldError('كلمة المرور') || getFieldError('قصيرة')}
+              description="8 أحرف على الأقل"
+            />
+          </div>
 
-          <InputField
-            label="تأكيد كلمة المرور"
-            type="password"
-            value={account.confirmPassword}
-            onChange={(value) => updateAccountData({ confirmPassword: value })}
-            placeholder="إعادة كتابة كلمة المرور"
-            icon={<Lock size={18} />}
-            showPasswordToggle
-            required
-            error={getFieldError('متطابقة')}
-          />
+          <div className="w-full">
+            <InputField
+              label="تأكيد كلمة المرور"
+              type="password"
+              value={account.confirmPassword}
+              onChange={(value) => updateAccountData({ confirmPassword: value })}
+              placeholder="إعادة كتابة كلمة المرور"
+              icon={<Lock size={18} />}
+              showPasswordToggle
+              required
+              error={getFieldError('متطابقة')}
+              description="يجب أن تطابق كلمة المرور"
+            />
+          </div>
         </div>
 
         {/* الموافقة على الشروط */}

@@ -131,7 +131,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         <div className="relative">
           {/* Right Icon */}
           {icon && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--muted)]">
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--muted)] pointer-events-none">
               {icon}
             </div>
           )}
@@ -144,9 +144,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             onChange={(e) => onChange(e.target.value)}
             onBlur={onBlur}
             className={`
-              w-full px-3 sm:px-4 py-4 h-14 rounded-xl border transition-all duration-200 leading-none
-              ${icon ? 'pr-12' : ''}
-              ${showPasswordToggle ? 'pl-12' : ''}
+              w-full py-4 h-14 rounded-xl border transition-all duration-200 leading-none
+              ${icon && showPasswordToggle ? 'px-12' : icon ? 'pr-12 pl-4' : showPasswordToggle ? 'pl-12 pr-4' : 'px-4'}
               ${error 
                 ? 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500' 
                 : success
@@ -165,7 +164,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--muted)] hover:text-[var(--text)] transition-colors z-10"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
