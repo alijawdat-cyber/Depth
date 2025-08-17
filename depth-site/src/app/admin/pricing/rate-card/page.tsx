@@ -103,23 +103,37 @@ export default function RateCardEditorPage() {
       setLoading(true);
       setError(null);
 
-      // تحميل Rate Card النشط
+      // تحميل الفئات الفرعية من API
+      const subcatResponse = await fetch('/api/catalog/subcategories');
+      if (!subcatResponse.ok) {
+        throw new Error('فشل في تحميل الفئات الفرعية - تأكد من تشغيل الخادم وإعداد قاعدة البيانات');
+      }
+      
+      const subcatData = await subcatResponse.json();
+      const loadedSubcategories = subcatData.items || subcatData.data || [];
+      
+      if (loadedSubcategories.length === 0) {
+        throw new Error('لا توجد فئات فرعية في قاعدة البيانات - يرجى تحميل البيانات الأولية أولاً');
+      }
+      
+      setSubcategories(loadedSubcategories);
+
+      // تحميل Rate Card النشط من قاعدة البيانات
       const rateResponse = await fetch('/api/pricing/rate-card/active');
-      if (!rateResponse.ok) throw new Error('فشل في تحميل جدول الأسعار');
+      if (!rateResponse.ok) {
+        throw new Error('لا يوجد جدول أسعار نشط - يرجى تحميل البيانات الأولية أو إنشاء جدول أسعار جديد');
+      }
       
       const rateData = await rateResponse.json();
+      if (!rateData.rateCard) {
+        throw new Error('لا يوجد جدول أسعار نشط في النظام');
+      }
+      
       setRateCard(rateData.rateCard);
       
       if (rateData.rateCard?.guardrails) {
         setGuardrailsConfig(rateData.rateCard.guardrails);
       }
-
-      // تحميل الفئات الفرعية
-      const subcatResponse = await fetch('/api/catalog/subcategories');
-      if (!subcatResponse.ok) throw new Error('فشل في تحميل الفئات الفرعية');
-      
-      const subcatData = await subcatResponse.json();
-      setSubcategories(subcatData.items || subcatData.data || []);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'خطأ في التحميل');
@@ -127,6 +141,8 @@ export default function RateCardEditorPage() {
       setLoading(false);
     }
   };
+
+
 
   const handleSaveRateCard = async (isDraft = true) => {
     if (!rateCard) return;
@@ -157,6 +173,34 @@ export default function RateCardEditorPage() {
       setError(err instanceof Error ? err.message : 'حدث خطأ في الحفظ');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // تحميل البيانات الأولية من seed
+  const handleLoadSeedData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/catalog/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'full' })
+      });
+
+      if (!response.ok) throw new Error('فشل في تحميل البيانات الأولية');
+
+      setSuccess('تم تحميل البيانات الأولية بنجاح');
+      
+      // إعادة تحميل البيانات
+      setTimeout(() => {
+        loadRateCardData();
+      }, 1000);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'فشل في تحميل البيانات الأولية');
+    } finally {
+      setLoading(false);
     }
   };
 
