@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { Query, DocumentData } from 'firebase-admin/firestore';
 
 // جلب جميع المعدات المخصصة للمراجعة
 export async function GET(req: NextRequest) {
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
     const category = url.searchParams.get('category');
     const limit = parseInt(url.searchParams.get('limit') || '50');
 
-    let query = adminDb.collection('custom_equipment');
+    let query: Query<DocumentData> = adminDb.collection('custom_equipment');
     
     if (status) {
       query = query.where('status', '==', status);
@@ -36,10 +37,28 @@ export async function GET(req: NextRequest) {
       .limit(limit)
       .get();
     
-    const customEquipment = snapshot.docs.map(doc => ({
+    interface CustomEquipmentData {
+      id: string;
+      name: string;
+      brand?: string;
+      model?: string;
+      category: string;
+      description?: string;
+      status: 'pending_review' | 'approved' | 'rejected' | 'changes_requested';
+      submittedBy: string;
+      createdAt: string;
+      updatedAt?: string;
+      reviewedBy?: string;
+      reviewedAt?: string;
+      rejectionReason?: string;
+      changeRequests?: string;
+      adminModifications?: Record<string, unknown>;
+    }
+
+    const customEquipment: CustomEquipmentData[] = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    } as CustomEquipmentData));
 
     // إحصائيات
     const stats = {
@@ -49,7 +68,7 @@ export async function GET(req: NextRequest) {
       total: customEquipment.length
     };
 
-    customEquipment.forEach(item => {
+    customEquipment.forEach((item) => {
       if (item.status === 'pending_review') stats.pending++;
       else if (item.status === 'approved') stats.approved++;
       else if (item.status === 'rejected') stats.rejected++;
@@ -105,7 +124,7 @@ export async function PUT(req: NextRequest) {
     const equipmentData = equipmentDoc.data();
     const now = new Date().toISOString();
 
-    let updateData: any = {
+    const updateData: Record<string, unknown> = {
       updatedAt: now,
       reviewedBy: session.user.email,
       reviewedAt: now

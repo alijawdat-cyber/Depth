@@ -61,6 +61,37 @@ export async function POST(req: NextRequest) {
       } as OnboardingApiResponse, { status: 400 });
     }
 
+    // التحقق من بيانات التوفر
+    if (!formData.availability?.availability) {
+      return NextResponse.json({
+        success: false,
+        error: 'نوع التوفر مطلوب',
+        requestId
+      } as OnboardingApiResponse, { status: 400 });
+    }
+
+    if (!formData.availability.weeklyHours || formData.availability.weeklyHours <= 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'عدد الساعات الأسبوعية مطلوب',
+        requestId
+      } as OnboardingApiResponse, { status: 400 });
+    }
+
+    // التحقق من وجود أيام عمل
+    const hasWeeklyAvailability = formData.availability.weeklyAvailability && 
+      formData.availability.weeklyAvailability.some(day => day.available);
+    const hasPreferredWorkdays = formData.availability.preferredWorkdays && 
+      formData.availability.preferredWorkdays.length > 0;
+    
+    if (!hasWeeklyAvailability && !hasPreferredWorkdays) {
+      return NextResponse.json({
+        success: false,
+        error: 'يجب اختيار يوم واحد على الأقل للعمل',
+        requestId
+      } as OnboardingApiResponse, { status: 400 });
+    }
+
     // التحقق من المعلومات الأساسية
     if (!formData.basicInfo.role || !formData.basicInfo.city?.trim()) {
       return NextResponse.json({
@@ -192,6 +223,13 @@ export async function POST(req: NextRequest) {
 
       creatorDoc = await adminDb.collection('creators').add(creatorData);
 
+      console.log('[onboarding] Creator document created successfully:', {
+        creatorId: creatorDoc.id,
+        email: email,
+        weeklyAvailability: creatorData.capacity.weeklyAvailability,
+        preferredWorkdays: creatorData.preferredWorkdays
+      });
+
       // إنشاء حساب في NextAuth users collection
       try {
         await adminDb.collection('users').add({
@@ -202,6 +240,7 @@ export async function POST(req: NextRequest) {
           onboardingStatus: 'completed',
           createdAt: now
         });
+        console.log('[onboarding] User record created successfully for:', email);
       } catch (error) {
         console.warn('[onboarding] Failed to create user record:', error);
       }

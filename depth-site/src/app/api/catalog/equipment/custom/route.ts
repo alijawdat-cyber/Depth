@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { Query, DocumentData } from 'firebase-admin/firestore';
 
 export async function POST(req: NextRequest) {
   try {
@@ -97,7 +98,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const status = url.searchParams.get('status');
 
-    let query = adminDb.collection('custom_equipment');
+    let query: Query<DocumentData> = adminDb.collection('custom_equipment');
     
     // للمبدعين: عرض معداتهم المخصصة فقط
     if (session.user.role === 'creator') {
@@ -111,10 +112,23 @@ export async function GET(req: NextRequest) {
     
     const snapshot = await query.orderBy('createdAt', 'desc').get();
     
-    const customEquipment = snapshot.docs.map(doc => ({
+    interface CustomEquipmentData {
+      id: string;
+      name: string;
+      brand?: string;
+      model?: string;
+      category: string;
+      description?: string;
+      status: 'pending_review' | 'approved' | 'rejected' | 'changes_requested';
+      submittedBy: string;
+      createdAt: string;
+      updatedAt?: string;
+    }
+
+    const customEquipment: CustomEquipmentData[] = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    } as CustomEquipmentData));
 
     return NextResponse.json({
       success: true,

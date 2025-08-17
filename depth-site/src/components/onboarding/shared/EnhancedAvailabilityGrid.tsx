@@ -91,16 +91,18 @@ export default function EnhancedAvailabilityGrid({
   const updateDayData = (dayId: string, updates: Partial<WeeklyAvailability>) => {
     const updatedValue = value.filter(item => item.day !== dayId);
     if (updates.available !== false) {
-      updatedValue.push({
+      const existingData = getDayData(dayId);
+      const newDayData: WeeklyAvailability = {
         day: dayId as WeeklyAvailability['day'],
-        available: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        ...getDayData(dayId),
-        ...updates
-      });
+        available: updates.available ?? true,
+        startTime: updates.startTime ?? existingData.startTime ?? '09:00',
+        endTime: updates.endTime ?? existingData.endTime ?? '17:00'
+      };
+      updatedValue.push(newDayData);
+      console.log('[EnhancedAvailabilityGrid] Updated day data:', newDayData);
     }
     onChange(updatedValue);
+    console.log('[EnhancedAvailabilityGrid] Full availability data:', updatedValue);
   };
 
   // تطبيق قالب على الأيام المحددة
@@ -293,7 +295,12 @@ export default function EnhancedAvailabilityGrid({
               <div>
                 <h5 className="font-medium text-[var(--text)] mb-3">طبق على الأيام:</h5>
                 <DayToggleGroup
-                  days={DAYS_CONFIG}
+                  days={DAYS_CONFIG.map(day => ({
+                    id: day.id,
+                    label: day.label,
+                    shortLabel: day.shortLabel,
+                    emoji: day.emoji
+                  }))}
                   selectedDays={[]}
                   onChange={(selectedDays) => {
                     if (selectedTemplate) {
@@ -374,7 +381,7 @@ export default function EnhancedAvailabilityGrid({
                   >
                     <TimePicker
                       label="وقت البداية"
-                      value={dayData.startTime}
+                      value={dayData.startTime || '09:00'}
                       onChange={(time) => updateDayData(day.id, { startTime: time })}
                       disabled={disabled}
                       step={15}
@@ -382,11 +389,11 @@ export default function EnhancedAvailabilityGrid({
                     
                     <TimePicker
                       label="وقت النهاية"
-                      value={dayData.endTime}
+                      value={dayData.endTime || '17:00'}
                       onChange={(time) => updateDayData(day.id, { endTime: time })}
                       disabled={disabled}
                       step={15}
-                      minTime={dayData.startTime}
+                      minTime={dayData.startTime || '09:00'}
                     />
                   </motion.div>
                 )}
