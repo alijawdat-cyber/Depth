@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { Button } from "@/components/ui/Button";
+import Dropdown from "@/components/ui/Dropdown";
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Plus, 
@@ -289,32 +290,38 @@ export default function AdminUsersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-50 border-green-200';
-      case 'inactive': return 'text-gray-600 bg-gray-50 border-gray-200';
-      case 'pending': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'suspended': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'banned': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'active':
+        return 'text-[var(--success-fg)] bg-[var(--success-bg)] border-[var(--success-border)]';
+      case 'pending':
+      case 'suspended':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
+      case 'banned':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)] border-[var(--danger-border)]';
+      case 'inactive':
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'admin': return <Crown size={16} className="text-purple-600" />;
-      case 'employee': return <User size={16} className="text-blue-600" />;
-      case 'creator': return <Camera size={16} className="text-green-600" />;
-      case 'client': return <Building size={16} className="text-orange-600" />;
-      default: return <User size={16} className="text-gray-600" />;
+      case 'admin': return <Crown size={16} className="text-[var(--text)]" />;
+      case 'employee': return <User size={16} className="text-[var(--text)]" />;
+      case 'creator': return <Camera size={16} className="text-[var(--text)]" />;
+      case 'client': return <Building size={16} className="text-[var(--text)]" />;
+      default: return <User size={16} className="text-[var(--text)]" />;
     }
   };
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'platinum': return 'text-purple-600 bg-purple-50';
-      case 'gold': return 'text-yellow-600 bg-yellow-50';
-      case 'silver': return 'text-gray-600 bg-gray-50';
-      case 'bronze': return 'text-orange-600 bg-orange-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'platinum':
+      case 'gold':
+      case 'silver':
+      case 'bronze':
+        return 'text-[var(--muted)] bg-[var(--panel)]';
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)]';
     }
   };
 
@@ -374,10 +381,10 @@ export default function AdminUsersPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
+            <span className="text-[var(--danger-fg)]">{error}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -453,33 +460,37 @@ export default function AdminUsersPage() {
           
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-[var(--muted)]" />
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">جميع الأدوار</option>
-              <option value="admin">إدمن</option>
-              <option value="employee">موظف</option>
-              <option value="creator">مبدع</option>
-              <option value="client">عميل</option>
-            </select>
+            <div className="min-w-[180px]">
+              <Dropdown
+                value={roleFilter}
+                onChange={(v) => setRoleFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'جميع الأدوار' },
+                  { value: 'admin', label: 'إدمن' },
+                  { value: 'employee', label: 'موظف' },
+                  { value: 'creator', label: 'مبدع' },
+                  { value: 'client', label: 'عميل' },
+                ]}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-[var(--muted)]" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">جميع الحالات</option>
-              <option value="active">نشط</option>
-              <option value="inactive">غير نشط</option>
-              <option value="pending">في الانتظار</option>
-              <option value="suspended">معلق</option>
-              <option value="banned">محظور</option>
-            </select>
+            <div className="min-w-[180px]">
+              <Dropdown
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'جميع الحالات' },
+                  { value: 'active', label: 'نشط' },
+                  { value: 'inactive', label: 'غير نشط' },
+                  { value: 'pending', label: 'في الانتظار' },
+                  { value: 'suspended', label: 'معلق' },
+                  { value: 'banned', label: 'محظور' },
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -527,7 +538,7 @@ export default function AdminUsersPage() {
                       </span>
 
                       {/* Role Badge */}
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-600">
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)]">
                         {getRoleText(user.role)}
                       </span>
 
@@ -540,7 +551,7 @@ export default function AdminUsersPage() {
 
                       {/* Performance Indicator */}
                       {user.status === 'active' && user.role === 'creator' && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-green-50 text-green-600">
+                        <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-[var(--success-bg)] text-[var(--success-fg)] border border-[var(--success-border)]">
                           <TrendingUp size={12} />
                           <span>أداء متميز</span>
                         </div>
@@ -590,12 +601,12 @@ export default function AdminUsersPage() {
                         <span className="text-sm text-[var(--muted)]">المهارات:</span>
                         <div className="flex gap-1">
                           {user.skills.slice(0, 3).map((skill, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs">
+                            <span key={index} className="px-2 py-1 bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)] rounded text-xs">
                               {skill}
                             </span>
                           ))}
                           {user.skills.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-50 text-gray-600 rounded text-xs">
+                            <span className="px-2 py-1 bg-[var(--panel)] text-[var(--muted)] border border-[var(--elev)] rounded text-xs">
                               +{user.skills.length - 3}
                             </span>
                           )}

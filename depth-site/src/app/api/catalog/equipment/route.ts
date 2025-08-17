@@ -1,78 +1,143 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { z } from 'zod';
+import { EquipmentCatalogItem, EquipmentPresetKit } from '@/types/creators';
 
-type EquipmentCategory = 'cameras' | 'lenses' | 'lighting' | 'audio' | 'accessories' | 'specialSetups';
+// Schema للتحقق من الاستعلام
+const GetEquipmentQuerySchema = z.object({
+  category: z.enum(['camera', 'lens', 'lighting', 'audio', 'accessory', 'special_setup']).optional(),
+  brand: z.string().optional(),
+  q: z.string().optional(), // بحث عام
+  limit: z.coerce.number().min(1).max(100).default(50),
+  cursor: z.string().optional(),
+  includePresets: z.enum(['true', 'false']).default('false'),
+  targetRole: z.enum(['photographer', 'videographer', 'designer', 'producer']).optional(),
+});
 
-const DEFAULT_SEED: Record<EquipmentCategory, Array<{ id: string; name: string; model?: string }>> = {
-  cameras: [
-    { id: 'sony-a7-iv', name: 'Sony A7 IV', model: 'ILCE-7M4' },
-    { id: 'canon-5d-mark-iv', name: 'Canon 5D Mark IV' },
-    { id: 'sony-a7s-iii', name: 'Sony A7S III', model: 'ILCE-7SM3' },
-  ],
-  lenses: [
-    { id: 'sigma-24-70-2-8', name: 'Sigma 24-70mm f/2.8' },
-    { id: 'sony-85-1-8', name: 'Sony FE 85mm f/1.8' },
-    { id: 'canon-50-1-8', name: 'Canon 50mm f/1.8' },
-  ],
-  lighting: [
-    { id: 'godox-sl60w', name: 'Godox SL60W' },
-    { id: 'aputure-120d', name: 'Aputure 120D' },
-    { id: 'neewer-led-panel', name: 'Neewer LED Panel 660' },
-  ],
-  audio: [
-    { id: 'rode-wireless-go-ii', name: 'RØDE Wireless GO II' },
-    { id: 'zoom-h5', name: 'Zoom H5' },
-    { id: 'rode-videomic-pro', name: 'RØDE VideoMic Pro' },
-  ],
-  accessories: [
-    { id: 'manfrotto-tripod', name: 'Manfrotto Tripod' },
-    { id: 'dji-rs3', name: 'DJI RS3 Gimbal' },
-    { id: 'reflector-5in1', name: '5-in-1 Reflector' },
-  ],
-  specialSetups: [
-    { id: 'product-light-tent', name: 'Light Tent (Product)' },
-    { id: 'green-screen', name: 'Green Screen' },
-    { id: 'motorized-turntable', name: 'Motorized Turntable' },
-  ],
-};
-
-async function ensureSeeded() {
-  const col = adminDb.collection('catalog_equipment');
-  const any = await col.limit(1).get();
-  if (!any.empty) return;
-  const batch = adminDb.batch();
-  (Object.keys(DEFAULT_SEED) as EquipmentCategory[]).forEach((cat) => {
-    DEFAULT_SEED[cat].forEach((item) => {
-      const id = `${cat}:${item.id}`;
-      const ref = col.doc(id);
-      batch.set(ref, { category: cat, ...item, createdAt: new Date(), updatedAt: new Date() });
-    });
-  });
-  await batch.commit();
-}
-
+// GET /api/catalog/equipment
 export async function GET(req: NextRequest) {
-  const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   try {
-    await ensureSeeded();
-    const url = new URL(req.url);
-    const category = url.searchParams.get('category') as EquipmentCategory | null;
-    const snap = category
-      ? await adminDb.collection('catalog_equipment').where('category', '==', category).orderBy('name').get()
-      : await adminDb.collection('catalog_equipment').orderBy('category').orderBy('name').get();
+    const { searchParams } = new URL(req.url);
+    const queryParams = Object.fromEntries(searchParams.entries());
+    const { category, brand, q, limit, cursor, includePresets, targetRole } = GetEquipmentQuerySchema.parse(queryParams);
 
-    const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
-    const grouped: Record<string, Array<Record<string, unknown>>> = {};
-    for (const it of items) {
-      const cat = String((it as { category?: string }).category || 'unknown');
-      grouped[cat] = grouped[cat] || [];
-      grouped[cat].push(it);
+    // بناء الاستعلام
+    let query = adminDb.collection('equipment_catalog').orderBy('brand').orderBy('model');
+
+    // تطبيق الفلاتر
+    if (category) {
+      query = query.where('category', '==', category);
     }
-    return NextResponse.json({ success: true, requestId, items: grouped });
+    if (brand) {
+      query = query.where('brand', '==', brand);
+    }
+
+    // التصفح (pagination)
+    if (cursor) {
+      const cursorDoc = await adminDb.collection('equipment_catalog').doc(cursor).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+
+    query = query.limit(limit);
+
+    const snapshot = await query.get();
+    let items: EquipmentCatalogItem[] = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as EquipmentCatalogItem));
+
+    // البحث النصي (إذا مطلوب)
+    if (q && q.trim()) {
+      const searchTerm = q.toLowerCase().trim();
+      items = items.filter(item => 
+        item.brand.toLowerCase().includes(searchTerm) ||
+        item.model.toLowerCase().includes(searchTerm) ||
+        item.capabilities.some(cap => cap.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    // تجميع البرندات والفئات للفلترة
+    const brands = [...new Set(items.map(item => item.brand))].sort();
+    const categories = [...new Set(items.map(item => item.category))];
+    const capabilities = [...new Set(items.flatMap(item => item.capabilities))].sort();
+
+    // جلب المجموعات الجاهزة (إذا مطلوبة)
+    let presets: EquipmentPresetKit[] = [];
+    if (includePresets === 'true') {
+      let presetsQuery = adminDb.collection('equipment_presets');
+      if (targetRole) {
+        presetsQuery = presetsQuery.where('targetRole', '==', targetRole);
+      }
+      const presetsSnapshot = await presetsQuery.get();
+      presets = presetsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as EquipmentPresetKit));
+    }
+
+    // معلومات التصفح التالي
+    const nextCursor = snapshot.docs.length === limit ? snapshot.docs[snapshot.docs.length - 1].id : null;
+
+    return NextResponse.json({
+      success: true,
+      items,
+      metadata: {
+        total: items.length,
+        brands,
+        categories,
+        capabilities,
+        nextCursor,
+        hasMore: !!nextCursor
+      },
+      presets: includePresets === 'true' ? presets : undefined
+    });
+
   } catch (error) {
-    console.error('[catalog.equipment] error', { requestId, error });
-    return NextResponse.json({ success: false, code: 'SERVER_ERROR', message: 'Failed to fetch equipment', requestId }, { status: 500 });
+    console.error('[GET /api/catalog/equipment] Error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
   }
 }
 
+// POST /api/catalog/equipment - للإدمن لسيّد المعدات
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    const role = (session?.user as unknown as { role?: string })?.role;
+    
+    if (!session?.user || role !== 'admin') {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
 
+    const body = await req.json();
+    const { mode = 'equipment', force = false } = body;
+
+    // استدعاء دالة السيّد
+    const seedModule = await import('@/lib/catalog/seed');
+    const result = await seedModule.seedCatalog(mode);
+
+    return NextResponse.json({
+      success: true,
+      message: `Equipment catalog seeded successfully`,
+      result
+    });
+
+  } catch (error) {
+    console.error('[POST /api/catalog/equipment] Error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
+  }
+}

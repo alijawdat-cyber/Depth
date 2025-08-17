@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import Dropdown from "@/components/ui/Dropdown";
 import { toast } from 'sonner';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
@@ -507,10 +508,10 @@ export default function AdminSecurityPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
+            <span className="text-[var(--danger-fg)]">{error}</span>
             <Button 
               variant="ghost" 
               size="sm" 

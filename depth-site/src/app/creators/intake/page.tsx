@@ -20,11 +20,13 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+import { CreatorEquipmentItem, EquipmentCatalogItem, EquipmentPresetKit } from '@/types/creators';
+
 interface IntakeFormData {
   // معلومات إضافية
   bio: string;
   experience: string;
-  equipment: string[];
+  equipment: CreatorEquipmentItem[]; // محدث: مرتبط بالكتالوج
   skills: string[];
   portfolio: string;
   
@@ -122,7 +124,7 @@ export default function CreatorIntakePage() {
     }
   };
 
-  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[]) => {
+  const updateFormData = (field: keyof IntakeFormData, value: string | number | string[] | CreatorEquipmentItem[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -138,31 +140,137 @@ export default function CreatorIntakePage() {
     updateFormData(field, currentArray.filter(item => item !== value));
   };
 
-  // مصادر اختيار ثابتة محسّنة
-  const LANGUAGE_OPTIONS = ['ar', 'en', 'fr', 'tr', 'ku'];
+  // وظائف إدارة المعدات الجديدة
+  const addEquipmentItem = (catalogId: string) => {
+    const catalogItem = equipmentCatalog.find(item => item.id === catalogId);
+    if (!catalogItem) return;
 
-  // جلب فئات فرعية (skills) + معدات (equipment)
+    // تحقق من عدم الإضافة المكررة
+    const exists = formData.equipment.find(item => item.catalogId === catalogId);
+    if (exists) return;
+
+    const newItem: CreatorEquipmentItem = {
+      catalogId,
+      owned: true,
+      condition: 'excellent',
+      quantity: 1,
+      notes: ''
+    };
+
+    updateFormData('equipment', [...formData.equipment, newItem]);
+  };
+
+  const removeEquipmentItem = (catalogId: string) => {
+    updateFormData('equipment', formData.equipment.filter(item => item.catalogId !== catalogId));
+  };
+
+  const updateEquipmentItem = (catalogId: string, updates: Partial<CreatorEquipmentItem>) => {
+    const updatedEquipment = formData.equipment.map(item =>
+      item.catalogId === catalogId ? { ...item, ...updates } : item
+    );
+    updateFormData('equipment', updatedEquipment);
+  };
+
+  const loadPresetKit = (presetId: string) => {
+    const preset = equipmentPresets.find(p => p.id === presetId);
+    if (!preset) return;
+
+    const newItems: CreatorEquipmentItem[] = preset.items
+      .filter(catalogId => !formData.equipment.find(item => item.catalogId === catalogId))
+      .map(catalogId => ({
+        catalogId,
+        owned: true,
+        condition: 'excellent' as const,
+        quantity: 1,
+        notes: `من ${preset.nameAr}`
+      }));
+
+    updateFormData('equipment', [...formData.equipment, ...newItems]);
+  };
+
+  // تصفية المعدات حسب الفئة
+  const getFilteredEquipment = () => {
+    if (!selectedCategory) return equipmentCatalog;
+    return equipmentCatalog.filter(item => item.category === selectedCategory);
+  };
+
+  // التحقق من متطلبات المعدات
+  const checkEquipmentRequirements = () => {
+    // الحصول على دور المبدع (من session أو تخمين)
+    const creatorRole = session?.user.role || 'photographer'; // افتراضي
+    
+    // متطلبات أساسية
+    const requirements = {
+      photographer: {
+        camera: 1,
+        lens: 1
+      },
+      videographer: {
+        camera: 1,
+        audio: 1
+      },
+      designer: {},
+      producer: {}
+    };
+
+    const currentCounts = formData.equipment.reduce((counts, item) => {
+      const catalogItem = equipmentCatalog.find(eq => eq.id === item.catalogId);
+      if (catalogItem) {
+        counts[catalogItem.category] = (counts[catalogItem.category] || 0) + item.quantity;
+      }
+      return counts;
+    }, {} as Record<string, number>);
+
+    const roleRequirements = requirements[creatorRole as keyof typeof requirements] || {};
+    const missingRequirements: string[] = [];
+
+    Object.entries(roleRequirements).forEach(([category, required]) => {
+      const current = currentCounts[category] || 0;
+      const requiredCount = typeof required === 'number' ? required : 0;
+      if (current < requiredCount) {
+        missingRequirements.push(`${category}: ${requiredCount - current} مطلوب`);
+      }
+    });
+
+    return missingRequirements;
+  };
+
+  // مصادر اختيار ثابتة محسّنة (سيتم استخدامها لاحقاً)
+  // const LANGUAGE_OPTIONS = ['ar', 'en', 'fr', 'tr', 'ku'];
+
+  // جلب فئات فرعية (skills) + معدات (equipment) من الكتالوج الحقيقي
   const [skillsOptions, setSkillsOptions] = useState<Array<{ id: string; nameAr: string }>>([]);
-  const [equipmentOptions, setEquipmentOptions] = useState<Record<string, Array<{ id: string; name: string }>>>({});
+  const [equipmentCatalog, setEquipmentCatalog] = useState<EquipmentCatalogItem[]>([]);
+  const [equipmentPresets, setEquipmentPresets] = useState<EquipmentPresetKit[]>([]);
+  // Loading states سيتم استخدامها لاحقاً
+  // const [equipmentLoading, setEquipmentLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   useEffect(() => {
-    (async () => {
-      try {
-        const [subsRes, eqRes] = await Promise.all([
-          fetch('/api/catalog/subcategories?includeDefaults=true'),
-          fetch('/api/catalog/equipment'),
-        ]);
-        if (subsRes.ok) {
-          const data = await subsRes.json();
-          setSkillsOptions((data.items || []).map((i: any) => ({ id: i.id, nameAr: i.nameAr })));
-        }
-        if (eqRes.ok) {
-          const data = await eqRes.json();
-          setEquipmentOptions(data.items || {});
-        }
-      } catch {}
-    })();
+    loadInitialData();
   }, []);
+
+  const loadInitialData = async () => {
+    try {
+      const [subsRes, eqRes] = await Promise.all([
+        fetch('/api/catalog/subcategories?includeDefaults=true'),
+        fetch('/api/catalog/equipment?includePresets=true&limit=100'),
+      ]);
+      
+              if (subsRes.ok) {
+          const data = await subsRes.json();
+          setSkillsOptions((data.items || []).map((i: { id: string; nameAr: string }) => ({ id: i.id, nameAr: i.nameAr })));
+        }
+      
+      if (eqRes.ok) {
+        const data = await eqRes.json();
+        setEquipmentCatalog(data.items || []);
+        setEquipmentPresets(data.presets || []);
+      }
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+    }
+  };
 
   // إزالة التكرار غير المقصود أعلاه
 
@@ -253,34 +361,186 @@ export default function CreatorIntakePage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-[var(--text)] mb-4">المعدات والأدوات</h2>
             
+            {/* المجموعات الجاهزة */}
+            {equipmentPresets.length > 0 && (
+              <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+                <h3 className="font-semibold text-[var(--text)] mb-3">مجموعات جاهزة لدورك</h3>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {equipmentPresets
+                    .filter(preset => !session?.user.role || preset.targetRole === session.user.role)
+                    .map(preset => (
+                      <button
+                        key={preset.id}
+                        onClick={() => loadPresetKit(preset.id)}
+                        className="p-3 text-left border border-[var(--border)] rounded-lg hover:bg-[var(--accent-50)] transition-colors"
+                      >
+                        <div className="font-medium text-[var(--text)]">{preset.nameAr}</div>
+                        <div className="text-sm text-[var(--muted)] mt-1">
+                          {preset.capabilities.slice(0, 3).join(', ')}
+                          {preset.capabilities.length > 3 && '...'}
+                        </div>
+                        <div className="text-xs text-[var(--accent-600)] mt-2">
+                          {preset.items.length} قطعة
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* فلترة بالفئة */}
             <div>
-              <label className="block text-sm font-medium text-[var(--text)] mb-2">المعدات المتوفرة لديك (قائمة قياسية)</label>
-              <div className="grid md:grid-cols-2 gap-3">
-                {Object.entries(equipmentOptions).map(([cat, items]) => (
-                  <div key={cat}>
-                    <div className="text-sm text-[var(--muted)] mb-1">{cat}</div>
-                    <Dropdown
-                      value={''}
-                      onChange={(v) => {
-                        const name = (items || []).find((it: any) => String(it.id) === String(v))?.name || String(v);
-                        if (name) addToArray('equipment', name);
-                      }}
-                      options={(items || []).map((it: any) => ({ value: it.id, label: it.name }))}
-                      placeholder={`اختر من ${cat}`}
-                    />
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">فلترة حسب الفئة</label>
+              <Dropdown
+                value={selectedCategory}
+                onChange={(v) => setSelectedCategory(String(v))}
+                options={[
+                  { value: '', label: 'جميع الفئات' },
+                  { value: 'camera', label: '📷 كاميرات' },
+                  { value: 'lens', label: '🔍 عدسات' },
+                  { value: 'lighting', label: '💡 إضاءة' },
+                  { value: 'audio', label: '🎤 صوتيات' },
+                  { value: 'accessory', label: '🛠️ إكسسوارات' },
+                  { value: 'special_setup', label: '⚙️ تجهيزات خاصة' }
+                ]}
+                placeholder="اختر فئة"
+              />
+            </div>
+
+            {/* اختيار المعدات */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">إضافة معدات من الكتالوج</label>
+              <div className="max-h-64 overflow-y-auto border border-[var(--border)] rounded-lg">
+                {getFilteredEquipment().map(item => (
+                  <div key={item.id} className="p-3 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-alt)] transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium text-[var(--text)]">
+                          {item.brand} {item.model}
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {item.capabilities.slice(0, 4).map(cap => (
+                            <span key={cap} className="px-2 py-0.5 bg-[var(--accent-100)] text-[var(--accent-700)] text-xs rounded">
+                              {cap}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => addEquipmentItem(item.id)}
+                        disabled={formData.equipment.some(eq => eq.catalogId === item.id)}
+                        className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                      >
+                        {formData.equipment.some(eq => eq.catalogId === item.id) ? 'مضاف' : 'إضافة'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {formData.equipment.map((item, index) => (
-                  <span key={index} className="bg-[var(--accent-100)] text-[var(--accent-700)] px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    {item}
-                    <button type="button" onClick={() => removeFromArray('equipment', item)} className="text-red-500 hover:text-red-700">×</button>
-                  </span>
-                ))}
-              </div>
-              <div className="text-xs text-[var(--muted)] mt-2">لا ترى معدّة؟ يمكنك اقتراح عنصر جديد وسيتم اعتماده من الإدارة.</div>
             </div>
+
+            {/* المعدات المختارة */}
+            {formData.equipment.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-[var(--text)] mb-3">المعدات المختارة ({formData.equipment.length})</h3>
+                <div className="space-y-3">
+                  {formData.equipment.map(item => {
+                    const catalogItem = equipmentCatalog.find(eq => eq.id === item.catalogId);
+                    if (!catalogItem) return null;
+                    
+                    return (
+                      <div key={item.catalogId} className="p-3 border border-[var(--border)] rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <div className="font-medium text-[var(--text)]">
+                              {catalogItem.brand} {catalogItem.model}
+                            </div>
+                            <div className="text-sm text-[var(--muted)]">{catalogItem.category}</div>
+                          </div>
+                          <button
+                            onClick={() => removeEquipmentItem(item.catalogId)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            إزالة
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div>
+                            <label className="block text-[var(--muted)] mb-1">الكمية</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.quantity}
+                              onChange={(e) => updateEquipmentItem(item.catalogId, { quantity: parseInt(e.target.value) || 1 })}
+                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-[var(--muted)] mb-1">الحالة</label>
+                            <select
+                              value={item.condition}
+                              onChange={(e) => updateEquipmentItem(item.catalogId, { condition: e.target.value as 'excellent' | 'good' | 'fair' | 'poor' })}
+                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                            >
+                              <option value="excellent">ممتاز</option>
+                              <option value="good">جيد</option>
+                              <option value="fair">مقبول</option>
+                              <option value="poor">ضعيف</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-[var(--muted)] mb-1">الملكية</label>
+                            <select
+                              value={item.owned ? 'owned' : 'borrowed'}
+                              onChange={(e) => updateEquipmentItem(item.catalogId, { owned: e.target.value === 'owned' })}
+                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                            >
+                              <option value="owned">ملكي</option>
+                              <option value="borrowed">مستعار</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-[var(--muted)] mb-1">ملاحظات</label>
+                            <input
+                              type="text"
+                              value={item.notes || ''}
+                              onChange={(e) => updateEquipmentItem(item.catalogId, { notes: e.target.value })}
+                              placeholder="اختياري"
+                              className="w-full px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* تحذيرات المتطلبات */}
+            {(() => {
+              const missingRequirements = checkEquipmentRequirements();
+              if (missingRequirements.length > 0) {
+                return (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                      <AlertCircle size={20} />
+                      <span className="font-medium">متطلبات ناقصة</span>
+                    </div>
+                    <ul className="text-sm text-yellow-700 list-disc list-inside">
+                      {missingRequirements.map((req, index) => (
+                        <li key={index}>{req}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
         );
 

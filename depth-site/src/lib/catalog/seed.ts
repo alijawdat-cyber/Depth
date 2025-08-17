@@ -3,6 +3,7 @@ import { z } from 'zod';
 // Bundle seed data statically so it's available in serverless runtime
 import taxonomyJson from '../../../docs/catalog/09-Seed/taxonomy.json';
 import rateCardJson from '../../../docs/catalog/09-Seed/rate-card.json';
+import equipmentJson from '../../../docs/catalog/09-Seed/equipment.json';
 
 const TaxonomySchema = z.object({
   categories: z.array(z.object({ 
@@ -70,7 +71,51 @@ const RateCardSchema = z.object({
   fxPolicy: z.object({ mode: z.enum(['manual','source']).optional(), lastRate: z.number().nullable().optional(), lastDate: z.string().nullable().optional(), source: z.string().nullable().optional() }).partial().optional(),
 });
 
-export type SeedMode = 'full' | 'rate-card' | 'taxonomy';
+const EquipmentSchema = z.object({
+  equipmentCatalog: z.array(z.object({
+    id: z.string(),
+    category: z.enum(['camera', 'lens', 'lighting', 'audio', 'accessory', 'special_setup']),
+    brand: z.string(),
+    model: z.string(),
+    capabilities: z.array(z.string()),
+    mount: z.string().optional(),
+    compatibleMounts: z.array(z.string()).optional(),
+    type: z.string().optional(),
+    focalLength: z.string().optional(),
+    maxAperture: z.string().optional(),
+    power: z.string().optional(),
+    size: z.string().optional(),
+  })),
+  presetKits: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    nameAr: z.string(),
+    targetRole: z.enum(['photographer', 'videographer', 'designer', 'producer']),
+    items: z.array(z.string()),
+    capabilities: z.array(z.string()),
+    supportedVerticals: z.array(z.string()),
+  })),
+  governanceRules: z.array(z.object({
+    role: z.enum(['photographer', 'videographer', 'designer', 'producer']),
+    minimumRequirements: z.array(z.object({
+      category: z.string(),
+      count: z.number(),
+      requiredCapabilities: z.array(z.string()).optional(),
+    })),
+    recommendations: z.array(z.object({
+      category: z.string(),
+      count: z.number(),
+      reason: z.string(),
+    })),
+  })),
+  compatibilityRules: z.array(z.object({
+    mountType: z.string(),
+    compatibleCameras: z.array(z.string()),
+    description: z.string(),
+  })),
+});
+
+export type SeedMode = 'full' | 'rate-card' | 'taxonomy' | 'equipment';
 
 async function upsertCollection(collection: string, id: string, data: Record<string, unknown>) {
   const ref = adminDb.collection(collection).doc(id);
@@ -85,6 +130,38 @@ async function upsertCollection(collection: string, id: string, data: Record<str
 export async function seedCatalog(mode: SeedMode = 'full') {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   const summary: Record<string, unknown> = { requestId };
+
+  if (mode === 'full' || mode === 'equipment') {
+    const rawEquipment = equipmentJson as unknown;
+    const equipment = EquipmentSchema.parse(rawEquipment);
+    
+    // Process equipment catalog
+    for (const item of equipment.equipmentCatalog) {
+      await upsertCollection('equipment_catalog', item.id, { ...item });
+    }
+    
+    // Process preset kits
+    for (const kit of equipment.presetKits) {
+      await upsertCollection('equipment_presets', kit.id, { ...kit });
+    }
+    
+    // Process governance rules
+    for (const rule of equipment.governanceRules) {
+      await upsertCollection('equipment_governance', rule.role, { ...rule });
+    }
+    
+    // Process compatibility rules
+    for (const rule of equipment.compatibilityRules) {
+      await upsertCollection('equipment_compatibility', rule.mountType, { ...rule });
+    }
+    
+    summary.equipment = {
+      catalogItems: equipment.equipmentCatalog.length,
+      presetKits: equipment.presetKits.length,
+      governanceRules: equipment.governanceRules.length,
+      compatibilityRules: equipment.compatibilityRules.length,
+    };
+  }
 
   if (mode === 'full' || mode === 'taxonomy') {
     const rawTax = taxonomyJson as unknown;

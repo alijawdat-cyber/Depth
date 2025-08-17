@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 // motion و Container غير مستخدمين في هذا الإصدار - تم حذفهما
 import { Button } from '@/components/ui/Button';
+import { WeeklyAvailability } from '@/types/creators';
 import { 
   User, 
   Award, 
@@ -64,8 +65,7 @@ interface IntakeFormData {
   // 5) السعة والزمن (Capacity & Time)
   capacity: {
     maxAssetsPerDay: number;
-    availableDays: string[]; // ['sunday', 'monday', ...]
-    peakHours?: string;
+    weeklyAvailability: WeeklyAvailability[]; // جدول أسبوعي مفصل
     standardSLA: number; // بالساعات
     rushSLA: number; // بالساعات
   };
@@ -176,7 +176,7 @@ export default function CompleteCreatorIntakePage() {
     },
     capacity: {
       maxAssetsPerDay: 10,
-      availableDays: [],
+      weeklyAvailability: [],
       standardSLA: 48,
       rushSLA: 24
     },
@@ -496,86 +496,468 @@ export default function CompleteCreatorIntakePage() {
     </div>
   );
 
-  const renderEquipmentStep = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-[var(--text)] mb-2">المعدات والأدوات</h2>
-        <p className="text-[var(--muted)]">Equipment Inventory مفصل</p>
+  const renderEquipmentStep = () => {
+    const equipmentCategories = [
+      { id: 'cameras', nameAr: 'الكاميرات', icon: '📷' },
+      { id: 'lenses', nameAr: 'العدسات', icon: '🔍' },
+      { id: 'lighting', nameAr: 'الإضاءة', icon: '💡' },
+      { id: 'audio', nameAr: 'الصوتيات', icon: '🎤' },
+      { id: 'accessories', nameAr: 'الإكسسوارات', icon: '🛠️' },
+      { id: 'specialSetups', nameAr: 'التجهيزات الخاصة', icon: '⚙️' }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--text)] mb-2">المعدات والأدوات</h2>
+          <p className="text-[var(--muted)]">Equipment Inventory مفصل</p>
+        </div>
+        
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 text-blue-800 mb-2">
+            <Settings size={20} />
+            <span className="font-medium">نموذج مطور</span>
+          </div>
+          <p className="text-sm text-blue-700">
+            هذا النموذج المطور يستخدم كتالوج المعدات الجديد. يمكنك إضافة معدات مفصلة لكل فئة.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {equipmentCategories.map(category => {
+            const categoryEquipment = formData.equipment[category.id as keyof typeof formData.equipment] as EquipmentItem[];
+            
+            return (
+              <div key={category.id} className="border border-[var(--border)] rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-[var(--text)] flex items-center gap-2">
+                    <span>{category.icon}</span>
+                    {category.nameAr}
+                    {categoryEquipment?.length > 0 && (
+                      <span className="text-sm bg-[var(--accent-100)] text-[var(--accent-700)] px-2 py-1 rounded">
+                        {categoryEquipment.length}
+                      </span>
+                    )}
+                  </h3>
+                  <button
+                    onClick={() => {
+                      // إضافة عنصر فارغ جديد
+                      const newItem: EquipmentItem = {
+                        name: '',
+                        model: '',
+                        quantity: 1,
+                        condition: 'excellent',
+                        notes: ''
+                      };
+                      setFormData(prev => ({
+                        ...prev,
+                        equipment: {
+                          ...prev.equipment,
+                          [category.id]: [...(categoryEquipment || []), newItem]
+                        }
+                      }));
+                    }}
+                    className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)]"
+                  >
+                    + إضافة
+                  </button>
+                </div>
+
+                {categoryEquipment && categoryEquipment.length > 0 ? (
+                  <div className="space-y-3">
+                    {categoryEquipment.map((item, index) => (
+                      <div key={index} className="grid md:grid-cols-6 gap-3 p-3 bg-[var(--bg)] rounded border">
+                        <div>
+                          <label className="block text-xs text-[var(--muted)] mb-1">النوع/الاسم</label>
+                          <input
+                            type="text"
+                            value={item.name}
+                            onChange={(e) => {
+                              const updated = [...categoryEquipment];
+                              updated[index] = { ...updated[index], name: e.target.value };
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            placeholder="Canon, Sony..."
+                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-[var(--muted)] mb-1">الموديل</label>
+                          <input
+                            type="text"
+                            value={item.model || ''}
+                            onChange={(e) => {
+                              const updated = [...categoryEquipment];
+                              updated[index] = { ...updated[index], model: e.target.value };
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            placeholder="5D Mark IV..."
+                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-[var(--muted)] mb-1">العدد</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const updated = [...categoryEquipment];
+                              updated[index] = { ...updated[index], quantity: parseInt(e.target.value) || 1 };
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-[var(--muted)] mb-1">الحالة</label>
+                          <select
+                            value={item.condition}
+                            onChange={(e) => {
+                              const updated = [...categoryEquipment];
+                              updated[index] = { ...updated[index], condition: e.target.value as EquipmentItem['condition'] };
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
+                          >
+                            <option value="excellent">ممتاز</option>
+                            <option value="good">جيد</option>
+                            <option value="fair">مقبول</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-[var(--muted)] mb-1">ملاحظات</label>
+                          <input
+                            type="text"
+                            value={item.notes || ''}
+                            onChange={(e) => {
+                              const updated = [...categoryEquipment];
+                              updated[index] = { ...updated[index], notes: e.target.value };
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            placeholder="اختياري"
+                            className="w-full px-2 py-1 text-sm border border-[var(--border)] rounded text-[var(--text)]"
+                          />
+                        </div>
+
+                        <div className="flex items-end">
+                          <button
+                            onClick={() => {
+                              const updated = categoryEquipment.filter((_, i) => i !== index);
+                              setFormData(prev => ({
+                                ...prev,
+                                equipment: { ...prev.equipment, [category.id]: updated }
+                              }));
+                            }}
+                            className="px-2 py-1 text-red-500 hover:text-red-700 text-sm"
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-[var(--muted)] py-8">
+                    لا توجد معدات في هذه الفئة
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* تحذير إذا لم تكن هناك معدات كافية */}
+        {(() => {
+          const totalEquipment = Object.values(formData.equipment).flat().length;
+          if (totalEquipment === 0) {
+            return (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                  <AlertCircle size={20} />
+                  <span className="font-medium">لا توجد معدات</span>
+                </div>
+                <p className="text-sm text-yellow-700">
+                  يُنصح بإضافة المعدات الأساسية التي تملكها لتحسين فرص الحصول على مشاريع مناسبة.
+                </p>
+              </div>
+            );
+          }
+          return null;
+        })()}
       </div>
+    );
+  };
+
+  const renderCapacityStep = () => {
+    const daysOfWeek = [
+      { id: 'sunday', nameAr: 'الأحد' },
+      { id: 'monday', nameAr: 'الإثنين' },
+      { id: 'tuesday', nameAr: 'الثلاثاء' },
+      { id: 'wednesday', nameAr: 'الأربعاء' },
+      { id: 'thursday', nameAr: 'الخميس' },
+      { id: 'friday', nameAr: 'الجمعة' },
+      { id: 'saturday', nameAr: 'السبت' }
+    ];
+
+    const addTimeRange = (dayId: string) => {
+      const newRange = { start: '09:00', end: '17:00' };
+      const dayAvailability = formData.capacity.weeklyAvailability.find(d => d.day === dayId);
       
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-green-800">
-          <Settings size={20} />
-          <span className="font-medium">قيد التطوير</span>
-        </div>
-        <p className="text-sm text-green-700 mt-1">
-          سيتم إضافة نماذج مفصلة للكاميرات، العدسات، الإضاءة، الصوت، إلخ...
-        </p>
-      </div>
-    </div>
-  );
+      if (dayAvailability) {
+        // تحديث اليوم الموجود
+        setFormData(prev => ({
+          ...prev,
+          capacity: {
+            ...prev.capacity,
+            weeklyAvailability: prev.capacity.weeklyAvailability.map(d =>
+              d.day === dayId 
+                ? { ...d, timeRanges: [...d.timeRanges, newRange] }
+                : d
+            )
+          }
+        }));
+      } else {
+        // إضافة يوم جديد
+        setFormData(prev => ({
+          ...prev,
+          capacity: {
+            ...prev.capacity,
+            weeklyAvailability: [...prev.capacity.weeklyAvailability, {
+              day: dayId as WeeklyAvailability['day'],
+              timeRanges: [newRange]
+            }]
+          }
+        }));
+      }
+    };
 
-  const renderCapacityStep = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-[var(--text)] mb-2">السعة والزمن</h2>
-        <p className="text-[var(--muted)]">Capacity & Time Management</p>
-      </div>
-      
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)] mb-2">
-            أقصى عدد أصول/اليوم *
-          </label>
-          <input
-            type="number"
-            value={formData.capacity.maxAssetsPerDay}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              capacity: { ...prev.capacity, maxAssetsPerDay: parseInt(e.target.value) || 10 }
-            }))}
-            className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            min="1"
-            max="100"
-          />
-        </div>
+    const removeTimeRange = (dayId: string, rangeIndex: number) => {
+      setFormData(prev => ({
+        ...prev,
+        capacity: {
+          ...prev.capacity,
+          weeklyAvailability: prev.capacity.weeklyAvailability.map(d =>
+            d.day === dayId
+              ? { ...d, timeRanges: d.timeRanges.filter((_, i) => i !== rangeIndex) }
+              : d
+          ).filter(d => d.timeRanges.length > 0) // إزالة الأيام الفارغة
+        }
+      }));
+    };
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)] mb-2">
-            SLA عادي (بالساعات) *
-          </label>
-          <input
-            type="number"
-            value={formData.capacity.standardSLA}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              capacity: { ...prev.capacity, standardSLA: parseInt(e.target.value) || 48 }
-            }))}
-            className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            min="1"
-            max="168"
-          />
-        </div>
+    const updateTimeRange = (dayId: string, rangeIndex: number, field: 'start' | 'end', value: string) => {
+      setFormData(prev => ({
+        ...prev,
+        capacity: {
+          ...prev.capacity,
+          weeklyAvailability: prev.capacity.weeklyAvailability.map(d =>
+            d.day === dayId
+              ? {
+                  ...d,
+                  timeRanges: d.timeRanges.map((range, i) =>
+                    i === rangeIndex ? { ...range, [field]: value } : range
+                  )
+                }
+              : d
+          )
+        }
+      }));
+    };
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)] mb-2">
-            SLA سريع (بالساعات) *
-          </label>
-          <input
-            type="number"
-            value={formData.capacity.rushSLA}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              capacity: { ...prev.capacity, rushSLA: parseInt(e.target.value) || 24 }
-            }))}
-            className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            min="1"
-            max="72"
-          />
+    const copyToAllDays = (sourceDay: string) => {
+      const sourceAvailability = formData.capacity.weeklyAvailability.find(d => d.day === sourceDay);
+      if (!sourceAvailability || sourceAvailability.timeRanges.length === 0) return;
+
+      const newWeeklyAvailability: WeeklyAvailability[] = daysOfWeek.map(day => ({
+        day: day.id as WeeklyAvailability['day'],
+        timeRanges: [...sourceAvailability.timeRanges]
+      }));
+
+      setFormData(prev => ({
+        ...prev,
+        capacity: {
+          ...prev.capacity,
+          weeklyAvailability: newWeeklyAvailability
+        }
+      }));
+    };
+
+    const clearDay = (dayId: string) => {
+      setFormData(prev => ({
+        ...prev,
+        capacity: {
+          ...prev.capacity,
+          weeklyAvailability: prev.capacity.weeklyAvailability.filter(d => d.day !== dayId)
+        }
+      }));
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--text)] mb-2">السعة والزمن</h2>
+          <p className="text-[var(--muted)]">Capacity & Time Management</p>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)] mb-2">
+              أقصى عدد أصول/اليوم *
+            </label>
+            <input
+              type="number"
+              value={formData.capacity.maxAssetsPerDay}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                capacity: { ...prev.capacity, maxAssetsPerDay: parseInt(e.target.value) || 10 }
+              }))}
+              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+              min="1"
+              max="100"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                SLA عادي (بالساعات) *
+              </label>
+              <input
+                type="number"
+                value={formData.capacity.standardSLA}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  capacity: { ...prev.capacity, standardSLA: parseInt(e.target.value) || 48 }
+                }))}
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                min="1"
+                max="168"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">
+                SLA سريع (بالساعات) *
+              </label>
+              <input
+                type="number"
+                value={formData.capacity.rushSLA}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  capacity: { ...prev.capacity, rushSLA: parseInt(e.target.value) || 24 }
+                }))}
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
+                min="1"
+                max="72"
+              />
+            </div>
+          </div>
+
+          {/* جدول التوافق الأسبوعي */}
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)] mb-4">
+              التوافق الأسبوعي (من/إلى لكل يوم)
+            </label>
+            
+            <div className="space-y-4">
+              {daysOfWeek.map(day => {
+                const dayAvailability = formData.capacity.weeklyAvailability.find(d => d.day === day.id);
+                
+                return (
+                  <div key={day.id} className="border border-[var(--border)] rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-[var(--text)]">{day.nameAr}</h3>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => addTimeRange(day.id)}
+                          className="px-3 py-1 bg-[var(--accent-500)] text-white text-sm rounded hover:bg-[var(--accent-600)]"
+                        >
+                          + إضافة فترة
+                        </button>
+                        {dayAvailability && (
+                          <>
+                            <button
+                              onClick={() => copyToAllDays(day.id)}
+                              className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
+                            >
+                              نسخ لجميع الأيام
+                            </button>
+                            <button
+                              onClick={() => clearDay(day.id)}
+                              className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                            >
+                              مسح
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {dayAvailability && dayAvailability.timeRanges.length > 0 ? (
+                      <div className="space-y-2">
+                        {dayAvailability.timeRanges.map((range, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm text-[var(--muted)]">من:</label>
+                              <input
+                                type="time"
+                                value={range.start}
+                                onChange={(e) => updateTimeRange(day.id, index, 'start', e.target.value)}
+                                className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm text-[var(--muted)]">إلى:</label>
+                              <input
+                                type="time"
+                                value={range.end}
+                                onChange={(e) => updateTimeRange(day.id, index, 'end', e.target.value)}
+                                className="px-2 py-1 border border-[var(--border)] rounded text-[var(--text)]"
+                              />
+                            </div>
+                            <button
+                              onClick={() => removeTimeRange(day.id, index)}
+                              className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                              إزالة
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center text-[var(--muted)] py-4">
+                        غير متاح في هذا اليوم
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderComplianceStep = () => (
     <div className="space-y-6">

@@ -25,8 +25,7 @@ export interface Creator {
   // السعة والزمن
   capacity: {
     maxAssetsPerDay: number;
-    availableDays: string[]; // ['sunday', 'monday', ...]
-    peakHours?: string;
+    weeklyAvailability: WeeklyAvailability[]; // جدول أسبوعي مفصل
     standardSLA: number; // بالساعات
     rushSLA: number; // بالساعات
   };
@@ -65,21 +64,56 @@ export interface CreatorSkill {
   verified?: boolean; // تم التحقق من الإدارة
 }
 
-export interface EquipmentInventory {
-  cameras: EquipmentItem[];
-  lenses: EquipmentItem[];
-  lighting: EquipmentItem[];
-  audio: EquipmentItem[];
-  accessories: EquipmentItem[];
-  specialSetups: string[]; // مثل Ghost Mannequin
+// أنواع المعدات المحدثة - مرتبطة بكتالوج المعدات
+export type EquipmentCategory = 'camera' | 'lens' | 'lighting' | 'audio' | 'accessory' | 'special_setup';
+
+export interface EquipmentCatalogItem {
+  id: string;                // Firestore: equipment_catalog/{id}
+  category: EquipmentCategory;
+  brand: string;
+  model: string;
+  capabilities: string[];    // ['4k','macro','studio','gimbal',...]
+  mount?: string;            // للعدسات
+  compatibleMounts?: string[]; // للكاميرات
+  type?: string;             // نوع فرعي
+  focalLength?: string;      // للعدسات
+  maxAperture?: string;      // للعدسات
+  power?: string;            // للإضاءة
+  size?: string;             // للمعدلات
 }
 
-export interface EquipmentItem {
-  name: string;
-  model?: string;
+export interface CreatorEquipmentItem {
+  catalogId: string;         // ref → EquipmentCatalogItem.id
+  owned: boolean;
+  condition: 'excellent' | 'good' | 'fair' | 'poor';
   quantity: number;
-  condition: 'excellent' | 'good' | 'fair';
   notes?: string;
+}
+
+export interface EquipmentInventory {
+  cameras: CreatorEquipmentItem[];
+  lenses: CreatorEquipmentItem[];
+  lighting: CreatorEquipmentItem[];
+  audio: CreatorEquipmentItem[];
+  accessories: CreatorEquipmentItem[];
+  specialSetups: CreatorEquipmentItem[];
+}
+
+// مجموعات معدات جاهزة
+export interface EquipmentPresetKit {
+  id: string;
+  name: string;
+  nameAr: string;
+  targetRole: 'photographer' | 'videographer' | 'designer' | 'producer';
+  items: string[]; // catalogIds
+  capabilities: string[];
+  supportedVerticals: string[];
+}
+
+// جدول التوافق الأسبوعي المحدث
+export interface WeeklyAvailability {
+  day: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+  timeRanges: Array<{ start: string; end: string }>; // HH:mm, يدعم أكثر من فترة باليوم
 }
 
 // نموذج التقييم من الإدارة

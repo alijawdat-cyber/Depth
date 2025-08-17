@@ -136,6 +136,33 @@
     filter: brightness(0) invert(1); 
   }
 }
+
+/* Form controls — force tokens for bg/text/border in all themes */
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .form-control {
+    background-color: var(--bg);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+  [data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+  [data-theme="dark"] select,
+  [data-theme="dark"] textarea,
+  .dark input:not([type="checkbox"]):not([type="radio"]),
+  .dark select,
+  .dark textarea {
+    background-color: var(--card);
+    border-color: var(--elev);
+    color: var(--text);
+  }
+}
 [data-theme="light"] {
   --bg: var(--neutral-0);
   --text: var(--ink-900);

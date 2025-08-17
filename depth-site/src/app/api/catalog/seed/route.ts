@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 // Note: lazy import inside handler to capture module-load errors in try/catch
 
-const BodySchema = z.object({ mode: z.enum(['full','rate-card','taxonomy']).optional().default('full') });
+const BodySchema = z.object({ mode: z.enum(['full','rate-card','taxonomy','equipment']).optional().default('full') });
 
 export async function POST(req: NextRequest) {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;

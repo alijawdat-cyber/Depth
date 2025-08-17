@@ -17,11 +17,9 @@ import {
   Eye,
   Edit,
   Download,
-  Send,
   FileText,
   CheckCircle,
   Clock,
-  AlertTriangle,
   Users,
   Calendar,
   DollarSign,
@@ -110,11 +108,11 @@ interface ContractContent {
   confidentialityPeriod?: string;
   
   // تفاصيل خاصة بكل نوع ملحق
-  equipmentDetails?: any;
-  modelDetails?: any;
-  influencerDetails?: any;
-  mediaBuyingDetails?: any;
-  clinicaDetails?: any;
+  equipmentDetails?: EquipmentDetails;
+  modelDetails?: ModelDetails;
+  influencerDetails?: InfluencerDetails;
+  mediaBuyingDetails?: MediaBuyingDetails;
+  clinicaDetails?: ClinicaDetails;
 }
 
 interface SOWDeliverable {
@@ -123,6 +121,67 @@ interface SOWDeliverable {
   dimensions?: string;
   format: string;
   specifications: string;
+}
+
+// أنواع تفصيلية للملحقات بدل any
+type SocialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'snapchat' | 'facebook' | 'x' | 'other';
+
+interface EquipmentItem {
+  name: string;
+  quantity: number;
+  specification?: string;
+}
+
+interface EquipmentDetails {
+  items?: EquipmentItem[];
+  rentalDays?: number;
+  insuranceIncluded?: boolean;
+  deliveryNotes?: string;
+  notes?: string;
+  [key: string]: unknown;
+}
+
+interface ModelDetails {
+  modelName?: string;
+  modelId?: string;
+  age?: number;
+  gender?: 'male' | 'female' | 'other';
+  ratePerHour?: number;
+  hours?: number;
+  notes?: string;
+  [key: string]: unknown;
+}
+
+interface InfluencerDetails {
+  handle?: string;
+  platform?: SocialPlatform;
+  followers?: number;
+  cpmUsd?: number;
+  deliverables?: string[];
+  briefLink?: string;
+  [key: string]: unknown;
+}
+
+interface MediaBuyingChannel {
+  platform: SocialPlatform | string;
+  budget: number;
+  objective: 'reach' | 'traffic' | 'conversions' | 'awareness' | string;
+}
+
+interface MediaBuyingDetails {
+  channels?: MediaBuyingChannel[];
+  totalBudget?: number;
+  durationDays?: number;
+  [key: string]: unknown;
+}
+
+interface ClinicaDetails {
+  complianceOfficer?: string;
+  licenseNo?: string;
+  approvalRefs?: string[];
+  restrictions?: string[];
+  notes?: string;
+  [key: string]: unknown;
 }
 
 interface Milestone {
@@ -188,7 +247,6 @@ export default function AdminContractsPage() {
   
   // Operations
   const [submitting, setSubmitting] = useState(false);
-  const [generating, setGenerating] = useState(false);
 
   // التحقق من صلاحيات الإدمن
   const isAdmin = (session?.user as { role?: string })?.role === 'admin';
@@ -254,31 +312,7 @@ export default function AdminContractsPage() {
     }
   };
 
-  // توليد SOW من المشروع
-  const handleGenerateSOW = async (projectId: string) => {
-    try {
-      setGenerating(true);
-      const response = await fetch('/api/contracts/sow/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setContracts(prev => [result.contract, ...prev]);
-        alert('تم توليد SOW بنجاح من بيانات المشروع');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'فشل في توليد SOW');
-      }
-    } catch (err) {
-      setError('خطأ في الاتصال');
-      console.error('Generate SOW error:', err);
-    } finally {
-      setGenerating(false);
-    }
-  };
+  // ملاحظة: وظيفة توليد SOW تُدار ضمن مسارات الـ API مباشرة عند الاعتماد/العرض.
 
   // إرسال العقد للعميل
   const handleSendContract = async (contractId: string, method: 'email' | 'whatsapp') => {
