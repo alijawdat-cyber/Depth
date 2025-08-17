@@ -765,6 +765,33 @@ export default function AdminSecurityPage() {
                             <WifiOff size={16} />
                             إجبار الخروج
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewUserDetails(permission.userId)}
+                            className="text-blue-600"
+                          >
+                            <Server size={16} />
+                            تفاصيل
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyUserId(permission.userId)}
+                            className="text-gray-600"
+                          >
+                            <Copy size={16} />
+                            نسخ ID
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleBanUser(permission.userId)}
+                            className="text-red-600"
+                          >
+                            <Ban size={16} />
+                            حظر
+                          </Button>
                         </div>
                       </div>
                       
@@ -866,13 +893,39 @@ export default function AdminSecurityPage() {
                             </span>
                           </div>
                           <p className="text-sm text-[var(--text)] mb-2">{event.details}</p>
-                          <div className="flex items-center gap-4 text-xs text-[var(--muted)]">
+                                                  <div className="flex items-center gap-4 text-xs text-[var(--muted)]">
+                          <div className="flex items-center gap-1">
+                            <Clock size={12} />
                             <span>{new Date(event.timestamp).toLocaleString('ar-EG')}</span>
-                            <span>IP: {event.ipAddress}</span>
-                            <span title={event.userAgent}>
-                              {event.userAgent.includes('Mobile') ? 'جوال' : 'كمبيوتر'}
-                            </span>
                           </div>
+                          <div className="flex items-center gap-1">
+                            <Globe size={12} />
+                            <span>IP: {event.ipAddress}</span>
+                          </div>
+                          <div className="flex items-center gap-1" title={event.userAgent}>
+                            {event.userAgent.includes('Mobile') ? (
+                              <>
+                                <Smartphone size={12} />
+                                <span>جوال</span>
+                              </>
+                            ) : (
+                              <>
+                                <Server size={12} />
+                                <span>كمبيوتر</span>
+                              </>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Wifi size={12} />
+                            <span>متصل</span>
+                          </div>
+                          {event.type === 'failed_login' && (
+                            <div className="flex items-center gap-1">
+                              <Phone size={12} />
+                              <span>تحقق مطلوب</span>
+                            </div>
+                          )}
+                        </div>
                         </div>
                       </div>
                     </div>
@@ -1134,6 +1187,89 @@ export default function AdminSecurityPage() {
               >
                 إلغاء
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettingsForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[var(--card)] rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-[var(--text)]">إعدادات الأمان المتقدمة</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSettingsForm(false)}
+              >
+                <X size={16} />
+              </Button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 border border-[var(--border)] rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Server size={20} className="text-blue-500" />
+                    <h3 className="font-medium text-[var(--text)]">إعدادات الخادم</h3>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>نوع التشفير:</span>
+                      <span>AES-256</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>حالة الاتصال:</span>
+                      <div className="flex items-center gap-1">
+                        <Wifi size={12} className="text-green-500" />
+                        <span>متصل</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 border border-[var(--border)] rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Phone size={20} className="text-green-500" />
+                    <h3 className="font-medium text-[var(--text)]">إعدادات 2FA</h3>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>التطبيق المفضل:</span>
+                      <span>Google Authenticator</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>نسخ احتياطي:</span>
+                      <span>SMS</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-[var(--border)] rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Globe size={20} className="text-purple-500" />
+                  <div>
+                    <h3 className="font-medium text-[var(--text)]">الوصول العالمي</h3>
+                    <p className="text-sm text-[var(--muted)]">السماح بالوصول من جميع المناطق</p>
+                  </div>
+                </div>
+                <input type="checkbox" defaultChecked className="rounded" />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowSettingsForm(false)}
+                >
+                  إلغاء
+                </Button>
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  <Save size={16} />
+                  حفظ الإعدادات
+                </Button>
+              </div>
             </div>
           </div>
         </div>

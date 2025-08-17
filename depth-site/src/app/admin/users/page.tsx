@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
 import { Button } from "@/components/ui/Button";
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
@@ -503,7 +504,13 @@ export default function AdminUsersPage() {
                   {/* Avatar */}
                   <div className="w-12 h-12 rounded-full bg-[var(--accent-500)] flex items-center justify-center text-white font-semibold">
                     {user.avatar ? (
-                      <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                      <NextImage 
+                        src={user.avatar} 
+                        alt={user.name || 'صورة المستخدم'} 
+                        width={48}
+                        height={48}
+                        className="w-full h-full rounded-full object-cover" 
+                      />
                     ) : (
                       user.name.charAt(0).toUpperCase()
                     )}
@@ -529,6 +536,14 @@ export default function AdminUsersPage() {
                         <span className={`px-2 py-1 rounded text-xs font-medium ${getTierColor(user.tier)}`}>
                           {user.tier.toUpperCase()}
                         </span>
+                      )}
+
+                      {/* Performance Indicator */}
+                      {user.status === 'active' && user.role === 'creator' && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-green-50 text-green-600">
+                          <TrendingUp size={12} />
+                          <span>أداء متميز</span>
+                        </div>
                       )}
 
                       {/* Verification Badges */}

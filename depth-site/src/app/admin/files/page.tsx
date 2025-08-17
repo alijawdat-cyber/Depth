@@ -811,7 +811,7 @@ export default function AdminFilesPage() {
                     {file.thumbnailUrl ? (
                       <NextImage 
                         src={file.thumbnailUrl} 
-                        alt={file.name}
+                        alt={file.originalName || 'معاينة الملف'}
                         width={128}
                         height={128}
                         className="max-h-full max-w-full object-contain rounded"
@@ -898,6 +898,16 @@ export default function AdminFilesPage() {
                             <Play size={14} />
                           </Button>
                         )}
+                        {file.type === 'video' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => alert('ميزة الإيقاف المؤقت قيد التطوير')}
+                            title="إيقاف مؤقت"
+                          >
+                            <Pause size={14} />
+                          </Button>
+                        )}
                         {file.status === 'ready_for_review' && (
                           <Button
                             variant="ghost"
@@ -911,6 +921,30 @@ export default function AdminFilesPage() {
                             <Eye size={14} />
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const tag = prompt('أدخل اسم العلامة:');
+                            if (tag) handleTagFile(file.id, tag);
+                          }}
+                          className="text-blue-600"
+                          title="إضافة علامة"
+                        >
+                          <Tag size={14} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const comment = prompt('أدخل تعليقك:');
+                            if (comment) handleAddComment(file.id, comment);
+                          }}
+                          className="text-green-600"
+                          title="إضافة تعليق"
+                        >
+                          <MessageSquare size={14} />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
