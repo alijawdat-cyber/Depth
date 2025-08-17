@@ -27,33 +27,50 @@ import {
   ArrowLeft
 } from 'lucide-react';
 
-interface RateCardItem {
-  id: string;
-  category: string;
-  subcategory: string;
-  processing: string;
+// نوع واحد لكل فئة فرعية مع سعرها
+interface SubcategoryPriceItem {
+  id: string; // للتوافق مع ResponsiveTable
+  subcategoryId: string;
+  nameAr: string;
+  nameEn?: string;
+  categoryId: string;
   basePrice: number;
-  creatorCost: {
-    T1: number;
-    T2: number;
-    T3: number;
-  };
-  margin: number;
-  priceFloor: number;
-  lastUpdated: string;
-  updatedBy: string;
-  [key: string]: unknown;
+  priceFloor?: number;
+  [key: string]: unknown; // للتوافق مع ResponsiveTable
 }
 
-interface RateCardVersion {
-  id: string;
-  version: string;
+// هيكل Rate Card الصحيح
+interface RateCardData {
+  versionId: string;
   status: 'draft' | 'active' | 'archived';
-  createdAt: string;
-  createdBy: string;
-  items: RateCardItem[];
-  guardrails: GuardrailsConfig;
-  notes?: string;
+  effectiveFrom?: string;
+  currency: string;
+  basePricesIQD: Record<string, number>;
+  baseRangesIQD?: Record<string, [number, number]>;
+  processingLevels?: {
+    raw_only?: number;
+    raw_basic?: number;
+    full_retouch?: number | [number, number];
+  };
+  modifiers?: {
+    rushPct?: number;
+    creatorTierPct?: Record<string, number>;
+  };
+  verticalModifiers?: Record<string, number>;
+  locationZonesIQD?: Record<string, number>;
+  overrideCapPercent?: number;
+  guardrails?: {
+    minMarginDefault?: number;
+    minMarginHardStop?: number;
+  };
+  roundingIQD?: number;
+}
+
+interface Subcategory {
+  id: string;
+  nameAr: string;
+  nameEn?: string;
+  categoryId: string;
 }
 
 export default function RateCardEditorPage() {
@@ -65,15 +82,14 @@ export default function RateCardEditorPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   // Rate card state
-  const [currentVersion, setCurrentVersion] = useState<RateCardVersion | null>(null);
-  const [, setVersions] = useState<RateCardVersion[]>([]);
-  const [editingItem, setEditingItem] = useState<RateCardItem | null>(null);
+  const [rateCard, setRateCard] = useState<RateCardData | null>(null);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [editingItem, setEditingItem] = useState<SubcategoryPriceItem | null>(null);
   const [showGuardrails, setShowGuardrails] = useState(false);
 
   // Filters and view
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
   // Guardrails config
   const [guardrailsConfig, setGuardrailsConfig] = useState<GuardrailsConfig>(DEFAULT_GUARDRAILS);
@@ -85,16 +101,25 @@ export default function RateCardEditorPage() {
   const loadRateCardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/pricing/rate-card/active');
-      if (!response.ok) throw new Error('فشل في تحميل جدول الأسعار');
+      setError(null);
+
+      // تحميل Rate Card النشط
+      const rateResponse = await fetch('/api/pricing/rate-card/active');
+      if (!rateResponse.ok) throw new Error('فشل في تحميل جدول الأسعار');
       
-      const data = await response.json();
-      setCurrentVersion(data.rateCard);
-      setVersions(data.versions || []);
+      const rateData = await rateResponse.json();
+      setRateCard(rateData.rateCard);
       
-      if (data.rateCard?.guardrails) {
-        setGuardrailsConfig(data.rateCard.guardrails);
+      if (rateData.rateCard?.guardrails) {
+        setGuardrailsConfig(rateData.rateCard.guardrails);
       }
+
+      // تحميل الفئات الفرعية
+      const subcatResponse = await fetch('/api/catalog/subcategories');
+      if (!subcatResponse.ok) throw new Error('فشل في تحميل الفئات الفرعية');
+      
+      const subcatData = await subcatResponse.json();
+      setSubcategories(subcatData.items || subcatData.data || []);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'خطأ في التحميل');
@@ -104,7 +129,7 @@ export default function RateCardEditorPage() {
   };
 
   const handleSaveRateCard = async (isDraft = true) => {
-    if (!currentVersion) return;
+    if (!rateCard) return;
 
     try {
       setSaving(true);
@@ -115,7 +140,7 @@ export default function RateCardEditorPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rateCard: {
-            ...currentVersion,
+            ...rateCard,
             guardrails: guardrailsConfig,
             status: isDraft ? 'draft' : 'active'
           }
@@ -125,7 +150,7 @@ export default function RateCardEditorPage() {
       if (!response.ok) throw new Error('فشل في حفظ جدول الأسعار');
 
       const result = await response.json();
-      setCurrentVersion(result.rateCard);
+      setRateCard(result.rateCard);
       setSuccess(isDraft ? 'تم حفظ المسودة' : 'تم تفعيل جدول الأسعار');
 
     } catch (err) {
@@ -135,90 +160,88 @@ export default function RateCardEditorPage() {
     }
   };
 
-  const handleUpdateItem = (updatedItem: RateCardItem) => {
-    if (!currentVersion) return;
+  const handleUpdatePrice = (subcategoryId: string, newPrice: number) => {
+    if (!rateCard) return;
 
-    const updatedItems = currentVersion.items.map(item => 
-      item.id === updatedItem.id ? updatedItem : item
-    );
-
-    setCurrentVersion({
-      ...currentVersion,
-      items: updatedItems
+    setRateCard({
+      ...rateCard,
+      basePricesIQD: {
+        ...rateCard.basePricesIQD,
+        [subcategoryId]: newPrice
+      }
     });
-
-    setEditingItem(null);
   };
 
-  
+  // تحويل basePricesIQD إلى قائمة قابلة للعرض
+  const priceItems: SubcategoryPriceItem[] = !rateCard?.basePricesIQD ? [] : 
+    Object.entries(rateCard.basePricesIQD).map(([subcategoryId, basePrice]) => {
+      const subcategory = subcategories.find(sub => sub.id === subcategoryId);
+      const priceFloor = rateCard.baseRangesIQD?.[subcategoryId]?.[0];
+      
+      return {
+        id: subcategoryId, // للتوافق مع ResponsiveTable
+        subcategoryId,
+        nameAr: subcategory?.nameAr || subcategoryId,
+        nameEn: subcategory?.nameEn,
+        categoryId: subcategory?.categoryId || 'غير محدد',
+        basePrice,
+        priceFloor
+      };
+    });
 
-  const filteredItems = currentVersion?.items.filter(item => {
-    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+  const filteredItems = priceItems.filter(item => {
+    const matchesCategory = categoryFilter === 'all' || item.categoryId === categoryFilter;
     const matchesSearch = searchTerm === '' || 
-      item.subcategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase());
+      item.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.subcategoryId.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesCategory && matchesSearch;
-  }) || [];
+  });
 
-  const categories = [...new Set(currentVersion?.items.map(item => item.category) || [])];
+  const categories = [...new Set(priceItems.map(item => item.categoryId))];
 
   // تعريف أعمدة الجدول
   const tableColumns = [
     {
-      key: 'subcategory' as keyof RateCardItem,
-      label: 'البند',
-      render: (item: RateCardItem) => (
+      key: 'id' as const,
+      label: 'اسم الفئة الفرعية',
+      render: (item: SubcategoryPriceItem) => (
         <div>
-          <div className="font-medium text-[var(--text)]">{item.subcategory}</div>
-          <div className="text-sm text-[var(--muted)]">{item.processing}</div>
+          <div className="font-medium text-[var(--text)]">{item.nameAr}</div>
+          <div className="text-sm text-[var(--muted)]">{item.subcategoryId}</div>
+          {item.nameEn && <div className="text-xs text-[var(--muted)]">{item.nameEn}</div>}
         </div>
       )
     },
     {
-      key: 'category' as keyof RateCardItem,
+      key: 'id' as const,
       label: 'الفئة',
+      render: (item: SubcategoryPriceItem) => item.categoryId,
       hideOnMobile: true
     },
     {
-      key: 'basePrice' as keyof RateCardItem,
+      key: 'id' as const,
       label: 'السعر الأساسي',
-      render: (item: RateCardItem) => (
+      render: (item: SubcategoryPriceItem) => (
         <div className="font-medium text-[var(--text)]">
           {item.basePrice.toLocaleString()} د.ع
         </div>
       )
     },
     {
-      key: 'margin' as keyof RateCardItem,
-      label: 'الهامش',
-      render: (item: RateCardItem) => (
-        <span className={`px-2 py-1 rounded text-xs ${
-          item.margin >= guardrailsConfig.profitMargins.standard
-            ? 'bg-green-100 text-green-800'
-            : item.margin >= guardrailsConfig.profitMargins.minimum
-            ? 'bg-yellow-100 text-yellow-800'
-            : 'bg-red-100 text-red-800'
-        }`}>
-          {(item.margin * 100).toFixed(1)}%
-        </span>
-      ),
-      hideOnMobile: true
-    },
-    {
-      key: 'priceFloor' as keyof RateCardItem,
+      key: 'id' as const,
       label: 'أرضية السعر',
-      render: (item: RateCardItem) => (
+      render: (item: SubcategoryPriceItem) => (
         <span className="text-[var(--text)]">
-          {item.priceFloor.toLocaleString()} د.ع
+          {item.priceFloor ? `${item.priceFloor.toLocaleString()} د.ع` : 'غير محدد'}
         </span>
       ),
       hideOnMobile: true
     },
     {
-      key: 'id' as keyof RateCardItem,
+      key: 'id' as const,
       label: 'الإجراءات',
-      render: (item: RateCardItem) => (
+      render: (item: SubcategoryPriceItem) => (
         <Button
           size="sm"
           variant="ghost"
@@ -232,12 +255,12 @@ export default function RateCardEditorPage() {
   ];
 
   // دالة رندر البطاقة للشاشات الصغيرة
-  const renderItemCard = (item: RateCardItem) => (
+  const renderItemCard = (item: SubcategoryPriceItem) => (
     <DefaultCard
       key={item.id}
       item={item}
-      title={item.subcategory}
-      subtitle={`${item.category} • ${item.processing}`}
+      title={item.nameAr}
+      subtitle={`${item.categoryId} • ${item.subcategoryId}`}
       actions={
         <Button
           size="sm"
@@ -250,21 +273,7 @@ export default function RateCardEditorPage() {
       }
       fields={[
         { label: 'السعر الأساسي', value: `${item.basePrice.toLocaleString()} د.ع` },
-        { 
-          label: 'الهامش', 
-          value: (
-            <span className={`px-2 py-1 rounded text-xs ${
-              item.margin >= guardrailsConfig.profitMargins.standard
-                ? 'bg-green-100 text-green-800'
-                : item.margin >= guardrailsConfig.profitMargins.minimum
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {(item.margin * 100).toFixed(1)}%
-            </span>
-          )
-        },
-        { label: 'أرضية السعر', value: `${item.priceFloor.toLocaleString()} د.ع` }
+        { label: 'أرضية السعر', value: item.priceFloor ? `${item.priceFloor.toLocaleString()} د.ع` : 'غير محدد' }
       ]}
     />
   );
@@ -325,15 +334,15 @@ export default function RateCardEditorPage() {
       )}
 
       {/* Version Info */}
-      {currentVersion && (
+      {rateCard && (
         <div className="mb-6 bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-[var(--text)]">
-                إصدار {currentVersion.version}
+                إصدار {rateCard.versionId}
               </h3>
               <p className="text-sm text-[var(--muted)]">
-                الحالة: {currentVersion.status === 'active' ? 'نشط' : currentVersion.status === 'draft' ? 'مسودة' : 'مؤرشف'}
+                الحالة: {rateCard.status === 'active' ? 'نشط' : rateCard.status === 'draft' ? 'مسودة' : 'مؤرشف'}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -351,7 +360,7 @@ export default function RateCardEditorPage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-[var(--bg)] rounded-[var(--radius)]">
-              <div className="text-2xl font-bold text-[var(--text)]">{currentVersion.items.length}</div>
+              <div className="text-2xl font-bold text-[var(--text)]">{priceItems.length}</div>
               <div className="text-xs text-[var(--muted)]">إجمالي البنود</div>
             </div>
             <div className="text-center p-3 bg-[var(--bg)] rounded-[var(--radius)]">
@@ -539,24 +548,6 @@ export default function RateCardEditorPage() {
             onChange={setCategoryFilter}
             placeholder="تصفية حسب الفئة"
           />
-
-          <div className="flex items-center gap-2 lg:hidden">
-            <span className="text-sm text-[var(--muted)]">العرض:</span>
-            <Button
-              size="sm"
-              variant={viewMode === 'table' ? 'primary' : 'secondary'}
-              onClick={() => setViewMode('table')}
-            >
-              جدول
-            </Button>
-            <Button
-              size="sm"
-              variant={viewMode === 'cards' ? 'primary' : 'secondary'}
-              onClick={() => setViewMode('cards')}
-            >
-              بطاقات
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -609,14 +600,15 @@ export default function RateCardEditorPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-[var(--text)] mb-4">
-              تعديل البند: {editingItem.subcategory}
+              تعديل السعر: {editingItem.nameAr}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">السعر الأساسي</label>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">السعر الأساسي (د.ع)</label>
                 <input
                   type="number"
+                  min="0"
                   value={editingItem.basePrice}
                   onChange={(e) => setEditingItem(prev => prev ? {
                     ...prev,
@@ -627,69 +619,27 @@ export default function RateCardEditorPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">أرضية السعر</label>
-                <input
-                  type="number"
-                  value={editingItem.priceFloor}
-                  onChange={(e) => setEditingItem(prev => prev ? {
-                    ...prev,
-                    priceFloor: parseFloat(e.target.value) || 0
-                  } : null)}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">تكلفة T1</label>
-                <input
-                  type="number"
-                  value={editingItem.creatorCost.T1}
-                  onChange={(e) => setEditingItem(prev => prev ? {
-                    ...prev,
-                    creatorCost: { ...prev.creatorCost, T1: parseFloat(e.target.value) || 0 }
-                  } : null)}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">تكلفة T2</label>
-                <input
-                  type="number"
-                  value={editingItem.creatorCost.T2}
-                  onChange={(e) => setEditingItem(prev => prev ? {
-                    ...prev,
-                    creatorCost: { ...prev.creatorCost, T2: parseFloat(e.target.value) || 0 }
-                  } : null)}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">تكلفة T3</label>
-                <input
-                  type="number"
-                  value={editingItem.creatorCost.T3}
-                  onChange={(e) => setEditingItem(prev => prev ? {
-                    ...prev,
-                    creatorCost: { ...prev.creatorCost, T3: parseFloat(e.target.value) || 0 }
-                  } : null)}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-2">هامش الربح (%)</label>
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">أرضية السعر (د.ع)</label>
                 <input
                   type="number"
                   min="0"
-                  max="100"
-                  value={(editingItem.margin * 100).toFixed(1)}
+                  value={editingItem.priceFloor || ''}
                   onChange={(e) => setEditingItem(prev => prev ? {
                     ...prev,
-                    margin: parseFloat(e.target.value) / 100 || 0
+                    priceFloor: e.target.value ? parseFloat(e.target.value) : undefined
                   } : null)}
                   className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
+                  placeholder="اختياري"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-[var(--text)] mb-2">معرف الفئة الفرعية</label>
+                <input
+                  type="text"
+                  value={editingItem.subcategoryId}
+                  disabled
+                  className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--elev)] text-[var(--muted)]"
                 />
               </div>
             </div>
@@ -698,7 +648,12 @@ export default function RateCardEditorPage() {
               <Button variant="secondary" onClick={() => setEditingItem(null)}>
                 إلغاء
               </Button>
-              <Button onClick={() => editingItem && handleUpdateItem(editingItem)}>
+              <Button onClick={() => {
+                if (editingItem) {
+                  handleUpdatePrice(editingItem.subcategoryId, editingItem.basePrice);
+                  setEditingItem(null);
+                }
+              }}>
                 <Save size={16} />
                 حفظ التغييرات
               </Button>

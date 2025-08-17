@@ -67,8 +67,9 @@ interface RateCardVersion {
   notes?: string;
 }
 
-// PUT: Update rate card (legacy rate_cards collection)
-export async function PUT_LEGACY(request: NextRequest) {
+// PUT: Update rate card (legacy rate_cards collection) - unused
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function PUT_LEGACY(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as { role?: string }).role !== 'admin') {
@@ -177,8 +178,9 @@ export async function PUT_LEGACY(request: NextRequest) {
   }
 }
 
-// GET: Retrieve rate cards (legacy rate_cards collection)
-export async function GET_LEGACY(request: NextRequest) {
+// GET: Retrieve rate cards (legacy rate_cards collection) - unused
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function GET_LEGACY(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as { role?: string }).role !== 'admin') {

@@ -218,10 +218,10 @@ async function generateSOW(projectData: any, snapshot: any) {
 ${index + 1}. ${del.subcategoryNameAr || del.subcategory}
    - الكمية: ${del.quantity}
    - المعالجة: ${getProcessingText(del.processing)}
-   - السعر: ${formatCurrency(del.totalIQD)} (${formatCurrency(del.totalUSD, 'USD')})
+   - السعر: ${formatCurrencyUnified(del.totalIQD)} (${formatCurrencyUnified(del.totalUSD, 'USD')})
    - المُسند إلى: ${del.assignedToName || 'سيتم التحديد'}
-   ${del.conditions.isRush ? '   - عاجل (Rush) - SLA مخفض' : ''}
-   ${del.conditions.location !== 'studio' ? `   - الموقع: ${getLocationText(del.conditions.location)}` : ''}
+   ${del.conditions?.isRush ? '   - عاجل (Rush) - SLA مخفض' : ''}
+   ${del.conditions?.locationZone ? `   - المنطقة: ${getLocationZoneText(del.conditions.locationZone)}` : ''}
 `;
   });
 
@@ -269,25 +269,18 @@ ${index + 1}. ${del.subcategoryNameAr || del.subcategory}
 function getProcessingText(processing: string) {
   switch (processing) {
     case 'raw_only': return 'RAW Only';
-    case 'raw_color': return 'RAW + Color';
+    case 'raw_basic': return 'RAW + Basic Color';
     case 'full_retouch': return 'Full Retouch';
     default: return processing;
   }
 }
 
-function getLocationText(location: string) {
-  switch (location) {
-    case 'studio': return 'الاستوديو';
-    case 'outdoor_baghdad': return 'خارجي - بغداد';
-    case 'provinces': return 'المحافظات';
-    default: return location;
-  }
-}
-
-function formatCurrency(amount: number, currency: 'IQD' | 'USD' = 'IQD') {
-  if (currency === 'IQD') {
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
-  } else {
-    return '$' + new Intl.NumberFormat('en-US').format(amount);
+function getLocationZoneText(zone: string) {
+  switch (zone) {
+    case 'baghdad_center': return 'بغداد — مركز';
+    case 'baghdad_outer': return 'بغداد — أطراف';
+    case 'provinces_near': return 'محافظات — قريبة';
+    case 'provinces_far': return 'محافظات — بعيدة';
+    default: return zone;
   }
 }

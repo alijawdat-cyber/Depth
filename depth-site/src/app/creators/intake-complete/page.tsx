@@ -89,7 +89,7 @@ interface IntakeFormData {
     [key: string]: {
       deliverable: string;
       vertical?: string;
-      processing: 'raw_only' | 'raw_color' | 'full_retouch';
+      processing: 'raw_only' | 'raw_basic' | 'full_retouch';
       conditions: 'studio' | 'location';
       priority: 'standard' | 'rush';
       priceIQD: number;
