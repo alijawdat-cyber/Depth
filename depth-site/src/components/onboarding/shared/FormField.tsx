@@ -15,10 +15,11 @@ interface FormFieldProps {
   className?: string;
 }
 
-interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onBlur'> {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   error?: string;
   success?: boolean;
   required?: boolean;
@@ -103,6 +104,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     label, 
     value, 
     onChange, 
+    onBlur,
     error, 
     success, 
     required, 
@@ -140,6 +142,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             type={inputType}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
             className={`
               w-full px-4 py-3 rounded-xl border transition-all duration-200
               ${icon ? 'pr-12' : ''}

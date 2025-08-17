@@ -10,13 +10,8 @@ import CategorySelector from '../shared/CategorySelector';
 import { StepHeader } from '../OnboardingLayout';
 
 export default function Step2_BasicInfo() {
-  const { formData, updateBasicInfo, getStepErrors } = useOnboarding();
+  const { formData, updateBasicInfo, getFieldError } = useOnboarding();
   const { basicInfo } = formData;
-  const errors = getStepErrors(2);
-
-  const getFieldError = (field: string) => {
-    return errors.find(error => error.includes(field)) || undefined;
-  };
 
   const handleLanguageToggle = (lang: string) => {
     const currentLanguages = [...basicInfo.languages];

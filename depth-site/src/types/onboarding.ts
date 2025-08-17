@@ -97,6 +97,8 @@ export interface OnboardingState {
   success: boolean;
   canProceed: boolean;
   autoSaveEnabled: boolean;
+  touchedFields: Set<string>; // الحقول التي تم لمسها
+  showValidation: boolean; // هل نعرض أخطاء التحقق
 }
 
 // Context للـ Onboarding
@@ -125,6 +127,8 @@ export interface OnboardingContextType {
   // Validation
   validateCurrentStep: () => boolean;
   getStepErrors: (step: OnboardingStep) => string[];
+  getFieldError: (field: string) => string | undefined;
+  markFieldTouched: (field: string) => void;
 }
 
 // تكوين خطوات الـ Onboarding

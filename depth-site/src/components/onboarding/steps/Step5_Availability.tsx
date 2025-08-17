@@ -10,13 +10,8 @@ import WeeklyAvailabilityGrid from '../shared/WeeklyAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
 
 export default function Step5_Availability() {
-  const { formData, updateAvailability, getStepErrors } = useOnboarding();
+  const { formData, updateAvailability, getFieldError } = useOnboarding();
   const { availability } = formData;
-  const errors = getStepErrors(5);
-
-  const getFieldError = (field: string) => {
-    return errors.find(error => error.includes(field)) || undefined;
-  };
 
   const AVAILABILITY_OPTIONS = [
     {

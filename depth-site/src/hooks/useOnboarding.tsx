@@ -76,7 +76,9 @@ const initialState: OnboardingState = {
   error: null,
   success: false,
   canProceed: false,
-  autoSaveEnabled: true
+  autoSaveEnabled: true,
+  touchedFields: new Set<string>(),
+  showValidation: false
 };
 
 // Action types للـ Reducer
@@ -86,6 +88,8 @@ type OnboardingAction =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_SUCCESS'; payload: boolean }
   | { type: 'SET_CAN_PROCEED'; payload: boolean }
+  | { type: 'MARK_FIELD_TOUCHED'; payload: string }
+  | { type: 'SET_SHOW_VALIDATION'; payload: boolean }
   | { type: 'UPDATE_ACCOUNT'; payload: Partial<AccountCreationData> }
   | { type: 'UPDATE_BASIC_INFO'; payload: Partial<BasicInfoData> }
   | { type: 'UPDATE_EXPERIENCE'; payload: Partial<ExperienceData> }
@@ -117,6 +121,18 @@ function onboardingReducer(
     
     case 'SET_CAN_PROCEED':
       return { ...state, uiState: { ...state.uiState, canProceed: action.payload } };
+    
+    case 'MARK_FIELD_TOUCHED':
+      return { 
+        ...state, 
+        uiState: { 
+          ...state.uiState, 
+          touchedFields: new Set([...state.uiState.touchedFields, action.payload]) 
+        } 
+      };
+    
+    case 'SET_SHOW_VALIDATION':
+      return { ...state, uiState: { ...state.uiState, showValidation: action.payload } };
     
     case 'UPDATE_ACCOUNT':
       return {
@@ -341,6 +357,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {
+    // تفعيل عرض الأخطاء عند محاولة الانتقال
+    dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
+    
     if (!validateCurrentStep()) {
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
       return false;
@@ -394,6 +413,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     if (formData.currentStep < 5) {
       const nextStepNum = (formData.currentStep + 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: nextStepNum });
+      // إعادة تعيين validation للخطوة الجديدة
+      dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
       return true;
     }
     
@@ -553,6 +574,22 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: 'SET_CAN_PROCEED', payload: canProceed });
   }, [validateCurrentStep]);
 
+  // دالة لتحديد إذا كان الحقل تم لمسه
+  const markFieldTouched = useCallback((field: string) => {
+    dispatch({ type: 'MARK_FIELD_TOUCHED', payload: field });
+  }, []);
+
+  // دالة للحصول على خطأ حقل محدد (بس إذا تم لمسه أو حاول الانتقال)
+  const getFieldError = useCallback((field: string): string | undefined => {
+    // لا تظهر الأخطاء إلا إذا حاول المستخدم الانتقال أو لمس الحقل
+    if (!uiState.showValidation && !uiState.touchedFields.has(field)) {
+      return undefined;
+    }
+    
+    const stepErrors = getStepErrors(formData.currentStep);
+    return stepErrors.find(error => error.includes(field)) || undefined;
+  }, [uiState.touchedFields, uiState.showValidation, getStepErrors, formData.currentStep]);
+
   // قيم الـ Context
   const contextValue: OnboardingContextType = {
     formData,
@@ -578,7 +615,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // Validation
     validateCurrentStep,
-    getStepErrors
+    getStepErrors,
+    getFieldError,
+    markFieldTouched
   };
 
   return (

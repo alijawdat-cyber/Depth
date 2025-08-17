@@ -12,15 +12,9 @@ import { useState } from 'react';
 import type { ExperienceLevel } from '@/types/onboarding';
 
 export default function Step3_Experience() {
-  const { formData, updateExperience, updateEquipment, getStepErrors } = useOnboarding();
+  const { formData, updateExperience, updateEquipment, getFieldError } = useOnboarding();
   const { experience } = formData;
-  const errors = getStepErrors(3);
-  
   const [newClient, setNewClient] = useState('');
-
-  const getFieldError = (field: string) => {
-    return errors.find(error => error.includes(field)) || undefined;
-  };
 
   const addPreviousClient = () => {
     if (newClient.trim() && !experience.previousClients?.includes(newClient.trim())) {

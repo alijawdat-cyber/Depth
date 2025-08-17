@@ -9,13 +9,8 @@ import { StepHeader } from '../OnboardingLayout';
 import Link from 'next/link';
 
 export default function Step1_AccountCreation() {
-  const { formData, updateAccountData, getStepErrors } = useOnboarding();
+  const { formData, updateAccountData, getFieldError, markFieldTouched } = useOnboarding();
   const { account } = formData;
-  const errors = getStepErrors(1);
-
-  const getFieldError = (field: string) => {
-    return errors.find(error => error.includes(field)) || undefined;
-  };
 
   return (
     <div className="space-y-8">
@@ -35,6 +30,7 @@ export default function Step1_AccountCreation() {
           label="الاسم الكامل"
           value={account.fullName}
           onChange={(value) => updateAccountData({ fullName: value })}
+          onBlur={() => markFieldTouched('الاسم')}
           placeholder="أحمد محمد علي"
           icon={<User size={18} />}
           required
@@ -48,6 +44,7 @@ export default function Step1_AccountCreation() {
           type="email"
           value={account.email}
           onChange={(value) => updateAccountData({ email: value })}
+          onBlur={() => markFieldTouched('البريد')}
           placeholder="ahmed@example.com"
           icon={<Mail size={18} />}
           required

@@ -10,18 +10,13 @@ import { useState } from 'react';
 import type { WorkSample } from '@/types/onboarding';
 
 export default function Step4_Portfolio() {
-  const { formData, updatePortfolio, getStepErrors } = useOnboarding();
+  const { formData, updatePortfolio, getFieldError } = useOnboarding();
   const { portfolio } = formData;
-  const errors = getStepErrors(4);
   
   const [newSampleUrl, setNewSampleUrl] = useState('');
   const [newSampleTitle, setNewSampleTitle] = useState('');
   const [newSampleCategory, setNewSampleCategory] = useState<'photo' | 'video' | 'design'>('photo');
   const [newSampleDescription, setNewSampleDescription] = useState('');
-
-  const getFieldError = (field: string) => {
-    return errors.find(error => error.includes(field)) || undefined;
-  };
 
   const addWorkSample = () => {
     if (newSampleUrl.trim() && newSampleTitle.trim()) {
