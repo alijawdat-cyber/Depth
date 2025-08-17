@@ -25,10 +25,10 @@ const getBreadcrumbsFromPath = (pathname: string): BreadcrumbItem[] => {
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'المبدعين', href: '/admin/creators' }
     ],
-    '/admin/creators/intake': [
+    '/admin/creators/onboarding': [
       { label: 'لوحة التحكم', href: '/admin', icon: Home },
       { label: 'المبدعين', href: '/admin/creators' },
-      { label: 'تسجيل مبدع جديد', href: '/admin/creators/intake' }
+      { label: 'نظام انضمام المبدعين', href: '/admin/creators/onboarding' }
     ],
     '/admin/catalog': [
       { label: 'لوحة التحكم', href: '/admin', icon: Home },

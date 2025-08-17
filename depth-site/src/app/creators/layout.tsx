@@ -84,13 +84,13 @@ const CREATOR_NAV_ITEMS = [
         description: 'البيانات الشخصية'
       },
       {
-        href: '/creators/intake-complete',
+        href: '/creators/onboarding',
         label: 'الملف المهني الكامل',
         icon: FileText,
         description: 'النموذج التفصيلي'
       },
       {
-        href: '/creators/intake',
+        href: '/creators/onboarding',
         label: 'النموذج البسيط',
         icon: Settings,
         description: 'النموذج الأساسي'

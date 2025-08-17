@@ -289,7 +289,7 @@ export default function SignInPage() {
                     انضم كعميل
                   </Button>
                 </Link>
-                <Link href="/join/creator">
+                <Link href="/creators/onboarding">
                   <Button variant="outline" className="w-full text-sm">
                     <Camera size={16} className="ml-1" />
                     انضم كمبدع
