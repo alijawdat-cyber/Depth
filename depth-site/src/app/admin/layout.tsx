@@ -24,7 +24,8 @@ import {
   ChevronDown,
   Bell,
   User,
-  LogOut
+  LogOut,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
@@ -55,6 +56,12 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: 'المشاريع',
     icon: FileText,
     description: 'إدارة المشاريع مع حساب التسعير وفحص Guardrails'
+  },
+  {
+    href: '/admin/contracts',
+    label: 'العقود',
+    icon: Briefcase,
+    description: 'إدارة MSA + SOW + NDA وجميع الملحقات والاتفاقيات'
   },
   {
     href: '/admin/creators',
@@ -182,7 +189,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         
         {/* الشريط الجانبي للتنقل - مخفي في الموبايل */}
         <div className={clsx(
-          "fixed inset-y-0 right-0 z-50 w-72 bg-[var(--card)] border-l border-[var(--elev)] transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+          "fixed inset-y-0 right-0 z-50 w-56 sm:w-60 lg:w-72 max-w-[85vw] bg-[var(--bg)] lg:bg-[var(--card)] border-l border-[var(--elev)] transform transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none lg:translate-x-0 lg:static lg:inset-0",
           sidebarOpen ? "translate-x-0" : "translate-x-full"
         )}>
           <div className="flex flex-col h-full">
@@ -206,7 +213,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* قائمة التنقل */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto text-sm lg:text-base">
               {ADMIN_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
@@ -359,7 +366,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* المحتوى الرئيسي */}
         <div className="flex-1 flex flex-col">
           {/* الشريط العلوي */}
-          <header className="bg-[var(--card)] border-b border-[var(--elev)] px-6 py-4 flex-shrink-0">
+          <header className="bg-[var(--card)] border-b border-[var(--elev)] px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
@@ -370,7 +377,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </button>
                 
                 {/* مسار التنقل (Breadcrumb) */}
-                <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-xs sm:text-sm">
                   <Link href="/admin" className="text-[var(--muted)] hover:text-[var(--text)]">
                     الرئيسية
                   </Link>
@@ -387,7 +394,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               {/* شعار في الوسط يعيد للموقع العام */}
               <Link href="https://depth-agency.com/" prefetch={false} className="absolute left-1/2 -translate-x-1/2 inline-flex items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
-                <Image src={BRAND.wordmark} alt="Depth" width={120} height={24} priority />
+                <Image src={BRAND.wordmark} alt="Depth" width={96} height={20} priority />
               </Link>
 
               <div className="flex items-center gap-4">
