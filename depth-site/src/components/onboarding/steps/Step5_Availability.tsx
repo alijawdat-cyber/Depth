@@ -267,7 +267,7 @@ export default function Step5_Availability() {
         transition={{ delay: 0.3 }}
         className="max-w-3xl mx-auto"
       >
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Zap size={24} className="text-white" />
@@ -323,7 +323,7 @@ export default function Step5_Availability() {
         transition={{ delay: 0.4 }}
         className="max-w-2xl mx-auto text-center"
       >
-        <div className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] text-white rounded-xl p-6">
+        <div className="bg-[var(--accent-500)] text-white rounded-xl p-6">
           <CheckCircle size={48} className="mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-2">🎉 أكملت جميع الخطوات الأساسية!</h3>
           <p className="text-white/90 mb-4">

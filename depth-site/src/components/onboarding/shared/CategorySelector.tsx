@@ -37,37 +37,37 @@ const getCategoryIcon = (categoryId: string) => {
 const getCategoryStyle = (categoryId: string) => {
   const styles = {
     photo: {
-      gradient: 'from-blue-500 to-cyan-500',
+      color: 'bg-blue-500',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       textColor: 'text-blue-700'
     },
     video: {
-      gradient: 'from-red-500 to-pink-500',
+      color: 'bg-red-500',
       bgColor: 'bg-red-50',
       borderColor: 'border-red-200',
       textColor: 'text-red-700'
     },
     design: {
-      gradient: 'from-purple-500 to-indigo-500',
+      color: 'bg-purple-500',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       textColor: 'text-purple-700'
     },
     audio: {
-      gradient: 'from-green-500 to-emerald-500',
+      color: 'bg-green-500',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
       textColor: 'text-green-700'
     },
     interactive: {
-      gradient: 'from-orange-500 to-amber-500',
+      color: 'bg-orange-500',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
       textColor: 'text-orange-700'
     },
     ai_automation: {
-      gradient: 'from-violet-500 to-purple-500',
+      color: 'bg-violet-500',
       bgColor: 'bg-violet-50',
       borderColor: 'border-violet-200',
       textColor: 'text-violet-700'
@@ -212,7 +212,7 @@ export default function CategorySelector({
                   <div className={`
                     w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200
                     ${isSelected 
-                      ? `bg-gradient-to-br ${style.gradient} text-white shadow-lg` 
+                      ? `${style.color} text-white shadow-lg` 
                       : 'bg-[var(--bg-alt)] text-[var(--muted)]'
                     }
                   `}>
@@ -254,7 +254,7 @@ export default function CategorySelector({
                     <div className={`
                       w-6 h-6 rounded-lg border-2 transition-all duration-200 flex items-center justify-center
                       ${isSelected 
-                        ? `bg-gradient-to-br ${style.gradient} border-transparent` 
+                        ? `${style.color} border-transparent` 
                         : 'border-[var(--border)] bg-[var(--bg)]'
                       }
                     `}>

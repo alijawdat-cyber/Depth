@@ -147,7 +147,7 @@ export default function Step2_BasicInfo() {
         transition={{ delay: 0.5 }}
         className="max-w-2xl mx-auto"
       >
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xl">🎯</span>

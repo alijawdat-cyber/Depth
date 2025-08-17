@@ -122,7 +122,7 @@ export default function Step1_AccountCreation() {
         transition={{ delay: 0.3 }}
         className="max-w-2xl mx-auto"
       >
-        <div className="bg-gradient-to-r from-[var(--accent-50)] to-[var(--accent-100)] border border-[var(--accent-200)] rounded-xl p-6">
+        <div className="bg-[var(--accent-50)] border border-[var(--accent-200)] rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-[var(--accent-500)] rounded-xl flex items-center justify-center flex-shrink-0">
               <Shield size={24} className="text-white" />

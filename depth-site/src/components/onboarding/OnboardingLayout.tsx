@@ -98,12 +98,11 @@ export default function OnboardingLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] via-[var(--bg-alt)] to-[var(--bg)] relative overflow-hidden">
-      {/* خلفية ديكورية */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-20 w-64 h-64 bg-[var(--accent-500)] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-[var(--accent-300)] rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[var(--accent-400)] rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-[var(--bg)] relative overflow-hidden">
+      {/* خلفية بسيطة ونظيفة */}
+      <div className="absolute inset-0 opacity-3">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-[var(--accent-500)] rounded-full blur-2xl"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-[var(--accent-300)] rounded-full blur-2xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -117,7 +116,7 @@ export default function OnboardingLayout({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200 }}
-                  className="w-10 h-10 bg-gradient-to-br from-[var(--accent-500)] to-[var(--accent-600)] rounded-xl flex items-center justify-center"
+                  className="w-10 h-10 bg-[var(--accent-500)] rounded-xl flex items-center justify-center"
                 >
                   <span className="text-white font-bold text-lg">D</span>
                 </motion.div>
@@ -212,7 +211,7 @@ export default function OnboardingLayout({
               {/* Progress Bar */}
               <div className="w-full bg-[var(--border)] rounded-full h-2 overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] rounded-full"
+                  className="h-full bg-[var(--accent-500)] rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress.completionPercentage}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
@@ -233,7 +232,7 @@ export default function OnboardingLayout({
                 {/* Mobile Progress Bar */}
                 <div className="w-full bg-[var(--neutral-200)] rounded-full h-2">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] rounded-full"
+                    className="h-full bg-[var(--accent-500)] rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress.completionPercentage}%` }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -298,7 +297,7 @@ export default function OnboardingLayout({
             className="bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden"
           >
             {/* Step Header */}
-            <div className="bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] p-6 text-white">
+            <div className="bg-[var(--accent-500)] p-6 text-white">
               <div className="flex items-center gap-4">
                 {currentStepConfig && (
                   <>
@@ -472,7 +471,7 @@ export function StepHeader({
       animate={{ opacity: 1, y: 0 }}
       className="text-center mb-8"
     >
-      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--accent-500)] to-[var(--accent-600)] rounded-2xl mb-4 shadow-lg">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-[var(--accent-500)] rounded-2xl mb-4 shadow-lg">
         <Icon size={28} className="text-white" />
       </div>
       <h2 className="text-3xl font-bold text-[var(--text)] mb-2">{title}</h2>

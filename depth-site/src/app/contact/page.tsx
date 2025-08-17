@@ -289,17 +289,37 @@ export default function ContactPage() {
                 {...register("name")} 
               />
               {errors.name && hasInteracted && <p id="name-error" role="alert" className="text-red-500 text-sm break-words">{errors.name.message}</p>}
-              <p className="text-xs text-[var(--slate-600)]">
-                {watchName ? `${watchName.length}/100` : "2-100 حرف"}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-[var(--slate-600)]">
+                  {watchName ? `${watchName.length}/100` : "2-100 حرف"}
+                </p>
+                {watchName && (
+                  <div className="w-16 bg-gray-200 rounded-full h-1">
+                    <div 
+                      className={clsx(
+                        "h-1 rounded-full transition-all duration-300",
+                        watchName.length >= 2 ? "bg-green-500" : "bg-red-400"
+                      )}
+                      style={{ width: `${Math.min((watchName.length / 100) * 100, 100)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Email Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label htmlFor="email" className="block text-base font-medium text-[var(--text)]">
-                البريد الإلكتروني <span className="text-red-500">*</span>
+              <label htmlFor="email" className="block text-base font-medium text-[var(--text)] flex items-center justify-between">
+                <span>
+                  البريد الإلكتروني <span className="text-red-500">*</span>
+                </span>
                 {watchEmail && isValidEmail(watchEmail) && (
-                  <span className="text-green-600 text-sm ml-2">✓</span>
+                  <span className="text-green-600 text-sm flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    صحيح
+                  </span>
                 )}
               </label>
               <input 
@@ -322,10 +342,17 @@ export default function ContactPage() {
 
             {/* Message Field with Real-time Validation */}
             <div className="space-y-2 w-full">
-              <label htmlFor="message" className="block text-base font-medium text-[var(--text)]">
-                رسالتك <span className="text-red-500">*</span>
+              <label htmlFor="message" className="block text-base font-medium text-[var(--text)] flex items-center justify-between">
+                <span>
+                  رسالتك <span className="text-red-500">*</span>
+                </span>
                 {watchMessage && watchMessage.length >= 10 && (
-                  <span className="text-green-600 text-sm ml-2">✓</span>
+                  <span className="text-green-600 text-sm flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    صحيح
+                  </span>
                 )}
               </label>
               <textarea 
@@ -344,9 +371,22 @@ export default function ContactPage() {
                 {...register("message")} 
               />
               {errors.message && hasInteracted && <p id="message-error" role="alert" className="text-red-500 text-sm break-words">{errors.message.message}</p>}
-              <p className="text-xs text-[var(--slate-600)]">
-                {watchMessage ? `${watchMessage.length}/1500` : "10-1500 حرف"}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-[var(--slate-600)]">
+                  {watchMessage ? `${watchMessage.length}/1500` : "10-1500 حرف"}
+                </p>
+                {watchMessage && (
+                  <div className="w-16 bg-gray-200 rounded-full h-1">
+                    <div 
+                      className={clsx(
+                        "h-1 rounded-full transition-all duration-300",
+                        watchMessage.length >= 10 ? "bg-green-500" : "bg-red-400"
+                      )}
+                      style={{ width: `${Math.min((watchMessage.length / 1500) * 100, 100)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Submit Button - Mobile Optimized */}

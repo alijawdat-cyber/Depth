@@ -18,7 +18,7 @@ const ROLES = [
     title: 'مصور فوتوغرافي',
     description: 'التصوير الاحترافي للمنتجات والأشخاص والفعاليات',
     icon: Camera,
-    gradient: 'from-blue-500 to-blue-600',
+    color: 'bg-blue-500',
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
     textColor: 'text-blue-700'
@@ -28,7 +28,7 @@ const ROLES = [
     title: 'مصور فيديو',
     description: 'إنتاج الفيديوهات والريلز والمحتوى المرئي',
     icon: Video,
-    gradient: 'from-red-500 to-red-600',
+    color: 'bg-red-500',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
     textColor: 'text-red-700'
@@ -38,7 +38,7 @@ const ROLES = [
     title: 'مصمم جرافيكي',
     description: 'التصميم الإبداعي والهوية البصرية والإعلانات',
     icon: Palette,
-    gradient: 'from-purple-500 to-purple-600',
+    color: 'bg-purple-500',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
     textColor: 'text-purple-700'
@@ -48,7 +48,7 @@ const ROLES = [
     title: 'منتج محتوى',
     description: 'إدارة وتنسيق المشاريع الإبداعية والإنتاج',
     icon: Settings,
-    gradient: 'from-green-500 to-green-600',
+    color: 'bg-green-500',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200',
     textColor: 'text-green-700'
@@ -77,7 +77,7 @@ export default function RoleSelector({ value, onChange, error, disabled }: RoleS
               <div className={`
                 relative p-6 rounded-2xl border-2 transition-all duration-200
                 ${isSelected 
-                  ? `${role.borderColor} ${role.bgColor} shadow-lg ring-4 ring-${role.gradient.split('-')[1]}-100` 
+                  ? `${role.borderColor} ${role.bgColor} shadow-lg ring-4 ring-blue-100` 
                   : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--accent-300)] hover:shadow-md'
                 }
               `}>
@@ -96,7 +96,7 @@ export default function RoleSelector({ value, onChange, error, disabled }: RoleS
                 <div className={`
                   w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-all
                   ${isSelected 
-                    ? `bg-gradient-to-br ${role.gradient} text-white shadow-lg` 
+                    ? `${role.color} text-white shadow-lg` 
                     : 'bg-[var(--bg-alt)] text-[var(--muted)]'
                   }
                 `}>

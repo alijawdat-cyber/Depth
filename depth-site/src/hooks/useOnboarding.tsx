@@ -550,13 +550,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 3:
         if (!formData.experience.experienceLevel) errors.push('مستوى الخبرة مطلوب');
         if (!formData.experience.experienceYears) errors.push('سنوات الخبرة مطلوبة');
-        if ((formData.experience.skills?.length || 0) === 0 && (formData.experience.specializations?.length || 0) === 0) {
-          errors.push('يجب اختيار تخصص واحد على الأقل');
-        }
+        // المهارات اختيارية - يمكن إضافتها لاحقاً
         break;
       
       case 4:
-        if (formData.portfolio.workSamples.length < 2) errors.push('يجب إضافة عينتين على الأقل من الأعمال');
+        // Portfolio خطوة اختيارية - يمكن تخطيها
+        // لا توجد حقول إلزامية في هذه الخطوة
         break;
       
       case 5:

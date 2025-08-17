@@ -66,12 +66,27 @@ export default function Step4_Portfolio() {
     <div className="space-y-8">
       {/* Header */}
       <StepHeader
-        title="معرض أعمالك"
-        subtitle="اعرض أفضل أعمالك وحساباتك الاجتماعية لجذب العملاء"
+        title="معرض أعمالك (اختياري)"
+        subtitle="يمكنك إضافة أعمالك الآن أو تخطي هذه الخطوة وإضافتها لاحقاً من الملف الشخصي"
         icon={FileText}
         step={4}
         totalSteps={5}
       />
+      
+      {/* رسالة توضيحية */}
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 max-w-3xl mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-blue-600 text-sm">ℹ️</span>
+          </div>
+          <div>
+            <p className="text-sm text-[var(--text)] font-medium">هذه الخطوة اختيارية</p>
+            <p className="text-xs text-[var(--muted)] mt-1">
+              يمكنك إضافة معرض أعمالك الآن لزيادة فرص الحصول على مشاريع، أو تخطي هذه الخطوة وإضافتها لاحقاً
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-8 max-w-3xl mx-auto">
         {/* الحسابات الاجتماعية والمواقع */}
@@ -121,7 +136,7 @@ export default function Step4_Portfolio() {
         {/* عينات الأعمال */}
         <div>
           <h3 className="text-lg font-semibold text-[var(--text)] mb-4">
-            عينات من أعمالك *
+            عينات من أعمالك (اختياري)
           </h3>
           
           {/* نموذج إضافة عينة جديدة */}
@@ -303,7 +318,8 @@ export default function Step4_Portfolio() {
             <div className="text-center py-12 text-[var(--muted)]">
               <FileText size={48} className="mx-auto mb-4 opacity-50" />
               <p className="text-lg mb-2">لم تضف أي عينات بعد</p>
-              <p className="text-sm">أضف على الأقل عينتين من أعمالك لإكمال هذه الخطوة</p>
+              <p className="text-sm">يمكنك إضافة عينات من أعمالك أو المتابعة للخطوة التالية</p>
+              <p className="text-xs text-[var(--accent-600)] mt-2">💡 إضافة الأعمال تزيد من فرص الحصول على مشاريع</p>
             </div>
           )}
 
@@ -320,7 +336,7 @@ export default function Step4_Portfolio() {
         transition={{ delay: 0.3 }}
         className="max-w-3xl mx-auto"
       >
-        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6">
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xl">💎</span>

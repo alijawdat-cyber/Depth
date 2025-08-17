@@ -77,6 +77,14 @@ export default function Step3_Experience() {
 
         {/* التخصصات والمهارات */}
         <div>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-[var(--text)] mb-2">
+              تخصصاتك ومهاراتك (اختياري)
+            </h3>
+            <p className="text-sm text-[var(--muted)]">
+              يمكنك إضافة تخصصاتك الآن أو تخطي هذا القسم وإضافتها لاحقاً من الملف الشخصي
+            </p>
+          </div>
           <SubcategorySelector
             selectedCategories={formData.basicInfo.primaryCategories}
             value={experience.skills || []}
@@ -185,7 +193,7 @@ export default function Step3_Experience() {
         transition={{ delay: 0.3 }}
         className="max-w-2xl mx-auto"
       >
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <TrendingUp size={24} className="text-white" />
