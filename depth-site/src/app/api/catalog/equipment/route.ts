@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
     const grouped: Record<string, Array<Record<string, unknown>>> = {};
     for (const it of items) {
-      const cat = String(it.category);
+      const cat = String((it as { category?: string }).category || 'unknown');
       grouped[cat] = grouped[cat] || [];
       grouped[cat].push(it);
     }
