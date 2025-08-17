@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// import { useRouter } from "next/navigation"; // محجوز للاستخدام المستقبلي
 import { Button } from "@/components/ui/Button";
+import SectionHeading from "@/components/ui/SectionHeading";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import Dropdown from "@/components/ui/Dropdown";
 import Loader from "@/components/loaders/Loader";
 import { 
   DollarSign, 
@@ -11,50 +15,72 @@ import {
   CheckCircle, 
   XCircle,
   AlertCircle,
-  RefreshCw
+  AlertTriangle,
+  RefreshCw,
+  Plus,
+  Search
 } from "lucide-react";
-import { PriceOverride, OverrideStats } from "@/types/governance";
+import { PriceOverride, OverrideStats, OverrideListResponse } from "@/types/governance";
 
 interface OverridesPageState {
   overrides: PriceOverride[];
   stats: OverrideStats | null;
   loading: boolean;
   error: string | null;
+
+  // فلاتر موحدة للنوعين
+  selectedType: 'all' | 'basic' | 'advanced';
   selectedStatus: string;
+  selectedRiskLevel: string;
+  searchTerm: string;
+  
+  // العمليات
   updating: string | null;
+  showCreateForm: boolean;
 }
 
 export default function OverridesPage() {
+  // const router = useRouter(); // محجوز للاستخدام المستقبلي
+
   const [state, setState] = useState<OverridesPageState>({
     overrides: [],
     stats: null,
     loading: true,
     error: null,
+    selectedType: 'all',
     selectedStatus: 'all',
-    updating: null
+    selectedRiskLevel: 'all',
+    searchTerm: '',
+    updating: null,
+    showCreateForm: false
   });
 
   // Load data on mount
   useEffect(() => {
     loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.selectedStatus]);
+  }, [state.selectedType, state.selectedStatus, state.selectedRiskLevel, state.searchTerm]);
 
   const loadData = async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
       const queryParams = new URLSearchParams();
-      if (state.selectedStatus !== 'all') {
-        queryParams.set('status', state.selectedStatus);
-      }
+      if (state.selectedType !== 'all') queryParams.set('type', state.selectedType);
+      if (state.selectedStatus !== 'all') queryParams.set('status', state.selectedStatus);
+      if (state.selectedRiskLevel !== 'all') queryParams.set('riskLevel', state.selectedRiskLevel);
+      if (state.searchTerm) queryParams.set('search', state.searchTerm);
 
-      const response = await fetch(`/api/pricing/overrides?${queryParams}`);
+      const response = await fetch(`/api/admin/overrides?${queryParams}`);
       if (!response.ok) {
         throw new Error('فشل في تحميل طلبات التعديل');
       }
       
-      const data = await response.json();
+      const data: OverrideListResponse = await response.json();
+      if (!data.success) {
+        throw new Error('فشل في تحميل طلبات التعديل');
+      }
+
       setState(prev => ({
         ...prev,
         overrides: data.overrides || [],
@@ -76,13 +102,12 @@ export default function OverridesPage() {
     try {
       setState(prev => ({ ...prev, updating: overrideId }));
 
-      const response = await fetch('/api/pricing/overrides', {
+      const response = await fetch(`/api/admin/overrides/${overrideId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: overrideId,
           action,
-          counterPriceIQD: counterPrice,
+          counterPrice,
           reason: reason || `${action === 'approve' ? 'موافقة' : action === 'reject' ? 'رفض' : 'اقتراح بديل'} على طلب التعديل`
         })
       });
@@ -103,6 +128,16 @@ export default function OverridesPage() {
     } finally {
       setState(prev => ({ ...prev, updating: null }));
     }
+  };
+
+  // دالة للانتقال للعرض المتقدم (محجوزة للاستخدام المستقبلي)
+  // const goToAdvancedView = () => {
+  //   router.push('/admin/overrides/advanced');
+  // };
+
+  // دالة للتبديل بين الأنواع
+  const switchToType = (type: 'basic' | 'advanced') => {
+    setState(prev => ({ ...prev, selectedType: type }));
   };
 
   const formatDate = (dateString: string) => {
@@ -149,16 +184,103 @@ export default function OverridesPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text)]">طلبات التعديل</h1>
-          <p className="text-[var(--muted)]">مراجعة والموافقة على طلبات تعديل الأسعار من المبدعين</p>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
+      
+      {/* Header */}
+      <SectionHeading
+        title="التعديلات المتقدمة"
+        description="إدارة متقدمة لطلبات تعديل الأسعار والموافقات متعددة المستويات"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => switchToType('basic')}
+              className={state.selectedType === 'basic' ? 'bg-[var(--accent-bg)] border-[var(--accent-500)]' : ''}
+            >
+              <DollarSign size={16} />
+              التعديلات الأساسية
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => switchToType('advanced')}
+              className={state.selectedType === 'advanced' ? 'bg-[var(--accent-bg)] border-[var(--accent-500)]' : ''}
+            >
+              <AlertTriangle size={16} />
+              التعديلات المتقدمة
+            </Button>
+            <Button variant="secondary" onClick={loadData} disabled={state.loading}>
+              <RefreshCw size={16} className={state.loading ? "animate-spin" : ""} />
+              تحديث
+            </Button>
+          </div>
+        }
+      />
+
+      {/* فلاتر البحث */}
+      <div className="mb-6 bg-[var(--card)] rounded-[var(--radius-lg)] border border-[var(--elev)] p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)] mb-2">الحالة</label>
+            <Dropdown
+              options={[
+                { value: 'all', label: 'جميع الحالات' },
+                { value: 'pending', label: 'في الانتظار' },
+                { value: 'approved', label: 'مُوافق عليه' },
+                { value: 'rejected', label: 'مرفوض' },
+                { value: 'countered', label: 'عرض مضاد' },
+                { value: 'expired', label: 'منتهي الصلاحية' }
+              ]}
+              value={state.selectedStatus}
+              onChange={(value) => setState(prev => ({ ...prev, selectedStatus: value }))}
+              placeholder="اختر الحالة"
+            />
+          </div>
+          
+          {(state.selectedType === 'advanced' || state.selectedType === 'all') && (
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-2">مستوى المخاطر</label>
+              <Dropdown
+                options={[
+                  { value: 'all', label: 'جميع المستويات' },
+                  { value: 'low', label: 'منخفض' },
+                  { value: 'medium', label: 'متوسط' },
+                  { value: 'high', label: 'عالي' },
+                  { value: 'critical', label: 'حرج' }
+                ]}
+                value={state.selectedRiskLevel}
+                onChange={(value) => setState(prev => ({ ...prev, selectedRiskLevel: value }))}
+                placeholder="اختر المستوى"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)] mb-2">البحث</label>
+            <div className="relative">
+              <Search size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--muted)]" />
+              <input
+                type="text"
+                placeholder="البحث في الطلبات..."
+                value={state.searchTerm}
+                onChange={(e) => setState(prev => ({ ...prev, searchTerm: e.target.value }))}
+                className="w-full pr-10 pl-3 py-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--bg)] text-[var(--text)]"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-end">
+            <Button
+              variant="primary"
+              onClick={() => setState(prev => ({ ...prev, showCreateForm: true }))}
+              className="w-full"
+            >
+              <Plus size={16} />
+              طلب جديد
+            </Button>
+          </div>
         </div>
-        <Button variant="secondary" onClick={loadData} disabled={state.loading}>
-          <RefreshCw size={16} className={state.loading ? "animate-spin" : ""} />
-          تحديث
-        </Button>
       </div>
       {/* Error Display */}
       {state.error && (

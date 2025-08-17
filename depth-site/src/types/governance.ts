@@ -141,18 +141,49 @@ export interface VersionUpdateRequest {
   reason?: string;
 }
 
-// Override Management Types (for future implementation)
+// Override Management Types - Unified System
 export interface PriceOverride {
   id: string;
-  creatorEmail: string;
+  type: 'basic' | 'advanced'; // نوع التعديل
+  
+  // بيانات الطلب الأساسية
+  creatorEmail?: string; // للطلبات من المبدعين
+  quoteId?: string; // للطلبات من العروض
+  clientName?: string; // اسم العميل (للمتقدم)
+  requestedBy: string; // الطالب
+  
+  // بيانات التسعير
   subcategoryId: string;
   vertical: string;
   processing: string;
   currentPriceIQD: number;
   requestedPriceIQD: number;
   changePercent: number;
+  discountAmount: number;
+  
+  // تفاصيل الطلب
   reason: string;
-  status: 'pending' | 'approved' | 'rejected' | 'countered';
+  justification?: string; // للمتقدم
+  competitorPrice?: number; // للمتقدم
+  expectedVolume?: number; // للمتقدم
+  strategicValue?: string; // للمتقدم
+  
+  // تقييم المخاطر (للمتقدم)
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  marginImpact?: number;
+  profitabilityRisk?: string;
+  
+  // نظام الموافقات
+  status: 'pending' | 'approved' | 'rejected' | 'countered' | 'expired';
+  approvals?: Array<{
+    level: 'manager' | 'director' | 'ceo';
+    approver: string;
+    status: 'pending' | 'approved' | 'rejected';
+    timestamp?: string;
+    notes?: string;
+  }>;
+  
+  // الموافقة الأساسية (للنوع الأساسي)
   adminResponse?: {
     adminEmail: string;
     decision: 'approve' | 'reject' | 'counter';
@@ -160,6 +191,21 @@ export interface PriceOverride {
     reason: string;
     decidedAt: string;
   };
+  
+  // شروط التطبيق (للمتقدم)
+  conditions?: string[];
+  expiryDate?: string;
+  usageLimit?: number;
+  usageCount?: number;
+  
+  // سجل التدقيق
+  auditLog?: Array<{
+    action: string;
+    user: string;
+    timestamp: string;
+    details: Record<string, unknown>;
+  }>;
+  
   createdAt: string;
   updatedAt: string;
 }
@@ -168,6 +214,55 @@ export interface OverrideStats {
   pending: number;
   approved: number;
   rejected: number;
+  countered: number;
+  expired: number;
   total: number;
+  basic: number;
+  advanced: number;
   avgChangePercent: number;
+  totalDiscountRequested: number;
+  avgRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
+}
+
+// Request/Response types للAPI الموحد
+export interface OverrideListRequest {
+  type?: 'basic' | 'advanced' | 'all';
+  status?: 'pending' | 'approved' | 'rejected' | 'countered' | 'expired' | 'all';
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical' | 'all';
+  dateRange?: 'today' | 'week' | 'month' | 'quarter' | 'all';
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface OverrideListResponse {
+  success: boolean;
+  overrides: PriceOverride[];
+  stats: OverrideStats;
+  total: number;
+  requestId: string;
+}
+
+export interface OverrideActionRequest {
+  action: 'approve' | 'reject' | 'counter';
+  reason: string;
+  counterPrice?: number;
+  conditions?: string[];
+  expiryDate?: string;
+  usageLimit?: number;
+}
+
+export interface OverrideCreateRequest {
+  type: 'basic' | 'advanced';
+  subcategoryId: string;
+  vertical: string;
+  processing: string;
+  requestedPriceIQD: number;
+  reason: string;
+  justification?: string;
+  competitorPrice?: number;
+  expectedVolume?: number;
+  strategicValue?: string;
+  quoteId?: string;
+  clientName?: string;
 }

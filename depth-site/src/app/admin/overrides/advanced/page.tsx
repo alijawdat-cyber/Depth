@@ -115,11 +115,12 @@ export default function AdvancedOverridesPage() {
     
     try {
       const params = new URLSearchParams();
+      params.append('type', 'advanced'); // فلترة للنوع المتقدم فقط
       if (state.selectedStatus !== 'all') params.append('status', state.selectedStatus);
       if (state.selectedRiskLevel !== 'all') params.append('riskLevel', state.selectedRiskLevel);
       if (state.searchTerm) params.append('search', state.searchTerm);
 
-      const response = await fetch(`/api/admin/overrides/advanced?${params.toString()}`);
+      const response = await fetch(`/api/admin/overrides?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

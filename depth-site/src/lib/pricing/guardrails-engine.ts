@@ -141,6 +141,58 @@ export class GuardrailsEngine {
   updateConfig(newConfig: Partial<GuardrailsConfig>): void {
     this.config = { ...this.config, ...newConfig };
   }
+
+  // دالة للتحقق من صحة طلب التعديل
+  validateOverride(
+    currentPrice: number,
+    requestedPrice: number,
+    guardrails: GuardrailsConfig
+  ): PricingValidationResult {
+    const result: PricingValidationResult = {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      finalMargin: 0,
+      riskScore: 0
+    };
+
+    const discountPercent = ((currentPrice - requestedPrice) / currentPrice) * 100;
+    
+    // التحقق من حدود التخفيض
+    if (discountPercent > guardrails.discountLimits.maxDiscountPercent * 100) {
+      result.errors.push(`التخفيض ${discountPercent.toFixed(1)}% يتجاوز الحد الأقصى المسموح`);
+      result.isValid = false;
+    }
+
+    if (discountPercent > guardrails.discountLimits.requiresApproval * 100) {
+      result.warnings.push(`التخفيض ${discountPercent.toFixed(1)}% يتطلب موافقة الإدارة`);
+    }
+
+    // حساب الهامش المتوقع
+    const marginEstimate = (requestedPrice - (currentPrice * 0.7)) / requestedPrice; // تقدير تقريبي
+    result.finalMargin = marginEstimate;
+
+    if (marginEstimate < guardrails.profitMargins.minimum) {
+      result.errors.push(`الهامش المتوقع ${(marginEstimate * 100).toFixed(1)}% أقل من الحد الأدنى`);
+      result.isValid = false;
+    }
+
+    return result;
+  }
 }
 
 export const guardrailsEngine = new GuardrailsEngine();
+
+// دالة مساعدة لاستخراج إعدادات الحواجز من Rate Card
+export function extractGuardrailsConfig(rateCard: { guardrails?: GuardrailsConfig } | null): GuardrailsConfig {
+  return rateCard?.guardrails || DEFAULT_GUARDRAILS;
+}
+
+// دالة مساعدة للتحقق من صحة التعديل
+export function validateOverride(
+  currentPrice: number,
+  requestedPrice: number,
+  guardrails: GuardrailsConfig
+): PricingValidationResult {
+  return guardrailsEngine.validateOverride(currentPrice, requestedPrice, guardrails);
+}
