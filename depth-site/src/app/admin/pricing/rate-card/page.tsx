@@ -116,21 +116,26 @@ export default function RateCardEditorPage() {
       
       setSubcategories(loadedSubcategories);
 
-      // تحميل Rate Card النشط من قاعدة البيانات
-      const rateResponse = await fetch('/api/pricing/rate-card/active');
-      if (!rateResponse.ok) {
-        throw new Error('لا يوجد جدول أسعار نشط - يرجى تحميل البيانات الأولية أو إنشاء جدول أسعار جديد');
-      }
-      
-      const rateData = await rateResponse.json();
-      if (!rateData.rateCard) {
-        throw new Error('لا يوجد جدول أسعار نشط في النظام');
-      }
-      
-      setRateCard(rateData.rateCard);
-      
-      if (rateData.rateCard?.guardrails) {
-        setGuardrailsConfig(rateData.rateCard.guardrails);
+      // محاولة تحميل Rate Card النشط (اختياري)
+      try {
+        const rateResponse = await fetch('/api/pricing/rate-card/active');
+        if (rateResponse.ok) {
+          const rateData = await rateResponse.json();
+          if (rateData?.rateCard) {
+            setRateCard(rateData.rateCard);
+            if (rateData.rateCard?.guardrails) {
+              setGuardrailsConfig(rateData.rateCard.guardrails);
+            }
+          } else {
+            setRateCard(null);
+          }
+        } else {
+          // لا يوجد جدول أسعار نشط حالياً → نسمح بعرض الفئات وإدخال الأسعار من الصفر
+          setRateCard(null);
+        }
+      } catch {
+        // في حال فشل الاتصال، نستمر بعرض الفئات فقط
+        setRateCard(null);
       }
 
     } catch (err) {
@@ -188,22 +193,36 @@ export default function RateCardEditorPage() {
     });
   };
 
-  // تحويل basePricesIQD إلى قائمة قابلة للعرض
-  const priceItems: SubcategoryPriceItem[] = !rateCard?.basePricesIQD ? [] : 
-    Object.entries(rateCard.basePricesIQD).map(([subcategoryId, basePrice]) => {
-      const subcategory = subcategories.find(sub => sub.id === subcategoryId);
-      const priceFloor = rateCard.baseRangesIQD?.[subcategoryId]?.[0];
-      
-      return {
-        id: subcategoryId, // للتوافق مع ResponsiveTable
-        subcategoryId,
-        nameAr: subcategory?.nameAr || subcategoryId,
-        nameEn: subcategory?.nameEn,
-        categoryId: subcategory?.categoryId || 'غير محدد',
-        basePrice,
-        priceFloor
-      };
-    });
+  // تحويل البيانات إلى صفوف عرض:
+  // - إذا موجود RateCard: استخدم basePricesIQD
+  // - إذا ما موجود: اعرض جميع الفئات بسعر 0 حتى يدخل الأدمن الأسعار
+  const priceItems: SubcategoryPriceItem[] = ((): SubcategoryPriceItem[] => {
+    const baseMap = rateCard?.basePricesIQD || {};
+    if (Object.keys(baseMap).length > 0) {
+      return Object.entries(baseMap).map(([subcategoryId, basePrice]) => {
+        const subcategory = subcategories.find(sub => sub.id === subcategoryId);
+        const priceFloor = rateCard?.baseRangesIQD?.[subcategoryId]?.[0];
+        return {
+          id: subcategoryId,
+          subcategoryId,
+          nameAr: subcategory?.nameAr || subcategoryId,
+          nameEn: subcategory?.nameEn,
+          categoryId: subcategory?.categoryId || 'غير محدد',
+          basePrice,
+          priceFloor
+        };
+      });
+    }
+    // لا يوجد أسعار حالية → نعرض كل الفئات بسعر 0
+    return subcategories.map((sub) => ({
+      id: sub.id,
+      subcategoryId: sub.id,
+      nameAr: sub.nameAr,
+      nameEn: sub.nameEn,
+      categoryId: sub.categoryId,
+      basePrice: 0
+    }));
+  })();
 
   const filteredItems = priceItems.filter(item => {
     const matchesCategory = categoryFilter === 'all' || item.categoryId === categoryFilter;
@@ -239,8 +258,16 @@ export default function RateCardEditorPage() {
       key: 'id' as const,
       label: 'السعر الأساسي',
       render: (item: SubcategoryPriceItem) => (
-        <div className="font-medium text-[var(--text)]">
-          {item.basePrice.toLocaleString()} د.ع
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            step="1000"
+            value={item.basePrice || 0}
+            onChange={(e) => handleUpdatePrice(item.subcategoryId, parseFloat(e.target.value) || 0)}
+            className="w-32 px-3 py-2 border border-[var(--border)] rounded bg-[var(--bg)] text-[var(--text)] text-right"
+          />
+          <span className="text-sm text-[var(--muted)]">د.ع</span>
         </div>
       )
     },
