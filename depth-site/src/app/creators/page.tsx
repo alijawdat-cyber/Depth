@@ -29,7 +29,7 @@ interface CreatorData {
   id: string;
   fullName: string;
   role: string;
-  status: 'pending' | 'intake_submitted' | 'under_review' | 'approved' | 'rejected';
+  status: 'pending' | 'onboarding_started' | 'onboarding_completed' | 'under_review' | 'approved' | 'rejected';
   city: string;
   phone: string;
   canTravel: boolean;
@@ -96,7 +96,8 @@ export default function CreatorsPortalPage() {
     switch (status) {
       case 'approved': return 'text-green-600 bg-green-50';
       case 'under_review': return 'text-yellow-600 bg-yellow-50';
-      case 'intake_submitted': return 'text-blue-600 bg-blue-50';
+      case 'onboarding_completed': return 'text-blue-600 bg-blue-50';
+      case 'onboarding_started': return 'text-purple-600 bg-purple-50';
       case 'rejected': return 'text-red-600 bg-red-50';
       default: return 'text-gray-600 bg-gray-50';
     }
@@ -106,7 +107,8 @@ export default function CreatorsPortalPage() {
     switch (status) {
       case 'approved': return 'معتمد';
       case 'under_review': return 'قيد المراجعة';
-      case 'intake_submitted': return 'تم تقديم النموذج';
+      case 'onboarding_completed': return 'تم إكمال التسجيل';
+      case 'onboarding_started': return 'جاري التسجيل';
       case 'rejected': return 'مرفوض';
       default: return 'في الانتظار';
     }
@@ -189,21 +191,38 @@ export default function CreatorsPortalPage() {
           </div>
 
           {/* تنبيهات مهمة */}
-          {creatorData.status === 'pending' && (
+          {(creatorData.status === 'pending' || creatorData.status === 'onboarding_started') && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-blue-800 mb-2">
                 <FileText size={20} />
-                <span className="font-medium">أكمل نموذج الانضمام التفصيلي</span>
+                <span className="font-medium">
+                  {creatorData.status === 'onboarding_started' ? 'أكمل نموذج الانضمام' : 'ابدأ نموذج الانضمام'}
+                </span>
               </div>
               <p className="text-blue-700 text-sm mb-3">
-                يتطلب إكمال نموذج التفاصيل المهنية للبدء في استلام المشاريع
+                {creatorData.status === 'onboarding_started' 
+                  ? 'لديك نموذج انضمام غير مكتمل، أكمله للمتابعة'
+                  : 'يتطلب إكمال نموذج الانضمام التفصيلي للبدء في استلام المشاريع'
+                }
               </p>
               <Button 
                 size="sm"
-                onClick={() => router.push('/creators/intake')}
+                onClick={() => router.push('/creators/onboarding')}
               >
-                إكمال النموذج
+                {creatorData.status === 'onboarding_started' ? 'متابعة النموذج' : 'بدء النموذج'}
               </Button>
+            </div>
+          )}
+
+          {creatorData.status === 'onboarding_completed' && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 text-purple-800 mb-2">
+                <CheckCircle size={20} />
+                <span className="font-medium">تم إكمال نموذج الانضمام!</span>
+              </div>
+              <p className="text-purple-700 text-sm">
+                تم إرسال طلبك للمراجعة، سنتواصل معك قريباً
+              </p>
             </div>
           )}
 

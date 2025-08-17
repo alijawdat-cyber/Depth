@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
     // حذف أي بيانات مؤقتة من النماذج القديمة
     try {
       await adminDb.collection('creators_basic').doc(email).delete();
-    } catch (error) {
+    } catch {
       // لا مشكلة إذا لم يكن موجود
     }
 

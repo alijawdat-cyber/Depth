@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import type {
   OnboardingFormData,
@@ -210,6 +210,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // تحميل البيانات المحفوظة عند بدء الجلسة
   const loadSavedProgress = useCallback(async () => {
+    // للمستخدمين الجدد، لا نحمل بيانات محفوظة
     if (!session?.user?.email) return;
     
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -231,7 +232,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // حفظ التقدم تلقائياً
   const saveProgress = useCallback(async (): Promise<boolean> => {
-    if (!session?.user?.email || !uiState.autoSaveEnabled) return false;
+    // للمستخدمين الجدد، لا نحفظ التقدم حتى يتم إنشاء الحساب
+    if (!session?.user?.email || !uiState.autoSaveEnabled) return true;
     
     dispatch({ type: 'SET_SAVING', payload: true });
     
@@ -313,6 +315,43 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       return false;
     }
     
+    // للخطوة الأولى: إنشاء الحساب إذا لم يكن موجود
+    if (formData.currentStep === 1 && !session?.user) {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      try {
+        // إنشاء حساب جديد
+        const response = await fetch('/api/creators/onboarding/create-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData.account)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'فشل في إنشاء الحساب');
+        }
+        
+        // تسجيل دخول تلقائي
+        const signInResult = await signIn('credentials', {
+          email: formData.account.email,
+          password: formData.account.password,
+          redirect: false
+        });
+        
+        if (signInResult?.error) {
+          throw new Error('تم إنشاء الحساب لكن فشل تسجيل الدخول');
+        }
+        
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'حدث خطأ في إنشاء الحساب';
+        dispatch({ type: 'SET_ERROR', payload: errorMessage });
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return false;
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    }
+    
     // حفظ التقدم قبل الانتقال
     const saved = await saveProgress();
     if (!saved) return false;
@@ -328,7 +367,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
     
     return false;
-  }, [formData.currentStep, validateCurrentStep, saveProgress]);
+  }, [formData.currentStep, formData.account, session, validateCurrentStep, saveProgress]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {

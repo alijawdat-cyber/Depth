@@ -52,18 +52,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session?.user) {
-      // توجيه لصفحة تسجيل الدخول مع العودة للـ onboarding
-      router.push('/auth/signin?callbackUrl=' + encodeURIComponent('/creators/onboarding'));
-      return;
+    // للمستخدمين المسجلين: التحقق من الدور
+    if (session?.user) {
+      if (session.user.role && session.user.role !== 'creator') {
+        // إذا كان له دور آخر، توجيه للوحة التحكم المناسبة
+        router.push('/portal');
+        return;
+      }
     }
-
-    // التحقق من نوع المستخدم
-    if (session.user.role && session.user.role !== 'creator') {
-      // إذا كان له دور آخر، توجيه للوحة التحكم المناسبة
-      router.push('/portal');
-      return;
-    }
+    // للمستخدمين الجدد: يمكنهم الوصول للـ onboarding لإنشاء حساب
   }, [session, status, router]);
 
   // عرض شاشة تحميل أثناء التحقق

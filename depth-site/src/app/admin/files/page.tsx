@@ -13,7 +13,7 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Folder,
   File,
-  Image,
+  Image as ImageIcon,
   Video,
   FileText,
   Download,
@@ -859,7 +859,7 @@ export default function AdminFilesPage() {
                           </div>
                         )}
                         {file.type === 'image' && (
-                          <Image size={12} className="ml-2" />
+                          <ImageIcon size={12} className="ml-2" />
                         )}
                       </div>
                       

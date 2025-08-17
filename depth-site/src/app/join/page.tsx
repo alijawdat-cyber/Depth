@@ -130,7 +130,7 @@ export default function JoinPage() {
               "مرونة في أوقات العمل",
               "دعم وتدريب مستمر"
             ]}
-            href="/join/creator"
+            href="/creators/onboarding"
             icon={<Camera size={32} className="text-purple-600" />}
             gradient="bg-gradient-to-br from-purple-500 to-purple-600"
           />
