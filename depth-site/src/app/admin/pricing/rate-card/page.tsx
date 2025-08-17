@@ -183,12 +183,13 @@ export default function RateCardEditorPage() {
 
   const handleUpdatePrice = (subcategoryId: string, newPrice: number) => {
     if (!rateCard) return;
-
+    const step = 1000;
+    const normalized = Math.max(0, Math.round(newPrice / step) * step);
     setRateCard({
       ...rateCard,
       basePricesIQD: {
         ...rateCard.basePricesIQD,
-        [subcategoryId]: newPrice
+        [subcategoryId]: normalized
       }
     });
   };
@@ -261,10 +262,25 @@ export default function RateCardEditorPage() {
         <div className="flex items-center gap-2">
           <input
             type="number"
-            min="0"
-            step="1000"
+            inputMode="numeric"
+            min={0}
+            step={1000}
             value={item.basePrice || 0}
-            onChange={(e) => handleUpdatePrice(item.subcategoryId, parseFloat(e.target.value) || 0)}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              handleUpdatePrice(item.subcategoryId, isNaN(v) ? 0 : v);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                handleUpdatePrice(item.subcategoryId, (item.basePrice || 0) + 1000);
+              }
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                handleUpdatePrice(item.subcategoryId, Math.max(0, (item.basePrice || 0) - 1000));
+              }
+            }}
+            onWheel={(e) => (e.target as HTMLInputElement).blur()}
             className="w-32 px-3 py-2 border border-[var(--border)] rounded bg-[var(--bg)] text-[var(--text)] text-right"
           />
           <span className="text-sm text-[var(--muted)]">د.ع</span>
