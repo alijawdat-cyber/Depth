@@ -23,6 +23,8 @@ import {
   Package,
   Save,
   X,
+  DollarSign,
+  ExternalLink,
 } from 'lucide-react';
 import { Category, Subcategory, Vertical } from '@/types/catalog';
 
@@ -64,6 +66,10 @@ interface CatalogPageState {
   // حالات العمليات
   submitting: boolean;
   deleting: boolean;
+
+  // بيانات التسعير
+  rateCard: { basePricesIQD?: Record<string, number> } | null;
+  loadingPrices: boolean;
 }
 
 export default function AdminCatalogPage() {
@@ -96,7 +102,11 @@ export default function AdminCatalogPage() {
     
     // حالات العمليات
     submitting: false,
-    deleting: false
+    deleting: false,
+
+    // بيانات التسعير
+    rateCard: null,
+    loadingPrices: false
   });
 
   // التحقق من الجلسة والدور
@@ -106,10 +116,11 @@ export default function AdminCatalogPage() {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
-      // تحميل الفئات الفرعية والمحاور بشكل متوازي
-      const [subcatResponse, verticalResponse] = await Promise.all([
+      // تحميل الفئات الفرعية والمحاور وجدول الأسعار بشكل متوازي
+      const [subcatResponse, verticalResponse, rateCardResponse] = await Promise.all([
         fetch('/api/catalog/subcategories'),
-        fetch('/api/catalog/verticals')
+        fetch('/api/catalog/verticals'),
+        fetch('/api/pricing/rate-card/active')
       ]);
 
       if (!subcatResponse.ok || !verticalResponse.ok) {
@@ -120,6 +131,13 @@ export default function AdminCatalogPage() {
         subcatResponse.json(),
         verticalResponse.json()
       ]);
+
+      // تحميل جدول الأسعار (اختياري)
+      let rateCardData = null;
+      if (rateCardResponse.ok) {
+        const rateData = await rateCardResponse.json();
+        rateCardData = rateData.rateCard;
+      }
 
       // استخراج الفئات الرئيسية من الفئات الفرعية
       const subcategories = subcatData.items || [];
@@ -153,6 +171,7 @@ export default function AdminCatalogPage() {
         subcategories,
         verticals: verticalData.items || [],
         stats,
+        rateCard: rateCardData,
         loading: false
       }));
 
@@ -171,6 +190,19 @@ export default function AdminCatalogPage() {
       loadCatalogData();
     }
   }, [status, isAdmin, loadCatalogData]);
+
+  // دالة فتح محرر جدول الأسعار مع التركيز على فئة فرعية محددة
+  const openPriceEditor = useCallback((subcategoryId?: string) => {
+    const url = subcategoryId 
+      ? `/admin/pricing/rate-card?focus=${subcategoryId}`
+      : '/admin/pricing/rate-card';
+    window.open(url, '_blank');
+  }, []);
+
+  // دالة للحصول على السعر الأساسي لفئة فرعية
+  const getSubcategoryPrice = useCallback((subcategoryId: string): number | null => {
+    return state.rateCard?.basePricesIQD?.[subcategoryId] || null;
+  }, [state.rateCard]);
 
   // دالة لفتح نموذج الإنشاء
   const openCreateForm = useCallback((type: 'subcategory' | 'vertical') => {
@@ -556,19 +588,30 @@ export default function AdminCatalogPage() {
                       }
                     </p>
                   </div>
-                  <div className="w-48">
-                    <Dropdown
-                      options={[
-                        { value: 'all', label: 'جميع الفئات' },
-                        ...state.categories.map(cat => ({
-                          value: cat.id,
-                          label: cat.nameAr
-                        }))
-                      ]}
-                      value={state.selectedCategory}
-                      onChange={(value: string) => setState(prev => ({ ...prev, selectedCategory: value }))}
-                      placeholder="اختر فئة"
-                    />
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => openPriceEditor()}
+                      className="text-sm px-4 py-2 border-[var(--accent-500)] text-[var(--accent-500)] hover:bg-[var(--accent-bg)]"
+                    >
+                      <DollarSign size={16} className="mr-2" />
+                      محرر جدول الأسعار
+                      <ExternalLink size={14} className="ml-2" />
+                    </Button>
+                    <div className="w-48">
+                      <Dropdown
+                        options={[
+                          { value: 'all', label: 'جميع الفئات' },
+                          ...state.categories.map(cat => ({
+                            value: cat.id,
+                            label: cat.nameAr
+                          }))
+                        ]}
+                        value={state.selectedCategory}
+                        onChange={(value: string) => setState(prev => ({ ...prev, selectedCategory: value }))}
+                        placeholder="اختر فئة"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -581,7 +624,8 @@ export default function AdminCatalogPage() {
                       <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم العربي</th>
                       <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الاسم الإنجليزي</th>
                       <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden md:table-cell">الفئة الرئيسية</th>
-                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden md:table-cell">الوصف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm hidden lg:table-cell">الوصف</th>
+                      <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">السعر الأساسي</th>
                       <th className="text-right p-4 md:p-4 sm:p-2 font-medium text-[var(--text)] text-xs md:text-sm">الإجراءات</th>
                     </tr>
                   </thead>
@@ -594,8 +638,43 @@ export default function AdminCatalogPage() {
                         <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--text)] hidden md:table-cell">
                           {state.categories.find(c => c.id === subcategory.categoryId)?.nameAr}
                         </td>
-                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] max-w-xs truncate hidden md:table-cell">
+                        <td className="p-4 md:p-4 sm:p-2 text-xs md:text-sm text-[var(--muted)] max-w-xs truncate hidden lg:table-cell">
                           {subcategory.desc || '-'}
+                        </td>
+                        <td className="p-4 md:p-4 sm:p-2">
+                          {(() => {
+                            const price = getSubcategoryPrice(subcategory.id);
+                            return (
+                              <div className="flex items-center gap-2">
+                                {price !== null ? (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs md:text-sm font-medium text-[var(--success)]">
+                                      {price.toLocaleString()} د.ع
+                                    </span>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => openPriceEditor(subcategory.id)}
+                                      className="text-xs p-1 opacity-60 hover:opacity-100"
+                                      title="تعديل السعر"
+                                    >
+                                      <Edit3 size={12} />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openPriceEditor(subcategory.id)}
+                                    className="text-xs px-2 py-1 text-[var(--warning)] border-[var(--warning)] hover:bg-[var(--warning-bg)]"
+                                  >
+                                    <DollarSign size={12} className="mr-1" />
+                                    تحديد السعر
+                                  </Button>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="p-4 md:p-4 sm:p-2">
                           <div className="flex items-center gap-1 md:gap-2">

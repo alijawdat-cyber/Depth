@@ -4,7 +4,7 @@
 // الغرض: إدارة شاملة لجدول الأسعار مع الحواجز والهوامش والتحكم في الإصدارات
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import Dropdown from '@/components/ui/Dropdown';
 import SectionHeading from '@/components/ui/SectionHeading';
@@ -73,6 +73,7 @@ interface Subcategory {
 
 export default function RateCardEditorPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -88,11 +89,17 @@ export default function RateCardEditorPage() {
   // Filters and view
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [focusedSubcategory, setFocusedSubcategory] = useState<string | null>(null);
 
   // Guardrails config
   const [guardrailsConfig, setGuardrailsConfig] = useState<GuardrailsConfig>(DEFAULT_GUARDRAILS);
 
   useEffect(() => {
+    // التحقق من معامل التركيز في URL
+    const focusParam = searchParams.get('focus');
+    if (focusParam) {
+      setFocusedSubcategory(focusParam);
+    }
     loadRateCardData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -258,10 +265,15 @@ export default function RateCardEditorPage() {
       key: 'id' as const,
       label: 'اسم الفئة الفرعية',
       render: (item: SubcategoryPriceItem) => (
-        <div>
+        <div className={`${focusedSubcategory === item.subcategoryId ? 'p-2 bg-[var(--accent-bg)] border border-[var(--accent-500)] rounded-lg shadow-sm' : ''}`}>
           <div className="font-medium text-[var(--text)]">{item.nameAr}</div>
           <div className="text-sm text-[var(--muted)]">{item.subcategoryId}</div>
           {item.nameEn && <div className="text-xs text-[var(--muted)]">{item.nameEn}</div>}
+          {focusedSubcategory === item.subcategoryId && (
+            <div className="text-xs text-[var(--accent-600)] font-medium mt-1 flex items-center gap-1">
+              🎯 مُركز عليه من صفحة الكتالوج
+            </div>
+          )}
         </div>
       )
     },
@@ -635,6 +647,7 @@ export default function RateCardEditorPage() {
         emptyMessage="لا توجد بنود في جدول الأسعار"
         showViewToggle={true}
         defaultView="table"
+        className={focusedSubcategory ? "focused-table" : ""}
       />
 
                     {/* Action Buttons */}

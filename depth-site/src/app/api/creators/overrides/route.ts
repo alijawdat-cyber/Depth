@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
+import { calculateQuotePricing } from '@/lib/pricing/engine';
 
 // GET /api/creators/overrides
 // جلب طلبات Override الخاصة بالمبدع
@@ -73,27 +75,25 @@ export async function GET(req: NextRequest) {
       try {
         if (overrideData.deliverable) {
           const deliverableDoc = await adminDb
-            .collection('catalog')
-            .doc('subcategories')
-            .collection('items')
+            .collection('catalog_subcategories')
             .doc(overrideData.deliverable)
             .get();
           
           if (deliverableDoc.exists) {
-            deliverableName = deliverableDoc.data()?.name?.ar || deliverableName;
+            const d = deliverableDoc.data() as Record<string, unknown>;
+            deliverableName = (d?.nameAr as string) || deliverableName;
           }
         }
 
         if (overrideData.vertical) {
           const verticalDoc = await adminDb
-            .collection('catalog')
-            .doc('verticals')
-            .collection('items')
+            .collection('catalog_verticals')
             .doc(overrideData.vertical)
             .get();
           
           if (verticalDoc.exists) {
-            verticalName = verticalDoc.data()?.name?.ar || verticalName;
+            const v = verticalDoc.data() as Record<string, unknown>;
+            verticalName = (v?.nameAr as string) || verticalName;
           }
         }
       } catch (error) {
@@ -179,27 +179,17 @@ export async function GET(req: NextRequest) {
 
 // POST /api/creators/overrides
 // إنشاء طلب Override جديد
-// تحديد Override Cap حسب الوثائق
-const OVERRIDE_CAP_PERCENTAGE = 20; // حد أعلى افتراضي +20%
-const MIN_MARGIN_PERCENTAGE = 45; // هامش أدنى 45%
+// في حال عدم وجود rate card سنعتمد افتراضات حذرة
+const FALLBACK_OVERRIDE_CAP_PERCENTAGE = 20; // +20%
 
-function validateOverrideRequest(currentPrice: number, requestedPrice: number): { isValid: boolean; error?: string; } {
-  const priceIncrease = ((requestedPrice - currentPrice) / currentPrice) * 100;
-  
-  // فحص الحد الأعلى
-  if (priceIncrease > OVERRIDE_CAP_PERCENTAGE) {
+function validateOverrideRequest(currentPrice: number, requestedPrice: number, capPercent: number): { isValid: boolean; error?: string; } {
+  const priceIncrease = ((requestedPrice - currentPrice) / Math.max(currentPrice, 1)) * 100;
+  if (priceIncrease > capPercent) {
     return {
       isValid: false,
-      error: `الزيادة المطلوبة (${priceIncrease.toFixed(1)}%) تتجاوز الحد الأعلى المسموح (${OVERRIDE_CAP_PERCENTAGE}%)`
+      error: `الزيادة المطلوبة (${priceIncrease.toFixed(1)}%) تتجاوز الحد الأعلى المسموح (${capPercent}%)`
     };
   }
-  
-  // فحص الهامش الأدنى (تحتاج بيانات التكلفة)
-  // const margin = ((requestedPrice - cost) / requestedPrice) * 100;
-  // if (margin < MIN_MARGIN_PERCENTAGE) {
-  //   return { isValid: false, error: 'الهامش أقل من الحد الأدنى المطلوب' };
-  // }
-  
   return { isValid: true };
 }
 
@@ -258,24 +248,35 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // جلب السعر الحالي من الكتالوغ لتطبيق Override Cap
+    // حساب السعر الحالي عبر محرك التسعير (qty=1)
     let currentPriceIQD = 0;
+    let overrideCapPercent = FALLBACK_OVERRIDE_CAP_PERCENTAGE;
     try {
-      // هذا يحتاج تطوير أكثر - جلب السعر من الكتالوغ
-      // مؤقتاً نفترض سعر أساسي
-      currentPriceIQD = 100000; // سعر افتراضي للاختبار
-      
-      // تطبيق التحقق من Override Cap
-      const validation = validateOverrideRequest(currentPriceIQD, requestedPriceIQD);
-      if (!validation.isValid) {
-        return NextResponse.json({ 
-          success: false, 
-          error: validation.error 
-        }, { status: 400 });
+      const rateCard = await getActiveRateCard();
+      if (rateCard) {
+        overrideCapPercent = Math.round((rateCard.overrideCapPercent ?? (FALLBACK_OVERRIDE_CAP_PERCENTAGE / 100)) * 100);
+        const pricing = calculateQuotePricing([
+          {
+            subcategoryId: deliverable,
+            qty: 1,
+            vertical: vertical || 'general',
+            processing: (processing || 'full_retouch'),
+            conditions: conditions && typeof conditions === 'object' ? conditions : undefined
+          }
+        ] as any, { rateCard, estimatedCosts: {} });
+        currentPriceIQD = pricing.lines[0]?.unitPriceIQD || 0;
       }
     } catch (error) {
-      console.warn('Failed to fetch current price for validation:', error);
-      // نكمل العملية بدون تحقق إذا فشل جلب السعر
+      console.warn('Failed to compute current price via engine:', error);
+    }
+
+    // التحقق من Override Cap (من الـ Rate Card إن وجد)
+    const validation = validateOverrideRequest(currentPriceIQD, requestedPriceIQD, overrideCapPercent);
+    if (!validation.isValid) {
+      return NextResponse.json({ 
+        success: false, 
+        error: validation.error 
+      }, { status: 400 });
     }
 
     const email = session.user.email.toLowerCase();
@@ -315,23 +316,7 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // جلب السعر الحالي من Rate Card (إذا متوفر)
-    // currentPriceIQD already declared above
-    try {
-      const rateCardQuery = await adminDb
-        .collection('rate_card')
-        .where('deliverable', '==', deliverable)
-        .where('vertical', '==', vertical || null)
-        .where('processing', '==', processing || 'full_retouch')
-        .limit(1)
-        .get();
-
-      if (!rateCardQuery.empty) {
-        currentPriceIQD = rateCardQuery.docs[0].data().priceIQD;
-      }
-    } catch (error) {
-      console.warn('Failed to fetch current price:', error);
-    }
+    // currentPriceIQD تم حسابه عبر المحرك أعلاه
 
     const now = new Date().toISOString();
     const overrideId = `override_${creatorId}_${Date.now()}`;
