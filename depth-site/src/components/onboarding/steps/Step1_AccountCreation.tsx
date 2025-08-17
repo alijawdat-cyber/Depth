@@ -1,0 +1,179 @@
+// الخطوة الأولى: إنشاء الحساب
+'use client';
+
+import { motion } from 'framer-motion';
+import { User, Mail, Phone, Lock, Shield, CheckCircle } from 'lucide-react';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { InputField, CheckboxField } from '../shared/FormField';
+import { StepHeader } from '../OnboardingLayout';
+import Link from 'next/link';
+
+export default function Step1_AccountCreation() {
+  const { formData, updateAccountData, getStepErrors } = useOnboarding();
+  const { account } = formData;
+  const errors = getStepErrors(1);
+
+  const getFieldError = (field: string) => {
+    return errors.find(error => error.includes(field)) || undefined;
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <StepHeader
+        title="إنشاء حسابك"
+        subtitle="ابدأ رحلتك المهنية معنا بإنشاء حساب آمن"
+        icon={User}
+        step={1}
+        totalSteps={5}
+      />
+
+      {/* Form Fields */}
+      <div className="space-y-6 max-w-2xl mx-auto">
+        {/* الاسم الكامل */}
+        <InputField
+          label="الاسم الكامل"
+          value={account.fullName}
+          onChange={(value) => updateAccountData({ fullName: value })}
+          placeholder="أحمد محمد علي"
+          icon={<User size={18} />}
+          required
+          error={getFieldError('الاسم')}
+          description="اسمك كما تريد أن يظهر للعملاء"
+        />
+
+        {/* البريد الإلكتروني */}
+        <InputField
+          label="البريد الإلكتروني"
+          type="email"
+          value={account.email}
+          onChange={(value) => updateAccountData({ email: value })}
+          placeholder="ahmed@example.com"
+          icon={<Mail size={18} />}
+          required
+          error={getFieldError('البريد') || getFieldError('الإلكتروني')}
+          description="سيُستخدم لتسجيل الدخول واستلام الإشعارات"
+        />
+
+        {/* رقم الهاتف */}
+        <InputField
+          label="رقم الهاتف/واتساب"
+          type="tel"
+          value={account.phone}
+          onChange={(value) => updateAccountData({ phone: value })}
+          placeholder="+964 770 123 4567"
+          icon={<Phone size={18} />}
+          required
+          error={getFieldError('الهاتف')}
+          description="للتواصل السريع وتأكيد المشاريع"
+        />
+
+        {/* كلمات المرور */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <InputField
+            label="كلمة المرور"
+            type="password"
+            value={account.password}
+            onChange={(value) => updateAccountData({ password: value })}
+            placeholder="كلمة مرور قوية"
+            icon={<Lock size={18} />}
+            showPasswordToggle
+            required
+            error={getFieldError('كلمة المرور') || getFieldError('قصيرة')}
+            description="8 أحرف على الأقل"
+          />
+
+          <InputField
+            label="تأكيد كلمة المرور"
+            type="password"
+            value={account.confirmPassword}
+            onChange={(value) => updateAccountData({ confirmPassword: value })}
+            placeholder="إعادة كتابة كلمة المرور"
+            icon={<Lock size={18} />}
+            showPasswordToggle
+            required
+            error={getFieldError('متطابقة')}
+          />
+        </div>
+
+        {/* الموافقة على الشروط */}
+        <CheckboxField
+          label="أوافق على شروط الخدمة وسياسة الخصوصية"
+          value={account.agreeToTerms}
+          onChange={(checked) => updateAccountData({ agreeToTerms: checked })}
+          required
+          error={getFieldError('الشروط')}
+          description={
+            <span>
+              بالموافقة، أنت تقبل{' '}
+              <Link href="/legal#terms" className="text-[var(--accent-500)] hover:underline">
+                شروط الخدمة
+              </Link>
+              {' و '}
+              <Link href="/legal#privacy" className="text-[var(--accent-500)] hover:underline">
+                سياسة الخصوصية
+              </Link>
+            </span>
+          }
+        />
+      </div>
+
+      {/* Security Features */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="max-w-2xl mx-auto"
+      >
+        <div className="bg-gradient-to-r from-[var(--accent-50)] to-[var(--accent-100)] border border-[var(--accent-200)] rounded-xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-[var(--accent-500)] rounded-xl flex items-center justify-center flex-shrink-0">
+              <Shield size={24} className="text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[var(--accent-800)] mb-2">
+                🔒 حسابك آمن معنا
+              </h3>
+              <ul className="space-y-2 text-sm text-[var(--accent-700)]">
+                <li className="flex items-center gap-2">
+                  <CheckCircle size={14} className="text-green-600" />
+                  تشفير كلمات المرور بأحدث التقنيات
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle size={14} className="text-green-600" />
+                  حماية البيانات الشخصية وفقاً لمعايير GDPR
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle size={14} className="text-green-600" />
+                  عدم مشاركة معلوماتك مع أطراف ثالثة
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle size={14} className="text-green-600" />
+                  إمكانية حذف الحساب والبيانات في أي وقت
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Login Option */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="text-center"
+      >
+        <p className="text-[var(--muted)]">
+          لديك حساب بالفعل؟{' '}
+          <Link 
+            href="/auth/signin?callbackUrl=/creators/onboarding" 
+            className="text-[var(--accent-500)] hover:underline font-medium"
+          >
+            تسجيل الدخول
+          </Link>
+        </p>
+      </motion.div>
+    </div>
+  );
+}
