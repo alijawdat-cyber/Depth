@@ -3,6 +3,7 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Clock, Mail, Phone, CheckCircle, AlertCircle } from "lucide-react";
 
 interface PendingApprovalScreenProps {
@@ -14,6 +15,46 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
   const router = useRouter();
   const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER;
   const waHref = WA_NUMBER ? `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`مرحباً! أنا ${userName || 'عميل جديد'} وحسابي في انتظار التفعيل. البريد الإلكتروني: ${userEmail || 'غير متوفر'}`)}` : "https://wa.me/";
+  const [checking, setChecking] = useState(false);
+  const [lastCheckedAt, setLastCheckedAt] = useState<number | null>(null);
+
+  // استطلاع الحالة بشكل دوري (كل 10 ثواني)
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const poll = async () => {
+      setChecking(true);
+      try {
+        // نفحص حالة العميل أولاً
+        const clientRes = await fetch('/api/portal/clients');
+        if (clientRes.ok) {
+          const data = await clientRes.json();
+          const status = data?.client?.status;
+          if (status === 'approved') {
+            router.replace('/portal?approved=1');
+            return;
+          }
+        }
+        // ثم نفحص حالة المبدع إن كان المستخدم مبدعاً
+        const creatorRes = await fetch('/api/creators/profile');
+        if (creatorRes.ok) {
+          const data = await creatorRes.json();
+          const status = data?.creator?.status || data?.profile?.status;
+          if (status === 'approved') {
+            router.replace('/creators?approved=1');
+            return;
+          }
+        }
+      } catch {
+        // تجاهل الأخطاء في الاستطلاع
+      } finally {
+        setChecking(false);
+        setLastCheckedAt(Date.now());
+        timer = setTimeout(poll, 10000);
+      }
+    };
+    poll();
+    return () => { if (timer) clearTimeout(timer); };
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
@@ -137,8 +178,9 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
                 variant="secondary" 
                 onClick={() => window.location.reload()}
                 className="px-8 py-3"
+                disabled={checking}
               >
-                تحديث الحالة
+                {checking ? 'جاري التحقق...' : 'تحديث الحالة'}
               </Button>
               <Button 
                 variant="ghost" 
@@ -147,6 +189,9 @@ export default function PendingApprovalScreen({ userEmail, userName }: PendingAp
               >
                 العودة للرئيسية
               </Button>
+              {lastCheckedAt && (
+                <div className="text-xs text-[var(--slate-600)] pt-2">آخر تحقق: {new Date(lastCheckedAt).toLocaleTimeString('ar')}</div>
+              )}
             </div>
           </div>
         </Container>

@@ -25,7 +25,10 @@ import {
   Bell,
   User,
   LogOut,
-  Briefcase
+  Briefcase,
+  Users,
+  Shield,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
@@ -62,6 +65,24 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: 'العقود',
     icon: Briefcase,
     description: 'إدارة MSA + SOW + NDA وجميع الملحقات والاتفاقيات'
+  },
+  {
+    href: '/admin/users',
+    label: 'المستخدمين',
+    icon: Users,
+    description: 'إدارة العملاء والمبدعين والموظفين مع الصلاحيات والأدوار'
+  },
+  {
+    href: '/admin/security',
+    label: 'الأمان',
+    icon: Shield,
+    description: 'إدارة الأمان، الصلاحيات، 2FA، التدقيق، والامتثال'
+  },
+  {
+    href: '/admin/reports',
+    label: 'التقارير',
+    icon: BarChart3,
+    description: 'مؤشرات الأداء الرئيسية والتقارير التفصيلية'
   },
   {
     href: '/admin/creators',

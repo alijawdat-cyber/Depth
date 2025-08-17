@@ -224,7 +224,7 @@ export default function PortalClientReal() {
     );
   }
 
-  // Show pending approval screen if client is not approved
+  // Show pending approval screen if client is not approved (تُستخدم أيضاً كشاشة انتظار عامة)
   if (clientStatus === 'pending' || clientStatus === 'rejected') {
     return (
       <PendingApprovalScreen 

@@ -32,8 +32,13 @@ export const authOptions: NextAuthOptions = {
         
         try {
           // البحث في جميع المجموعات
-          const collections = ['clients', 'creators', 'employees'];
-          
+          const collections = ['clients', 'creators', 'employees'] as const;
+          const collectionRoleMap: Record<(typeof collections)[number], 'client' | 'creator' | 'employee'> = {
+            clients: 'client',
+            creators: 'creator',
+            employees: 'employee',
+          };
+
           for (const collectionName of collections) {
             const userQuery = await adminDb
               .collection(collectionName)
@@ -44,14 +49,15 @@ export const authOptions: NextAuthOptions = {
             if (!userQuery.empty) {
               const userDoc = userQuery.docs[0];
               const userData = userDoc.data();
-              
+
               // التحقق من كلمة المرور
               if (userData.password && await bcrypt.compare(credentials.password, userData.password)) {
                 return {
                   id: userDoc.id,
                   email: userData.email,
                   name: userData.name || userData.fullName,
-                  role: userData.role || collectionName.slice(0, -1) // clients -> client
+                  // لا نستخدم حقل role في وثيقة المبدع لأنه يحمل التخصص (photographer...) وليس دور الوصول
+                  role: collectionRoleMap[collectionName],
                 };
               }
             }
@@ -74,6 +80,26 @@ export const authOptions: NextAuthOptions = {
                 email: creatorData.contact.email,
                 name: creatorData.fullName,
                 role: 'creator'
+              };
+            }
+          }
+
+          // فحص احتياطي: بعض السجلات تحفظ البريد في المستوى العلوي `email`
+          const creatorTopQuery = await adminDb
+            .collection('creators')
+            .where('email', '==', email)
+            .limit(1)
+            .get();
+
+          if (!creatorTopQuery.empty) {
+            const creatorDoc = creatorTopQuery.docs[0];
+            const creatorData = creatorDoc.data();
+            if (creatorData.password && await bcrypt.compare(credentials.password, creatorData.password)) {
+              return {
+                id: creatorDoc.id,
+                email: creatorData.email,
+                name: creatorData.fullName || creatorData.name || '',
+                role: 'creator',
               };
             }
           }
@@ -112,7 +138,13 @@ export const authOptions: NextAuthOptions = {
       // Set role on first sign-in
       if (user) {
         token.userId = user.id;
-        token.role = (user as { role?: string }).role || await determineUserRole(user.email || '');
+        const candidate = (user as { role?: string }).role;
+        // نضمن أن الدور واحد من الأدوار المسموحة، وإلا نحدده من قاعدة البيانات
+        if (candidate === 'admin' || candidate === 'client' || candidate === 'creator' || candidate === 'employee') {
+          token.role = candidate;
+        } else {
+          token.role = await determineUserRole(user.email || '');
+        }
       }
       
       // Ensure role is derived even when `user` is undefined (subsequent JWT calls)
@@ -177,12 +209,15 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       try {
-        // If absolute url to same origin, keep it
+        // احترام الروابط النسبية (مثل /creators/intake)
+        if (url.startsWith('/')) {
+          return `${baseUrl}${url}`;
+        }
+        // إذا كان رابط مطلق على نفس الأصل، اتركه كما هو
         if (url.startsWith(baseUrl)) {
           return url;
         }
-        
-        // For external URLs, redirect to portal by default
+        // روابط خارجية → أعد للتطبيق إلى البوابة
         return `${baseUrl}/portal`;
       } catch {
         return `${baseUrl}/portal`;
@@ -206,13 +241,19 @@ async function determineUserRole(email: string): Promise<string> {
       .filter(Boolean);
     if (adminList.includes(emailLower)) return 'admin';
     
-    // 2. تحقق من المبدعين
+    // 2. تحقق من المبدعين (كلا الحقلين contact.email و email)
     const creatorSnap = await adminDb
       .collection('creators')
       .where('contact.email', '==', emailLower)
       .limit(1)
       .get();
     if (!creatorSnap.empty) return 'creator';
+    const creatorTop = await adminDb
+      .collection('creators')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!creatorTop.empty) return 'creator';
     
     // 3. تحقق من الموظفين
     const employeeSnap = await adminDb

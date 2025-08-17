@@ -61,7 +61,7 @@ export default function CreatorsPortalPage() {
       const response = await fetch('/api/creators/profile');
       if (response.ok) {
         const data = await response.json();
-        setCreatorData(data.creator);
+        setCreatorData(data.creator || data.profile);
         setProjectStats(data.stats || {
           total: 0,
           completed: 0,
