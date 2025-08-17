@@ -130,7 +130,7 @@ export default function OnboardingLayout({
               </div>
 
               {/* Progress Info */}
-              <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-2 md:gap-4">
                 {state.saving && (
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -161,7 +161,7 @@ export default function OnboardingLayout({
         {showProgress && (
           <div className="bg-[var(--card)]/50 backdrop-blur-sm border-b border-[var(--border)]">
             <div className="max-w-6xl mx-auto px-4 py-4">
-              {/* Desktop Progress */}
+              {/* Progress Steps - Desktop */}
               <div className="hidden md:block">
                 <div className="flex items-center justify-between mb-4">
                   {STEPS_CONFIG.map((step) => {
@@ -174,9 +174,9 @@ export default function OnboardingLayout({
                         key={step.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: step.id * 0.1 }}
+                        transition={{ delay: step.id * 0.05, duration: 0.3 }}
                         className={`flex flex-col items-center gap-2 cursor-pointer transition-all ${
-                          isAccessible ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'
+                          isAccessible ? 'hover:scale-105 active:scale-95' : 'opacity-50 cursor-not-allowed'
                         }`}
                         onClick={() => isAccessible && formData.currentStep !== step.id && goToStep(step.id as any)}
                       >
@@ -220,12 +220,24 @@ export default function OnboardingLayout({
               </div>
 
               {/* Mobile Progress */}
-              <div className="md:hidden mt-3 text-center">
-                <div className="text-sm text-[var(--text)] font-medium">
-                  {currentStepConfig?.title}
+              <div className="md:hidden mt-3">
+                <div className="text-center mb-3">
+                  <div className="text-sm text-[var(--text)] font-medium">
+                    {currentStepConfig?.title}
+                  </div>
+                  <div className="text-xs text-[var(--muted)]">
+                    الخطوة {formData.currentStep} من 5 • {Math.round(progress.completionPercentage)}% مكتمل
+                  </div>
                 </div>
-                <div className="text-xs text-[var(--muted)]">
-                  الخطوة {formData.currentStep} من 5 • {Math.round(progress.completionPercentage)}% مكتمل
+                
+                {/* Mobile Progress Bar */}
+                <div className="w-full bg-[var(--neutral-200)] rounded-full h-2">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-[var(--accent-500)] to-[var(--accent-600)] rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress.completionPercentage}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
                 </div>
               </div>
             </div>
@@ -233,7 +245,7 @@ export default function OnboardingLayout({
         )}
 
         {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {/* Error Display */}
           <AnimatePresence>
             {state.error && (

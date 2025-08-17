@@ -144,7 +144,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             onChange={(e) => onChange(e.target.value)}
             onBlur={onBlur}
             className={`
-              w-full px-4 py-3 rounded-xl border transition-all duration-200
+              w-full px-3 sm:px-4 py-3 rounded-xl border transition-all duration-200
               ${icon ? 'pr-12' : ''}
               ${showPasswordToggle ? 'pl-12' : ''}
               ${error 

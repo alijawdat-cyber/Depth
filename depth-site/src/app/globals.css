@@ -533,4 +533,25 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
   }
 }
 
+/* تحسين الأداء على الهواتف */
+@media (max-width: 768px) {
+  /* تقليل الحركات على الهواتف للأداء */
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
+  /* تحسين اللمس */
+  button, input, select, textarea {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* تحسين الخطوط على الهواتف */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
 /* Marquee styles for react-fast-marquee */

@@ -93,7 +93,7 @@ export default function Step5_Availability() {
         <div>
           <h3 className="text-lg font-semibold text-[var(--text)] mb-4">ما هو نوع توفرك للعمل؟</h3>
           
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {AVAILABILITY_OPTIONS.map((option, index) => {
               const isSelected = availability.availability === option.value;
               
@@ -156,7 +156,7 @@ export default function Step5_Availability() {
         </div>
 
         {/* الساعات الأسبوعية */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <InputField
             label="عدد الساعات الأسبوعية"
             type="number"
@@ -218,7 +218,7 @@ export default function Step5_Availability() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-[var(--accent-fg)] mb-3">📋 ملخص توفرك</h4>
-                <div className="grid md:grid-cols-2 gap-4 text-sm text-[var(--accent-fg)]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-[var(--accent-fg)]">
                   <div>
                     <p className="font-medium mb-1">نوع التوفر:</p>
                     <p>{AVAILABILITY_OPTIONS.find(opt => opt.value === availability.availability)?.label}</p>
@@ -274,7 +274,7 @@ export default function Step5_Availability() {
             </div>
             <div>
               <h4 className="font-bold text-emerald-800 mb-3">💡 نصائح لزيادة فرص العمل</h4>
-              <div className="grid md:grid-cols-2 gap-4 text-sm text-emerald-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-emerald-700">
                 <div>
                   <p className="font-medium mb-2">⭐ توفر أكثر = فرص أكثر:</p>
                   <ul className="space-y-1">

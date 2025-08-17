@@ -80,7 +80,7 @@ export default function Step4_Portfolio() {
             حساباتك الاجتماعية والمواقع
           </h3>
           
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               label="حساب الإنستغرام"
               value={portfolio.socialMedia.instagram || ''}
@@ -128,7 +128,7 @@ export default function Step4_Portfolio() {
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 mb-6">
             <h4 className="font-medium text-[var(--text)] mb-4">إضافة عينة عمل جديدة</h4>
             
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <InputField
                 label="رابط العينة"
                 value={newSampleUrl}
@@ -146,7 +146,7 @@ export default function Step4_Portfolio() {
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-2">
                   نوع العمل

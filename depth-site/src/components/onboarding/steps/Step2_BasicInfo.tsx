@@ -52,7 +52,7 @@ export default function Step2_BasicInfo() {
         </div>
 
         {/* الموقع والسفر */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <InputField
             label="المدينة"
             value={basicInfo.city}
@@ -81,7 +81,7 @@ export default function Step2_BasicInfo() {
             اللغات التي تتحدث بها
           </h3>
           
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {[
               { id: 'ar', label: 'العربية', required: true },
               { id: 'en', label: 'الإنجليزية', required: false },

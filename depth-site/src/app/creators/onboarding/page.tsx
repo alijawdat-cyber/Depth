@@ -82,11 +82,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // إذا لم يكن مسجل دخول، لا نعرض شيء (سيتم التوجيه)
-  if (!session?.user) {
-    return null;
-  }
-
+  // السماح للمستخدمين الجدد بالوصول للـ onboarding
   return <>{children}</>;
 }
 

@@ -44,7 +44,7 @@ export default function Step3_Experience() {
 
       <div className="space-y-8 max-w-2xl mx-auto">
         {/* مستوى الخبرة */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <SelectField
             label="مستوى خبرتك"
             value={experience.experienceLevel}

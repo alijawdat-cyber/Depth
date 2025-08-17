@@ -24,7 +24,7 @@ export default function Step1_AccountCreation() {
       />
 
       {/* Form Fields */}
-      <div className="space-y-6 max-w-2xl mx-auto">
+      <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto px-2 sm:px-0">
         {/* الاسم الكامل */}
         <InputField
           label="الاسم الكامل"
@@ -66,7 +66,7 @@ export default function Step1_AccountCreation() {
         />
 
         {/* كلمات المرور */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputField
             label="كلمة المرور"
             type="password"
