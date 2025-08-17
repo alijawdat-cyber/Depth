@@ -440,13 +440,35 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
             
             // تسجيل إكمال الخطوة الأولى
             dispatch({ type: 'COMPLETE_STEP', payload: 1 });
-            
-            // الانتقال للخطوة التالية
+
+            // حضّر نسخة محدثة للحفظ الفوري في حال صار Remount
+            const updatedFormData = {
+              ...formData,
+              currentStep: 2,
+              completedSteps: Array.from(new Set([...(formData.completedSteps || []), 1]))
+            };
+
+            // حفظ التقدم فوراً في السيرفر (بدون الاعتماد على الـ auto-save)
+            try {
+              await fetch('/api/creators/onboarding/progress', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  step: 2,
+                  data: updatedFormData,
+                  autoSave: false
+                })
+              });
+            } catch (e) {
+              console.warn('Immediate progress save failed (will rely on auto-save later).', e);
+            }
+
+            // الانتقال للخطوة التالية في الواجهة
             dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
             dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
             dispatch({ type: 'SET_SUCCESS', payload: false }); // إعادة تعيين success
             dispatch({ type: 'SET_LOADING', payload: false });
-            
+
             return true;
           }
           
