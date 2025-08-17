@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import Dropdown from "@/components/ui/Dropdown";
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Plus, 
@@ -369,27 +370,31 @@ export default function AdminContractsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'text-gray-600 bg-gray-50 border-gray-200';
-      case 'pending_client': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'signed': return 'text-green-600 bg-green-50 border-green-200';
-      case 'executed': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-      case 'expired': return 'text-red-600 bg-red-50 border-red-200';
-      case 'terminated': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'signed':
+      case 'executed':
+        return 'text-[var(--success-fg)] bg-[var(--success-bg)] border-[var(--success-border)]';
+      case 'pending_client':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
+      case 'expired':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)] border-[var(--danger-border)]';
+      case 'draft':
+      case 'terminated':
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'msa': return <Briefcase size={16} className="text-blue-600" />;
-      case 'sow': return <FileText size={16} className="text-green-600" />;
-      case 'nda': return <Shield size={16} className="text-purple-600" />;
-      case 'equipment': return <Camera size={16} className="text-orange-600" />;
-      case 'model_release': return <Users size={16} className="text-pink-600" />;
-      case 'influencer': return <Users size={16} className="text-indigo-600" />;
-      case 'media_buying': return <DollarSign size={16} className="text-yellow-600" />;
-      case 'clinica_compliance': return <Shield size={16} className="text-red-600" />;
-      default: return <FileText size={16} className="text-gray-600" />;
+      case 'msa': return <Briefcase size={16} className="text-[var(--text)]" />;
+      case 'sow': return <FileText size={16} className="text-[var(--text)]" />;
+      case 'nda': return <Shield size={16} className="text-[var(--text)]" />;
+      case 'equipment': return <Camera size={16} className="text-[var(--text)]" />;
+      case 'model_release': return <Users size={16} className="text-[var(--text)]" />;
+      case 'influencer': return <Users size={16} className="text-[var(--text)]" />;
+      case 'media_buying': return <DollarSign size={16} className="text-[var(--text)]" />;
+      case 'clinica_compliance': return <Shield size={16} className="text-[var(--text)]" />;
+      default: return <FileText size={16} className="text-[var(--text)]" />;
     }
   };
 
@@ -453,10 +458,10 @@ export default function AdminContractsPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
+            <span className="text-[var(--danger-fg)]">{error}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -534,38 +539,42 @@ export default function AdminContractsPage() {
           
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-[var(--muted)]" />
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">جميع الأنواع</option>
-              <option value="msa">اتفاقية خدمات رئيسية</option>
-              <option value="sow">بيان العمل</option>
-              <option value="nda">اتفاقية السرية</option>
-              <option value="equipment">اتفاقية المعدات</option>
-              <option value="model_release">موافقة النموذج</option>
-              <option value="influencer">اتفاقية المؤثر</option>
-              <option value="media_buying">ملحق شراء الوسائط</option>
-              <option value="clinica_compliance">امتثال طبي</option>
-            </select>
+            <div className="min-w-[220px]">
+              <Dropdown
+                value={typeFilter}
+                onChange={(v) => setTypeFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'جميع الأنواع' },
+                  { value: 'msa', label: 'اتفاقية خدمات رئيسية' },
+                  { value: 'sow', label: 'بيان العمل' },
+                  { value: 'nda', label: 'اتفاقية السرية' },
+                  { value: 'equipment', label: 'اتفاقية المعدات' },
+                  { value: 'model_release', label: 'موافقة النموذج' },
+                  { value: 'influencer', label: 'اتفاقية المؤثر' },
+                  { value: 'media_buying', label: 'ملحق شراء الوسائط' },
+                  { value: 'clinica_compliance', label: 'امتثال طبي' },
+                ]}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-[var(--muted)]" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">جميع الحالات</option>
-              <option value="draft">مسودة</option>
-              <option value="pending_client">في انتظار العميل</option>
-              <option value="signed">موقع</option>
-              <option value="executed">منفذ</option>
-              <option value="expired">منتهي الصلاحية</option>
-              <option value="terminated">منتهي</option>
-            </select>
+            <div className="min-w-[200px]">
+              <Dropdown
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'جميع الحالات' },
+                  { value: 'draft', label: 'مسودة' },
+                  { value: 'pending_client', label: 'في انتظار العميل' },
+                  { value: 'signed', label: 'موقع' },
+                  { value: 'executed', label: 'منفذ' },
+                  { value: 'expired', label: 'منتهي الصلاحية' },
+                  { value: 'terminated', label: 'منتهي' },
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -597,7 +606,7 @@ export default function AdminContractsPage() {
                     </span>
 
                     {/* Type Badge */}
-                    <span className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-600">
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)]">
                       {getTypeText(contract.type)}
                     </span>
                   </div>
@@ -757,8 +766,8 @@ export default function AdminContractsPage() {
 
               {/* Version Snapshot Info */}
               {contract.snapshot && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-800 text-sm">
+                <div className="mt-4 p-3 bg-[var(--panel)] border border-[var(--elev)] rounded-lg">
+                  <div className="flex items-center gap-2 text-[var(--text)] text-sm">
                     <Camera size={16} />
                     <span>
                       Version Snapshot: {contract.snapshot.version} | 

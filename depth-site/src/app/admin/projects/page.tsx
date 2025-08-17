@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import Dropdown from "@/components/ui/Dropdown";
 import { toast } from 'sonner';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
@@ -366,31 +367,42 @@ export default function AdminProjectsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'text-gray-600 bg-gray-50 border-gray-200';
-      case 'quote_sent': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'approved': return 'text-green-600 bg-green-50 border-green-200';
-      case 'in_progress': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'completed': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'delivered': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'approved':
+      case 'delivered':
+        return 'text-[var(--success-fg)] bg-[var(--success-bg)] border-[var(--success-border)]';
+      case 'in_progress':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
+      case 'draft':
+      case 'quote_sent':
+      case 'completed':
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'rush': return 'text-red-600 bg-red-50';
-      case 'high': return 'text-orange-600 bg-orange-50';
-      case 'normal': return 'text-blue-600 bg-blue-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'rush':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)]';
+      case 'high':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)]';
+      case 'normal':
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)]';
     }
   };
 
   const getGuardrailColor = (status: string) => {
     switch (status) {
-      case 'safe': return 'text-green-600 bg-green-50';
-      case 'warning': return 'text-yellow-600 bg-yellow-50';
-      case 'danger': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'safe':
+        return 'text-[var(--success-fg)] bg-[var(--success-bg)]';
+      case 'warning':
+        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)]';
+      case 'danger':
+        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)]';
+      default:
+        return 'text-[var(--muted)] bg-[var(--panel)]';
     }
   };
 
@@ -454,10 +466,10 @@ export default function AdminProjectsPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
+            <span className="text-[var(--danger-fg)]">{error}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -535,32 +547,36 @@ export default function AdminProjectsPage() {
           
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-[var(--muted)]" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">الكل</option>
-              <option value="draft">مسودة</option>
-              <option value="quote_sent">عرض مُرسل</option>
-              <option value="approved">معتمد</option>
-              <option value="in_progress">قيد التنفيذ</option>
-              <option value="completed">مكتمل</option>
-            </select>
+            <div className="min-w-[180px]">
+              <Dropdown
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'الكل' },
+                  { value: 'draft', label: 'مسودة' },
+                  { value: 'quote_sent', label: 'عرض مُرسل' },
+                  { value: 'approved', label: 'معتمد' },
+                  { value: 'in_progress', label: 'قيد التنفيذ' },
+                  { value: 'completed', label: 'مكتمل' }
+                ]}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Target size={16} className="text-[var(--muted)]" />
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-            >
-              <option value="all">الكل</option>
-              <option value="normal">عادي</option>
-              <option value="high">عالي</option>
-              <option value="rush">عاجل</option>
-            </select>
+            <div className="min-w-[160px]">
+              <Dropdown
+                value={priorityFilter}
+                onChange={(v) => setPriorityFilter(String(v))}
+                options={[
+                  { value: 'all', label: 'الكل' },
+                  { value: 'normal', label: 'عادي' },
+                  { value: 'high', label: 'عالي' },
+                  { value: 'rush', label: 'عاجل' }
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -725,7 +741,7 @@ export default function AdminProjectsPage() {
                 )}
 
                 {project.guardrailStatus === 'danger' && (
-                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                  <div className="flex items-center gap-2 text-[var(--danger-fg)] text-sm">
                     <AlertTriangle size={16} />
                     <span>الهامش أقل من 45% - يجب المراجعة</span>
                   </div>
@@ -734,8 +750,8 @@ export default function AdminProjectsPage() {
 
               {/* Version Snapshot Info */}
               {project.snapshot && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-800 text-sm">
+                <div className="mt-4 p-3 bg-[var(--panel)] border border-[var(--elev)] rounded-lg">
+                  <div className="flex items-center gap-2 text-[var(--text)] text-sm">
                     <Camera size={16} />
                     <span>
                       Version Snapshot: {project.snapshot.version} | 
