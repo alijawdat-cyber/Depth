@@ -28,7 +28,8 @@ import {
   Briefcase,
   Users,
   Shield,
-  BarChart3
+  BarChart3,
+  Folder
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
@@ -83,6 +84,12 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: 'التقارير',
     icon: BarChart3,
     description: 'مؤشرات الأداء الرئيسية والتقارير التفصيلية'
+  },
+  {
+    href: '/admin/files',
+    label: 'الملفات',
+    icon: Folder,
+    description: 'إدارة الملفات ومراجعة التسليمات'
   },
   {
     href: '/admin/creators',
@@ -413,17 +420,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               </div>
 
-              {/* شعار في الوسط يعيد للموقع العام */}
-              <Link href="https://depth-agency.com/" prefetch={false} className="absolute left-1/2 -translate-x-1/2 inline-flex items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
-                <Image src={BRAND.wordmark} alt="Depth" width={96} height={20} priority />
+              {/* شعار في الوسط لسطح المكتب فقط */}
+              <Link href="https://depth-agency.com/" prefetch={false} className="hidden md:inline-flex absolute left-1/2 -translate-x-1/2 items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
+                <Image src={BRAND.wordmark} alt="Depth" width={120} height={24} priority className="logo-enhanced" />
               </Link>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 {/* زر الإشعارات */}
                 <button className="relative p-2 hover:bg-[var(--elev)] rounded-lg">
                   <Bell size={20} className="text-[var(--muted)]" />
                   <span className="absolute -top-1 -left-1 w-3 h-3 bg-red-500 rounded-full"></span>
                 </button>
+
+                {/* شعار صغير على الهاتف بجانب الإشعارات */}
+                <Link href="https://depth-agency.com/" prefetch={false} className="md:hidden inline-flex items-center opacity-90 hover:opacity-100 transition-opacity" aria-label="Depth Home">
+                  <Image src={BRAND.wordmark} alt="Depth" width={88} height={20} priority className="logo-enhanced" />
+                </Link>
 
                 {/* معلومات المستخدم المبسطة */}
                 <div className="hidden md:flex items-center gap-2 text-sm">

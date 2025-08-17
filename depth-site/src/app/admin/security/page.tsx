@@ -325,6 +325,64 @@ export default function AdminSecurityPage() {
     }
   };
 
+  // حظر المستخدم
+  const handleBanUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/admin/security/users/${userId}/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        alert('تم حظر المستخدم');
+        loadSecurityData();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'فشل في حظر المستخدم');
+      }
+    } catch (err) {
+      setError('خطأ في الاتصال');
+      console.error('Ban user error:', err);
+    }
+  };
+
+  // نسخ معرف المستخدم
+  const handleCopyUserId = (userId: string) => {
+    navigator.clipboard.writeText(userId);
+    alert('تم نسخ معرف المستخدم');
+  };
+
+  // تحميل تقرير الأمان
+  const handleDownloadSecurityReport = async () => {
+    try {
+      const response = await fetch('/api/admin/security/report');
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `security-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (err) {
+      setError('فشل في تحميل التقرير');
+      console.error('Download report error:', err);
+    }
+  };
+
+  // حفظ إعدادات الأمان
+  const handleSaveSecuritySettings = () => {
+    setShowSettingsForm(true);
+  };
+
+  // الذهاب لصفحة تفاصيل المستخدم
+  const handleViewUserDetails = (userId: string) => {
+    router.push(`/admin/users/${userId}`);
+  };
+
   // تصفية الأحداث الأمنية
   const filteredEvents = events.filter(event => {
     const matchesSearch = searchQuery === '' || 
@@ -425,6 +483,20 @@ export default function AdminSecurityPage() {
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             تحديث
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={handleDownloadSecurityReport}
+          >
+            <Download size={16} />
+            تحميل تقرير
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={handleSaveSecuritySettings}
+          >
+            <Save size={16} />
+            حفظ الإعدادات
           </Button>
           <Button onClick={() => setShowScopeForm(true)}>
             <Plus size={16} />
@@ -648,8 +720,27 @@ export default function AdminSecurityPage() {
                                   <Lock size={14} className="text-red-500" />
                                 </div>
                               )}
+                              {permission.status === 'active' && (
+                                <div title="مستخدم نشط">
+                                  <UserCheck size={14} className="text-green-500" />
+                                </div>
+                              )}
+                              {permission.status === 'suspended' && (
+                                <div title="مستخدم موقوف">
+                                  <UserX size={14} className="text-red-500" />
+                                </div>
+                              )}
                             </div>
-                            <p className="text-sm text-[var(--muted)]">{permission.userEmail}</p>
+                            <div className="flex items-center gap-2 text-sm text-[var(--muted)]">
+                              <Mail size={12} />
+                              <span>{permission.userEmail}</span>
+                              {permission.lastLogin && (
+                                <>
+                                  <Clock size={12} className="ml-2" />
+                                  <span>آخر دخول: {new Date(permission.lastLogin).toLocaleDateString('ar-EG')}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                         

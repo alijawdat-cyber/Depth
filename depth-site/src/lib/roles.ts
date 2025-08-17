@@ -24,4 +24,40 @@ export function profilePathForRole(role?: string | null): string {
   }
 }
 
+// المسار الرئيسي (لوحة التحكم) لكل دور
+export function dashboardPathForRole(role?: string | null): string {
+  const r = normalizeRole(role);
+  switch (r) {
+    case 'admin':
+      return '/admin';
+    case 'creator':
+      return '/creators';
+    case 'employee':
+      return '/employees';
+    case 'client':
+      return '/portal';
+    case 'guest':
+    default:
+      return '/portal/auth/signin';
+  }
+}
+
+// التسمية العربية للوحة لكل دور
+export function dashboardLabelForRole(role?: string | null): string {
+  const r = normalizeRole(role);
+  switch (r) {
+    case 'admin':
+      return 'لوحة الأدمن';
+    case 'creator':
+      return 'لوحة المبدع';
+    case 'employee':
+      return 'لوحة الموظف';
+    case 'client':
+      return 'لوحة العميل';
+    case 'guest':
+    default:
+      return 'حسابي';
+  }
+}
+
 
