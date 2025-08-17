@@ -184,8 +184,24 @@ export class GuardrailsEngine {
 export const guardrailsEngine = new GuardrailsEngine();
 
 // دالة مساعدة لاستخراج إعدادات الحواجز من Rate Card
-export function extractGuardrailsConfig(rateCard: { guardrails?: GuardrailsConfig } | null): GuardrailsConfig {
-  return rateCard?.guardrails || DEFAULT_GUARDRAILS;
+export function extractGuardrailsConfig(rateCard: any): GuardrailsConfig {
+  if (!rateCard) return DEFAULT_GUARDRAILS;
+  
+  // تحويل من RateCardGuardrails إلى GuardrailsConfig
+  if (rateCard.guardrails) {
+    return {
+      profitMargins: {
+        minimum: rateCard.guardrails.minMarginHardStop || DEFAULT_GUARDRAILS.profitMargins.minimum,
+        standard: rateCard.guardrails.minMarginDefault || DEFAULT_GUARDRAILS.profitMargins.standard,
+        premium: DEFAULT_GUARDRAILS.profitMargins.premium,
+        luxury: DEFAULT_GUARDRAILS.profitMargins.luxury
+      },
+      discountLimits: DEFAULT_GUARDRAILS.discountLimits,
+      priceFloors: DEFAULT_GUARDRAILS.priceFloors
+    };
+  }
+  
+  return DEFAULT_GUARDRAILS;
 }
 
 // دالة مساعدة للتحقق من صحة التعديل
