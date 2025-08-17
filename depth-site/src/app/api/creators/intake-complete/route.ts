@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
     await creatorDoc.ref.update(updateData);
 
     // مزامنة مع users collection (مصدر الحقيقة الموحد)
-    await adminDb.collection('users').doc(session.user.uid || email).update({
+    await adminDb.collection('users').doc(email).update({
       role: personalInfo.role,
       onboardingStatus: 'complete_submitted',
       fullName: personalInfo.fullName.trim(),
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
 
     // وضع علامة migration على البيانات الأساسية
     try {
-      const basicDocRef = adminDb.collection('creators_basic').doc(session.user.uid || email);
+      const basicDocRef = adminDb.collection('creators_basic').doc(email);
       const basicDoc = await basicDocRef.get();
       
       if (basicDoc.exists) {

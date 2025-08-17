@@ -1,26 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 // API للتسجيل الأولي البسيط للمبدعين
 export async function POST(req: NextRequest) {
   try {
-    // التحقق من المصادقة
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
+    // التحقق من المصادقة باستخدام session
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    const userId = decodedToken.uid;
+    const userId = session.user.email.toLowerCase();
 
     const basicData = await req.json();
 
     // هيكل البيانات البسيطة
     const basicIntakeData = {
       userId,
-      email: decodedToken.email,
+      email: session.user.email,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
       status: 'basic_completed', // مؤشر على اكتمال التسجيل البسيط
@@ -100,18 +100,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// API للحصول على البيانات الأساسية المحفوظة
+// API للحصول على البيانات الأساسية المحفوظة  
 export async function GET(req: NextRequest) {
   try {
-    // التحقق من المصادقة
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
+    // التحقق من المصادقة باستخدام session
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    const userId = decodedToken.uid;
+    const userId = session.user.email.toLowerCase();
 
     // جلب البيانات الأساسية
     const basicDoc = await adminDb.collection('creators_basic').doc(userId).get();

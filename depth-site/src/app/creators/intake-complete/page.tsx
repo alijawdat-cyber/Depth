@@ -367,11 +367,7 @@ export default function CompleteCreatorIntakePage() {
   const loadBasicDataAndPrefill = async () => {
     try {
       setBasicDataLoaded(false);
-      const response = await fetch('/api/creators/intake-basic', {
-        headers: {
-          'Authorization': `Bearer ${await (session?.user as { getIdToken?: () => Promise<string> })?.getIdToken?.()}`
-        }
-      });
+      const response = await fetch('/api/creators/intake-basic');
 
       if (response.ok) {
         const result = await response.json();
@@ -387,12 +383,12 @@ export default function CompleteCreatorIntakePage() {
               role: result.data.role,
               city: result.data.city,
               canTravel: result.data.canTravel,
-              contact: {
-                ...prev.personalInfo.contact,
-                email: session?.user?.email || '',
-                whatsapp: result.data.contact?.whatsapp || '',
-                instagram: result.data.contact?.instagram || ''
-              }
+                              contact: {
+                  ...prev.personalInfo.contact,
+                  email: session?.user?.email || '',
+                  whatsapp: result.data.contact?.whatsapp || result.data.whatsapp || '',
+                  instagram: result.data.contact?.instagram || result.data.instagram || ''
+                }
             },
             portfolio: {
               ...prev.portfolio,
@@ -486,36 +482,10 @@ export default function CompleteCreatorIntakePage() {
     }
   };
 
-  // عرض الخطوة الحالية
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 1:
-        return renderPersonalInfoStep();
-      case 2:
-        return renderSkillsMatrixStep();
-      case 3:
-        return renderVerticalsStep();
-      case 4:
-        return renderEquipmentStep();
-      case 5:
-        return renderCapacityStep();
-      case 6:
-        return renderComplianceStep();
-      case 7:
-        return renderInternalCostStep();
-      case 8:
-        return renderRateOverridesStep();
-      case 9:
-        return renderSelfAssessmentStep();
-      case 10:
-        return renderPortfolioStep();
-      default:
-        return null;
-    }
-  };
+  // This will be moved after all render functions are defined
 
   // 1) الهوية والتواصل
-  const renderPersonalInfoStep = () => {
+  function renderPersonalInfoStep() {
     // إذا جاء من النموذج البسيط ولم يطلب التحرير، اعرض ملخص للقراءة فقط
     if (hasBasicData && startStep === 2 && !editingPersonalInfo) {
       return (
@@ -730,7 +700,7 @@ export default function CompleteCreatorIntakePage() {
   );
 
   // 2) Skills Matrix - مربوط بالكتالوج
-  const renderSkillsMatrixStep = () => {
+  function renderSkillsMatrixStep() {
     // فلترة الفئات الفرعية حسب الفلتر المطبق
     const filteredSubcategories = skillsFilter.length > 0 ? 
       subcategories.filter(subcat => {
@@ -856,7 +826,7 @@ export default function CompleteCreatorIntakePage() {
   };
 
   // 3) المحاور المفضلة - مربوط بقاعدة البيانات
-  const renderVerticalsStep = () => {
+  function renderVerticalsStep() {
     // فلترة المحاور حسب الفلتر المطبق
     const filteredVerticals = verticalsFilter.length > 0 ? 
       verticals.filter(vertical => {
@@ -968,7 +938,17 @@ export default function CompleteCreatorIntakePage() {
     );
   };
 
-  const renderEquipmentStep = () => {
+  function renderEquipmentStep() {
+    // خريطة تحويل من catalog categories إلى equipment keys
+    const categoryMapping: Record<string, keyof typeof formData.equipment> = {
+      'camera': 'cameras',
+      'lens': 'lenses', 
+      'lighting': 'lighting',
+      'audio': 'audio',
+      'accessory': 'accessories',
+      'special_setup': 'specialSetups'
+    };
+
     // تجميع المعدات حسب الفئة من الكتالوج
     const categorizedEquipment = equipmentCatalog.reduce((acc: any, item: any) => {
       const categoryName = item.category?.nameAr || 'أخرى';
@@ -1220,7 +1200,7 @@ export default function CompleteCreatorIntakePage() {
     );
   };
 
-  const renderCapacityStep = () => {
+  function renderCapacityStep() {
     const daysOfWeek = [
       { id: 'sunday', nameAr: 'الأحد' },
       { id: 'monday', nameAr: 'الإثنين' },
@@ -1464,7 +1444,8 @@ export default function CompleteCreatorIntakePage() {
     );
   };
 
-  const renderComplianceStep = () => (
+  function renderComplianceStep() {
+    return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الامتثال والموافقات</h2>
@@ -1536,9 +1517,11 @@ export default function CompleteCreatorIntakePage() {
         </div>
       </div>
     </div>
-  );
+    );
+  }
 
-  const renderInternalCostStep = () => (
+  function renderInternalCostStep() {
+    return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الكلفة الداخلية</h2>
@@ -1595,9 +1578,11 @@ export default function CompleteCreatorIntakePage() {
         </div>
       </div>
     </div>
-  );
+    );
+  }
 
-  const renderRateOverridesStep = () => (
+  function renderRateOverridesStep() {
+    return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-[var(--text)] mb-2">التسعير الفردي</h2>
@@ -1614,9 +1599,11 @@ export default function CompleteCreatorIntakePage() {
         </p>
       </div>
     </div>
-  );
+    );
+  }
 
-  const renderSelfAssessmentStep = () => (
+  function renderSelfAssessmentStep() {
+    return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-[var(--text)] mb-2">الجودة والانضباط</h2>
@@ -1675,9 +1662,11 @@ export default function CompleteCreatorIntakePage() {
         </div>
       </div>
     </div>
-  );
+    );
+  }
 
-  const renderPortfolioStep = () => (
+  function renderPortfolioStep() {
+    return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-[var(--text)] mb-2">المرفقات والمعرض</h2>
@@ -1731,7 +1720,36 @@ export default function CompleteCreatorIntakePage() {
         </div>
       </div>
     </div>
-  );
+    );
+  }
+
+  // عرض الخطوة الحالية
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return renderPersonalInfoStep();
+      case 2:
+        return renderSkillsMatrixStep();
+      case 3:
+        return renderVerticalsStep();
+      case 4:
+        return renderEquipmentStep();
+      case 5:
+        return renderCapacityStep();
+      case 6:
+        return renderComplianceStep();
+      case 7:
+        return renderInternalCostStep();
+      case 8:
+        return renderRateOverridesStep();
+      case 9:
+        return renderSelfAssessmentStep();
+      case 10:
+        return renderPortfolioStep();
+      default:
+        return null;
+    }
+  };
 
   if (loading) {
     return (
@@ -1759,116 +1777,117 @@ export default function CompleteCreatorIntakePage() {
   return (
     <div className="p-6">
       <div className="max-w-4xl mx-auto">
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-[var(--text)]">نموذج المبدع الكامل</h1>
-              <div className="text-sm text-[var(--muted)]">
-                الخطوة {currentStep} من {STEPS.length}
-              </div>
-            </div>
-            
-            {/* Welcome Message */}
-            {isWelcome && (
-              <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-4">
-                <CheckCircle size={20} className="text-[var(--success-fg)] inline mr-2" />
-                <span className="text-[var(--success-fg)]">🎉 مرحباً بك! تم إنشاء حسابك بنجاح.</span>
-              </div>
-            )}
-            
-            {/* Error Message */}
-            {error && (
-              <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg p-4 mb-4">
-                <AlertCircle size={20} className="text-[var(--danger-fg)] inline mr-2" />
-                <span className="text-[var(--danger-fg)]">{error}</span>
-              </div>
-            )}
-            
-            <div className="w-full bg-[var(--border)] rounded-full h-2">
-              <div 
-                className="bg-[var(--accent-500)] h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
-              ></div>
-            </div>
-            
-            <div className="flex justify-between mt-2 text-xs text-[var(--muted)]">
-              {STEPS.map((step, index) => (
-                <div 
-                  key={step.id}
-                  className={`text-center ${currentStep >= step.id ? 'text-[var(--accent-500)]' : ''}`}
-                  style={{ flex: `1 1 ${100 / STEPS.length}%` }}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
-                    currentStep >= step.id 
-                      ? 'bg-[var(--accent-500)] text-white' 
-                      : 'bg-[var(--border)] text-[var(--muted)]'
-                  }`}>
-                    {currentStep > step.id ? <CheckCircle size={16} /> : (index + 1)}
-                  </div>
-                  <div className="hidden md:block">{step.title}</div>
-                </div>
-              ))}
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold text-[var(--text)]">نموذج المبدع الكامل</h1>
+            <div className="text-sm text-[var(--muted)]">
+              الخطوة {currentStep} من {STEPS.length}
             </div>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg">
-              <div className="flex items-center gap-2 text-[var(--danger-fg)]">
-                <AlertCircle size={20} />
-                <span className="font-medium">{error}</span>
-              </div>
+          
+          {/* Welcome Message */}
+          {isWelcome && (
+            <div className="bg-[var(--success-bg)] border border-[var(--success-border)] rounded-lg p-4 mb-4">
+              <CheckCircle size={20} className="text-[var(--success-fg)] inline mr-2" />
+              <span className="text-[var(--success-fg)]">🎉 مرحباً بك! تم إنشاء حسابك بنجاح.</span>
             </div>
           )}
-
-          {/* Current Step Content */}
-          <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-8 mb-8">
-            {renderCurrentStep()}
+          
+          {/* Error Message */}
+          {error && (
+            <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg p-4 mb-4">
+              <AlertCircle size={20} className="text-[var(--danger-fg)] inline mr-2" />
+              <span className="text-[var(--danger-fg)]">{error}</span>
+            </div>
+          )}
+          
+          <div className="w-full bg-[var(--border)] rounded-full h-2">
+            <div 
+              className="bg-[var(--accent-500)] h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+            ></div>
           </div>
+          
+          <div className="flex justify-between mt-2 text-xs text-[var(--muted)]">
+            {STEPS.map((step, index) => (
+              <div 
+                key={step.id}
+                className={`text-center ${currentStep >= step.id ? 'text-[var(--accent-500)]' : ''}`}
+                style={{ flex: `1 1 ${100 / STEPS.length}%` }}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
+                  currentStep >= step.id 
+                    ? 'bg-[var(--accent-500)] text-white' 
+                    : 'bg-[var(--border)] text-[var(--muted)]'
+                }`}>
+                  {currentStep > step.id ? <CheckCircle size={16} /> : (index + 1)}
+                </div>
+                <div className="hidden md:block">{step.title}</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg">
+            <div className="flex items-center gap-2 text-[var(--danger-fg)]">
+              <AlertCircle size={20} />
+              <span className="font-medium">{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Current Step Content */}
+        <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-8 mb-8">
+          {renderCurrentStep()}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between">
+          <Button
+            variant="ghost"
+            onClick={prevStep}
+            disabled={currentStep === 1}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft size={20} />
+            السابق
+          </Button>
+
+          {currentStep === STEPS.length ? (
             <Button
-              variant="ghost"
-              onClick={prevStep}
-              disabled={currentStep === 1}
+              variant="primary"
+              onClick={handleSubmit}
+              disabled={loading}
               className="flex items-center gap-2"
             >
-              <ArrowLeft size={20} />
-              السابق
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  جاري الإرسال...
+                </>
+              ) : (
+                <>
+                  إرسال النموذج
+                  <CheckCircle size={20} />
+                </>
+              )}
             </Button>
-
-            {currentStep === STEPS.length ? (
-              <Button
-                variant="primary"
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    جاري الإرسال...
-                  </>
-                ) : (
-                  <>
-                    إرسال النموذج
-                    <CheckCircle size={20} />
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="primary"
-                onClick={nextStep}
-                className="flex items-center gap-2"
-              >
-                التالي
-                <ArrowRight size={20} />
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button
+              variant="primary"
+              onClick={nextStep}
+              className="flex items-center gap-2"
+            >
+              التالي
+              <ArrowRight size={20} />
+            </Button>
+          )}
         </div>
       </div>
     </div>
   );
+}
+}

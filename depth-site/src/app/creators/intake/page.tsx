@@ -98,12 +98,10 @@ export default function CreatorIntakePage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const token = await (session?.user as { getIdToken?: () => Promise<string> })?.getIdToken?.();
       const response = await fetch('/api/creators/intake-basic', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
