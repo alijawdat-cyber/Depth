@@ -64,10 +64,12 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // فحص Guardrails - حسب الوثائق (هامش ≥ 45%)
-    const projectMargin = projectData.margin || 0;
-    const minMarginHardStop = 45; // حسب الوثائق
+    // فحص Guardrails - وفق Rate Card
+    const activeRateCard = await getActiveRateCard();
+    const minMarginHardStop = Math.round((activeRateCard?.guardrails?.minMarginHardStop ?? 0.45) * 100);
+    const minMarginDefault = Math.round((activeRateCard?.guardrails?.minMarginDefault ?? 0.50) * 100);
 
+    const projectMargin = projectData.margin || 0;
     if (projectMargin < minMarginHardStop) {
       return NextResponse.json({ 
         success: false, 
@@ -95,8 +97,6 @@ export async function POST(
       }
     }
 
-    // جلب الـ Rate Card الفعّالة لمعرفة سياسة FX
-    const activeRateCard = await getActiveRateCard();
     const fxRate = getCurrentFXRate(activeRateCard?.fxPolicy || undefined);
 
     // إنشاء FX Snapshot للإجمالي بالدينار

@@ -94,7 +94,30 @@ export default function RateCardEditorPage() {
 
   useEffect(() => {
     loadRateCardData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // دالة إنشاء Rate Card جديد
+  const createNewRateCard = () => {
+    const newRateCard: RateCardData = {
+      versionId: `draft-${new Date().toISOString().split('T')[0]}-${Math.random().toString(36).substr(2, 5)}`,
+      status: 'draft',
+      effectiveFrom: new Date().toISOString().split('T')[0],
+      currency: 'IQD',
+      basePricesIQD: {}, // بداية فارغة
+      baseRangesIQD: {},
+      modifiers: {
+        rushPct: 0.25,
+        creatorTierPct: {}
+      },
+      guardrails: {
+        minMarginDefault: DEFAULT_GUARDRAILS.profitMargins.standard,
+        minMarginHardStop: DEFAULT_GUARDRAILS.profitMargins.minimum
+      },
+      roundingIQD: 1000
+    };
+    setRateCard(newRateCard);
+    setGuardrailsConfig(DEFAULT_GUARDRAILS);
+  };
 
   const loadRateCardData = async () => {
     try {
@@ -127,15 +150,15 @@ export default function RateCardEditorPage() {
               setGuardrailsConfig(rateData.rateCard.guardrails);
             }
           } else {
-            setRateCard(null);
+            createNewRateCard();
           }
         } else {
-          // لا يوجد جدول أسعار نشط حالياً → نسمح بعرض الفئات وإدخال الأسعار من الصفر
-          setRateCard(null);
+          // لا يوجد جدول أسعار نشط حالياً → إنشاء واحد جديد
+          createNewRateCard();
         }
       } catch {
-        // في حال فشل الاتصال، نستمر بعرض الفئات فقط
-        setRateCard(null);
+        // في حال فشل الاتصال، إنشاء Rate Card جديد
+        createNewRateCard();
       }
 
     } catch (err) {
@@ -148,7 +171,10 @@ export default function RateCardEditorPage() {
 
 
   const handleSaveRateCard = async (isDraft = true) => {
-    if (!rateCard) return;
+    if (!rateCard) {
+      setError('لا يمكن الحفظ: لم يتم إنشاء جدول أسعار بعد');
+      return;
+    }
 
     try {
       setSaving(true);
@@ -182,7 +208,12 @@ export default function RateCardEditorPage() {
 
 
   const handleUpdatePrice = (subcategoryId: string, newPrice: number) => {
-    if (!rateCard) return;
+    if (!rateCard) {
+      // إذا لم يكن هنالك رَيت كارد، أنشئ واحد جديد
+      createNewRateCard();
+      // بعد الإنشاء، سوف يحدث re-render وسيتم استدعاء هذه الدالة مرة أخرى
+      return;
+    }
     const step = 1000;
     const normalized = Math.max(0, Math.round(newPrice / step) * step);
     setRateCard({
@@ -195,35 +226,20 @@ export default function RateCardEditorPage() {
   };
 
   // تحويل البيانات إلى صفوف عرض:
-  // - إذا موجود RateCard: استخدم basePricesIQD
-  // - إذا ما موجود: اعرض جميع الفئات بسعر 0 حتى يدخل الأدمن الأسعار
-  const priceItems: SubcategoryPriceItem[] = ((): SubcategoryPriceItem[] => {
-    const baseMap = rateCard?.basePricesIQD || {};
-    if (Object.keys(baseMap).length > 0) {
-      return Object.entries(baseMap).map(([subcategoryId, basePrice]) => {
-        const subcategory = subcategories.find(sub => sub.id === subcategoryId);
-        const priceFloor = rateCard?.baseRangesIQD?.[subcategoryId]?.[0];
-        return {
-          id: subcategoryId,
-          subcategoryId,
-          nameAr: subcategory?.nameAr || subcategoryId,
-          nameEn: subcategory?.nameEn,
-          categoryId: subcategory?.categoryId || 'غير محدد',
-          basePrice,
-          priceFloor
-        };
-      });
-    }
-    // لا يوجد أسعار حالية → نعرض كل الفئات بسعر 0
-    return subcategories.map((sub) => ({
+  // نعرض جميع الفئات الفرعية مع أسعارها (أو 0 كافتراضي)
+  const priceItems: SubcategoryPriceItem[] = subcategories.map((sub) => {
+    const basePrice = rateCard?.basePricesIQD?.[sub.id] ?? 0; // افتراضي 0 إذا لم يكن موجود
+    const priceFloor = rateCard?.baseRangesIQD?.[sub.id]?.[0];
+    return {
       id: sub.id,
       subcategoryId: sub.id,
       nameAr: sub.nameAr,
       nameEn: sub.nameEn,
       categoryId: sub.categoryId,
-      basePrice: 0
-    }));
-  })();
+      basePrice,
+      priceFloor
+    };
+  });
 
   const filteredItems = priceItems.filter(item => {
     const matchesCategory = categoryFilter === 'all' || item.categoryId === categoryFilter;

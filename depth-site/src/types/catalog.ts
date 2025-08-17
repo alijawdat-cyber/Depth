@@ -74,6 +74,12 @@ export interface RateCard {
   fxPolicy?: RateCardFXPolicy;
   createdAt?: string;
   updatedAt?: string;
+  // Optional: تكاليف داخلية للمبدعين لكل فئة فرعية (تستخدم للتقييم/الهوامش)
+  creatorCosts?: Record<string, {
+    tier?: 'T1' | 'T2' | 'T3';
+    costs: Record<string, number>;
+    updatedAt?: string;
+  }>;
 }
 
 // Light quote types for preview/create

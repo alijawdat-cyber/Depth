@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { getActiveRateCard } from '@/lib/catalog/read';
+import { calculateQuotePricing } from '@/lib/pricing/engine';
+import { getCurrentFXRate, calculateUSDPreview } from '@/lib/pricing/fx';
 
 // POST /api/admin/projects/[id]/deliverables
 // إضافة تسليمة جديدة للمشروع مع حساب التسعير وفحص Guardrails
@@ -35,7 +38,8 @@ export async function POST(
       processing,
       isRush,
       locationZone,
-      assignedTo
+      assignedTo,
+      estimatedCostIQD
     } = body;
 
     // التحقق من صحة البيانات
@@ -68,86 +72,55 @@ export async function POST(
 
     const projectData = projectDoc.data()!;
 
-    // جلب السعر الأساسي من Rate Card
-    let basePriceIQD = 0;
-    let basePriceUSD = 0;
-    let subcategoryNameAr = '';
+    // جلب Rate Card النشط كمصدر الحقيقة الوحيد
+    const rateCard = await getActiveRateCard();
+    if (!rateCard) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'لا يوجد جدول أسعار نشط' 
+      }, { status: 500 });
+    }
 
-    try {
-      // جلب من Rate Card (مبسط - يحتاج تطوير أكثر)
-      const rateCardQuery = await adminDb
-        .collection('rate_card')
-        .where('deliverable', '==', subcategory)
-        .where('vertical', '==', projectData.vertical || 'fashion')
-        .limit(1)
-        .get();
-
-      if (!rateCardQuery.empty) {
-        const rateData = rateCardQuery.docs[0].data();
-        basePriceIQD = rateData.basePriceIQD || 20000; // افتراضي
-        basePriceUSD = rateData.basePriceUSD || 15;
-        subcategoryNameAr = rateData.nameAr || subcategory;
-      } else {
-        // أسعار افتراضية حسب النوع
-        const defaultPrices = getDefaultPrices(subcategory);
-        basePriceIQD = defaultPrices.iqd;
-        basePriceUSD = defaultPrices.usd;
-        subcategoryNameAr = defaultPrices.nameAr;
+    // بناء سطر تسعير موحّد واستخدام محرك التسعير
+    const lineInput = [{
+      subcategoryId: subcategory,
+      qty: quantity,
+      vertical: projectData.vertical || 'fashion',
+      processing,
+      conditions: {
+        rush: Boolean(isRush),
+        locationZone: locationZone || undefined
       }
-    } catch (error) {
-      console.warn('Failed to fetch rate card, using defaults:', error);
-      const defaultPrices = getDefaultPrices(subcategory);
-      basePriceIQD = defaultPrices.iqd;
-      basePriceUSD = defaultPrices.usd;
-      subcategoryNameAr = defaultPrices.nameAr;
-    }
+    }];
 
-    // تطبيق معاملات المعالجة (Processing Modifiers)
-    let processingMultiplier = 1;
-    switch (processing) {
-      case 'raw_only':
-        processingMultiplier = 0.9; // -10%
-        break;
-      case 'raw_basic':
-        processingMultiplier = 1.0; // 0%
-        break;
-      case 'full_retouch':
-        processingMultiplier = 1.35; // +35%
-        break;
-    }
+    // تقدير التكلفة لكل وحدة (اختياري) — إذا لم تُمرر، نعتمد 55% كافتراض مرحلي
+    const unitEstimatedCost = typeof estimatedCostIQD === 'number' && estimatedCostIQD >= 0
+      ? estimatedCostIQD
+      : undefined;
+    const estimatedCosts = unitEstimatedCost !== undefined
+      ? { [subcategory]: unitEstimatedCost }
+      : { [subcategory]: 0.55 * (rateCard.basePricesIQD?.[subcategory] || 0) };
 
-    let pricePerUnitIQD = basePriceIQD * processingMultiplier;
-    let pricePerUnitUSD = basePriceUSD * processingMultiplier;
+    const pricing = calculateQuotePricing(lineInput as any, { rateCard, estimatedCosts });
+    const result = pricing.lines[0];
 
-    // تطبيق Rush Surcharge (حسب الوثائق)
-    if (isRush) {
-      pricePerUnitIQD *= 1.35; // +35%
-      pricePerUnitUSD *= 1.35;
-    }
+    // اسم عربي للفئة الفرعية (إن وُجد في المشروع الحالي)
+    let subcategoryNameAr = subcategory;
+    try {
+      const subSnap = await adminDb.collection('catalog_subcategories').doc(subcategory).get();
+      if (subSnap.exists) {
+        subcategoryNameAr = (subSnap.data()?.nameAr as string) || subcategory;
+      }
+    } catch {}
 
-    // تطبيق رسوم الموقع (Location Zones)
-    let locationFeeIQD = 0;
-    const zoneMap: Record<string, number> = {
-      baghdad_center: 5000,
-      baghdad_outer: 10000,
-      provinces_near: 25000,
-      provinces_far: 50000
-    };
-    if (locationZone && zoneMap[locationZone]) {
-      locationFeeIQD = zoneMap[locationZone];
-    }
+    // FX حسب سياسة الريت كارد
+    const fxRate = getCurrentFXRate(rateCard.fxPolicy);
+    const totalUSD = calculateUSDPreview(result.lineTotalIQD, fxRate);
 
-    // إضافة رسوم الموقع للسعر الإجمالي (ليس لكل وحدة)
-    const totalIQD = (pricePerUnitIQD * quantity) + locationFeeIQD;
-    const totalUSD = (pricePerUnitUSD * quantity) + (locationFeeIQD / 1300); // تحويل تقريبي
-
-    // تقريب الأسعار (حسب الوثائق - أقرب 250 د.ع)
-    const roundedTotalIQD = Math.round(totalIQD / 250) * 250;
-    const roundedTotalUSD = Math.round(totalUSD * 100) / 100;
-
-    // حساب الهامش (مبسط)
-    const estimatedCostIQD = roundedTotalIQD * 0.55; // افتراض تكلفة 55%
-    const margin = Math.round(((roundedTotalIQD - estimatedCostIQD) / roundedTotalIQD) * 100);
+    // الهامش وفق الحواجز (إن توفر تقدير التكلفة)
+    const lineMarginPct = pricing.guardrails?.margin !== undefined
+      ? Math.round((pricing.guardrails.margin || 0) * 100)
+      : undefined;
 
     // جلب اسم المُسند إليه
     let assignedToName = '';
@@ -167,7 +140,7 @@ export async function POST(
       }
     }
 
-    // إنشاء التسليمة الجديدة
+    // إنشاء التسليمة الجديدة (مستندة إلى محرك التسعير)
     const newDeliverable = {
       id: `del_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       subcategory,
@@ -177,44 +150,50 @@ export async function POST(
       conditions: {
         isRush,
         locationZone: locationZone || null,
-        speedBonus: false // سيتم تحديثه لاحقاً حسب الأداء
+        speedBonus: false
       },
       assignedTo: assignedTo || null,
       assignedToName,
-      pricePerUnitIQD: Math.round(pricePerUnitIQD),
-      pricePerUnitUSD: Math.round(pricePerUnitUSD * 100) / 100,
-      totalIQD: roundedTotalIQD,
-      totalUSD: roundedTotalUSD,
-      margin,
+      pricePerUnitIQD: result.unitPriceIQD,
+      pricePerUnitUSD: Math.round((result.unitPriceIQD / fxRate) * 100) / 100,
+      totalIQD: result.lineTotalIQD,
+      totalUSD: totalUSD,
+      // حفظ تكلفة تقديرية لكل وحدة لكي نحسب الهامش على مستوى المشروع لاحقاً
+      unitEstimatedCostIQD: estimatedCosts[subcategory] || 0,
+      margin: lineMarginPct,
       createdAt: new Date().toISOString(),
       createdBy: session.user.email
-    };
+    } as Record<string, unknown>;
 
     // تحديث المشروع بالتسليمة الجديدة
     const currentDeliverables = projectData.deliverables || [];
     const updatedDeliverables = [...currentDeliverables, newDeliverable];
 
-    // حساب الإجماليات الجديدة للمشروع
+    // حساب الإجماليات الجديدة للمشروع + الهامش وفق الحواجز
     let projectTotalIQD = 0;
     let projectTotalUSD = 0;
-    let totalMarginSum = 0;
+    let projectEstimatedCostTotalIQD = 0;
 
     updatedDeliverables.forEach((del: any) => {
+      const qty = Number(del.quantity) || 0;
+      const unitCost = Number(del.unitEstimatedCostIQD) || 0;
       projectTotalIQD += del.totalIQD || 0;
       projectTotalUSD += del.totalUSD || 0;
-      totalMarginSum += del.margin || 0;
+      projectEstimatedCostTotalIQD += unitCost * qty;
     });
 
-    const projectAverageMargin = updatedDeliverables.length > 0 
-      ? Math.round(totalMarginSum / updatedDeliverables.length) 
-      : 0;
+    let projectMarginPct: number | null = null;
+    if (projectTotalIQD > 0 && projectEstimatedCostTotalIQD > 0) {
+      projectMarginPct = Math.round(((projectTotalIQD - projectEstimatedCostTotalIQD) / projectTotalIQD) * 100);
+    }
 
-    // تحديد حالة Guardrail
+    // تحديد حالة Guardrail بناءً على Rate Card
+    const minHard = Math.round((rateCard.guardrails?.minMarginHardStop ?? 0.45) * 100);
+    const minDefault = Math.round((rateCard.guardrails?.minMarginDefault ?? 0.50) * 100);
     let guardrailStatus: 'safe' | 'warning' | 'danger' = 'safe';
-    if (projectAverageMargin < 45) {
-      guardrailStatus = 'danger';
-    } else if (projectAverageMargin < 50) {
-      guardrailStatus = 'warning';
+    if (projectMarginPct !== null) {
+      if (projectMarginPct < minHard) guardrailStatus = 'danger';
+      else if (projectMarginPct < minDefault) guardrailStatus = 'warning';
     }
 
     // تحديث المشروع في قاعدة البيانات
@@ -231,7 +210,8 @@ export async function POST(
         deliverables: updatedDeliverables,
         totalIQD: projectTotalIQD,
         totalUSD: projectTotalUSD,
-        margin: projectAverageMargin,
+        estimatedCostTotalIQD: projectEstimatedCostTotalIQD,
+        margin: projectMarginPct,
         guardrailStatus,
         updatedAt: new Date().toISOString(),
         updatedBy: session.user.email,
@@ -243,7 +223,8 @@ export async function POST(
       deliverables: updatedDeliverables,
       totalIQD: projectTotalIQD,
       totalUSD: projectTotalUSD,
-      margin: projectAverageMargin,
+      estimatedCostTotalIQD: projectEstimatedCostTotalIQD,
+      margin: projectMarginPct,
       guardrailStatus
     });
 
@@ -254,20 +235,4 @@ export async function POST(
       error: 'خطأ في إضافة التسليمة' 
     }, { status: 500 });
   }
-}
-
-// دالة للحصول على الأسعار الافتراضية
-function getDefaultPrices(subcategory: string) {
-  const defaults: { [key: string]: { iqd: number; usd: number; nameAr: string } } = {
-    'photo_flat_lay': { iqd: 19500, usd: 15, nameAr: 'صورة — فلات لي' },
-    'photo_lifestyle': { iqd: 23400, usd: 18, nameAr: 'صورة — لايف ستايل' },
-    'photo_on_model': { iqd: 23400, usd: 18, nameAr: 'صورة — أون مودل' },
-    'photo_ghost': { iqd: 26000, usd: 20, nameAr: 'صورة — مانيكان شبح' },
-    'reel_try_on': { iqd: 156000, usd: 120, nameAr: 'ريل — تراي أون' },
-    'reel_bts': { iqd: 143000, usd: 110, nameAr: 'ريل — كواليس' },
-    'design_carousel': { iqd: 58500, usd: 45, nameAr: 'تصميم — كاروسيل' },
-    'design_story_cover': { iqd: 32500, usd: 25, nameAr: 'تصميم — غلاف ستوري' }
-  };
-
-  return defaults[subcategory] || { iqd: 20000, usd: 15, nameAr: subcategory };
 }

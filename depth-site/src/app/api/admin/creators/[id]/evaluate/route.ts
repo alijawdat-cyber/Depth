@@ -244,26 +244,26 @@ async function updateRateCardWithCreatorCosts(creatorId: string, tier: 'T1' | 'T
       return; // No internal costs to add
     }
 
-    // Get active rate card
+    // Get active pricing rate card (single source of truth)
     const rateCardSnapshot = await adminDb
-      .collection('rate_cards')
+      .collection('pricing_rate_card')
       .where('status', '==', 'active')
       .limit(1)
       .get();
 
     if (rateCardSnapshot.empty) {
-      console.warn('No active rate card found');
+      console.warn('No active pricing_rate_card found');
       return;
     }
 
     const rateCardDoc = rateCardSnapshot.docs[0];
-    const rateCardData = rateCardDoc.data();
+    const rateCardData = rateCardDoc.data() as Record<string, any>;
 
-    // Update creator costs in rate card
+    // Update creator costs in pricing_rate_card
     const updatedRateCard = {
       ...rateCardData,
       creatorCosts: {
-        ...rateCardData.creatorCosts,
+        ...(rateCardData.creatorCosts || {}),
         [creatorId]: {
           tier,
           costs: internalCosts,
@@ -273,12 +273,12 @@ async function updateRateCardWithCreatorCosts(creatorId: string, tier: 'T1' | 'T
       updatedAt: new Date().toISOString()
     };
 
-    await adminDb.collection('rate_cards').doc(rateCardDoc.id).update(updatedRateCard);
+    await adminDb.collection('pricing_rate_card').doc(rateCardDoc.id).set(updatedRateCard, { merge: true });
 
     // Log the rate card update
     await adminDb.collection('audit_log').add({
-      action: 'rate_card_creator_added',
-      entityType: 'rate_card',
+      action: 'pricing_rate_card_creator_added',
+      entityType: 'pricing_rate_card',
       entityId: rateCardDoc.id,
       userId: 'system',
       timestamp: new Date().toISOString(),
