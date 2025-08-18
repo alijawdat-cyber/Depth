@@ -231,10 +231,12 @@ export async function GET(req: Request) {
       pending: statusCounts.pending,
       suspended: statusCounts.suspended,
       banned: statusCounts.banned,
-      admins: roleCounts.admins,
-      employees: roleCounts.employees,
-      creators: roleCounts.creators,
-      clients: roleCounts.clients,
+      byRole: {
+        admins: roleCounts.admins,
+        employees: roleCounts.employees,
+        creators: roleCounts.creators,
+        clients: roleCounts.clients,
+      },
       verifiedUsers,
       twoFactorUsers,
       newUsersThisMonth
