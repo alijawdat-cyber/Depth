@@ -65,13 +65,28 @@ export async function POST(request: NextRequest) {
     // حفظ الموظف في employees collection
     const employeeRef = await adminDb.collection('employees').add(employeeData);
 
-    // حفظ في users collection للتوحيد
-    await adminDb.collection('users').doc(employeeRef.id).set({
-      ...employeeData,
-      role: 'employee',
-      employeeRole: inviteData.role, // الدور الفرعي
-      profileId: employeeRef.id
-    });
+    // ✅ حفظ في users collection للتوحيد
+    try {
+      await adminDb.collection('users').add({
+        name: inviteData.name,
+        email: inviteData.email,
+        role: 'employee',
+        status: 'active',
+        profileId: employeeRef.id, // ربط مع الملف الشخصي
+        source: 'employee-invite',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        emailVerified: true, // الموظفون معتمدون من الإدارة
+        twoFactorEnabled: false,
+        // نسخ بعض البيانات المهمة
+        position: inviteData.position || inviteData.role,
+        department: inviteData.department,
+        permissions: inviteData.permissions || [],
+      });
+    } catch (usersError) {
+      console.warn('[employee.accept-invite] Failed to add employee to users collection:', usersError);
+      // لا نفشل التسجيل إذا فشل التوحيد
+    }
 
     // تحديث حالة الدعوة لمقبولة
     await adminDb.collection('employee_invites').doc(inviteDoc.id).update({

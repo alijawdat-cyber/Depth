@@ -38,8 +38,17 @@ export async function GET(
     }
 
     // التحقق من صلاحيات الإدارة
-    const user = await adminDb.collection('users').doc(session.user.email).get();
-    const isAdmin = user.exists && user.data()?.role === 'admin';
+    let isAdmin = false;
+    
+    // البحث في users collection الموحدة أولاً
+    const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
+    if (!userDoc.empty) {
+      isAdmin = userDoc.docs[0].data()?.role === 'admin';
+    } else {
+      // احتياطي: البحث في admins collection
+      const adminDoc = await adminDb.collection('admins').doc(session.user.email).get();
+      isAdmin = adminDoc.exists;
+    }
     
     const { id: creatorId } = await params;
 
@@ -114,8 +123,17 @@ export async function PUT(
     const validatedData = UpdateAvailabilitySchema.parse(body);
 
     // التحقق من صلاحيات الإدارة أو الملكية
-    const user = await adminDb.collection('users').doc(session.user.email).get();
-    const isAdmin = user.exists && user.data()?.role === 'admin';
+    let isAdmin = false;
+    
+    // البحث في users collection الموحدة أولاً
+    const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
+    if (!userDoc.empty) {
+      isAdmin = userDoc.docs[0].data()?.role === 'admin';
+    } else {
+      // احتياطي: البحث في admins collection
+      const adminDoc = await adminDb.collection('admins').doc(session.user.email).get();
+      isAdmin = adminDoc.exists;
+    }
     
     if (!isAdmin) {
       const creatorDoc = await adminDb.collection('creators').doc(creatorId).get();

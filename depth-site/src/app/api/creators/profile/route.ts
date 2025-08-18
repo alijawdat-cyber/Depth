@@ -141,13 +141,33 @@ export async function PUT(req: Request) {
     // sanitize
     delete updates.email; delete updates.status; delete updates.role; delete updates.createdAt; delete updates.updatedAt;
     updates.updatedAt = new Date();
-    const snap = await adminDb.collection('creators').where('email', '==', session.user.email).limit(1).get();
-    if (snap.empty) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+    
+    // البحث في مجموعة users الموحدة أولاً
+    const userSnap = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
+    
+    if (!userSnap.empty) {
+      // تحديث في مجموعة users الموحدة
+      const userDoc = userSnap.docs[0];
+      await userDoc.ref.update(updates);
+      
+      // تحديث في creators أيضاً إذا وجدت (للتوافق العكسي)
+      const creatorSnap = await adminDb.collection('creators').where('email', '==', session.user.email).limit(1).get();
+      if (!creatorSnap.empty) {
+        const creatorDoc = creatorSnap.docs[0];
+        await creatorDoc.ref.update(updates);
+      }
+      
+      return NextResponse.json({ success: true, message: 'تم الحفظ' });
+    } else {
+      // احتياطي: البحث في مجموعة creators القديمة
+      const snap = await adminDb.collection('creators').where('email', '==', session.user.email).limit(1).get();
+      if (snap.empty) {
+        return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      }
+      const doc = snap.docs[0];
+      await doc.ref.update(updates);
+      return NextResponse.json({ success: true, message: 'تم الحفظ' });
     }
-    const doc = snap.docs[0];
-    await doc.ref.update(updates);
-    return NextResponse.json({ success: true, message: 'تم الحفظ' });
   } catch (error) {
     console.error('Failed to update creator profile:', error);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });

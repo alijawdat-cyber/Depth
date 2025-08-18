@@ -109,6 +109,29 @@ export async function POST(req: NextRequest) {
     // حفظ في مجموعة creators المتخصصة
     const creatorDocRef = await adminDb.collection('creators').add(creatorData);
 
+    // ✅ حفظ في users collection للتوحيد
+    try {
+      await adminDb.collection('users').add({
+        name: fullName,
+        email: email,
+        role: 'creator',
+        status: 'onboarding_started',
+        profileId: creatorDocRef.id, // ربط مع الملف الشخصي
+        source: 'creator-account-creation',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        emailVerified: false,
+        twoFactorEnabled: false,
+        // نسخ بعض البيانات المهمة
+        phone: phone,
+        uid: userRecord.uid,
+        specialization: 'photographer', // مؤقت
+      });
+    } catch (usersError) {
+      console.warn('[creator.create-account] Failed to add creator to users collection:', usersError);
+      // لا نفشل التسجيل إذا فشل التوحيد
+    }
+
     // حفظ في مجموعة users الموحدة
     const userDocRef = await adminDb.collection('users').add({
       name: fullName,
