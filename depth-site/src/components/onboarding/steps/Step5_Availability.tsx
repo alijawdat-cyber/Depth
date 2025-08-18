@@ -73,6 +73,14 @@ export default function Step5_Availability() {
                    option.value === 'part-time' ? 25 : 
                    option.value === 'weekends' ? 16 : 20;
       updateAvailability({ weeklyHours: hours });
+      
+      // إضافة أيام افتراضية إذا لم تكن موجودة
+      if (!availability.preferredWorkdays || availability.preferredWorkdays.length === 0) {
+        const defaultWorkdays = option.value === 'weekends' ? ['friday', 'saturday'] :
+                               option.value === 'full-time' ? ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'] :
+                               ['sunday', 'monday', 'tuesday'];
+        updateAvailability({ preferredWorkdays: defaultWorkdays });
+      }
     }
   };
 
@@ -199,6 +207,17 @@ export default function Step5_Availability() {
                 .filter(day => day.available)
                 .map(day => day.day);
               updateAvailability({ preferredWorkdays });
+              
+              // تحديث الساعات بناءً على التوفر إذا لم تكن محددة
+              if (!availability.weeklyHours || availability.weeklyHours === 0) {
+                const totalAvailableHours = weeklyAvailability
+                  .filter(day => day.available)
+                  .reduce((total, day) => {
+                    const hours = day.timeSlots?.length || 8; // افتراض 8 ساعات يومياً
+                    return total + hours;
+                  }, 0);
+                updateAvailability({ weeklyHours: Math.min(totalAvailableHours, 40) });
+              }
             }}
             error={getFieldError('التوفر')}
             disabled={false}

@@ -411,12 +411,24 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         return true; // خطوة اختيارية بالكامل
       
       case 5: // Availability
-        return !!(
+        const hasBasicAvailability = !!(
           formData.availability.availability &&
-          formData.availability.weeklyHours > 0 &&
-          (formData.availability.preferredWorkdays.length > 0 || 
-           formData.availability.weeklyAvailability?.some(day => day.available))
+          formData.availability.weeklyHours > 0
         );
+        
+        const hasWorkdays = (formData.availability.preferredWorkdays?.length || 0) > 0;
+        const hasWeeklyAvailability = !!(formData.availability.weeklyAvailability?.some(day => day.available));
+        
+        logger.onboardingDebug('Step 5 validation', {
+          availability: formData.availability.availability,
+          weeklyHours: formData.availability.weeklyHours,
+          preferredWorkdaysLength: formData.availability.preferredWorkdays?.length || 0,
+          hasWeeklyAvailability,
+          hasBasicAvailability,
+          hasWorkdays
+        });
+        
+        return hasBasicAvailability && (hasWorkdays || hasWeeklyAvailability);
       
       default:
         return false;
@@ -624,16 +636,39 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // إرسال الـ Onboarding الكامل
   const submitOnboarding = useCallback(async (): Promise<boolean> => {
+    // منع تشغيل متعدد
+    if (uiState.loading || uiState.saving) {
+      logger.onboardingDebug('Submit blocked - already in progress');
+      return false;
+    }
+    
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: null });
     
     try {
       // التحقق من صحة البيانات قبل الإرسال
       const isValid = validateCurrentStep();
+      logger.onboardingDebug('Submit validation result', { isValid, step: formData.currentStep });
+      
       if (!isValid) {
         dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
-        throw new Error('يرجى إكمال جميع الحقول المطلوبة');
+        // إنشاء رسالة خطأ بسيطة بدلاً من استدعاء getStepErrors
+        const basicErrors = [];
+        if (formData.currentStep === 5) {
+          if (!formData.availability.availability) basicErrors.push('نوع التوفر مطلوب');
+          if (!formData.availability.weeklyHours) basicErrors.push('عدد الساعات الأسبوعية مطلوب');
+          if (!(formData.availability.preferredWorkdays?.length > 0 || formData.availability.weeklyAvailability?.some(day => day.available))) {
+            basicErrors.push('يجب اختيار يوم واحد على الأقل للعمل');
+          }
+        }
+        throw new Error('يرجى إكمال جميع الحقول المطلوبة' + (basicErrors.length > 0 ? ': ' + basicErrors.join(', ') : ''));
       }
+
+      logger.onboardingDebug('Submitting onboarding data', {
+        step: formData.currentStep,
+        hasAccount: !!formData.account.fullName,
+        hasAvailability: !!formData.availability.availability
+      });
 
       const response = await fetch('/api/creators/onboarding', {
         method: 'POST',
@@ -644,29 +679,43 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         })
       });
       
-      if (response.ok) {
+      const responseData = await response.json();
+      logger.onboardingDebug('Submit response', { 
+        ok: response.ok, 
+        status: response.status,
+        success: responseData.success,
+        error: responseData.error 
+      });
+      
+      if (response.ok && responseData.success) {
         dispatch({ type: 'SET_SUCCESS', payload: true });
         showSuccess('تم إرسال طلبك بنجاح! سيتم مراجعته خلال 24-48 ساعة.');
         
         // توجيه للصفحة التالية بعد النجاح
         setTimeout(() => {
-          router.push('/creators?onboarding=completed');
+          try {
+            router.push('/creators?onboarding=completed');
+          } catch (routerError) {
+            logger.onboardingDebug('Router push error', { error: String(routerError) });
+            // fallback لإعادة تحميل الصفحة
+            window.location.href = '/creators?onboarding=completed';
+          }
         }, 2000);
         
         return true;
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في إرسال النموذج');
+        throw new Error(responseData.error || 'فشل في إرسال النموذج');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
+      logger.onboardingDebug('Submit error', { error: errorMessage, originalError: error });
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
       showError(errorMessage);
       return false;
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [formData, router, validateCurrentStep, showSuccess, showError]);
+  }, [formData, router, uiState.loading, uiState.saving, validateCurrentStep, showSuccess, showError]);
 
   // دالة لتحديث حالة التفاعل
   const setHasInteracted = useCallback(() => {
