@@ -132,7 +132,7 @@ export default function RateCardEditorPage() {
       setError(null);
 
       // تحميل الفئات الفرعية من API
-      const subcatResponse = await fetch('/api/catalog/subcategories?includeDefaults=true');
+      const subcatResponse = await fetch('/api/admin/catalog/subcategories?includeDefaults=true');
       if (!subcatResponse.ok) {
         throw new Error('فشل في تحميل الفئات الفرعية - تأكد من تشغيل الخادم وإعداد قاعدة البيانات');
       }
@@ -150,7 +150,7 @@ export default function RateCardEditorPage() {
 
       // محاولة تحميل Rate Card النشط (اختياري)
       try {
-        const rateResponse = await fetch('/api/pricing/rate-card/active');
+        const rateResponse = await fetch('/api/admin/pricing/rate-card/active');
         if (rateResponse.ok) {
           const rateData = await rateResponse.json();
           console.log('Loaded rate card:', rateData);
@@ -191,7 +191,7 @@ export default function RateCardEditorPage() {
       setSaving(true);
       setError(null);
 
-      const response = await fetch('/api/pricing/rate-card', {
+      const response = await fetch('/api/admin/pricing/rate-card', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

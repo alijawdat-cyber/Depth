@@ -118,9 +118,9 @@ export default function AdminCatalogPage() {
 
       // تحميل الفئات الفرعية والمحاور وجدول الأسعار بشكل متوازي
       const [subcatResponse, verticalResponse, rateCardResponse] = await Promise.all([
-        fetch('/api/catalog/subcategories'),
-        fetch('/api/catalog/verticals'),
-        fetch('/api/pricing/rate-card/active')
+        fetch('/api/admin/catalog/subcategories'),
+        fetch('/api/admin/catalog/verticals'),
+        fetch('/api/admin/pricing/rate-card/active')
       ]);
 
       if (!subcatResponse.ok || !verticalResponse.ok) {
@@ -271,8 +271,8 @@ export default function AdminCatalogPage() {
       setState(prev => ({ ...prev, submitting: true, error: null }));
 
       const endpoint = state.formType === 'subcategory' 
-        ? '/api/catalog/subcategories' 
-        : '/api/catalog/verticals';
+        ? '/api/admin/catalog/subcategories' 
+        : '/api/admin/catalog/verticals';
 
       const method = state.showEditForm ? 'PUT' : 'POST';
       const url = state.showEditForm 
@@ -330,8 +330,8 @@ export default function AdminCatalogPage() {
       setState(prev => ({ ...prev, deleting: true, error: null }));
 
       const endpoint = state.itemToDelete.type === 'subcategory'
-        ? '/api/catalog/subcategories'
-        : '/api/catalog/verticals';
+        ? '/api/admin/catalog/subcategories'
+        : '/api/admin/catalog/verticals';
 
       const response = await fetch(`${endpoint}/${state.itemToDelete.id}`, {
         method: 'DELETE'

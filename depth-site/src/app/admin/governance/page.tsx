@@ -62,7 +62,7 @@ export default function GovernancePage() {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
       // Load versions and stats
-      const versionsResponse = await fetch('/api/governance/versions');
+      const versionsResponse = await fetch('/api/admin/governance/versions');
       if (!versionsResponse.ok) {
         if (versionsResponse.status === 401) {
           throw new Error('صلاحيات غير كافية للوصول إلى صفحة الحوكمة');
@@ -76,7 +76,7 @@ export default function GovernancePage() {
       const versionsData = await versionsResponse.json();
 
       // Load recent audit log
-      const auditResponse = await fetch('/api/governance/audit?limit=20');
+      const auditResponse = await fetch('/api/admin/governance/audit?limit=20');
       const auditData = auditResponse.ok ? await auditResponse.json() : { entries: [] };
 
       setState(prev => ({
@@ -113,7 +113,7 @@ export default function GovernancePage() {
     try {
       setState(prev => ({ ...prev, loading: true }));
 
-      const response = await fetch('/api/governance/versions/diff', {
+      const response = await fetch('/api/admin/governance/versions/diff', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -141,7 +141,7 @@ export default function GovernancePage() {
 
   const handleVersionStatusChange = async (versionId: string, newStatus: 'active' | 'archived') => {
     try {
-      const response = await fetch('/api/governance/versions', {
+      const response = await fetch('/api/admin/governance/versions', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

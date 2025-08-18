@@ -220,7 +220,7 @@ export const authOptions: NextAuthOptions = {
 };
 
 // دالة تحديد دور المستخدم بناءً على البريد الإلكتروني
-async function determineUserRole(email: string): Promise<string> {
+export async function determineUserRole(email: string): Promise<string> {
   if (!email) return 'client';
   
   const emailLower = email.toLowerCase();

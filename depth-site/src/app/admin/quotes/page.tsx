@@ -73,9 +73,9 @@ export default function AdminQuotesPage() {
       // تحميل الفئات الفرعية والمحاور والريت كارد (إذا لم تكن محملة)
       if (subcategories.length === 0 || verticals.length === 0 || !rateCard) {
         const [subcatResponse, verticalResponse, rateResponse] = await Promise.all([
-          fetch('/api/catalog/subcategories'),
-          fetch('/api/catalog/verticals'),
-          fetch('/api/pricing/rate-card/active')
+          fetch('/api/admin/catalog/subcategories'),
+          fetch('/api/admin/catalog/verticals'),
+          fetch('/api/admin/pricing/rate-card/active')
         ]);
 
         if (subcatResponse.ok) {
@@ -117,7 +117,7 @@ export default function AdminQuotesPage() {
       setCreating(true);
       setError(null);
 
-      const response = await fetch('/api/pricing/quote', {
+      const response = await fetch('/api/admin/pricing/quote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ export default function AdminQuotesPage() {
       setUpdating(quoteId);
       setError(null);
 
-      const response = await fetch('/api/pricing/quote', {
+      const response = await fetch('/api/admin/pricing/quote', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -305,7 +305,7 @@ export default function AdminQuotesPage() {
       setUpdating(quoteId);
       setError(null);
 
-      const response = await fetch('/api/contracts/sow/generate', {
+      const response = await fetch('/api/admin/contracts/sow/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

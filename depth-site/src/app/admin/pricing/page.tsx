@@ -109,7 +109,7 @@ export default function AdminPricingPage() {
       setError(null);
 
       // تحميل جدول الأسعار النشط
-      const rateResponse = await fetch('/api/pricing/rate-card/active');
+      const rateResponse = await fetch('/api/admin/pricing/rate-card/active');
       if (!rateResponse.ok) {
         throw new Error('فشل في تحميل جدول الأسعار');
       }
@@ -117,7 +117,7 @@ export default function AdminPricingPage() {
       setRateCard(rateData.rateCard ?? null);
 
       // تحميل الفئات الفرعية
-      const subcatResponse = await fetch('/api/catalog/subcategories');
+      const subcatResponse = await fetch('/api/admin/catalog/subcategories');
       if (!subcatResponse.ok) {
         throw new Error('فشل في تحميل الفئات الفرعية');
       }
@@ -125,7 +125,7 @@ export default function AdminPricingPage() {
       setSubcategories(subcatData.items || subcatData.data || []);
 
       // تحميل المحاور
-      const verticalResponse = await fetch('/api/catalog/verticals');
+      const verticalResponse = await fetch('/api/admin/catalog/verticals');
       if (!verticalResponse.ok) {
         throw new Error('فشل في تحميل المحاور');
       }
@@ -151,7 +151,7 @@ export default function AdminPricingPage() {
       setError(null);
       setResult(null);
 
-      const response = await fetch('/api/pricing/quote/preview', {
+      const response = await fetch('/api/admin/pricing/quote/preview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
