@@ -27,7 +27,7 @@ async function determineUserRole(email: string): Promise<string> {
 
 // GET /api/admin/users
 // جلب جميع المستخدمين مع الإحصائيات - للإدمن فقط
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -44,6 +44,14 @@ export async function GET() {
         error: 'غير مسموح - مخصص للإدمن فقط' 
       }, { status: 403 });
     }
+
+    // استخراج معاملات البحث والفلترة
+    const { searchParams } = new URL(req.url);
+    const roleFilter = searchParams.get('role');
+    const statusFilter = searchParams.get('status');
+    const searchQuery = searchParams.get('search');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '50');
 
     // جلب جميع المستخدمين من مجموعة users الموحدة
     const users = [];
@@ -74,22 +82,51 @@ export async function GET() {
     currentMonth.setHours(0, 0, 0, 0);
 
     try {
-      // قراءة جميع المستخدمين من users collection
-      const snapshot = await adminDb
-        .collection('users')
-        .orderBy('email', 'asc')
-        .get();
+      // بناء الاستعلام مع الفلاتر
+      let query: any = adminDb.collection('users');
+      
+      // فلتر الحالة
+      if (statusFilter && statusFilter !== 'all') {
+        query = query.where('status', '==', statusFilter);
+      }
+
+      // ترتيب حسب البريد الإلكتروني
+      query = query.orderBy('email', 'asc');
+
+      const snapshot = await query.get();
 
       for (const doc of snapshot.docs) {
         const userData = doc.data();
-        totalUsers++;
         
         // تحديد الدور باستخدام دالة determineUserRole
         const userRole = await determineUserRole(userData.email || '');
         
+        // فلتر الدور
+        if (roleFilter && roleFilter !== 'all' && userRole !== roleFilter) {
+          continue;
+        }
+
+        // فلتر البحث النصي
+        if (searchQuery) {
+          const searchLower = searchQuery.toLowerCase();
+          const matchesSearch = (
+            (userData.name || '').toLowerCase().includes(searchLower) ||
+            (userData.email || '').toLowerCase().includes(searchLower) ||
+            (userData.phone || '').toLowerCase().includes(searchLower) ||
+            (userData.company || '').toLowerCase().includes(searchLower)
+          );
+          if (!matchesSearch) {
+            continue;
+          }
+        }
+
+        totalUsers++;
+        
         // حساب الإحصائيات
         const status = userData.status || 'active';
-        statusCounts[status as keyof typeof statusCounts]++;
+        if (status in statusCounts) {
+          statusCounts[status as keyof typeof statusCounts]++;
+        }
         
         if (userRole === 'admin') roleCounts.admins++;
         else if (userRole === 'employee') roleCounts.employees++;
@@ -136,6 +173,11 @@ export async function GET() {
       console.warn(`Failed to fetch users:`, error);
     }
 
+    // تطبيق التصفح (pagination)
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUsers = users.slice(startIndex, endIndex);
+
     const stats = {
       total: totalUsers,
       active: statusCounts.active,
@@ -154,9 +196,14 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      users,
+      users: paginatedUsers,
       stats,
-      total: users.length
+      pagination: {
+        page,
+        limit,
+        total: totalUsers,
+        totalPages: Math.ceil(totalUsers / limit)
+      }
     });
 
   } catch (error) {

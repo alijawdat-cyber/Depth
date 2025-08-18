@@ -233,7 +233,22 @@ async function determineUserRole(email: string): Promise<string> {
       .filter(Boolean);
     if (adminList.includes(emailLower)) return 'admin';
     
-    // 2. تحقق من الأدمن في مجموعة admins (احتياطي)
+    // 2. تحقق من مجموعة users الموحدة
+    const userSnap = await adminDb
+      .collection('users')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    
+    if (!userSnap.empty) {
+      const userData = userSnap.docs[0].data();
+      // إذا كان للمستخدم دور محدد في البيانات، استخدمه
+      if (userData.role && ['admin', 'employee', 'creator', 'client'].includes(userData.role)) {
+        return userData.role;
+      }
+    }
+    
+    // 3. احتياطي: تحقق من المجموعات المنفصلة (للتوافق مع النظام القديم)
     const adminDocSnap = await adminDb
       .collection('admins')
       .where('email', '==', emailLower)
@@ -241,7 +256,6 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!adminDocSnap.empty) return 'admin';
     
-    // 3. تحقق من الموظفين
     const employeeSnap = await adminDb
       .collection('employees')
       .where('email', '==', emailLower)
@@ -249,13 +263,13 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!employeeSnap.empty) return 'employee';
     
-    // 4. تحقق من المبدعين (كلا الحقلين contact.email و email)
     const creatorSnap = await adminDb
       .collection('creators')
       .where('contact.email', '==', emailLower)
       .limit(1)
       .get();
     if (!creatorSnap.empty) return 'creator';
+    
     const creatorTop = await adminDb
       .collection('creators')
       .where('email', '==', emailLower)
@@ -263,7 +277,6 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!creatorTop.empty) return 'creator';
     
-    // 5. تحقق من العملاء
     const clientSnap = await adminDb
       .collection('clients')
       .where('email', '==', emailLower)
@@ -271,7 +284,7 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!clientSnap.empty) return 'client';
     
-    // 6. افتراضي: عميل جديد
+    // 4. افتراضي: عميل جديد
     return 'client';
   } catch (error) {
     console.error('[determineUserRole] Error:', error);
