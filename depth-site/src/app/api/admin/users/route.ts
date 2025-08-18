@@ -167,3 +167,77 @@ export async function GET() {
     }, { status: 500 });
   }
 }
+
+// POST /api/admin/users
+// إنشاء مستخدم جديد - للإدمن فقط
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'غير مسموح - يتطلب تسجيل الدخول' 
+      }, { status: 401 });
+    }
+
+    if (session.user.role !== 'admin') {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'غير مسموح - مخصص للإدمن فقط' 
+      }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { name, email, role, status } = body;
+
+    if (!name || !email || !role) {
+      return NextResponse.json({
+        success: false,
+        error: 'بيانات ناقصة'
+      }, { status: 400 });
+    }
+
+    // التحقق من عدم وجود المستخدم مسبقاً
+    const existingUser = await adminDb
+      .collection('users')
+      .where('email', '==', email.toLowerCase())
+      .limit(1)
+      .get();
+
+    if (!existingUser.empty) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'المستخدم موجود مسبقاً' 
+      }, { status: 400 });
+    }
+
+    // إنشاء المستخدم الجديد
+    const newUser = {
+      name,
+      email: email.toLowerCase(),
+      role,
+      status: status || 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      emailVerified: false,
+      twoFactorEnabled: false,
+      loginAttempts: 0,
+      lockedUntil: null,
+    };
+
+    const docRef = await adminDb.collection('users').add(newUser);
+
+    return NextResponse.json({
+      success: true,
+      user: { id: docRef.id, ...newUser }
+    });
+
+  } catch (error) {
+    console.error('[admin.users.POST] Error:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'خطأ في الخادم' 
+    }, { status: 500 });
+  }
+}
