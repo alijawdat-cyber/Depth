@@ -44,7 +44,6 @@ const initialFormData: OnboardingFormData = {
     experienceLevel: 'beginner',
     experienceYears: '0-1',
     skills: [],
-    specializations: [], // احتفظ للتوافق المؤقت
     previousClients: []
   },
   portfolio: {
