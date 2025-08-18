@@ -62,7 +62,7 @@ export default function AdminQuotesPage() {
 
       // تحميل العروض
       const qs = selectedStatus === 'all' ? '?limit=50' : `?status=${selectedStatus}&limit=50`;
-      const quotesResponse = await fetch(`/api/pricing/quote${qs}`);
+      const quotesResponse = await fetch(`/api/admin/pricing/quote${qs}`);
       if (!quotesResponse.ok) {
         throw new Error('فشل في تحميل العروض');
       }

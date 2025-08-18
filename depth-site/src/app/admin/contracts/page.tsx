@@ -312,7 +312,68 @@ export default function AdminContractsPage() {
     }
   };
 
-  // ملاحظة: وظيفة توليد SOW تُدار ضمن مسارات الـ API مباشرة عند الاعتماد/العرض.
+  // توليد SOW من عرض معتمد
+  const handleGenerateSOW = async (quoteId: string) => {
+    try {
+      setSubmitting(true);
+      const response = await fetch('/api/admin/contracts/sow/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quoteId })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // إضافة SOW الجديد للقائمة
+        setContracts(prev => [result.sow, ...prev]);
+        alert(`تم توليد SOW بنجاح! سيتم تحميل PDF تلقائياً.`);
+        
+        // فتح PDF في تبويب جديد
+        if (result.pdfUrl) {
+          window.open(result.pdfUrl, '_blank');
+        }
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'فشل في توليد SOW');
+      }
+    } catch (err) {
+      setError('خطأ في الاتصال أثناء توليد SOW');
+      console.error('Generate SOW error:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // توقيع SOW (للعملاء)
+  const handleSignSOW = async (sowId: string) => {
+    try {
+      setSubmitting(true);
+      const response = await fetch('/api/admin/contracts/sow/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sowId })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // تحديث حالة العقد
+        setContracts(prev => prev.map(contract => 
+          contract.id === sowId 
+            ? { ...contract, status: 'signed' as const, signedAt: new Date().toISOString() }
+            : contract
+        ));
+        alert('تم توقيع المستند بنجاح!');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'فشل في توقيع المستند');
+      }
+    } catch (err) {
+      setError('خطأ في الاتصال أثناء التوقيع');
+      console.error('Sign SOW error:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // إرسال العقد للعميل
   const handleSendContract = async (contractId: string, method: 'email' | 'whatsapp') => {
@@ -687,6 +748,60 @@ export default function AdminContractsPage() {
                     <Download size={16} />
                     تحميل PDF
                   </Button>
+
+                  {/* SOW Actions */}
+                  {contract.type === 'sow' && (
+                    <>
+                      {contract.status === 'draft' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleGenerateSOW(contract.projectId || contract.id)}
+                          disabled={submitting}
+                        >
+                          <FileText size={16} />
+                          توليد SOW
+                        </Button>
+                      )}
+                      
+                      {contract.status === 'pending_client' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSignSOW(contract.id)}
+                          disabled={submitting}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Shield size={16} />
+                          توقيع المستند
+                        </Button>
+                      )}
+                    </>
+                  )}
+
+                  {contract.status === 'draft' && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSendContract(contract.id, 'email')}
+                        disabled={submitting}
+                      >
+                        <Mail size={16} />
+                        إرسال بالإيميل
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSendContract(contract.id, 'whatsapp')}
+                        disabled={submitting}
+                      >
+                        <Mail size={16} />
+                        إرسال بواتساب
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
 

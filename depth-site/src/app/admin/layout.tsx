@@ -49,7 +49,7 @@ interface AdminNavItem {
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   {
-    href: '/admin',
+    href: '/admin/dashboard',
     label: 'لوحة التحكم',
     icon: LayoutDashboard,
     description: 'نظرة عامة على النشاط والإحصائيات'
@@ -169,8 +169,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // دالة للتحقق من النشاط
   const isActive = (href: string) => {
-    if (href === '/admin') {
-      return pathname === '/admin';
+    if (href === '/admin/dashboard') {
+      return pathname === '/admin' || pathname === '/admin/dashboard';
     }
     return pathname?.startsWith(href);
   };
@@ -413,10 +413,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 
                 {/* مسار التنقل (Breadcrumb) */}
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Link href="/admin" className="text-[var(--muted)] hover:text-[var(--text)]">
+                  <Link href="/admin/dashboard" className="text-[var(--muted)] hover:text-[var(--text)]">
                     الرئيسية
                   </Link>
-                  {pathname !== '/admin' && (
+                  {pathname !== '/admin' && pathname !== '/admin/dashboard' && (
                     <>
                       <span className="text-[var(--muted)]">/</span>
                       <span className="text-[var(--text)] font-medium">
