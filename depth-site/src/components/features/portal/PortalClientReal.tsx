@@ -462,10 +462,10 @@ export default function PortalClientReal() {
                           <span className="text-[var(--slate-600)]">آخر تحديث:</span>
                           <span className="font-medium text-[var(--text)]">{formatDate(activeProject.updatedAt)}</span>
                         </div>
-                        {(activeProject as any).estimatedDays && (
+                        {activeProject.estimatedDays && (
                           <div className="flex justify-between">
                             <span className="text-[var(--slate-600)]">المدة المتوقعة:</span>
-                            <span className="font-medium text-[var(--text)]">{(activeProject as any).estimatedDays} يوم</span>
+                            <span className="font-medium text-[var(--text)]">{activeProject.estimatedDays} يوم</span>
                           </div>
                         )}
                       </div>
@@ -502,11 +502,11 @@ export default function PortalClientReal() {
                         </div>
 
                         {/* أعضاء الفريق */}
-                        {(activeProject as any).team && (activeProject as any).team.length > 0 && (
+                        {activeProject.team && activeProject.team.length > 0 && (
                           <div className="bg-[var(--bg)] p-4 rounded-[var(--radius)]">
                             <h4 className="font-medium text-[var(--text)] mb-3">فريق العمل:</h4>
                             <div className="space-y-2">
-                              {(activeProject as any).team.map((member: { name?: string; role?: string }, index: number) => (
+                              {activeProject.team.map((member, index: number) => (
                                 <div key={index} className="flex items-center gap-2 text-sm">
                                   <div className="w-6 h-6 bg-[var(--accent-500)] rounded-full flex items-center justify-center text-white text-xs">
                                     {member.name?.charAt(0) || 'م'}
@@ -906,7 +906,7 @@ export default function PortalClientReal() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--slate-600)]">المدة المقدرة:</span>
-                                                    <span className="font-medium text-[var(--text)]">{(activeProject as any).estimatedDays || 'غير محدد'} يوم</span>
+                                                    <span className="font-medium text-[var(--text)]">{activeProject.estimatedDays || 'غير محدد'} يوم</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--slate-600)]">الوقت المنقضي:</span>

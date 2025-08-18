@@ -31,9 +31,17 @@ export interface BasicInfoData {
 export interface ExperienceData {
   experienceLevel: ExperienceLevel;
   experienceYears: string;
-  skills: CreatorSkill[]; // استبدل specializations بـ skills مع subcategoryId
-  specializations?: string[]; // احتفظ بالقديم للتوافق المؤقت
+  skills: UnifiedCreatorSkill[]; // البنية الموحدة الجديدة
   previousClients?: string[];
+}
+
+// هيكل مهارات موحد للنظام كاملاً
+export interface UnifiedCreatorSkill {
+  subcategoryId: string; // معرف الفئة الفرعية
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert'; // موحد مع الإدارة
+  experienceYears: number; // بدلاً من string
+  verified?: boolean; // تم التحقق من الإدارة
+  notes?: string; // ملاحظات إضافية
 }
 
 // المرحلة 4: معرض الأعمال

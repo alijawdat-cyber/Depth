@@ -24,6 +24,11 @@ export interface Project {
   clientEmail: string;
   createdAt?: string | null;
   updatedAt?: string | null;
+  estimatedDays?: number;
+  team?: Array<{
+    name?: string;
+    role?: string;
+  }>;
 }
 
 export interface ProjectFile {

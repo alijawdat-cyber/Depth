@@ -56,6 +56,12 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     description: 'نظرة عامة على النشاط والإحصائيات'
   },
   {
+    href: '/admin/users',
+    label: 'إدارة المستخدمين',
+    icon: Users,
+    description: 'إدارة شاملة للعملاء والمبدعين والموظفين والإدمن في صفحة واحدة'
+  },
+  {
     href: '/admin/projects',
     label: 'المشاريع',
     icon: FileText,
@@ -66,12 +72,6 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: 'العقود',
     icon: Briefcase,
     description: 'إدارة MSA + SOW + NDA وجميع الملحقات والاتفاقيات'
-  },
-  {
-    href: '/admin/users',
-    label: 'المستخدمين',
-    icon: Users,
-    description: 'إدارة العملاء والمبدعين والموظفين مع الصلاحيات والأدوار'
   },
   {
     href: '/admin/security',
@@ -90,12 +90,6 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: 'الملفات',
     icon: Folder,
     description: 'إدارة الملفات ومراجعة التسليمات'
-  },
-  {
-    href: '/admin/creators',
-    label: 'المبدعين',
-    icon: UserCheck,
-    description: 'إدارة المصورين والمصممين والمنتجين'
   },
   {
     href: '/admin/catalog',

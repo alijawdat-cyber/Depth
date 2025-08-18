@@ -1,879 +1,529 @@
-"use client";
+'use client';
 
-// صفحة إدارة المستخدمين - Admin
-// الوثيقة المرجعية: docs/roles/admin/06-Security-and-Access.md
-// الغرض: إدارة جميع المستخدمين (العملاء، المبدعين، الموظفين) مع الصلاحيات والأدوار
-
-import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import NextImage from "next/image";
-import { Button } from "@/components/ui/Button";
-import Dropdown from "@/components/ui/Dropdown";
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import { useState, useEffect, useCallback } from 'react';
 import { 
-  Plus, 
+  Users, 
   Search, 
-  Filter,
-  Eye,
-  Edit,
-  UserCheck,
-  UserX,
-  Shield,
-  Users,
-  Calendar,
-  Mail,
-  Phone,
-  MapPin,
-  Star,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  RefreshCw,
-  AlertCircle,
-  Crown,
-  User,
-  Building,
-  Camera
-} from "lucide-react";
+  Eye, 
+  CheckCircle, 
+  XCircle, 
+  Trash2,
+  UserPlus
+} from 'lucide-react';
 
-// واجهات البيانات
-interface SystemUser {
+// Unified user interface
+interface UnifiedUser {
   id: string;
-  role: 'admin' | 'employee' | 'creator' | 'client';
-  status: 'active' | 'inactive' | 'pending' | 'suspended' | 'banned';
-  
-  // معلومات أساسية
   name: string;
   email: string;
-  phone?: string;
-  avatar?: string;
-  
-  // معلومات الشركة (للعملاء)
-  company?: string;
-  industry?: string;
-  
-  // معلومات المبدع
-  skills?: string[];
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
-  modifier?: number;
-  portfolio?: string[];
-  
-  // معلومات الموظف
-  department?: string;
-  position?: string;
-  permissions?: string[];
-  
-  // الإحصائيات
-  stats?: {
-    projectsCount: number;
-    totalValue: number;
-    averageRating: number;
-    completionRate: number;
-    lastActivity: string;
-  };
-  
-  // التواريخ
+  role: 'creator' | 'client' | 'employee' | 'admin';
+  status: 'pending' | 'active' | 'inactive' | 'suspended';
   createdAt: string;
-  updatedAt: string;
-  lastLoginAt?: string;
-  
-  // الأمان
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  twoFactorEnabled: boolean;
-  
-  // الموقع
-  location?: {
-    city: string;
-    country: string;
-  };
+  location?: string;
+  phone?: string;
+  company?: string;
+  skills?: string[];
+  specialization?: string;
+  department?: string;
+  lastActive?: string;
 }
 
+// Statistics interface
 interface UserStats {
   total: number;
+  pending: number;
   active: number;
   inactive: number;
-  pending: number;
   suspended: number;
-  banned: number;
-  
-  // حسب الدور
-  admins: number;
-  employees: number;
-  creators: number;
-  clients: number;
-  
-  // إحصائيات أخرى
-  verifiedUsers: number;
-  twoFactorUsers: number;
-  newUsersThisMonth: number;
+  byRole: {
+    creators: number;
+    clients: number;
+    employees: number;
+    admins: number;
+  };
 }
 
-export default function AdminUsersPage() {
-  const { data: session } = useSession();
-  const router = useRouter();
-  
-  // States
-  const [users, setUsers] = useState<SystemUser[]>([]);
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Filters
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // User Management
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [formData, setFormData] = useState({
-    role: 'client' as SystemUser['role'],
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    department: '',
-    position: ''
+export default function UnifiedUsersPage() {
+  const [users, setUsers] = useState<UnifiedUser[]>([]);
+  const [stats, setStats] = useState<UserStats>({
+    total: 0,
+    pending: 0,
+    active: 0,
+    inactive: 0,
+    suspended: 0,
+    byRole: { creators: 0, clients: 0, employees: 0, admins: 0 }
   });
-  
-  // Operations
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // التحقق من صلاحيات الإدمن
-  const isAdmin = (session?.user as { role?: string })?.role === 'admin';
+  // Filters and search
+  const [activeTab, setActiveTab] = useState<'all' | 'creator' | 'client' | 'employee' | 'admin'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'active' | 'inactive' | 'suspended'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState<UnifiedUser | null>(null);
 
-  // تحميل البيانات
-  const loadUsers = useCallback(async () => {
+  // Load users data
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch('/api/admin/users');
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
-        setStats(data.stats || null);
+      const params = new URLSearchParams();
+      if (activeTab !== 'all') params.append('role', activeTab);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const response = await fetch(`/api/admin/users?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setUsers(data.users);
+        setStats(data.stats);
       } else {
-        throw new Error('Failed to fetch users');
+        setError(data.error || 'خطأ في تحميل البيانات');
       }
     } catch (err) {
-      setError('فشل في تحميل المستخدمين');
-      console.error('Load users error:', err);
+      setError('خطأ في الاتصال بالخادم');
+      console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeTab, statusFilter, searchQuery]);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadUsers();
-    }
-  }, [isAdmin, loadUsers]);
+    fetchUsers();
+  }, [fetchUsers]);
 
-  // إنشاء مستخدم جديد
-  const handleCreateUser = async () => {
-    try {
-      setSubmitting(true);
-      const response = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setUsers(prev => [result.user, ...prev]);
-        setShowCreateForm(false);
-        setFormData({
-          role: 'client',
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          department: '',
-          position: ''
-        });
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'فشل في إنشاء المستخدم');
-      }
-    } catch (err) {
-      setError('خطأ في الاتصال');
-      console.error('Create user error:', err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // تغيير حالة المستخدم
-  const handleUserStatusChange = async (userId: string, newStatus: SystemUser['status']) => {
+  const updateUserStatus = async (userId: string, newStatus: string) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}/status`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
 
-      if (response.ok) {
-        setUsers(prev => prev.map(u => 
-          u.id === userId 
-            ? { ...u, status: newStatus }
-            : u
-        ));
-        
-        const statusText = getStatusText(newStatus);
-        alert(`تم تغيير حالة المستخدم إلى: ${statusText}`);
+      const result = await response.json();
+      if (result.success) {
+        fetchUsers(); // Refresh data
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'فشل في تغيير حالة المستخدم');
+        setError(result.error || 'خطأ في تحديث الحالة');
       }
     } catch (err) {
-      setError('خطأ في الاتصال');
-      console.error('Change user status error:', err);
+      setError('خطأ في تحديث الحالة');
+      console.error('Error updating status:', err);
     }
   };
 
-  // إعادة تعيين كلمة المرور
-  const handlePasswordReset = async (userId: string) => {
+  const deleteUser = async (userId: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+
     try {
-      const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      const response = await fetch(`/api/admin/users/${userId}/status`, {
+        method: 'DELETE'
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        alert(`تم إرسال رابط إعادة تعيين كلمة المرور إلى: ${result.email}`);
+      const result = await response.json();
+      if (result.success) {
+        fetchUsers(); // Refresh data
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'فشل في إعادة تعيين كلمة المرور');
+        setError(result.error || 'خطأ في حذف المستخدم');
       }
     } catch (err) {
-      setError('خطأ في الاتصال');
-      console.error('Password reset error:', err);
+      setError('خطأ في حذف المستخدم');
+      console.error('Error deleting user:', err);
     }
   };
 
-  // تصفية المستخدمين
-  const filteredUsers = users.filter(user => {
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesSearch = searchQuery === '' || 
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.company && user.company.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    return matchesRole && matchesStatus && matchesSearch;
-  });
-
-  // دوال المساعدة
-  const getRoleText = (role: string) => {
+  const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'إدمن';
-      case 'employee': return 'موظف';
-      case 'creator': return 'مبدع';
-      case 'client': return 'عميل';
-      default: return role;
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active': return 'نشط';
-      case 'inactive': return 'غير نشط';
-      case 'pending': return 'في الانتظار';
-      case 'suspended': return 'معلق';
-      case 'banned': return 'محظور';
-      default: return status;
+      case 'creator': return 'bg-purple-100 text-purple-800';
+      case 'client': return 'bg-blue-100 text-blue-800';
+      case 'employee': return 'bg-green-100 text-green-800';
+      case 'admin': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'text-[var(--success-fg)] bg-[var(--success-bg)] border-[var(--success-border)]';
-      case 'pending':
-      case 'suspended':
-        return 'text-[var(--warning-fg)] bg-[var(--warning-bg)] border-[var(--warning-border)]';
-      case 'banned':
-        return 'text-[var(--danger-fg)] bg-[var(--danger-bg)] border-[var(--danger-border)]';
-      case 'inactive':
-      default:
-        return 'text-[var(--muted)] bg-[var(--panel)] border-[var(--elev)]';
+      case 'active': return 'text-green-600';
+      case 'pending': return 'text-yellow-600';
+      case 'inactive': return 'text-gray-600';
+      case 'suspended': return 'text-red-600';
+      default: return 'text-gray-600';
     }
   };
 
-  const getRoleIcon = (role: string) => {
+  const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return <Crown size={16} className="text-[var(--text)]" />;
-      case 'employee': return <User size={16} className="text-[var(--text)]" />;
-      case 'creator': return <Camera size={16} className="text-[var(--text)]" />;
-      case 'client': return <Building size={16} className="text-[var(--text)]" />;
-      default: return <User size={16} className="text-[var(--text)]" />;
+      case 'creator': return 'مبدع';
+      case 'client': return 'عميل';
+      case 'employee': return 'موظف';
+      case 'admin': return 'إدمن';
+      default: return role;
     }
   };
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'platinum':
-      case 'gold':
-      case 'silver':
-      case 'bronze':
-        return 'text-[var(--muted)] bg-[var(--panel)]';
-      default:
-        return 'text-[var(--muted)] bg-[var(--panel)]';
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active': return 'نشط';
+      case 'pending': return 'في الانتظار';
+      case 'inactive': return 'غير نشط';
+      case 'suspended': return 'معلق';
+      default: return status;
     }
   };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
-  };
-
-  if (!isAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[var(--text)] mb-2">غير مسموح</h2>
-          <p className="text-[var(--muted)]">هذه الصفحة مخصصة للإدمن فقط</p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-500)] mx-auto mb-4"></div>
-          <p className="text-[var(--muted)]">جاري تحميل المستخدمين...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <Breadcrumbs />
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">إدارة المستخدمين</h1>
+        <p className="text-gray-600">عرض وإدارة جميع المستخدمين في النظام</p>
+      </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">إدارة المستخدمين</h1>
-          <p className="text-[var(--muted)]">إدارة العملاء والمبدعين والموظفين مع الصلاحيات والأدوار</p>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
         </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="secondary" 
-            onClick={loadUsers}
-            disabled={loading}
-          >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            تحديث
-          </Button>
-          <Button onClick={() => setShowCreateForm(true)}>
-            <Plus size={16} />
-            مستخدم جديد
-          </Button>
+      )}
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <Users className="h-8 w-8 text-blue-600" />
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-600">إجمالي المستخدمين</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <UserPlus className="h-8 w-8 text-purple-600" />
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-600">المبدعون</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.creators}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <Users className="h-8 w-8 text-blue-600" />
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-600">العملاء</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.clients}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <Users className="h-8 w-8 text-green-600" />
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-600">الموظفون</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.employees}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <CheckCircle className="h-8 w-8 text-yellow-600" />
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-600">في الانتظار</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Error Alert */}
-      {error && (
-        <div className="rounded-lg p-4 bg-[var(--danger-bg)] border border-[var(--danger-border)]">
-          <div className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-[var(--danger-fg)]" />
-            <span className="text-[var(--danger-fg)]">{error}</span>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setError(null)}
-              className="mr-auto"
+      {/* Filters and Search */}
+      <div className="bg-white rounded-lg shadow-sm border mb-6">
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Role Tabs */}
+            <div className="flex space-x-2 rtl:space-x-reverse">
+              {[
+                { key: 'all', label: 'الكل' },
+                { key: 'creator', label: 'المبدعون' },
+                { key: 'client', label: 'العملاء' },
+                { key: 'employee', label: 'الموظفون' },
+                { key: 'admin', label: 'الإدمن' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as 'all' | 'creator' | 'client' | 'employee' | 'admin')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    activeTab === tab.key
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'active' | 'inactive' | 'suspended')}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              إغلاق
-            </Button>
-          </div>
-        </div>
-      )}
+              <option value="all">جميع الحالات</option>
+              <option value="pending">في الانتظار</option>
+              <option value="active">نشط</option>
+              <option value="inactive">غير نشط</option>
+              <option value="suspended">معلق</option>
+            </select>
 
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--muted)]">إجمالي المستخدمين</p>
-                <p className="text-2xl font-bold text-[var(--text)]">{stats.total}</p>
-              </div>
-              <Users size={24} className="text-[var(--accent-500)]" />
-            </div>
-          </div>
-
-          <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--muted)]">نشط</p>
-                <p className="text-2xl font-bold text-[var(--text)]">{stats.active}</p>
-              </div>
-              <CheckCircle size={24} className="text-green-500" />
-            </div>
-          </div>
-
-          <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--muted)]">المبدعين</p>
-                <p className="text-2xl font-bold text-[var(--text)]">{stats.creators}</p>
-              </div>
-              <Camera size={24} className="text-green-500" />
-            </div>
-          </div>
-
-          <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--muted)]">العملاء</p>
-                <p className="text-2xl font-bold text-[var(--text)]">{stats.clients}</p>
-              </div>
-              <Building size={24} className="text-orange-500" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search size={20} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--muted)]" />
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث في المستخدمين..."
+                placeholder="البحث بالاسم أو البريد الإلكتروني..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)] focus:border-transparent"
-              />
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Filter size={16} className="text-[var(--muted)]" />
-            <div className="min-w-[180px]">
-              <Dropdown
-                value={roleFilter}
-                onChange={(v) => setRoleFilter(String(v))}
-                options={[
-                  { value: 'all', label: 'جميع الأدوار' },
-                  { value: 'admin', label: 'إدمن' },
-                  { value: 'employee', label: 'موظف' },
-                  { value: 'creator', label: 'مبدع' },
-                  { value: 'client', label: 'عميل' },
-                ]}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Clock size={16} className="text-[var(--muted)]" />
-            <div className="min-w-[180px]">
-              <Dropdown
-                value={statusFilter}
-                onChange={(v) => setStatusFilter(String(v))}
-                options={[
-                  { value: 'all', label: 'جميع الحالات' },
-                  { value: 'active', label: 'نشط' },
-                  { value: 'inactive', label: 'غير نشط' },
-                  { value: 'pending', label: 'في الانتظار' },
-                  { value: 'suspended', label: 'معلق' },
-                  { value: 'banned', label: 'محظور' },
-                ]}
+                className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Users List */}
-      {filteredUsers.length === 0 ? (
-        <div className="text-center py-12">
-          <Users size={64} className="text-[var(--muted)] mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-[var(--text)] mb-2">لا توجد مستخدمين</h3>
-          <p className="text-[var(--muted)] mb-4">ابدأ بإضافة مستخدم جديد</p>
-          <Button onClick={() => setShowCreateForm(true)}>
-            <Plus size={16} />
-            إضافة مستخدم جديد
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredUsers.map((user) => (
-            <div key={user.id} className="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-[var(--accent-500)] flex items-center justify-center text-white font-semibold">
-                    {user.avatar ? (
-                      <NextImage 
-                        src={user.avatar} 
-                        alt={user.name || 'صورة المستخدم'} 
-                        width={48}
-                        height={48}
-                        className="w-full h-full rounded-full object-cover" 
-                      />
-                    ) : (
-                      user.name.charAt(0).toUpperCase()
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      {getRoleIcon(user.role)}
-                      <h3 className="text-xl font-semibold text-[var(--text)]">{user.name}</h3>
-                      
-                      {/* Status Badge */}
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(user.status)}`}>
-                        {getStatusText(user.status)}
-                      </span>
-
-                      {/* Role Badge */}
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)]">
-                        {getRoleText(user.role)}
-                      </span>
-
-                      {/* Tier Badge for Creators */}
-                      {user.role === 'creator' && user.tier && (
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${getTierColor(user.tier)}`}>
-                          {user.tier.toUpperCase()}
-                        </span>
-                      )}
-
-                      {/* Performance Indicator */}
-                      {user.status === 'active' && user.role === 'creator' && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-[var(--success-bg)] text-[var(--success-fg)] border border-[var(--success-border)]">
-                          <TrendingUp size={12} />
-                          <span>أداء متميز</span>
-                        </div>
-                      )}
-
-                      {/* Verification Badges */}
-                      {user.emailVerified && (
-                        <div title="البريد موثق">
-                          <CheckCircle size={16} className="text-green-500" />
-                        </div>
-                      )}
-                      {user.twoFactorEnabled && (
-                        <div title="المصادقة الثنائية مفعلة">
-                          <Shield size={16} className="text-blue-500" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-4 text-sm text-[var(--muted)] mb-2">
-                      <div className="flex items-center gap-1">
-                        <Mail size={16} />
-                        {user.email}
-                      </div>
-                      {user.phone && (
-                        <div className="flex items-center gap-1">
-                          <Phone size={16} />
-                          {user.phone}
-                        </div>
-                      )}
-                      {user.company && (
-                        <div className="flex items-center gap-1">
-                          <Building size={16} />
-                          {user.company}
-                        </div>
-                      )}
-                      {user.location && (
-                        <div className="flex items-center gap-1">
-                          <MapPin size={16} />
-                          {user.location.city}, {user.location.country}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Skills for Creators */}
-                    {user.role === 'creator' && user.skills && user.skills.length > 0 && (
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm text-[var(--muted)]">المهارات:</span>
-                        <div className="flex gap-1">
-                          {user.skills.slice(0, 3).map((skill, index) => (
-                            <span key={index} className="px-2 py-1 bg-[var(--panel)] text-[var(--text)] border border-[var(--elev)] rounded text-xs">
-                              {skill}
-                            </span>
-                          ))}
-                          {user.skills.length > 3 && (
-                            <span className="px-2 py-1 bg-[var(--panel)] text-[var(--muted)] border border-[var(--elev)] rounded text-xs">
-                              +{user.skills.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={16} />
-                        انضم: {new Date(user.createdAt).toLocaleDateString('ar-EG')}
-                      </div>
-                      {user.lastLoginAt && (
-                        <div className="flex items-center gap-1">
-                          <Clock size={16} />
-                          آخر دخول: {new Date(user.lastLoginAt).toLocaleDateString('ar-EG')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => router.push(`/admin/users/${user.id}`)}
-                  >
-                    <Eye size={16} />
-                    عرض
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => router.push(`/admin/users/${user.id}/edit`)}
-                  >
-                    <Edit size={16} />
-                    تعديل
-                  </Button>
-                </div>
-              </div>
-
-              {/* Stats for Users */}
-              {user.stats && (
-                <div className="bg-[var(--bg)] rounded-lg p-4 mb-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                      <p className="text-sm text-[var(--muted)]">المشاريع</p>
-                      <p className="text-lg font-semibold text-[var(--text)]">
-                        {user.stats.projectsCount}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[var(--muted)]">القيمة الإجمالية</p>
-                      <p className="text-lg font-semibold text-[var(--text)]">
-                        {formatCurrency(user.stats.totalValue)}
-                      </p>
-                    </div>
-                    {user.stats.averageRating > 0 && (
-                      <div>
-                        <p className="text-sm text-[var(--muted)]">التقييم</p>
-                        <div className="flex items-center justify-center gap-1">
-                          <Star size={16} className="text-yellow-500" />
-                          <p className="text-lg font-semibold text-[var(--text)]">
-                            {user.stats.averageRating.toFixed(1)}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-sm text-[var(--muted)]">معدل الإكمال</p>
-                      <p className="text-lg font-semibold text-[var(--text)]">
-                        {user.stats.completionRate}%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2">
-                {user.status === 'active' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleUserStatusChange(user.id, 'suspended')}
-                    className="flex items-center gap-1 text-orange-600"
-                  >
-                    <UserX size={16} />
-                    تعليق
-                  </Button>
-                )}
-
-                {user.status === 'suspended' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleUserStatusChange(user.id, 'active')}
-                    className="flex items-center gap-1 text-green-600"
-                  >
-                    <UserCheck size={16} />
-                    تفعيل
-                  </Button>
-                )}
-
-                {user.status === 'pending' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleUserStatusChange(user.id, 'active')}
-                    className="flex items-center gap-1 text-green-600"
-                  >
-                    <CheckCircle size={16} />
-                    اعتماد
-                  </Button>
-                )}
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handlePasswordReset(user.id)}
-                  className="flex items-center gap-1"
-                >
-                  <Shield size={16} />
-                  إعادة تعيين كلمة المرور
-                </Button>
-
-                {user.status !== 'banned' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleUserStatusChange(user.id, 'banned')}
-                    className="flex items-center gap-1 text-red-600"
-                  >
-                    <AlertTriangle size={16} />
-                    حظر
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Create User Modal */}
-      {showCreateForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[var(--card)] rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold text-[var(--text)] mb-4">إضافة مستخدم جديد</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
+      {/* Users Table */}
+      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  المستخدم
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   الدور
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as SystemUser['role'] }))}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  الحالة
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  تاريخ التسجيل
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  الإجراءات
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-700">
+                            {user.name.charAt(0)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mr-4">
+                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm text-gray-500">{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
+                      {getRoleLabel(user.role)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`text-sm font-medium ${getStatusColor(user.status)}`}>
+                      {getStatusLabel(user.status)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(user.createdAt).toLocaleDateString('ar-SA')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2 rtl:space-x-reverse">
+                      <button
+                        onClick={() => setSelectedUser(user)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="عرض التفاصيل"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      
+                      {user.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => updateUserStatus(user.id, 'active')}
+                            className="text-green-600 hover:text-green-900"
+                            title="موافقة"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => updateUserStatus(user.id, 'inactive')}
+                            className="text-red-600 hover:text-red-900"
+                            title="رفض"
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
+                      
+                      {user.status === 'active' && (
+                        <button
+                          onClick={() => updateUserStatus(user.id, 'suspended')}
+                          className="text-yellow-600 hover:text-yellow-900"
+                          title="تعليق"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                      
+                      {user.status === 'suspended' && (
+                        <button
+                          onClick={() => updateUserStatus(user.id, 'active')}
+                          className="text-green-600 hover:text-green-900"
+                          title="إلغاء التعليق"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={() => deleteUser(user.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="حذف"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {users.length === 0 && (
+          <div className="text-center py-12">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد مستخدمين</h3>
+            <p className="mt-1 text-sm text-gray-500">لم يتم العثور على مستخدمين بالمعايير المحددة.</p>
+          </div>
+        )}
+      </div>
+
+      {/* User Details Modal */}
+      {selectedUser && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">تفاصيل المستخدم</h3>
+                <button
+                  onClick={() => setSelectedUser(null)}
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  <option value="client">عميل</option>
-                  <option value="creator">مبدع</option>
-                  <option value="employee">موظف</option>
-                  <option value="admin">إدمن</option>
-                </select>
+                  <XCircle className="h-6 w-6" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  الاسم الكامل
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                  placeholder="أحمد محمد"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  البريد الإلكتروني
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                  placeholder="user@example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  رقم الهاتف (اختياري)
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                  placeholder="+964 XXX XXX XXXX"
-                />
-              </div>
-
-              {formData.role === 'client' && (
-                <div>
-                  <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                    اسم الشركة (اختياري)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                    placeholder="شركة ABC"
-                  />
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">الاسم</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">الدور</label>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(selectedUser.role)}`}>
+                      {getRoleLabel(selectedUser.role)}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">الحالة</label>
+                    <span className={`text-sm font-medium ${getStatusColor(selectedUser.status)}`}>
+                      {getStatusLabel(selectedUser.status)}
+                    </span>
+                  </div>
                 </div>
-              )}
 
-              {formData.role === 'employee' && (
-                <>
+                {selectedUser.phone && (
                   <div>
-                    <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                      القسم
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.department}
-                      onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                      className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                      placeholder="التسويق"
-                    />
+                    <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.phone}</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                      المنصب
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.position}
-                      onChange={(e) => setFormData(prev => ({ ...prev, position: e.target.value }))}
-                      className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent-500)]"
-                      placeholder="مدير التسويق"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+                )}
 
-            <div className="flex items-center gap-3 mt-6">
-              <Button
-                onClick={handleCreateUser}
-                disabled={submitting || !formData.name || !formData.email}
-                className="flex-1"
-              >
-                {submitting ? 'جاري الإضافة...' : 'إضافة المستخدم'}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => setShowCreateForm(false)}
-                disabled={submitting}
-              >
-                إلغاء
-              </Button>
+                {selectedUser.location && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">الموقع</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.location}</p>
+                  </div>
+                )}
+
+                {selectedUser.company && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">الشركة</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.company}</p>
+                  </div>
+                )}
+
+                {selectedUser.specialization && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">التخصص</label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedUser.specialization}</p>
+                  </div>
+                )}
+
+                {selectedUser.skills && selectedUser.skills.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">المهارات</label>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {selectedUser.skills.map((skill, index) => (
+                        <span key={index} className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">تاريخ التسجيل</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {new Date(selectedUser.createdAt).toLocaleDateString('ar-SA')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end space-x-3 rtl:space-x-reverse">
+                <button
+                  onClick={() => setSelectedUser(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  إغلاق
+                </button>
+              </div>
             </div>
           </div>
         </div>

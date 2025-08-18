@@ -86,26 +86,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          // فحص احتياطي: بعض السجلات تحفظ البريد في المستوى العلوي `email`
-          const creatorTopQuery = await adminDb
-            .collection('creators')
-            .where('email', '==', email)
-            .limit(1)
-            .get();
-
-          if (!creatorTopQuery.empty) {
-            const creatorDoc = creatorTopQuery.docs[0];
-            const creatorData = creatorDoc.data();
-            const passwordHash = creatorData.password || creatorData.hashedPassword;
-            if (passwordHash && await bcrypt.compare(credentials.password, passwordHash)) {
-              return {
-                id: creatorDoc.id,
-                email: creatorData.email,
-                name: creatorData.fullName || creatorData.name || '',
-                role: 'creator',
-              };
-            }
-          }
+          return null; // لا توجد مطابقة
         } catch (error) {
           console.error('[auth.credentials] Error:', error);
         }
