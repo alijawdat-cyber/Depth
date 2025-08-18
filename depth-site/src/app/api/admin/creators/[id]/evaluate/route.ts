@@ -257,7 +257,7 @@ async function updateRateCardWithCreatorCosts(creatorId: string, tier: 'T1' | 'T
     }
 
     const rateCardDoc = rateCardSnapshot.docs[0];
-    const rateCardData = rateCardDoc.data() as Record<string, any>;
+    const rateCardData = rateCardDoc.data() as Record<string, unknown>;
 
     // Update creator costs in pricing_rate_card
     const updatedRateCard = {

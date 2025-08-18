@@ -5,6 +5,43 @@ import { adminDb } from '@/lib/firebase/admin';
 import { getActiveRateCard } from '@/lib/catalog/read';
 import { getCurrentFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
 
+// Types
+interface ClientData {
+  name?: string;
+  company?: string;
+  email?: string;
+  phone?: string;
+  [key: string]: unknown;
+}
+
+interface DeliverableItem {
+  subcategoryNameAr?: string;
+  subcategory?: string;
+  quantity?: number;
+  processing?: string;
+  totalIQD?: number;
+  totalUSD?: number;
+  assignedToName?: string;
+  conditions?: {
+    isRush?: boolean;
+    locationZone?: string;
+  };
+  [key: string]: unknown;
+}
+
+interface ProjectData {
+  deliverables?: DeliverableItem[];
+  totalIQD?: number;
+  totalUSD?: number;
+  title?: string;
+  clientId?: string;
+  fxSnapshot?: {
+    rate?: number;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
 // POST /api/admin/projects/[id]/send-quote
 // إرسال العرض مع فحص Guardrails - حسب الوثائق
 export async function POST(
@@ -81,7 +118,7 @@ export async function POST(
     }
 
     // جلب بيانات العميل
-    let clientData: any = {};
+    let clientData: ClientData = {};
     if (projectData.clientId) {
       try {
         const clientDoc = await adminDb
@@ -90,7 +127,7 @@ export async function POST(
           .get();
         
         if (clientDoc.exists) {
-          clientData = clientDoc.data() || {};
+          clientData = clientDoc.data() as ClientData || {};
         }
       } catch (error) {
         console.warn('Failed to fetch client data:', error);
@@ -111,7 +148,7 @@ export async function POST(
       ...projectData,
       totalIQD,
       totalUSD,
-      fxSnapshot,
+      fxSnapshot: fxSnapshot as unknown as Record<string, unknown>,
     }, clientData);
 
     // إرسال العرض حسب الطريقة المحددة
@@ -188,17 +225,17 @@ export async function POST(
 }
 
 // دالة إنشاء محتوى العرض
-function generateQuoteContent(projectData: any, clientData: any) {
+function generateQuoteContent(projectData: ProjectData, clientData: ClientData) {
   const clientName = clientData.name || clientData.company || 'العميل المحترم';
   const deliverables = projectData.deliverables || [];
   
   let deliverablesList = '';
-  deliverables.forEach((del: any, index: number) => {
+  deliverables.forEach((del: DeliverableItem, index: number) => {
     deliverablesList += `
-${index + 1}. ${del.subcategoryNameAr || del.subcategory}
-   - الكمية: ${del.quantity}
-   - المعالجة: ${getProcessingText(del.processing)}
-   - السعر: ${formatCurrencyUnified(del.totalIQD)} (${formatCurrencyUnified(del.totalUSD, 'USD')})
+${index + 1}. ${del.subcategoryNameAr || del.subcategory || 'غير محدد'}
+   - الكمية: ${del.quantity || 0}
+   - المعالجة: ${getProcessingText(del.processing || '')}
+   - السعر: ${formatCurrencyUnified(del.totalIQD || 0)} (${formatCurrencyUnified(del.totalUSD || 0, 'USD')})
    ${del.conditions?.isRush ? '   - عاجل (Rush)' : ''}
    ${del.conditions?.locationZone ? `   - المنطقة: ${getLocationZoneText(del.conditions.locationZone)}` : ''}
 `;
@@ -213,8 +250,8 @@ ${index + 1}. ${del.subcategoryNameAr || del.subcategory}
 ${deliverablesList}
 
 الإجمالي:
-- بالدينار العراقي: ${formatCurrencyUnified(projectData.totalIQD)}
-- بالدولار الأمريكي: ${formatCurrencyUnified(projectData.totalUSD, 'USD')} (مثبّت بسعر صرف ${projectData?.fxSnapshot?.rate || '1300'})
+- بالدينار العراقي: ${formatCurrencyUnified(projectData.totalIQD || 0)}
+- بالدولار الأمريكي: ${formatCurrencyUnified(projectData.totalUSD || 0, 'USD')} (مثبّت بسعر صرف ${projectData?.fxSnapshot?.rate || '1300'})
 
 ملاحظات:
 - الأسعار شاملة جميع الخدمات المذكورة
@@ -231,7 +268,7 @@ ${deliverablesList}
 }
 
 // دالة إرسال العرض بالبريد الإلكتروني
-async function sendEmailQuote(projectData: any, clientData: any, content: string) {
+async function sendEmailQuote(projectData: ProjectData, clientData: ClientData, content: string) {
   try {
     // هنا يتم الإرسال الفعلي عبر خدمة البريد الإلكتروني
     // مؤقتاً نسجل فقط في console
@@ -252,7 +289,7 @@ async function sendEmailQuote(projectData: any, clientData: any, content: string
 }
 
 // دالة إرسال العرض عبر واتساب
-async function sendWhatsAppQuote(projectData: any, clientData: any, content: string) {
+async function sendWhatsAppQuote(projectData: ProjectData, clientData: ClientData, content: string) {
   try {
     // هنا يتم الإرسال الفعلي عبر واتساب API
     // مؤقتاً نسجل فقط في console

@@ -5,6 +5,30 @@ import { adminDb } from '@/lib/firebase/admin';
 import { getActiveRateCard } from '@/lib/catalog/read';
 import { getCurrentFXRate, createFXSnapshot, formatCurrency as formatCurrencyUnified } from '@/lib/pricing/fx';
 
+// Types
+interface Deliverable {
+  subcategoryNameAr?: string;
+  subcategory?: string;
+  quantity?: number;
+  processing?: string;
+  totalIQD?: number;
+  totalUSD?: number;
+  assignedToName?: string;
+  conditions?: {
+    isRush?: boolean;
+    locationZone?: string;
+  };
+}
+
+interface ProjectData {
+  deliverables?: Deliverable[];
+  [key: string]: unknown;
+}
+
+interface ProjectSnapshot {
+  [key: string]: unknown;
+}
+
 // POST /api/admin/projects/[id]/approve
 // اعتماد المشروع وإنشاء Version Snapshot - حسب الوثائق
 export async function POST(
@@ -181,16 +205,16 @@ async function getCurrentVersion() {
 
 
 // دالة إنشاء SOW (Statement of Work)
-async function generateSOW(projectData: any, snapshot: any) {
+async function generateSOW(projectData: ProjectData, snapshot: ProjectSnapshot) {
   const deliverables = projectData.deliverables || [];
   
   let deliverablesList = '';
-  deliverables.forEach((del: any, index: number) => {
+  deliverables.forEach((del: Deliverable, index: number) => {
     deliverablesList += `
-${index + 1}. ${del.subcategoryNameAr || del.subcategory}
-   - الكمية: ${del.quantity}
-   - المعالجة: ${getProcessingText(del.processing)}
-   - السعر: ${formatCurrencyUnified(del.totalIQD)} (${formatCurrencyUnified(del.totalUSD, 'USD')})
+${index + 1}. ${del.subcategoryNameAr || del.subcategory || 'غير محدد'}
+   - الكمية: ${del.quantity || 0}
+   - المعالجة: ${getProcessingText(del.processing || '')}
+   - السعر: ${formatCurrencyUnified(del.totalIQD || 0)} (${formatCurrencyUnified(del.totalUSD || 0, 'USD')})
    - المُسند إلى: ${del.assignedToName || 'سيتم التحديد'}
    ${del.conditions?.isRush ? '   - عاجل (Rush) - SLA مخفض' : ''}
    ${del.conditions?.locationZone ? `   - المنطقة: ${getLocationZoneText(del.conditions.locationZone)}` : ''}

@@ -1,24 +1,28 @@
 // صفحة إدارة المعدات المخصصة المقترحة من المبدعين
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Package, 
   Check, 
   X, 
   Edit, 
-  Eye,
   Clock,
-  User,
-  Calendar,
-  Filter,
   Search,
   AlertCircle,
   CheckCircle,
   XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+
+interface CustomEquipmentModifications {
+  name?: string;
+  brand?: string;
+  model?: string;
+  description?: string;
+  category?: string;
+}
 
 interface CustomEquipment {
   id: string;
@@ -34,7 +38,7 @@ interface CustomEquipment {
   reviewedAt?: string;
   rejectionReason?: string;
   changeRequests?: string;
-  adminModifications?: any;
+  adminModifications?: CustomEquipmentModifications;
 }
 
 export default function CustomEquipmentManagement() {
@@ -55,7 +59,7 @@ export default function CustomEquipmentManagement() {
   });
 
   // جلب المعدات المخصصة
-  const fetchCustomEquipment = async () => {
+  const fetchCustomEquipment = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -71,12 +75,12 @@ export default function CustomEquipmentManagement() {
       } else {
         setError(data.error || 'فشل في جلب البيانات');
       }
-    } catch (err) {
+    } catch {
       setError('خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   // مراجعة معدة
   const reviewEquipment = async () => {
@@ -104,7 +108,7 @@ export default function CustomEquipmentManagement() {
         const errorData = await response.json();
         alert(errorData.error || 'حدث خطأ في المراجعة');
       }
-    } catch (error) {
+    } catch {
       alert('خطأ في الاتصال بالخادم');
     }
   };
@@ -121,7 +125,7 @@ export default function CustomEquipmentManagement() {
 
   useEffect(() => {
     fetchCustomEquipment();
-  }, [filter]);
+  }, [filter, fetchCustomEquipment]);
 
   // فتح مودال المراجعة
   const openReviewModal = (item: CustomEquipment, action: 'approve' | 'reject' | 'request_changes') => {

@@ -3,6 +3,55 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Types
+interface ClientData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  company?: string;
+  [key: string]: unknown;
+}
+
+interface ContractData {
+  clientId: string;
+  status: string;
+  type?: string;
+  title?: string;
+  description?: string;
+  amount?: number;
+  currency?: string;
+  value?: number;
+  clientEmail?: string;
+  effectiveDate?: string | number | Date;
+  expiresAt?: string | number | Date;
+  content?: {
+    scope?: string;
+    paymentTerms?: {
+      advance?: number;
+      onDelivery?: number;
+    };
+    liability?: {
+      limit?: string;
+    };
+    deliverables?: Array<{
+      title?: string;
+      description?: string;
+      timeline?: string;
+    }>;
+    budget?: {
+      fees?: number;
+      thirdPartyExpenses?: number;
+      total?: number;
+    };
+    revisionRounds?: number;
+    acceptanceTarget?: number;
+    confidentialityPeriod?: string;
+    obligations?: string;
+  };
+  [key: string]: unknown;
+}
+
 // POST /api/admin/contracts/[id]/send
 // إرسال العقد للعميل عبر البريد أو واتساب
 export async function POST(
@@ -52,7 +101,7 @@ export async function POST(
       }, { status: 404 });
     }
 
-    const contractData = contractDoc.data()!;
+    const contractData = contractDoc.data() as ContractData;
 
     // التحقق من أن العقد في حالة مسودة
     if (contractData.status !== 'draft') {
@@ -63,7 +112,7 @@ export async function POST(
     }
 
     // جلب بيانات العميل
-    let clientData: any = {};
+    let clientData: ClientData = {};
     if (contractData.clientId) {
       try {
         const clientDoc = await adminDb
@@ -72,7 +121,7 @@ export async function POST(
           .get();
         
         if (clientDoc.exists) {
-          clientData = clientDoc.data() || {};
+          clientData = clientDoc.data() as ClientData || {};
         }
       } catch (error) {
         console.warn('Failed to fetch client data:', error);
@@ -150,9 +199,9 @@ export async function POST(
 }
 
 // دالة إنشاء محتوى العقد للإرسال
-function generateContractContent(contractData: any, clientData: any) {
+function generateContractContent(contractData: ContractData, clientData: ClientData) {
   const clientName = clientData.name || clientData.company || 'العميل المحترم';
-  const contractType = getContractTypeText(contractData.type);
+  const contractType = getContractTypeText(contractData.type || '');
   
   let specificContent = '';
   
@@ -175,8 +224,8 @@ function generateContractContent(contractData: any, clientData: any) {
     case 'sow':
       const deliverables = contractData.content?.deliverables || [];
       let deliverablesList = '';
-      deliverables.forEach((del: any, index: number) => {
-        deliverablesList += `${index + 1}. ${del.type} - ${del.quantity} قطعة (${del.format})\n`;
+      deliverables.forEach((del, index: number) => {
+        deliverablesList += `${index + 1}. ${del.title} - ${del.description} (${del.timeline})\n`;
       });
       
       specificContent = `
@@ -216,7 +265,7 @@ ${deliverablesList}
 نتشرف بإرسال ${contractType} للمراجعة والتوقيع:
 
 العقد: ${contractData.title}
-${contractData.value ? `القيمة: ${formatCurrency(contractData.value, contractData.currency)}` : ''}
+${contractData.value ? `القيمة: ${formatCurrency(contractData.value, (contractData.currency as 'IQD' | 'USD') || 'IQD')}` : ''}
 ${contractData.effectiveDate ? `تاريخ السريان: ${new Date(contractData.effectiveDate).toLocaleDateString('ar-EG')}` : ''}
 ${contractData.expiresAt ? `تاريخ انتهاء الصلاحية: ${new Date(contractData.expiresAt).toLocaleDateString('ar-EG')}` : ''}
 
@@ -234,9 +283,9 @@ ${specificContent}
 }
 
 // دالة إرسال العقد بالبريد الإلكتروني
-async function sendEmailContract(contractData: any, clientData: any, content: string, contractId: string) {
+async function sendEmailContract(contractData: ContractData, clientData: ClientData, content: string, contractId: string) {
   try {
-    const contractType = getContractTypeText(contractData.type);
+    const contractType = getContractTypeText(contractData.type || '');
     const subject = `${contractType} - ${contractData.title}`;
     const signatureUrl = `${process.env.NEXTAUTH_URL}/contracts/${contractId}/sign`;
     
@@ -261,7 +310,7 @@ async function sendEmailContract(contractData: any, clientData: any, content: st
 }
 
 // دالة إرسال العقد عبر واتساب
-async function sendWhatsAppContract(contractData: any, clientData: any, content: string) {
+async function sendWhatsAppContract(contractData: ContractData, clientData: ClientData, content: string) {
   try {
     // هنا يتم الإرسال الفعلي عبر واتساب API
     console.log('Sending WhatsApp contract:', {

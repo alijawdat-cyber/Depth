@@ -6,6 +6,49 @@ import { getActiveRateCard } from '@/lib/catalog/read';
 import { calculateQuotePricing } from '@/lib/pricing/engine';
 import { getCurrentFXRate, calculateUSDPreview } from '@/lib/pricing/fx';
 
+// Types
+interface RateCard {
+  basePricesIQD?: Record<string, number>;
+  fxPolicy?: string;
+  [key: string]: unknown;
+}
+
+interface EstimatedCosts {
+  [subcategory: string]: number;
+}
+
+interface ProjectData {
+  vertical?: string;
+  deliverables?: Deliverable[];
+  [key: string]: unknown;
+}
+
+interface Deliverable {
+  subcategory: string;
+  subcategoryNameAr?: string;
+  quantity: number;
+  processing: string;
+  totalIQD: number;
+  totalUSD: number;
+  unitEstimatedCostIQD?: number;
+  assignedTo?: string;
+  assignedToName?: string;
+  assignedToEmail?: string;
+  conditions: {
+    isRush?: boolean;
+    locationZone?: string;
+  };
+  guardrails?: {
+    status: string;
+    checks: Array<{
+      type: string;
+      status: string;
+      details: string;
+    }>;
+  };
+  [key: string]: unknown;
+}
+
 // POST /api/admin/projects/[id]/deliverables
 // إضافة تسليمة جديدة للمشروع مع حساب التسعير وفحص Guardrails
 export async function POST(
@@ -101,7 +144,7 @@ export async function POST(
       ? { [subcategory]: unitEstimatedCost }
       : { [subcategory]: 0.55 * (rateCard.basePricesIQD?.[subcategory] || 0) };
 
-    const pricing = calculateQuotePricing(lineInput as any, { rateCard, estimatedCosts });
+    const pricing = calculateQuotePricing(lineInput, { rateCard, estimatedCosts });
     const result = pricing.lines[0];
 
     // اسم عربي للفئة الفرعية (إن وُجد في المشروع الحالي)
@@ -174,7 +217,7 @@ export async function POST(
     let projectTotalUSD = 0;
     let projectEstimatedCostTotalIQD = 0;
 
-    updatedDeliverables.forEach((del: any) => {
+    updatedDeliverables.forEach((del: Deliverable) => {
       const qty = Number(del.quantity) || 0;
       const unitCost = Number(del.unitEstimatedCostIQD) || 0;
       projectTotalIQD += del.totalIQD || 0;
@@ -200,7 +243,7 @@ export async function POST(
     // بناء فهرس معياري للمعيّنين على مستوى المشروع لتمكين استعلامات القيود لاحقاً
     const assignedMemberIds = Array.from(new Set(
       updatedDeliverables
-        .map((del: any) => del.assignedTo)
+        .map((del: Deliverable) => del.assignedTo)
         .filter((v: string | null | undefined): v is string => Boolean(v))
     ));
     await adminDb
