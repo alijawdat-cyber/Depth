@@ -9,7 +9,7 @@ import { StepHeader } from '../OnboardingLayout';
 import SubcategorySelector from '../shared/SubcategorySelector';
 import EquipmentSelector from '../shared/EquipmentSelector';
 import { useState } from 'react';
-import type { ExperienceLevel } from '@/types/onboarding';
+import type { ExperienceLevel, UnifiedCreatorSkill } from '@/types/onboarding';
 
 export default function Step3_Experience() {
   const { formData, updateExperience, updateEquipment, getFieldError } = useOnboarding();
@@ -80,8 +80,25 @@ export default function Step3_Experience() {
           </div>
           <SubcategorySelector
             selectedCategories={formData.basicInfo.primaryCategories}
-            value={experience.skills || []}
-            onChange={(skills) => updateExperience({ skills })}
+            value={experience.skills?.map(skill => ({
+              subcategoryId: skill.subcategoryId,
+              proficiency: (skill.level === 'expert' ? 'pro' : 
+                          skill.level === 'advanced' ? 'intermediate' : 'beginner') as 'beginner' | 'intermediate' | 'pro',
+              notes: skill.notes,
+              verified: skill.verified
+            })) || []}
+            onChange={(skills) => {
+              const unifiedSkills: UnifiedCreatorSkill[] = skills.map(skill => ({
+                subcategoryId: skill.subcategoryId,
+                level: (skill.proficiency === 'pro' ? 'expert' : 
+                       skill.proficiency === 'intermediate' ? 'advanced' : 'beginner') as 'beginner' | 'intermediate' | 'advanced' | 'expert',
+                experienceYears: experience.experienceLevel === 'beginner' ? 1 : 
+                                experience.experienceLevel === 'intermediate' ? 3 : 6,
+                notes: skill.notes,
+                verified: skill.verified
+              }));
+              updateExperience({ skills: unifiedSkills });
+            }}
             error={getFieldError('تخصص')}
             disabled={formData.basicInfo.primaryCategories.length === 0}
           />

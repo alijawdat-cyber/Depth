@@ -18,7 +18,6 @@ import {
   Settings, 
   GitBranch,
   DollarSign,
-  UserCheck,
   Menu,
   X,
   ChevronDown,
