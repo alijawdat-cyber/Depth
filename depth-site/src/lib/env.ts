@@ -12,6 +12,8 @@ const EnvSchema = z.object({
   // NextAuth
   NEXTAUTH_URL: z.string().url().optional(),
   NEXTAUTH_SECRET: z.string().min(1).optional(),
+  // Admin Emails
+  ADMIN_EMAILS: z.string().optional(),
   // Firebase Admin
   FIREBASE_PROJECT_ID: z.string().min(1),
   FIREBASE_CLIENT_EMAIL: z.string().email(),
@@ -61,6 +63,7 @@ export const env = EnvSchema.parse({
   NEXT_PUBLIC_SITE_URL: sanitize(process.env.NEXT_PUBLIC_SITE_URL),
   NEXTAUTH_URL: sanitize(process.env.NEXTAUTH_URL),
   NEXTAUTH_SECRET: sanitize(process.env.NEXTAUTH_SECRET),
+  ADMIN_EMAILS: sanitize(process.env.ADMIN_EMAILS),
   FIREBASE_PROJECT_ID: sanitize(process.env.FIREBASE_PROJECT_ID),
   FIREBASE_CLIENT_EMAIL: sanitize(process.env.FIREBASE_CLIENT_EMAIL),
   FIREBASE_PRIVATE_KEY: sanitize(process.env.FIREBASE_PRIVATE_KEY),

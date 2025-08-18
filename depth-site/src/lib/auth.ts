@@ -154,15 +154,16 @@ export const authOptions: NextAuthOptions = {
       try {
         const email = String(user?.email || '').toLowerCase();
         const provider = account?.provider || 'unknown';
-        console.log('[auth.signIn] start', { email, provider });
+        console.log('[auth.signIn] start', { email, provider, userId: user?.id });
         
         if (!email) return true;
         
         // للمصادقة بـ Google، تحقق من وجود المستخدم في النظام
         if (provider === 'google') {
           const userRole = await determineUserRole(email);
+          console.log('[auth.signIn] determined role:', userRole);
           
-          // إذا لم يكن موجود في أي مجموعة، أنشئ عميل جديد
+          // فقط أنشئ عميل جديد إذا لم يكن موجود في أي مجموعة
           if (userRole === 'client') {
             const clientSnap = await adminDb
               .collection('clients')
@@ -171,6 +172,7 @@ export const authOptions: NextAuthOptions = {
               .get();
               
             if (clientSnap.empty) {
+              console.log('[auth.signIn] creating new client document for:', email);
               await adminDb.collection('clients').add({
                 email,
                 name: user?.name || '',
@@ -181,7 +183,13 @@ export const authOptions: NextAuthOptions = {
                 createdAt: new Date(),
                 updatedAt: new Date(),
               });
+            } else {
+              console.log('[auth.signIn] client document already exists for:', email);
             }
+          } else {
+            console.log('[auth.signIn] user has existing role:', userRole, 'for email:', email);
+            // Admin, creator, employee users لا نحتاج لإنشاء documents إضافية
+            // FirestoreAdapter سينشئ documents في users و accounts تلقائياً
           }
         }
         
@@ -218,14 +226,30 @@ async function determineUserRole(email: string): Promise<string> {
   const emailLower = email.toLowerCase();
   
   try {
-    // 1. تحقق من الأدمن
+    // 1. تحقق من قائمة الأدمن في متغيرات البيئة أولاً (أولوية قصوى)
     const adminList = (process.env.ADMIN_EMAILS || 'admin@depth-agency.com')
       .split(',')
       .map(e => e.trim().toLowerCase())
       .filter(Boolean);
     if (adminList.includes(emailLower)) return 'admin';
     
-    // 2. تحقق من المبدعين (كلا الحقلين contact.email و email)
+    // 2. تحقق من الأدمن في مجموعة admins (احتياطي)
+    const adminDocSnap = await adminDb
+      .collection('admins')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!adminDocSnap.empty) return 'admin';
+    
+    // 3. تحقق من الموظفين
+    const employeeSnap = await adminDb
+      .collection('employees')
+      .where('email', '==', emailLower)
+      .limit(1)
+      .get();
+    if (!employeeSnap.empty) return 'employee';
+    
+    // 4. تحقق من المبدعين (كلا الحقلين contact.email و email)
     const creatorSnap = await adminDb
       .collection('creators')
       .where('contact.email', '==', emailLower)
@@ -239,15 +263,7 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!creatorTop.empty) return 'creator';
     
-    // 3. تحقق من الموظفين
-    const employeeSnap = await adminDb
-      .collection('employees')
-      .where('email', '==', emailLower)
-      .limit(1)
-      .get();
-    if (!employeeSnap.empty) return 'employee';
-    
-    // 4. تحقق من العملاء
+    // 5. تحقق من العملاء
     const clientSnap = await adminDb
       .collection('clients')
       .where('email', '==', emailLower)
@@ -255,7 +271,7 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!clientSnap.empty) return 'client';
     
-    // 5. افتراضي: عميل جديد
+    // 6. افتراضي: عميل جديد
     return 'client';
   } catch (error) {
     console.error('[determineUserRole] Error:', error);
