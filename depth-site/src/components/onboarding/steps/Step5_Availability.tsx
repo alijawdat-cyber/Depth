@@ -8,7 +8,6 @@ import { SelectField, InputField, CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
 import EnhancedAvailabilityGrid from '../shared/EnhancedAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
-import { toast } from 'sonner';
 
 export default function Step5_Availability() {
   const { formData, updateAvailability, getFieldError } = useOnboarding();
@@ -213,8 +212,14 @@ export default function Step5_Availability() {
                 const totalAvailableHours = weeklyAvailability
                   .filter(day => day.available)
                   .reduce((total, day) => {
-                    const hours = day.timeSlots?.length || 8; // افتراض 8 ساعات يومياً
-                    return total + hours;
+                    // حساب الساعات بناءً على start/end time أو افتراض 8 ساعات
+                    let dayHours = 8; // القيمة الافتراضية
+                    if (day.startTime && day.endTime) {
+                      const start = new Date(`2000-01-01T${day.startTime}`);
+                      const end = new Date(`2000-01-01T${day.endTime}`);
+                      dayHours = Math.max(1, (end.getTime() - start.getTime()) / (1000 * 60 * 60));
+                    }
+                    return total + dayHours;
                   }, 0);
                 updateAvailability({ weeklyHours: Math.min(totalAvailableHours, 40) });
               }
