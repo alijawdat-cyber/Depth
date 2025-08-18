@@ -27,25 +27,42 @@ async function determineUserRole(email: string): Promise<string> {
 
 // GET /api/admin/users
 // جلب جميع المستخدمين مع الإحصائيات - للإدمن فقط
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     
+    // تشخيص مفصل
+    console.log('[ADMIN_USERS_API] Session details:', {
+      sessionExists: !!session,
+      userEmail: session?.user?.email,
+      userRole: session?.user?.role,
+      timestamp: new Date().toISOString()
+    });
+
     if (!session?.user?.email) {
+      console.log('[ADMIN_USERS_API] No session or email found');
       return NextResponse.json({ 
         success: false, 
         error: 'غير مسموح - يتطلب تسجيل الدخول' 
       }, { status: 401 });
     }
 
-    if (session.user.role !== 'admin') {
+    // تحقق من الدور مع تشخيص
+    const userRole = session.user.role || await determineUserRole(session.user.email);
+    console.log('[ADMIN_USERS_API] Role check:', {
+      sessionRole: session.user.role,
+      determinedRole: userRole,
+      email: session.user.email,
+      isAdmin: userRole === 'admin'
+    });
+
+    if (userRole !== 'admin') {
+      console.log('[ADMIN_USERS_API] Access denied - not admin:', { userRole, email: session.user.email });
       return NextResponse.json({ 
         success: false, 
-        error: 'غير مسموح - مخصص للإدمن فقط' 
+        error: `غير مسموح - مخصص للإدمن فقط. الدور الحالي: ${userRole}` 
       }, { status: 403 });
-    }
-
-    // استخراج معاملات البحث والفلترة
+    }    // استخراج معاملات البحث والفلترة
     const { searchParams } = new URL(req.url);
     const roleFilter = searchParams.get('role');
     const statusFilter = searchParams.get('status');
