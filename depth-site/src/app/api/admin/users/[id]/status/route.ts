@@ -3,6 +3,14 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Types
+interface UserData {
+  name?: string;
+  displayName?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
 // PATCH /api/admin/users/[id]/status
 // تغيير حالة المستخدم - للإدمن فقط
 export async function PATCH(
@@ -135,7 +143,7 @@ export async function PATCH(
 }
 
 // دالة إرسال إشعار تغيير الحالة
-async function sendStatusChangeNotification(userData: any, newStatus: string, collection: string) {
+async function sendStatusChangeNotification(userData: UserData, newStatus: string, collection: string) {
   try {
     const userRole = getUserRole(collection);
 

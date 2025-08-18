@@ -68,11 +68,14 @@ export async function GET(req: NextRequest) {
     // جلب المجموعات الجاهزة (إذا مطلوبة)
     let presets: EquipmentPresetKit[] = [];
     if (includePresets === 'true') {
-      let presetsQuery = adminDb.collection('equipment_presets');
+      let presetsSnapshot;
       if (targetRole) {
-        presetsQuery = presetsQuery.where('targetRole', '==', targetRole) as any;
+        presetsSnapshot = await adminDb.collection('equipment_presets')
+          .where('targetRole', '==', targetRole)
+          .get();
+      } else {
+        presetsSnapshot = await adminDb.collection('equipment_presets').get();
       }
-      const presetsSnapshot = await presetsQuery.get();
       presets = presetsSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()

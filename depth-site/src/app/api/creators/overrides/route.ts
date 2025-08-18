@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { getActiveRateCard } from '@/lib/catalog/read';
 import { calculateQuotePricing } from '@/lib/pricing/engine';
+import type { QuoteLineInput } from '@/types/catalog';
 
 // GET /api/creators/overrides
 // جلب طلبات Override الخاصة بالمبدع
@@ -263,7 +264,7 @@ export async function POST(req: NextRequest) {
             processing: (processing || 'full_retouch'),
             conditions: conditions && typeof conditions === 'object' ? conditions : undefined
           }
-        ] as any, { rateCard, estimatedCosts: {} });
+        ] as QuoteLineInput[], { rateCard, estimatedCosts: {} });
         currentPriceIQD = pricing.lines[0]?.unitPriceIQD || 0;
       }
     } catch (error) {

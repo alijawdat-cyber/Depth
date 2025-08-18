@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Types
+interface DeliverableData {
+  totalIQD?: number;
+  totalUSD?: number;
+  [key: string]: unknown;
+}
+
 // GET /api/admin/projects
 // جلب جميع المشاريع مع الإحصائيات - للإدمن فقط
 export async function GET() {
@@ -75,7 +82,7 @@ export async function GET() {
       let projectTotalUSD = 0;
       let projectMargin = 0;
 
-      deliverables.forEach((deliverable: any) => {
+      deliverables.forEach((deliverable: DeliverableData) => {
         projectTotalIQD += deliverable.totalIQD || 0;
         projectTotalUSD += deliverable.totalUSD || 0;
       });

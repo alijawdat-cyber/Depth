@@ -1,5 +1,5 @@
 // API لإدارة أرباح المبدعين
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
@@ -25,7 +25,7 @@ interface PaymentRecord {
 }
 
 // GET /api/creators/earnings - جلب أرباح المبدع
-export async function GET(req: NextRequest) {
+export async function GET() {
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   
   try {

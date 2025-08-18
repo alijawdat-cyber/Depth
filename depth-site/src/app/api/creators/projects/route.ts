@@ -3,17 +3,45 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Types (إضافة نوع مقاييس الأداء)
+interface PerformanceMetrics {
+  onTimePercentage: number;
+  firstPassPercentage: number;
+  averageCompletionTime: number;
+  totalCompletedTasks: number;
+}
+
+interface TaskData {
+  assignedTo?: string;
+  status?: string;
+  quality?: string;
+  completedAt?: string;
+  assignedAt?: string;
+  rate?: number;
+  dueDate?: string;
+  deadline?: string;
+  revisionCount?: number;
+  [key: string]: unknown;
+}
+
+interface ProjectData {
+  tasks?: TaskData[];
+  slaHours?: number;
+  deliverables?: unknown[];
+  [key: string]: unknown;
+}
+
 // دوال حساب Speed Bonus حسب الوثائق
-function calculateSpeedBonus(projectData: any, creatorId: string): number {
-  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
-  const completedTasks = creatorTasks.filter((task: any) => task.status === 'completed' && task.quality === 'approved');
+function calculateSpeedBonus(projectData: ProjectData, creatorId: string): number {
+  const creatorTasks = (projectData.tasks || []).filter((task: TaskData) => task.assignedTo === creatorId);
+  const completedTasks = creatorTasks.filter((task: TaskData) => task.status === 'completed' && task.quality === 'approved');
   
   if (completedTasks.length === 0) return 0;
   
   let totalBonus = 0;
   const slaHours = projectData.slaHours || 48;
   
-  completedTasks.forEach((task: any) => {
+  completedTasks.forEach((task: TaskData) => {
     if (task.completedAt && task.assignedAt) {
       const completionTime = new Date(task.completedAt).getTime() - new Date(task.assignedAt).getTime();
       const completionHours = completionTime / (1000 * 60 * 60);
@@ -30,28 +58,28 @@ function calculateSpeedBonus(projectData: any, creatorId: string): number {
   return Math.round(totalBonus);
 }
 
-function isDeliveredEarly(projectData: any, creatorId: string): boolean {
-  const creatorTasks = (projectData.tasks || []).filter((task: any) => 
+function isDeliveredEarly(projectData: ProjectData, creatorId: string): boolean {
+  const creatorTasks = (projectData.tasks || []).filter((task: TaskData) => 
     task.assignedTo === creatorId && task.status === 'completed'
   );
   
-  return creatorTasks.some((task: any) => {
-    if (task.completedAt && task.deadline) {
-      return new Date(task.completedAt) < new Date(task.deadline);
+  return creatorTasks.some((task: TaskData) => {
+    if (task.completedAt && task.dueDate) {
+      return new Date(task.completedAt) < new Date(task.dueDate);
     }
     return false;
   });
 }
 
 // حساب نقاط الجودة حسب الوثائق
-function calculateQualityScore(projectData: any, creatorId: string): number {
-  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
+function calculateQualityScore(projectData: ProjectData, creatorId: string): number {
+  const creatorTasks = (projectData.tasks || []).filter((task: TaskData) => task.assignedTo === creatorId);
   if (creatorTasks.length === 0) return 0;
   
   let totalScore = 0;
   let scoredTasks = 0;
   
-  creatorTasks.forEach((task: any) => {
+  creatorTasks.forEach((task: TaskData) => {
     if (task.quality) {
       switch (task.quality) {
         case 'excellent': totalScore += 5; break;
@@ -69,19 +97,19 @@ function calculateQualityScore(projectData: any, creatorId: string): number {
 }
 
 // حساب مقاييس الأداء
-function calculatePerformanceMetrics(projectData: any, creatorId: string): any {
-  const creatorTasks = (projectData.tasks || []).filter((task: any) => task.assignedTo === creatorId);
+function calculatePerformanceMetrics(projectData: ProjectData, creatorId: string): PerformanceMetrics | null {
+  const creatorTasks = (projectData.tasks || []).filter((task: TaskData) => task.assignedTo === creatorId);
   if (creatorTasks.length === 0) return null;
   
-  const completedTasks = creatorTasks.filter((task: any) => task.status === 'completed');
-  const onTimeTasks = completedTasks.filter((task: any) => {
+  const completedTasks = creatorTasks.filter((task: TaskData) => task.status === 'completed');
+  const onTimeTasks = completedTasks.filter((task: TaskData) => {
     if (task.completedAt && task.deadline) {
-      return new Date(task.completedAt) <= new Date(task.deadline);
+      return new Date(task.completedAt) <= new Date(task.deadline!);
     }
     return false;
   });
   
-  const firstPassTasks = completedTasks.filter((task: any) => 
+  const firstPassTasks = completedTasks.filter((task: TaskData) => 
     task.revisionCount === 0 || task.revisionCount === undefined
   );
   
@@ -93,12 +121,12 @@ function calculatePerformanceMetrics(projectData: any, creatorId: string): any {
   };
 }
 
-function calculateAverageCompletionTime(tasks: any[]): number {
+function calculateAverageCompletionTime(tasks: TaskData[]): number {
   const timesInHours = tasks
-    .filter((task: any) => task.assignedAt && task.completedAt)
-    .map((task: any) => {
-      const assignedTime = new Date(task.assignedAt).getTime();
-      const completedTime = new Date(task.completedAt).getTime();
+    .filter((task: TaskData) => task.assignedAt && task.completedAt)
+    .map((task: TaskData) => {
+      const assignedTime = new Date(task.assignedAt!).getTime();
+      const completedTime = new Date(task.completedAt!).getTime();
       return (completedTime - assignedTime) / (1000 * 60 * 60); // ساعات
     });
   
