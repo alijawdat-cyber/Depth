@@ -84,19 +84,6 @@ export async function POST(req: NextRequest) {
       disabled: false
     });
 
-    // إنشاء وثيقة المستخدم في Firestore للتوافق مع NextAuth
-    const userData = {
-      name: fullName,
-      email,
-      emailVerified: null, // للتوافق مع NextAuth adapter
-      image: null,
-      role: 'creator',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    const userDoc = await adminDb.collection('users').add(userData);
-
     // إنشاء وثيقة المبدع الأولية
     const creatorData = {
       uid: userRecord.uid,
@@ -116,16 +103,26 @@ export async function POST(req: NextRequest) {
         startedAt: new Date().toISOString()
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      userId: userDoc.id // ربط بسجل المستخدم
+      updatedAt: new Date().toISOString()
     };
 
+    // حفظ في مجموعة creators المتخصصة
     const creatorDocRef = await adminDb.collection('creators').add(creatorData);
 
-    // تحديث سجل المستخدم بمعرف المبدع
-    await adminDb.collection('users').doc(userDoc.id).update({
-      creatorId: creatorDocRef.id,
-      updatedAt: new Date().toISOString()
+    // حفظ في مجموعة users الموحدة
+    const userDocRef = await adminDb.collection('users').add({
+      name: fullName,
+      email,
+      role: 'creator',
+      status: 'onboarding_started',
+      profileId: creatorDocRef.id, // ربط مع الملف الشخصي
+      source: 'creator-onboarding',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      emailVerified: false,
+      twoFactorEnabled: false,
+      phone,
+      uid: userRecord.uid
     });
 
     console.log('Account and creator profile created successfully for:', email);
@@ -136,6 +133,7 @@ export async function POST(req: NextRequest) {
       data: {
         uid: userRecord.uid,
         creatorId: creatorDocRef.id,
+        userId: userDocRef.id,
         email,
         fullName,
         status: 'onboarding_started',

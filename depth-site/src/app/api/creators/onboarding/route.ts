@@ -242,6 +242,31 @@ export async function POST(req: NextRequest) {
 
       creatorDoc = await adminDb.collection('creators').add(creatorData);
 
+      // ✅ حفظ في users collection للتوحيد
+      try {
+        await adminDb.collection('users').add({
+          name: formData.account.fullName.trim(),
+          email: email,
+          role: 'creator',
+          status: 'intake_submitted',
+          profileId: creatorDoc.id, // ربط مع الملف الشخصي
+          source: 'creator-onboarding',
+          createdAt: now,
+          updatedAt: now,
+          emailVerified: false,
+          twoFactorEnabled: false,
+          // نسخ بعض البيانات المهمة
+          phone: formData.account.phone.trim(),
+          city: formData.basicInfo.city.trim(),
+          specialization: formData.basicInfo.role,
+          experienceLevel: formData.experience.experienceLevel,
+        });
+        console.log('[onboarding] Creator also added to users collection for unification');
+      } catch (usersError) {
+        console.warn('[onboarding] Failed to add creator to users collection:', usersError);
+        // لا نفشل التسجيل إذا فشل التوحيد
+      }
+
       console.log('[onboarding] Creator document created successfully:', {
         creatorId: creatorDoc.id,
         email: email,

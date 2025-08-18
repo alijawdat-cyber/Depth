@@ -1,41 +1,116 @@
-// API لإدارة المعدات المخصصة من لوحة الأدمن
+// API لإضافة معدات مخصصة من المبدعين
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { Query, DocumentData } from 'firebase-admin/firestore';
 
-// جلب جميع المعدات المخصصة للمراجعة
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email || session.user.role !== 'creator') {
+      return NextResponse.json(
+        { error: 'غير مسموح - يتطلب حساب مبدع' },
+        { status: 401 }
+      );
+    }
+
+    const data = await req.json();
+    const { name, brand, model, category, description, condition } = data;
+
+    // التحقق من البيانات الأساسية
+    if (!name?.trim() || !brand?.trim() || !category) {
+      return NextResponse.json(
+        { error: 'اسم المعدة والماركة والفئة مطلوبة' },
+        { status: 400 }
+      );
+    }
+
+    // إنشاء معرف فريد
+    const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // إضافة المعدة المخصصة لقاعدة البيانات
+    const customEquipmentData = {
+      id: customId,
+      name: name.trim(),
+      brand: brand.trim(),
+      model: model?.trim() || '',
+      category,
+      description: description?.trim() || '',
+      condition: condition || 'good',
+      status: 'pending_review',
+      isCustom: true,
+      submittedBy: session.user.email,
+      submittedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    await adminDb.collection('custom_equipment').doc(customId).set(customEquipmentData);
+
+    // تسجيل في audit log
+    await adminDb.collection('audit_log').add({
+      action: 'custom_equipment_submitted',
+      entityType: 'custom_equipment',
+      entityId: customId,
+      userId: session.user.email,
+      timestamp: new Date().toISOString(),
+      details: {
+        name,
+        brand,
+        model,
+        category,
+        status: 'pending_review'
+      }
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'تم إرسال المعدة للمراجعة بنجاح',
+      data: {
+        id: customId,
+        status: 'pending_review'
+      }
+    });
+
+  } catch (error) {
+    console.error('Custom equipment submission error:', error);
+    return NextResponse.json(
+      { error: 'حدث خطأ في إرسال المعدة للمراجعة' },
+      { status: 500 }
+    );
+  }
+}
+
+// جلب المعدات المخصصة للمبدع
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email || session.user.role !== 'admin') {
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { error: 'غير مسموح - يتطلب صلاحيات أدمن' },
+        { error: 'غير مسموح - يتطلب تسجيل الدخول' },
         { status: 401 }
       );
     }
 
     const url = new URL(req.url);
-    const status = url.searchParams.get('status') || 'pending_review';
-    const category = url.searchParams.get('category');
-    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const status = url.searchParams.get('status');
 
     let query: Query<DocumentData> = adminDb.collection('custom_equipment');
     
+    // للمبدعين: عرض معداتهم المخصصة فقط
+    if (session.user.role === 'creator') {
+      query = query.where('submittedBy', '==', session.user.email);
+    }
+    
+    // فلترة حسب الحالة إذا كانت محددة
     if (status) {
       query = query.where('status', '==', status);
     }
     
-    if (category) {
-      query = query.where('category', '==', category);
-    }
-    
-    const snapshot = await query
-      .orderBy('createdAt', 'desc')
-      .limit(limit)
-      .get();
+    const snapshot = await query.orderBy('createdAt', 'desc').get();
     
     interface CustomEquipmentData {
       id: string;
@@ -48,11 +123,6 @@ export async function GET(req: NextRequest) {
       submittedBy: string;
       createdAt: string;
       updatedAt?: string;
-      reviewedBy?: string;
-      reviewedAt?: string;
-      rejectionReason?: string;
-      changeRequests?: string;
-      adminModifications?: Record<string, unknown>;
     }
 
     const customEquipment: CustomEquipmentData[] = snapshot.docs.map(doc => ({
@@ -60,24 +130,9 @@ export async function GET(req: NextRequest) {
       ...doc.data()
     } as CustomEquipmentData));
 
-    // إحصائيات
-    const stats = {
-      pending: 0,
-      approved: 0,
-      rejected: 0,
-      total: customEquipment.length
-    };
-
-    customEquipment.forEach((item) => {
-      if (item.status === 'pending_review') stats.pending++;
-      else if (item.status === 'approved') stats.approved++;
-      else if (item.status === 'rejected') stats.rejected++;
-    });
-
     return NextResponse.json({
       success: true,
       data: customEquipment,
-      stats,
       total: customEquipment.length
     });
 
@@ -85,120 +140,6 @@ export async function GET(req: NextRequest) {
     console.error('Get custom equipment error:', error);
     return NextResponse.json(
       { error: 'حدث خطأ في جلب المعدات المخصصة' },
-      { status: 500 }
-    );
-  }
-}
-
-// الموافقة على معدة مخصصة أو رفضها
-export async function PUT(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'غير مسموح - يتطلب صلاحيات أدمن' },
-        { status: 401 }
-      );
-    }
-
-    const { equipmentId, action, feedback, modifications } = await req.json();
-
-    if (!equipmentId || !action || !['approve', 'reject', 'request_changes'].includes(action)) {
-      return NextResponse.json(
-        { error: 'معرف المعدة والإجراء مطلوبان' },
-        { status: 400 }
-      );
-    }
-
-    const equipmentRef = adminDb.collection('custom_equipment').doc(equipmentId);
-    const equipmentDoc = await equipmentRef.get();
-
-    if (!equipmentDoc.exists) {
-      return NextResponse.json(
-        { error: 'المعدة غير موجودة' },
-        { status: 404 }
-      );
-    }
-
-    const equipmentData = equipmentDoc.data();
-    const now = new Date().toISOString();
-
-    const updateData: Record<string, unknown> = {
-      updatedAt: now,
-      reviewedBy: session.user.email,
-      reviewedAt: now
-    };
-
-    if (action === 'approve') {
-      updateData.status = 'approved';
-      
-      // إضافة المعدة للكاتالوج الرسمي إذا تم الموافقة عليها
-      const catalogData = {
-        id: `approved_${equipmentId}`,
-        name: modifications?.name || equipmentData?.name,
-        brand: modifications?.brand || equipmentData?.brand,
-        model: modifications?.model || equipmentData?.model,
-        category: equipmentData?.category,
-        description: modifications?.description || equipmentData?.description,
-        isApproved: true,
-        addedFromCustom: true,
-        originalCustomId: equipmentId,
-        approvedBy: session.user.email,
-        approvedAt: now,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      await adminDb.collection('equipment_catalog').doc(`approved_${equipmentId}`).set(catalogData);
-      
-    } else if (action === 'reject') {
-      updateData.status = 'rejected';
-      updateData.rejectionReason = feedback;
-      
-    } else if (action === 'request_changes') {
-      updateData.status = 'changes_requested';
-      updateData.changeRequests = feedback;
-    }
-
-    // إضافة التعديلات إذا كانت موجودة
-    if (modifications) {
-      updateData.adminModifications = modifications;
-    }
-
-    await equipmentRef.update(updateData);
-
-    // تسجيل في audit log
-    await adminDb.collection('audit_log').add({
-      action: `custom_equipment_${action}`,
-      entityType: 'custom_equipment',
-      entityId: equipmentId,
-      userId: session.user.email,
-      timestamp: now,
-      details: {
-        originalName: equipmentData?.name,
-        action,
-        feedback,
-        modifications
-      }
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: action === 'approve' ? 'تم اعتماد المعدة وإضافتها للكاتالوج' :
-               action === 'reject' ? 'تم رفض المعدة' :
-               'تم طلب تعديلات على المعدة',
-      data: {
-        equipmentId,
-        status: updateData.status,
-        catalogId: action === 'approve' ? `approved_${equipmentId}` : null
-      }
-    });
-
-  } catch (error) {
-    console.error('Update custom equipment error:', error);
-    return NextResponse.json(
-      { error: 'حدث خطأ في تحديث حالة المعدة' },
       { status: 500 }
     );
   }
