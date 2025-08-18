@@ -111,8 +111,16 @@ export async function POST(req: NextRequest) {
         name: fullName.trim(),
         email: email.toLowerCase().trim(),
         role: 'client',
-        clientId: docRef.id,
-        createdAt: now
+        profileId: docRef.id, // ربط مع الملف الشخصي
+        status: 'pending',
+        source: 'web-signup',
+        createdAt: now,
+        updatedAt: now,
+        emailVerified: false,
+        twoFactorEnabled: false,
+        // نسخ بعض البيانات المهمة
+        phone: phone.trim(),
+        company: company?.trim() || '',
       });
     } catch (error) {
       console.warn('[client.signup] Failed to create user record:', error);

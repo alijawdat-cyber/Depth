@@ -51,12 +51,30 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date(),
     };
 
-    const docRef = await adminDb.collection('clients').add(clientData);
+    // حفظ في مجموعة clients المتخصصة
+    const clientDocRef = await adminDb.collection('clients').add(clientData);
+
+    // حفظ في مجموعة users الموحدة
+    const userDocRef = await adminDb.collection('users').add({
+      name,
+      email,
+      role: 'client',
+      status: 'pending',
+      profileId: clientDocRef.id, // ربط مع الملف الشخصي
+      source: 'portal-client-registration',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      emailVerified: false,
+      twoFactorEnabled: false,
+      company,
+      phone,
+    });
 
     return NextResponse.json({
       success: true,
       message: 'تم إنشاء الحساب بنجاح. في انتظار التفعيل من الإدارة',
-      clientId: docRef.id,
+      clientId: clientDocRef.id,
+      userId: userDocRef.id,
     });
 
   } catch (error) {

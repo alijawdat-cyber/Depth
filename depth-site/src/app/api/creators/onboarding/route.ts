@@ -255,9 +255,18 @@ export async function POST(req: NextRequest) {
           name: formData.account.fullName.trim(),
           email: email,
           role: 'creator',
-          creatorId: creatorDoc.id,
+          profileId: creatorDoc.id, // ربط مع الملف الشخصي
           onboardingStatus: 'completed',
-          createdAt: now
+          status: 'pending', // في انتظار موافقة الإدارة
+          source: 'creator-onboarding',
+          createdAt: now,
+          updatedAt: now,
+          emailVerified: false,
+          twoFactorEnabled: false,
+          // نسخ بعض البيانات المهمة للوصول السريع
+          phone: formData.account.phone.trim(),
+          city: formData.basicInfo.city.trim(),
+          primaryCategories: formData.basicInfo.primaryCategories,
         });
         console.log('[onboarding] User record created successfully for:', email);
       } catch (error) {

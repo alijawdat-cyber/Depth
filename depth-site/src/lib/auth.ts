@@ -233,7 +233,7 @@ async function determineUserRole(email: string): Promise<string> {
       .filter(Boolean);
     if (adminList.includes(emailLower)) return 'admin';
     
-    // 2. تحقق من مجموعة users الموحدة
+    // 2. تحقق من مجموعة users الموحدة أولاً (الأولوية الأعلى)
     const userSnap = await adminDb
       .collection('users')
       .where('email', '==', emailLower)
@@ -249,6 +249,8 @@ async function determineUserRole(email: string): Promise<string> {
     }
     
     // 3. احتياطي: تحقق من المجموعات المنفصلة (للتوافق مع النظام القديم)
+    // البحث بترتيب الأولوية: admin > employee > creator > client
+    
     const adminDocSnap = await adminDb
       .collection('admins')
       .where('email', '==', emailLower)
@@ -263,6 +265,7 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!employeeSnap.empty) return 'employee';
     
+    // البحث في creators (لديهم contact.email)
     const creatorSnap = await adminDb
       .collection('creators')
       .where('contact.email', '==', emailLower)
@@ -270,6 +273,7 @@ async function determineUserRole(email: string): Promise<string> {
       .get();
     if (!creatorSnap.empty) return 'creator';
     
+    // البحث في creators بـ email مباشر (احتياطي)
     const creatorTop = await adminDb
       .collection('creators')
       .where('email', '==', emailLower)

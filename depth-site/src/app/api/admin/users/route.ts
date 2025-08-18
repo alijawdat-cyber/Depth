@@ -54,7 +54,14 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // جلب جميع المستخدمين من مجموعة users الموحدة
-    const users = [];
+    const users: Array<{
+      id: string;
+      role: string;
+      status: string;
+      name: string;
+      email: string;
+      [key: string]: any;
+    }> = [];
 
     // إحصائيات
     let totalUsers = 0;
@@ -82,91 +89,113 @@ export async function GET(req: NextRequest) {
     currentMonth.setHours(0, 0, 0, 0);
 
     try {
-      // بناء الاستعلام مع الفلاتر
-      let query: any = adminDb.collection('users');
-      
-      // فلتر الحالة
-      if (statusFilter && statusFilter !== 'all') {
-        query = query.where('status', '==', statusFilter);
-      }
+      // جمع المستخدمين من جميع المجموعات
+      const collections = [
+        { name: 'users', role: null }, // مجموعة موحدة (إن وجدت)
+        { name: 'clients', role: 'client' },
+        { name: 'creators', role: 'creator' },
+        { name: 'employees', role: 'employee' },
+        { name: 'admins', role: 'admin' }
+      ];
 
-      // ترتيب حسب البريد الإلكتروني
-      query = query.orderBy('email', 'asc');
+      for (const collection of collections) {
+        try {
+          const collectionRef = adminDb.collection(collection.name);
+          
+          // بناء الاستعلام مع الفلاتر
+          const query = statusFilter && statusFilter !== 'all' 
+            ? collectionRef.where('status', '==', statusFilter)
+            : collectionRef;
 
-      const snapshot = await query.get();
+          const snapshot = await query.get();
 
-      for (const doc of snapshot.docs) {
-        const userData = doc.data();
-        
-        // تحديد الدور باستخدام دالة determineUserRole
-        const userRole = await determineUserRole(userData.email || '');
-        
-        // فلتر الدور
-        if (roleFilter && roleFilter !== 'all' && userRole !== roleFilter) {
-          continue;
-        }
+          for (const doc of snapshot.docs) {
+            const userData = doc.data();
+            
+            // تحديد البريد الإلكتروني (creators لديهم contact.email)
+            const userEmail = userData.email || userData.contact?.email || '';
+            if (!userEmail) continue;
 
-        // فلتر البحث النصي
-        if (searchQuery) {
-          const searchLower = searchQuery.toLowerCase();
-          const matchesSearch = (
-            (userData.name || '').toLowerCase().includes(searchLower) ||
-            (userData.email || '').toLowerCase().includes(searchLower) ||
-            (userData.phone || '').toLowerCase().includes(searchLower) ||
-            (userData.company || '').toLowerCase().includes(searchLower)
-          );
-          if (!matchesSearch) {
-            continue;
+            // تحديد الدور
+            const userRole = collection.role || userData.role || await determineUserRole(userEmail);
+            
+            // فلتر الدور
+            if (roleFilter && roleFilter !== 'all' && userRole !== roleFilter) {
+              continue;
+            }
+
+            // تجنب التكرار (إذا كان المستخدم موجود في مجموعات متعددة)
+            if (users.some(u => u.email === userEmail.toLowerCase())) {
+              continue;
+            }
+
+            // فلتر البحث النصي
+            if (searchQuery) {
+              const searchLower = searchQuery.toLowerCase();
+              const matchesSearch = (
+                (userData.name || userData.fullName || '').toLowerCase().includes(searchLower) ||
+                userEmail.toLowerCase().includes(searchLower) ||
+                (userData.phone || '').toLowerCase().includes(searchLower) ||
+                (userData.company || '').toLowerCase().includes(searchLower)
+              );
+              if (!matchesSearch) {
+                continue;
+              }
+            }
+
+            totalUsers++;
+            
+            // حساب الإحصائيات
+            const status = userData.status || 'active';
+            if (status in statusCounts) {
+              statusCounts[status as keyof typeof statusCounts]++;
+            }
+            
+            if (userRole === 'admin') roleCounts.admins++;
+            else if (userRole === 'employee') roleCounts.employees++;
+            else if (userRole === 'creator') roleCounts.creators++;
+            else roleCounts.clients++;
+            
+            if (userData.emailVerified) verifiedUsers++;
+            if (userData.twoFactorEnabled) twoFactorUsers++;
+            
+            const createdAt = userData.createdAt?.toDate?.() || new Date();
+            if (createdAt >= currentMonth) newUsersThisMonth++;
+            
+            const user = {
+              id: doc.id,
+              role: userRole,
+              status: status,
+              name: userData.name || userData.fullName || userData.displayName || 'غير محدد',
+              email: userEmail,
+              phone: userData.phone || null,
+              avatar: userData.avatar || userData.photoURL || null,
+              company: userData.company || null,
+              industry: userData.industry || null,
+              skills: userData.skills || null,
+              tier: userData.tier || null,
+              modifier: userData.modifier || null,
+              portfolio: userData.portfolio || null,
+              department: userData.department || null,
+              position: userData.position || null,
+              permissions: userRole === 'admin' ? ['all'] : userData.permissions || null,
+              stats: null,
+              createdAt: userData.createdAt || new Date().toISOString(),
+              updatedAt: userData.updatedAt || new Date().toISOString(),
+              lastLoginAt: userData.lastLoginAt || null,
+              emailVerified: userData.emailVerified || false,
+              twoFactorEnabled: userData.twoFactorEnabled || false,
+              loginAttempts: userData.loginAttempts || 0,
+              lockedUntil: userData.lockedUntil || null,
+              source: collection.name, // لمعرفة المصدر
+            };
+
+            users.push(user);
           }
+        } catch (collectionError) {
+          console.warn(`Failed to fetch from ${collection.name}:`, collectionError);
+          // لا نفشل العملية كاملة إذا فشلت مجموعة واحدة
         }
-
-        totalUsers++;
-        
-        // حساب الإحصائيات
-        const status = userData.status || 'active';
-        if (status in statusCounts) {
-          statusCounts[status as keyof typeof statusCounts]++;
-        }
-        
-        if (userRole === 'admin') roleCounts.admins++;
-        else if (userRole === 'employee') roleCounts.employees++;
-        else if (userRole === 'creator') roleCounts.creators++;
-        else roleCounts.clients++;
-        
-        if (userData.emailVerified) verifiedUsers++;
-        if (userData.twoFactorEnabled) twoFactorUsers++;
-        
-        const createdAt = userData.createdAt?.toDate?.() || new Date();
-        if (createdAt >= currentMonth) newUsersThisMonth++;
-        
-        const user = {
-          id: doc.id,
-          role: userRole,
-          status: status,
-          name: userData.name || userData.displayName || 'غير محدد',
-          email: userData.email || '',
-          phone: userData.phone || null,
-          avatar: userData.avatar || userData.photoURL || null,
-          company: userData.company || null,
-          industry: userData.industry || null,
-          skills: userData.skills || null,
-          tier: userData.tier || null,
-          modifier: userData.modifier || null,
-          portfolio: userData.portfolio || null,
-          department: userData.department || null,
-          position: userData.position || null,
-          permissions: userRole === 'admin' ? ['all'] : userData.permissions || null,
-          stats: null,
-          createdAt: userData.createdAt || new Date().toISOString(),
-          updatedAt: userData.updatedAt || new Date().toISOString(),
-          lastLoginAt: userData.lastLoginAt || null,
-          emailVerified: userData.emailVerified || false,
-          twoFactorEnabled: userData.twoFactorEnabled || false,
-          loginAttempts: userData.loginAttempts || 0,
-          lockedUntil: userData.lockedUntil || null,
-        };
-
-        users.push(user);
       }
 
     } catch (error) {
