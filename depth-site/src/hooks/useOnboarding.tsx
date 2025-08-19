@@ -72,6 +72,7 @@ const initialFormData: OnboardingFormData = {
   }
 };
 
+// الحالة الأولية للـ UI
 const initialState: OnboardingState = {
   loading: false,
   saving: false,
@@ -80,12 +81,14 @@ const initialState: OnboardingState = {
   canProceed: false,
   autoSaveEnabled: true,
   touchedFields: new Set<string>(),
-  showValidation: false
+  showValidation: false,
+  loadingMessage: '' // رسالة التحميل المخصصة
 };
 
 // Action types للـ Reducer
 type OnboardingAction =
   | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_LOADING_MESSAGE'; payload: string }
   | { type: 'SET_SAVING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_SUCCESS'; payload: boolean }
@@ -113,6 +116,9 @@ function onboardingReducer(
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, uiState: { ...state.uiState, loading: action.payload } };
+    
+    case 'SET_LOADING_MESSAGE':
+      return { ...state, uiState: { ...state.uiState, loadingMessage: action.payload } };
     
     case 'SET_SAVING':
       return { ...state, uiState: { ...state.uiState, saving: action.payload } };
@@ -284,6 +290,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [formData.metadata.startedAt]);
 
+  // دالة مساعدة لإعداد التحميل مع رسالة
+  const setLoadingWithMessage = useCallback((loading: boolean, message: string = '') => {
+    dispatch({ type: 'SET_LOADING', payload: loading });
+    dispatch({ type: 'SET_LOADING_MESSAGE', payload: message });
+  }, []);
+
   // تحميل البيانات المحفوظة عند بدء الجلسة
   const loadSavedProgress = useCallback(async () => {
     // للمستخدمين الجدد، لا نحمل بيانات محفوظة
@@ -451,7 +463,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // للخطوة الأولى: إنشاء الحساب إذا لم يكن موجود
     if (formData.currentStep === 1 && !session?.user) {
-      dispatch({ type: 'SET_LOADING', payload: true });
+      setLoadingWithMessage(true, 'جاري إنشاء حسابك...');
       dispatch({ type: 'SET_ERROR', payload: null }); // مسح الأخطاء السابقة
       
       try {
@@ -470,121 +482,70 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const result = await response.json();
         console.log('Account created successfully:', result);
         
-        // عرض toast للنجاح
-        showSuccess('تم إنشاء حسابك بنجاح!', 'مرحباً بك');
+        // عرض إشعار النجاح مع رسالة واضحة
+        showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'مرحباً بك في Depth Agency');
         
-        // تقليل وقت الانتظار الأولي
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // إعطاء وقت لعرض الإشعار
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // تسجيل دخول تلقائي مع retry محسن
-        let signInResult;
-        let lastError = '';
-        let sessionUpdated = false;
+        // تحديث الحالة لإظهار رسالة تسجيل الدخول
+        setLoadingWithMessage(true, 'جاري تسجيل الدخول...');
+        dispatch({ type: 'SET_ERROR', payload: null });
+        showSuccess('جاري تسجيل الدخول...', 'خطوة تلقائية');
         
-        for (let attempt = 1; attempt <= 8; attempt++) {
-          console.log(`Attempting sign in - attempt ${attempt}`);
+        // تسجيل دخول مبسط (محاولة واحدة فقط)
+        try {
+          const signInResult = await signIn('credentials', {
+            email: formData.account.email.toLowerCase().trim(),
+            password: formData.account.password,
+            redirect: false
+          });
           
-          try {
-            signInResult = await signIn('credentials', {
-              email: formData.account.email.toLowerCase().trim(),
-              password: formData.account.password,
-              redirect: false
-            });
+          if (signInResult?.ok && !signInResult?.error) {
+            // نجح تسجيل الدخول
+            console.log('Sign in successful on first attempt');
             
-            if (signInResult?.ok && !signInResult?.error) {
-              console.log(`Sign in successful on attempt ${attempt}`);
-              
-              // انتظار أقل للتأكد من تحديث الجلسة
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              
-              // التحقق من تحديث الجلسة من خلال API
-              try {
-                const sessionResponse = await fetch('/api/auth/session');
-                const sessionData = await sessionResponse.json();
-                
-                if (sessionData?.user?.email) {
-                  console.log('Session verified and updated:', sessionData.user.email);
-                  sessionUpdated = true;
-                  break;
-                } else {
-                  console.log('Session not yet updated, retrying...');
-                  lastError = 'الجلسة لم يتم تحديثها بعد';
-                }
-              } catch (sessionError) {
-                console.error('Error checking session:', sessionError);
-                lastError = 'خطأ في التحقق من الجلسة';
-              }
-            } else {
-              lastError = signInResult?.error || 'فشل في تسجيل الدخول';
-              console.log(`Sign in failed on attempt ${attempt}:`, lastError);
-            }
-          } catch (authError) {
-            lastError = authError instanceof Error ? authError.message : 'خطأ في التصديق';
-            console.error(`Sign in attempt ${attempt} error:`, authError);
+            // إشعار نجاح واضح
+            showSuccess('تم تسجيل الدخول بنجاح! ✅', 'جاري الانتقال للمرحلة التالية...');
+            
+            // تسجيل إكمال الخطوة الأولى
+            dispatch({ type: 'COMPLETE_STEP', payload: 1 });
+            
+            // انتظار قصير لعرض الإشعار
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // الانتقال للخطوة التالية مباشرة
+            dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+            dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+            setLoadingWithMessage(false, '');
+            
+            console.log('Account creation and login successful, proceeding to step 2');
+            return true;
+            
+          } else {
+            // فشل تسجيل الدخول - توجيه لصفحة تسجيل الدخول
+            console.log('Sign in failed:', signInResult?.error);
+            
+            showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'يرجى تسجيل الدخول الآن');
+            
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // توجيه لصفحة تسجيل الدخول مع رسالة واضحة
+            router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
+            return false;
           }
           
-          if (attempt < 8) {
-            const delayTime = Math.min(1000 * attempt, 3000); // تأخير أقل مع حد أقصى 3 ثواني
-            console.log(`Sign in attempt ${attempt} failed: ${lastError}, retrying in ${delayTime}ms...`);
-            await new Promise(resolve => setTimeout(resolve, delayTime));
-          }
-        }
-        
-        if (!sessionUpdated) {
-          // إذا فشل تسجيل الدخول، نعرض رسالة وننقل المستخدم لصفحة تسجيل الدخول
-          console.error('Sign in failed after all retries:', lastError);
+        } catch (authError) {
+          console.error('Sign in error:', authError);
           
-          showError('يرجى تسجيل الدخول الآن باستخدام البيانات التي أدخلتها', 'تم إنشاء الحساب بنجاح!');
-          dispatch({ type: 'SET_LOADING', payload: false });
+          // إظهار رسالة نجاح إنشاء الحساب + توجيه لتسجيل الدخول
+          showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'يرجى تسجيل الدخول الآن');
           
-          // إعادة توجيه للصفحة الرئيسية مع رسالة النجاح
-          setTimeout(() => {
-            window.location.href = `/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`;
-          }, 4000);
+          await new Promise(resolve => setTimeout(resolve, 3000));
           
+          router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
           return false;
         }
-        
-        // إذا نجح تسجيل الدخول
-        showSuccess('تم تسجيل الدخول بنجاح! جاري الانتقال للمرحلة التالية...', 'مرحلة مكتملة');
-        console.log('Account creation and login successful, proceeding to step 2');
-        
-        // تسجيل إكمال الخطوة الأولى
-        dispatch({ type: 'COMPLETE_STEP', payload: 1 });
-
-        // حضّر نسخة محدثة للحفظ الفوري
-        const updatedFormData = {
-          ...formData,
-          currentStep: 2,
-          completedSteps: Array.from(new Set([...(formData.completedSteps || []), 1]))
-        };
-
-        // حفظ التقدم فوراً في السيرفر
-        try {
-          await fetch('/api/creators/onboarding/progress', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              step: 2,
-              data: updatedFormData,
-              autoSave: false
-            })
-          });
-          console.log('Progress saved successfully');
-        } catch (e) {
-          console.warn('Immediate progress save failed:', e);
-        }
-
-        // الانتقال للخطوة التالية في الواجهة
-        dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
-        dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
-        dispatch({ type: 'SET_SUCCESS', payload: false });
-        dispatch({ type: 'SET_LOADING', payload: false });
-
-        // إعادة تحميل الصفحة للتأكد من تحديث الجلسة بشكل كامل
-        setTimeout(() => {
-          window.location.reload();
-        }, 500); // تقليل من 1000 إلى 500
 
         return true;
         
@@ -615,7 +576,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
     
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, showError]);
+  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, router, setLoadingWithMessage]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
@@ -879,7 +840,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     validateCurrentStep,
     getStepErrors,
     getFieldError,
-    markFieldTouched
+    markFieldTouched,
+    
+    // UI helpers
+    setLoadingWithMessage
   };
 
   return (

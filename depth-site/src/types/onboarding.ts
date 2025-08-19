@@ -1,7 +1,7 @@
 // Types موحدة لنظام الـ Onboarding الاحترافي
 // تجمع كل البيانات المطلوبة في هيكل منطقي ومتدرج
 
-import type { CreatorSkill, EquipmentInventory, WeeklyAvailability } from './creators';
+import type { EquipmentInventory, WeeklyAvailability } from './creators';
 
 export type CreatorRole = 'photographer' | 'videographer' | 'designer' | 'producer';
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'professional';
@@ -108,6 +108,7 @@ export interface OnboardingState {
   autoSaveEnabled: boolean;
   touchedFields: Set<string>; // الحقول التي تم لمسها
   showValidation: boolean; // هل نعرض أخطاء التحقق
+  loadingMessage: string; // رسالة التحميل المخصصة
 }
 
 // Context للـ Onboarding
@@ -138,6 +139,9 @@ export interface OnboardingContextType {
   getStepErrors: (step: OnboardingStep) => string[];
   getFieldError: (field: string) => string | undefined;
   markFieldTouched: (field: string) => void;
+  
+  // UI helpers
+  setLoadingWithMessage: (loading: boolean, message?: string) => void;
 }
 
 // تكوين خطوات الـ Onboarding
