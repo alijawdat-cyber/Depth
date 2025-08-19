@@ -116,7 +116,7 @@ export async function POST(
 
     // تسجيل في Audit Log
     await adminDb
-      .collection('audit_logs')
+      .collection('audit_log')
       .add({
         action: 'project_approved',
         entityType: 'project',

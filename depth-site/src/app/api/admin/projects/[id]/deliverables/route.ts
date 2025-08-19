@@ -7,21 +7,7 @@ import { calculateQuotePricing } from '@/lib/pricing/engine';
 import { getCurrentFXRate, calculateUSDPreview } from '@/lib/pricing/fx';
 
 // Types
-interface RateCard {
-  basePricesIQD?: Record<string, number>;
-  fxPolicy?: string;
-  [key: string]: unknown;
-}
-
-interface EstimatedCosts {
-  [subcategory: string]: number;
-}
-
-interface ProjectData {
-  vertical?: string;
-  deliverables?: Deliverable[];
-  [key: string]: unknown;
-}
+// (Interfaces removed/not used after refactor)
 
 interface Deliverable {
   subcategory: string;
@@ -169,17 +155,15 @@ export async function POST(
     let assignedToName = '';
     if (assignedTo) {
       try {
-        const creatorDoc = await adminDb
-          .collection('creators')
-          .doc(assignedTo)
-          .get();
-        
-        if (creatorDoc.exists) {
-          const creatorData = creatorDoc.data();
-          assignedToName = creatorData?.name || 'مبدع غير محدد';
+        const userDoc = await adminDb.collection('users').doc(assignedTo).get();
+        if (userDoc.exists) {
+          const data = userDoc.data() as { role?: string; name?: string; creatorProfile?: { specialty?: string } } | undefined;
+          if (data?.role === 'creator') {
+            assignedToName = data.name || data.creatorProfile?.specialty || 'مبدع';
+          }
         }
       } catch (error) {
-        console.warn('Failed to fetch creator name:', error);
+        console.warn('Failed to fetch unified creator name:', error);
       }
     }
 

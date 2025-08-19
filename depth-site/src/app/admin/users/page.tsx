@@ -29,7 +29,7 @@ interface UnifiedUser {
   lastActive?: string;
 }
 
-// Statistics interface
+// Statistics interface - النظام الموحد
 interface UserStats {
   total: number;
   pending: number;
@@ -37,11 +37,12 @@ interface UserStats {
   inactive: number;
   suspended: number;
   byRole: {
-    creators: number;
-    clients: number;
-    employees: number;
-    admins: number;
+    admin: number;
+    creator: number;
+    client: number;
+    employee: number;
   };
+  verified?: number;
 }
 
 export default function UnifiedUsersPage() {
@@ -52,7 +53,7 @@ export default function UnifiedUsersPage() {
     active: 0,
     inactive: 0,
     suspended: 0,
-    byRole: { creators: 0, clients: 0, employees: 0, admins: 0 }
+    byRole: { admin: 0, creator: 0, client: 0, employee: 0 }
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -216,7 +217,7 @@ export default function UnifiedUsersPage() {
             <UserPlus className="h-8 w-8 text-purple-600" />
             <div className="mr-4">
               <p className="text-sm font-medium text-gray-600">المبدعون</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.creators}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.creator}</p>
             </div>
           </div>
         </div>
@@ -226,7 +227,7 @@ export default function UnifiedUsersPage() {
             <Users className="h-8 w-8 text-blue-600" />
             <div className="mr-4">
               <p className="text-sm font-medium text-gray-600">العملاء</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.clients}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.client}</p>
             </div>
           </div>
         </div>
@@ -236,7 +237,7 @@ export default function UnifiedUsersPage() {
             <Users className="h-8 w-8 text-green-600" />
             <div className="mr-4">
               <p className="text-sm font-medium text-gray-600">الموظفون</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.employees}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.byRole.employee}</p>
             </div>
           </div>
         </div>

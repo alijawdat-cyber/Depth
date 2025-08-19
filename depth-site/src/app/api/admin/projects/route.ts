@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 
+interface UnifiedClientLite {
+  name?: string;
+  email?: string;
+  role?: string;
+  clientProfile?: { company?: string };
+}
+
 // Types
 interface DeliverableData {
   totalIQD?: number;
@@ -55,24 +62,21 @@ export async function GET() {
     for (const doc of projectsSnapshot.docs) {
       const projectData = doc.data();
       
-      // جلب بيانات العميل
+      // جلب بيانات العميل من النظام الموحد
       let clientName = 'غير محدد';
       let clientEmail = projectData.clientEmail || '';
-      
       if (projectData.clientId) {
         try {
-          const clientDoc = await adminDb
-            .collection('clients')
-            .doc(projectData.clientId)
-            .get();
-          
+          const clientDoc = await adminDb.collection('users').doc(projectData.clientId).get();
           if (clientDoc.exists) {
-            const clientData = clientDoc.data();
-            clientName = clientData?.name || clientData?.company || 'غير محدد';
-            clientEmail = clientData?.email || clientEmail;
+            const clientData = clientDoc.data() as UnifiedClientLite;
+            if (clientData.role === 'client') {
+              clientName = clientData.name || clientData.clientProfile?.company || 'غير محدد';
+              clientEmail = clientData.email || clientEmail;
+            }
           }
-        } catch (error) {
-          console.warn('Failed to fetch client data:', error);
+        } catch (e) {
+          console.warn('Failed unified client fetch', e);
         }
       }
 
@@ -211,29 +215,29 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // البحث عن العميل أو إنشاؤه
+    // البحث عن العميل في النظام الموحد أو إنشاؤه
     let clientId = '';
-    const clientQuery = await adminDb
-      .collection('clients')
+    const clientQuery = await adminDb.collection('users')
       .where('email', '==', clientEmail.toLowerCase())
+      .where('role', '==', 'client')
       .limit(1)
       .get();
 
     if (!clientQuery.empty) {
       clientId = clientQuery.docs[0].id;
     } else {
-      // إنشاء عميل جديد
-      const newClientRef = await adminDb
-        .collection('clients')
-        .add({
-          email: clientEmail.toLowerCase(),
-          name: 'عميل جديد',
-          company: '',
-          phone: '',
-          status: 'pending',
-          createdAt: new Date().toISOString(),
-          createdBy: session.user.email
-        });
+      const nowIso = new Date().toISOString();
+      const newClientRef = await adminDb.collection('users').add({
+        email: clientEmail.toLowerCase(),
+        name: 'عميل جديد',
+        role: 'client',
+        status: 'pending',
+        emailVerified: false,
+        twoFactorEnabled: false,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+        source: 'project-create'
+      });
       clientId = newClientRef.id;
     }
 
@@ -262,17 +266,12 @@ export async function POST(req: NextRequest) {
       .add(projectData);
 
     // إرجاع المشروع المُنشأ مع بيانات العميل
-    const clientDoc = await adminDb
-      .collection('clients')
-      .doc(clientId)
-      .get();
-    
-    const clientData = clientDoc.data();
-
+    const clientDoc = await adminDb.collection('users').doc(clientId).get();
+  const clientData = clientDoc.data() as UnifiedClientLite | undefined;
     const project = {
       id: projectRef.id,
       ...projectData,
-      clientName: clientData?.name || clientData?.company || 'عميل جديد'
+      clientName: clientData?.name || clientData?.clientProfile?.company || 'عميل جديد'
     };
 
     return NextResponse.json({

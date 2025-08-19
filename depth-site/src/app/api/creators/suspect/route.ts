@@ -50,8 +50,9 @@ export async function GET(req: NextRequest) {
 
       // البحث عن معرف المبدع
       const creatorQuery = await adminDb
-        .collection('creators')
+        .collection('users')
         .where('email', '==', session.user.email.toLowerCase())
+        .where('role', '==', 'creator')
         .limit(1)
         .get();
 
@@ -142,8 +143,8 @@ export async function POST(req: NextRequest) {
     }
 
     // التحقق من وجود المبدع
-    const creatorDoc = await adminDb.collection('creators').doc(creatorId).get();
-    if (!creatorDoc.exists) {
+  const creatorDoc = await adminDb.collection('users').doc(creatorId).get();
+  if (!creatorDoc.exists || creatorDoc.data()?.role !== 'creator') {
       return NextResponse.json({
         success: false,
         error: 'المبدع غير موجود',

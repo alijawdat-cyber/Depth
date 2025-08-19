@@ -161,21 +161,16 @@ export async function GET(req: NextRequest) {
 
     const email = session.user.email.toLowerCase();
 
-    // البحث عن المبدع للحصول على ID
-    const creatorQuery = await adminDb
-      .collection('creators')
+    // البحث عن المبدع في النظام الموحد
+    const userQuery = await adminDb.collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
-
-    if (creatorQuery.empty) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'لم يتم العثور على بيانات المبدع' 
-      }, { status: 404 });
+    if (userQuery.empty) {
+      return NextResponse.json({ success: false, error: 'المبدع غير موجود بالنظام الموحد' }, { status: 404 });
     }
-
-    const creatorId = creatorQuery.docs[0].id;
+    const creatorId = userQuery.docs[0].id;
 
     // بناء الاستعلام للمشاريع المُسندة للمبدع
     let projectsQuery = adminDb
@@ -213,12 +208,15 @@ export async function GET(req: NextRequest) {
       let clientName = 'غير محدد';
       if (projectData.clientId) {
         try {
-          const clientDoc = await adminDb.collection('clients').doc(projectData.clientId).get();
+          const clientDoc = await adminDb.collection('users').doc(projectData.clientId).get();
           if (clientDoc.exists) {
-            clientName = clientDoc.data()?.name || clientName;
+            const cdata = clientDoc.data() as { role?: string; name?: string };
+            if (cdata.role === 'client') {
+              clientName = cdata.name || clientName;
+            }
           }
         } catch (error) {
-          console.warn(`Failed to fetch client ${projectData.clientId}:`, error);
+          console.warn(`Failed to fetch client (users) ${projectData.clientId}:`, error);
         }
       }
 

@@ -37,48 +37,24 @@ export async function GET(
       );
     }
 
-    // التحقق من صلاحيات الإدارة
-    let isAdmin = false;
-    
-    // البحث في users collection الموحدة أولاً
-    const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
-    if (!userDoc.empty) {
-      isAdmin = userDoc.docs[0].data()?.role === 'admin';
-    } else {
-      // احتياطي: البحث في admins collection
-      const adminDoc = await adminDb.collection('admins').doc(session.user.email).get();
-      isAdmin = adminDoc.exists;
-    }
+  // التحقق من صلاحيات الإدارة من خلال users فقط
+  const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
+  const isAdmin = !userDoc.empty && userDoc.docs[0].data()?.role === 'admin';
     
     const { id: creatorId } = await params;
 
-    // إذا لم يكن إدارياً، تحقق من أنه المبدع نفسه
-    if (!isAdmin) {
-      const creatorDoc = await adminDb.collection('creators').doc(creatorId).get();
-      if (!creatorDoc.exists || creatorDoc.data()?.contact?.email !== session.user.email) {
-        return NextResponse.json(
-          { success: false, error: 'غير مصرح للوصول لهذا المبدع', requestId },
-          { status: 403 }
-        );
-      }
+    // جلب بيانات المستخدم الموحد
+    const unifiedDoc = await adminDb.collection('users').doc(creatorId).get();
+    if (!unifiedDoc.exists || unifiedDoc.data()?.role !== 'creator') {
+      return NextResponse.json({ success: false, error: 'المبدع غير موجود بالنظام الموحد', requestId }, { status: 404 });
     }
-
-    // جلب بيانات المبدع
-    const creatorDoc = await adminDb.collection('creators').doc(creatorId).get();
-    
-    if (!creatorDoc.exists) {
-      return NextResponse.json(
-        { success: false, error: 'المبدع غير موجود', requestId },
-        { status: 404 }
-      );
+  const unifiedData = unifiedDoc.data() as { email?: string; role?: string; name?: string; updatedAt?: string; creatorProfile?: { availability?: { weeklyAvailability?: unknown[]; timeZone?: string; urgentWork?: boolean; }; }; };
+    if (!isAdmin && unifiedData.email !== session.user.email) {
+      return NextResponse.json({ success: false, error: 'غير مصرح للوصول لهذا المبدع', requestId }, { status: 403 });
     }
-
-    const creatorData = creatorDoc.data();
-
-    // استخراج بيانات التوفر
-    const weeklyAvailability = creatorData?.capacity?.weeklyAvailability || [];
-    const timeZone = creatorData?.timeZone || 'Asia/Baghdad';
-    const urgentWork = creatorData?.urgentWork || false;
+    const weeklyAvailability = unifiedData.creatorProfile?.availability?.weeklyAvailability || [];
+    const timeZone = unifiedData.creatorProfile?.availability?.timeZone || 'Asia/Baghdad';
+    const urgentWork = unifiedData.creatorProfile?.availability?.urgentWork || false;
 
     return NextResponse.json({
       success: true,
@@ -88,8 +64,8 @@ export async function GET(
         weeklyAvailability,
         timeZone,
         urgentWork,
-        lastUpdated: creatorData?.updatedAt,
-        creatorName: creatorData?.fullName
+  lastUpdated: unifiedData.updatedAt,
+  creatorName: unifiedData.name
       }
     });
 
@@ -122,26 +98,14 @@ export async function PUT(
     const body = await req.json();
     const validatedData = UpdateAvailabilitySchema.parse(body);
 
-    // التحقق من صلاحيات الإدارة أو الملكية
-    let isAdmin = false;
-    
-    // البحث في users collection الموحدة أولاً
-    const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
-    if (!userDoc.empty) {
-      isAdmin = userDoc.docs[0].data()?.role === 'admin';
-    } else {
-      // احتياطي: البحث في admins collection
-      const adminDoc = await adminDb.collection('admins').doc(session.user.email).get();
-      isAdmin = adminDoc.exists;
-    }
+  // التحقق من صلاحيات الإدارة أو الملكية عبر users فقط
+  const userDoc = await adminDb.collection('users').where('email', '==', session.user.email).limit(1).get();
+  const isAdmin = !userDoc.empty && userDoc.docs[0].data()?.role === 'admin';
     
     if (!isAdmin) {
-      const creatorDoc = await adminDb.collection('creators').doc(creatorId).get();
-      if (!creatorDoc.exists || creatorDoc.data()?.contact?.email !== session.user.email) {
-        return NextResponse.json(
-          { success: false, error: 'غير مصرح للتعديل على هذا المبدع', requestId },
-          { status: 403 }
-        );
+      const unifiedDoc = await adminDb.collection('users').doc(creatorId).get();
+      if (!unifiedDoc.exists || unifiedDoc.data()?.email !== session.user.email) {
+        return NextResponse.json({ success: false, error: 'غير مصرح للتعديل على هذا المبدع', requestId }, { status: 403 });
       }
     }
 
@@ -169,16 +133,14 @@ export async function PUT(
     const weeklyHours = calculateWeeklyHours(validatedData.weeklyAvailability);
 
     // تحديث بيانات المبدع
-    const updateData = {
-      'capacity.weeklyAvailability': validatedData.weeklyAvailability,
-      'capacity.weeklyHours': weeklyHours,
-      'timeZone': validatedData.timeZone,
-      'urgentWork': validatedData.urgentWork,
-      'updatedAt': new Date().toISOString(),
-      'lastAvailabilityUpdate': new Date().toISOString()
-    };
-
-    await adminDb.collection('creators').doc(creatorId).update(updateData);
+  await adminDb.collection('users').doc(creatorId).update({
+      'creatorProfile.availability.weeklyAvailability': validatedData.weeklyAvailability,
+      'creatorProfile.availability.weeklyHours': weeklyHours,
+      'creatorProfile.availability.timeZone': validatedData.timeZone,
+      'creatorProfile.availability.urgentWork': validatedData.urgentWork,
+      updatedAt: new Date().toISOString(),
+      'creatorProfile.lastAvailabilityUpdate': new Date().toISOString()
+    });
 
     // إنشاء سجل في تاريخ التحديثات
     await adminDb.collection('creator_availability_history').add({

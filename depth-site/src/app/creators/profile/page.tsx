@@ -37,7 +37,19 @@ export default function CreatorProfilePage() {
     try {
       const res = await fetch("/api/creators/profile", { cache: "no-store" });
       const data = await res.json();
-      if (data.success) setProfile(data.profile || {});
+      if (data.success) {
+        const p = data.profile;
+        setProfile({
+          id: p.id,
+          // name/email/phone موجودة مباشرة من الوثيقة
+          name: p.name,
+          email: p.email,
+          phone: p.phone,
+          specialty: p.specialty || p.creatorProfile?.specialty,
+          portfolioUrl: p.portfolioUrl || p.creatorProfile?.portfolio?.portfolioUrl,
+          status: p.status,
+        });
+      }
     } catch {
       setMessage("تعذر تحميل البيانات");
     } finally {
@@ -98,7 +110,13 @@ export default function CreatorProfilePage() {
               </label>
               <label className="grid gap-2">
                 <span className="text-sm">التخصص</span>
-                <input value={profile.specialty || ""} onChange={(e) => setProfile({ ...profile, specialty: e.target.value })} className="input" />
+                <select value={profile.specialty || ""} onChange={(e) => setProfile({ ...profile, specialty: e.target.value })} className="input">
+                  <option value="">اختر</option>
+                  <option value="photographer">مصور</option>
+                  <option value="videographer">فيديو</option>
+                  <option value="designer">مصمم</option>
+                  <option value="producer">منتج</option>
+                </select>
               </label>
               <label className="grid gap-2">
                 <span className="text-sm">رابط البورتفوليو</span>

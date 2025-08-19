@@ -53,17 +53,18 @@ export async function GET() {
 
     const email = session.user.email.toLowerCase();
 
-    // البحث عن المبدع
+    // البحث عن المبدع في النظام الموحد
     const creatorQuery = await adminDb
-      .collection('creators')
+      .collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
     if (creatorQuery.empty) {
       return NextResponse.json({
         success: false,
-        error: 'لم يتم العثور على بيانات المبدع',
+        error: 'لم يتم العثور على المستخدم كَمبدع',
         requestId
       }, { status: 404 });
     }

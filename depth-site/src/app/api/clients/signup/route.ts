@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
+import type { UnifiedUser } from '@/types/unified-user';
 import bcrypt from 'bcryptjs';
 
 // POST /api/clients/signup
@@ -44,9 +45,9 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // التحقق من عدم وجود بريد مكرر
+    // التحقق من عدم وجود بريد مكرر في النظام الموحد
     const existingClientQuery = await adminDb
-      .collection('clients')
+      .collection('users')
       .where('email', '==', email.toLowerCase())
       .limit(1)
       .get();
@@ -62,41 +63,57 @@ export async function POST(req: NextRequest) {
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // إنشاء بيانات العميل
+    // إنشاء بيانات العميل الموحد
     const now = new Date().toISOString();
-    const clientData = {
-      // معلومات أساسية
-      name: fullName.trim(),
-      company: company?.trim() || '',
+    const unifiedUser: Omit<UnifiedUser, 'id'> = {
       email: email.toLowerCase().trim(),
-      phone: phone.trim(),
-      
-      // كلمة المرور المشفرة
-      password: hashedPassword,
-      
-      // حالة العميل
-      status: 'pending', // في انتظار الموافقة
+      name: fullName.trim(),
       role: 'client',
-      
-      // بيانات النظام
+      status: 'pending',
+      emailVerified: false,
+      twoFactorEnabled: false,
+      phone: phone.trim(),
+      avatar: undefined,
+      clientProfile: {
+        company: company?.trim() || '',
+        industry: undefined,
+        website: undefined,
+        size: undefined,
+        preferredLanguage: 'ar',
+        timeZone: 'Asia/Baghdad',
+        msaOnFile: false,
+        preferredCommunication: 'email',
+        typicalBudgetRange: undefined,
+        preferredDeliveryMethod: undefined
+      },
       createdAt: now,
       updatedAt: now,
-      lastLoginAt: null,
-      
-      // audit
-      createdBy: 'self-registration',
-      source: 'web-signup'
+      lastLoginAt: undefined,
+      source: 'web-signup',
+      originalId: undefined,
+      originalCollection: undefined,
+      loginAttempts: 0,
+      lockedUntil: undefined,
+      preferences: { language: 'ar', notifications: true, theme: 'light' }
     };
 
-    // حفظ في قاعدة البيانات
-    const docRef = await adminDb.collection('clients').add(clientData);
+    const userRef = await adminDb.collection('users').add(unifiedUser);
+
+    // تخزين بيانات الاعتماد في مجموعة منفصلة
+    await adminDb.collection('user_credentials').doc(userRef.id).set({
+      userId: userRef.id,
+      email: unifiedUser.email,
+      hashedPassword,
+      createdAt: now,
+      lastPasswordChange: now
+    });
 
     // تسجيل العملية في audit log
     await adminDb.collection('audit_log').add({
       action: 'client_registration',
-      entityType: 'client',
-      entityId: docRef.id,
-      userId: email,
+      entityType: 'user',
+      entityId: userRef.id,
+      userId: unifiedUser.email,
       timestamp: now,
       details: {
         fullName,
@@ -105,32 +122,10 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // إنشاء حساب في NextAuth users collection إذا كان موجود
-    try {
-      await adminDb.collection('users').add({
-        name: fullName.trim(),
-        email: email.toLowerCase().trim(),
-        role: 'client',
-        profileId: docRef.id, // ربط مع الملف الشخصي
-        status: 'pending',
-        source: 'web-signup',
-        createdAt: now,
-        updatedAt: now,
-        emailVerified: false,
-        twoFactorEnabled: false,
-        // نسخ بعض البيانات المهمة
-        phone: phone.trim(),
-        company: company?.trim() || '',
-      });
-    } catch (error) {
-      console.warn('[client.signup] Failed to create user record:', error);
-      // لا نفشل التسجيل إذا فشل إنشاء سجل المستخدم
-    }
-
     return NextResponse.json({
       success: true,
       message: 'تم إنشاء حساب العميل بنجاح',
-      clientId: docRef.id,
+  clientId: userRef.id,
       requestId
     }, { status: 201 });
 

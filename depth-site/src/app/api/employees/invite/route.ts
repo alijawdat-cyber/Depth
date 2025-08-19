@@ -4,6 +4,19 @@ import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { z } from 'zod';
 
+interface EmployeeInviteDoc {
+  email: string;
+  name: string;
+  position: string;
+  department: string;
+  salary: number;
+  permissions: string[];
+  inviteToken: string;
+  used: boolean;
+  expiresAt: string | { toDate?: () => Date };
+  invitedAt: string | { toDate?: () => Date };
+}
+
 // Schema لإنشاء دعوة موظف
 const createInviteSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صالح'),
@@ -26,13 +39,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
     }
 
-    // التحقق من صلاحيات الإدارة
-    const adminUser = await adminDb.collection('admins')
-      .where('email', '==', session.user.email)
+    // التحقق من صلاحيات الإدارة في النظام الموحد
+    const adminQuery = await adminDb.collection('users')
+      .where('email', '==', session.user.email.toLowerCase())
+      .where('role', '==', 'admin')
       .limit(1)
       .get();
-
-    if (adminUser.empty) {
+    if (adminQuery.empty) {
       return NextResponse.json({ error: 'صلاحيات غير كافية' }, { status: 403 });
     }
 
@@ -48,16 +61,14 @@ export async function POST(request: NextRequest) {
 
     const { email, name, position, department, salary, permissions } = validation.data;
 
-    // التحقق من عدم وجود الموظف مسبقاً
-    const existingEmployee = await adminDb.collection('employees')
+    // التحقق من عدم وجود الموظف مسبقاً في النظام الموحد
+    const existingUnified = await adminDb.collection('users')
       .where('email', '==', email.toLowerCase())
+      .where('role', '==', 'employee')
       .limit(1)
       .get();
-
-    if (!existingEmployee.empty) {
-      return NextResponse.json({
-        error: 'البريد الإلكتروني مستخدم بالفعل'
-      }, { status: 409 });
+    if (!existingUnified.empty) {
+      return NextResponse.json({ error: 'البريد الإلكتروني مستخدم بالفعل' }, { status: 409 });
     }
 
     // التحقق من وجود دعوة سابقة لم تستخدم
@@ -83,6 +94,7 @@ export async function POST(request: NextRequest) {
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     // حفظ الدعوة في قاعدة البيانات
+    const nowIso = new Date().toISOString();
     const inviteData = {
       email: email.toLowerCase(),
       name,
@@ -92,10 +104,12 @@ export async function POST(request: NextRequest) {
       permissions,
       inviteToken,
       used: false,
-      expiresAt,
+      expiresAt: expiresAt.toISOString(),
       invitedBy: session.user.email,
-      invitedAt: new Date(),
-    };
+      invitedAt: nowIso,
+      createdAt: nowIso,
+      updatedAt: nowIso
+    } as const;
 
     const inviteRef = await adminDb.collection('employee_invites').add(inviteData);
 
@@ -141,30 +155,40 @@ export async function GET() {
     }
 
     // التحقق من صلاحيات الإدارة
-    const adminUser = await adminDb.collection('admins')
-      .where('email', '==', session.user.email)
+    const adminQuery = await adminDb.collection('users')
+      .where('email', '==', session.user.email.toLowerCase())
+      .where('role', '==', 'admin')
       .limit(1)
       .get();
-
-    if (adminUser.empty) {
+    if (adminQuery.empty) {
       return NextResponse.json({ error: 'صلاحيات غير كافية' }, { status: 403 });
     }
 
     // جلب الدعوات المعلقة
+    // جلب الدعوات النشطة (التحقق يدوياً من الانتهاء بواسطة ISO)
     const invitesSnapshot = await adminDb.collection('employee_invites')
       .where('used', '==', false)
-      .where('expiresAt', '>', new Date())
       .orderBy('invitedAt', 'desc')
       .get();
 
-    const invites = invitesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      // إخفاء الرمز من الاستجابة
-      inviteToken: undefined,
-      invitedAt: doc.data().invitedAt?.toDate?.()?.toISOString(),
-      expiresAt: doc.data().expiresAt?.toDate?.()?.toISOString()
-    }));
+    const now = Date.now();
+    const invites = invitesSnapshot.docs.map(doc => {
+      const d = doc.data() as EmployeeInviteDoc;
+      const expiresAtIso = typeof d.expiresAt === 'string' ? d.expiresAt : d.expiresAt?.toDate?.()?.toISOString();
+      const valid = !!(expiresAtIso && Date.parse(expiresAtIso) > now);
+      if (!valid) return null;
+      return {
+        id: doc.id,
+        email: d.email,
+        name: d.name,
+        position: d.position,
+        department: d.department,
+        salary: d.salary,
+        permissions: d.permissions,
+        invitedAt: typeof d.invitedAt === 'string' ? d.invitedAt : d.invitedAt?.toDate?.()?.toISOString(),
+        expiresAt: expiresAtIso
+      };
+    }).filter((v): v is Exclude<typeof v, null> => Boolean(v));
 
     return NextResponse.json({
       success: true,

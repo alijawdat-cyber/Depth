@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import type { UnifiedUser, EmployeeProfile } from '@/types/unified-user';
+
+// نوع مساعد مرن لتجنب أخطاء الخصائص الاختيارية
+interface FlexibleEmployeeProfile extends Partial<EmployeeProfile> {
+  [key: string]: unknown;
+}
 
 export async function GET() {
   try {
@@ -16,24 +22,26 @@ export async function GET() {
       return NextResponse.json({ error: 'صلاحيات إدارية مطلوبة' }, { status: 403 });
     }
 
-    // جلب كل الموظفين
-    const employeesSnapshot = await adminDb.collection('employees')
+    // جلب كل الموظفين من النظام الموحد (users حيث role == employee)
+    const employeesSnapshot = await adminDb.collection('users')
+      .where('role', '==', 'employee')
       .orderBy('createdAt', 'desc')
       .get();
 
     const employees = employeesSnapshot.docs.map(doc => {
-      const data = doc.data();
+      const data = doc.data() as UnifiedUser & { employeeProfile?: FlexibleEmployeeProfile };
+      const profile: FlexibleEmployeeProfile = data.employeeProfile || {};
       return {
         id: doc.id,
         email: data.email,
         name: data.name,
-        role: data.role,
-        department: data.department,
-        salary: data.salary,
+        role: 'employee',
+        department: profile.department,
+        salary: profile.salary,
         status: data.status,
-        startDate: data.startDate,
-        createdAt: data.createdAt?.toDate?.()?.toISOString(),
-        joinedAt: data.joinedAt?.toDate?.()?.toISOString()
+        startDate: profile.startDate,
+        createdAt: data.createdAt,
+        joinedAt: profile.joinedAt
       };
     });
 
@@ -58,15 +66,16 @@ export async function GET() {
       };
     });
 
-    // إحصائيات
+    // إحصائيات (مبسطة حسب النموذج الموحد)
     const stats = {
       totalEmployees: employees.length,
       activeEmployees: employees.filter(emp => emp.status === 'active').length,
       pendingInvites: pendingInvites.length,
+      // احتفاظ بمفاتيح سابقة عبر تحليل department أو role الداخلي إن وُجد
       byRole: {
-        photographer: employees.filter(emp => emp.role === 'photographer').length,
-        admin_staff: employees.filter(emp => emp.role === 'admin_staff').length,
-        manager: employees.filter(emp => emp.role === 'manager').length
+        photographer: employees.filter(emp => emp.department === 'photographer' || emp.role === 'photographer').length,
+        admin_staff: employees.filter(emp => emp.department === 'admin_staff' || emp.role === 'admin_staff').length,
+        manager: employees.filter(emp => emp.department === 'manager' || emp.role === 'manager').length
       }
     };
 
@@ -124,17 +133,31 @@ export async function PATCH(request: NextRequest) {
 
     validUpdates.updatedAt = new Date();
 
-    // تحديث في employees collection
-    await adminDb.collection('employees').doc(employeeId).update(validUpdates);
-
-    // تحديث في users collection أيضاً
-    const userUpdates = { ...validUpdates };
-    if (validUpdates.role) {
-      userUpdates.employeeRole = validUpdates.role;
-      userUpdates.role = 'employee'; // يبقى employee في users
+    // تحديث في users collection فقط (النظام الموحد)
+    const userRef = adminDb.collection('users').doc(employeeId);
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      return NextResponse.json({ error: 'المستخدم غير موجود بالنظام الموحد' }, { status: 404 });
     }
 
-    await adminDb.collection('users').doc(employeeId).update(userUpdates);
+    // إذا كانت هناك بيانات تخص ملف الموظف ننقلها إلى employeeProfile
+  const userData = userSnap.data() as UnifiedUser & { employeeProfile?: FlexibleEmployeeProfile };
+  const existingProfile: FlexibleEmployeeProfile = userData.employeeProfile || {};
+  const profileUpdates: FlexibleEmployeeProfile = { ...existingProfile };
+
+  if (typeof validUpdates.department === 'string') profileUpdates.department = validUpdates.department;
+  if (typeof validUpdates.salary === 'number') profileUpdates.salary = validUpdates.salary;
+  if (typeof validUpdates.role === 'string' && validUpdates.role !== 'employee') profileUpdates.position = String(validUpdates.role);
+  if (!profileUpdates.startDate) profileUpdates.startDate = existingProfile.startDate || new Date().toISOString();
+
+  const rootUpdates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+  if (typeof validUpdates.name === 'string') rootUpdates.name = validUpdates.name;
+  if (typeof validUpdates.status === 'string') rootUpdates.status = validUpdates.status;
+
+    await userRef.update({
+      ...rootUpdates,
+      employeeProfile: profileUpdates
+    });
 
     return NextResponse.json({
       success: true,

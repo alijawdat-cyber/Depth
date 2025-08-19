@@ -48,20 +48,19 @@ function mapFirestoreDoc(doc: FirebaseFirestore.DocumentSnapshot): FirestoreDocu
 // جلب بيانات العملاء
 async function fetchClientsData() {
   try {
-    const clientsSnapshot = await adminDb.collection('clients').get();
+    const clientsSnapshot = await adminDb.collection('users').where('role', '==', 'client').get();
     const clients = clientsSnapshot.docs.map(mapFirestoreDoc);
-
     return {
       clients,
       stats: {
         total: clients.length,
         pending: clients.filter(c => c.status === 'pending').length,
-        approved: clients.filter(c => c.status === 'approved').length,
-        rejected: clients.filter(c => c.status === 'rejected').length
+        approved: clients.filter(c => c.status === 'active').length,
+        rejected: clients.filter(c => c.status === 'suspended' || c.status === 'deleted').length
       }
     };
   } catch (error) {
-    console.error('خطأ في جلب بيانات العملاء:', error);
+    console.error('خطأ في جلب بيانات العملاء (users unified):', error);
     return { clients: [], stats: { total: 0, pending: 0, approved: 0, rejected: 0 } };
   }
 }
@@ -130,18 +129,26 @@ async function fetchQuotesData() {
   }
 }
 
-// جلب بيانات المبدعين
+// جلب بيانات المبدعين - النظام الموحد
 async function fetchCreatorsData() {
   try {
-    const creatorsSnapshot = await adminDb.collection('creators').get();
-    const creators = creatorsSnapshot.docs.map(mapFirestoreDoc);
+    const usersSnapshot = await adminDb
+      .collection('users')
+      .where('role', '==', 'creator')
+      .get();
+    
+    const creators = usersSnapshot.docs.map(mapFirestoreDoc);
 
     return {
       creators,
       stats: {
         total: creators.length,
         active: creators.filter(c => c.status === 'active').length,
-        pending: creators.filter(c => c.status === 'pending').length
+        pending: creators.filter(c => 
+          c.status === 'pending' || 
+          c.status === 'onboarding_started' || 
+          c.status === 'intake_submitted'
+        ).length
       }
     };
   } catch (error) {
@@ -253,9 +260,9 @@ export async function POST(req: NextRequest) {
       case 'update_client_status':
         {
           const { clientId, status } = data;
-          await adminDb.collection('clients').doc(clientId).update({
+          await adminDb.collection('users').doc(clientId).update({
             status,
-            updatedAt: new Date()
+            updatedAt: new Date().toISOString()
           });
           
           return NextResponse.json({

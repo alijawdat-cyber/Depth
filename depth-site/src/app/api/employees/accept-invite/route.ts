@@ -15,9 +15,10 @@ export async function POST(request: NextRequest) {
 
     // البحث عن الدعوة
     const inviteSnapshot = await adminDb.collection('employee_invites')
-      .where('token', '==', token)
-      .where('email', '==', email)
-      .where('status', '==', 'pending')
+      .where('inviteToken', '==', token)
+      .where('email', '==', email.toLowerCase())
+      .where('used', '==', false)
+      .limit(1)
       .get();
 
     if (inviteSnapshot.empty) {
@@ -31,74 +32,61 @@ export async function POST(request: NextRequest) {
 
     // التحقق من انتهاء صلاحية الدعوة
     const now = new Date();
-    const expiresAt = inviteData.expiresAt?.toDate?.() || new Date(inviteData.expiresAt);
-    
-    if (now > expiresAt) {
-      // تحديث حالة الدعوة لمنتهية
-      await adminDb.collection('employee_invites').doc(inviteDoc.id).update({
-        status: 'expired'
-      });
-      
-      return NextResponse.json({ 
-        error: 'انتهت صلاحية الدعوة' 
-      }, { status: 410 });
+    const expiresAt = typeof inviteData.expiresAt === 'string' ? new Date(inviteData.expiresAt) : inviteData.expiresAt?.toDate?.();
+    if (!expiresAt || now > expiresAt) {
+      await inviteDoc.ref.update({ used: true, usedAt: now.toISOString(), expired: true });
+      return NextResponse.json({ error: 'انتهت صلاحية الدعوة' }, { status: 410 });
     }
 
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // إنشاء بيانات الموظف
-    const employeeData = {
-      email,
+    const isoNow = now.toISOString();
+    const userRef = await adminDb.collection('users').add({
+      email: email.toLowerCase(),
       name,
-      password: hashedPassword,
-      role: inviteData.role,
-      department: inviteData.department,
-      salary: inviteData.salary,
-      startDate: inviteData.startDate,
-      invitedBy: inviteData.invitedBy,
+      role: 'employee',
       status: 'active',
-      createdAt: new Date(),
-      joinedAt: new Date()
-    };
-
-    // حفظ الموظف في employees collection
-    const employeeRef = await adminDb.collection('employees').add(employeeData);
-
-    // ✅ حفظ في users collection للتوحيد
-    try {
-      await adminDb.collection('users').add({
-        name: inviteData.name,
-        email: inviteData.email,
-        role: 'employee',
-        status: 'active',
-        profileId: employeeRef.id, // ربط مع الملف الشخصي
-        source: 'employee-invite',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        emailVerified: true, // الموظفون معتمدون من الإدارة
-        twoFactorEnabled: false,
-        // نسخ بعض البيانات المهمة
+      emailVerified: true,
+      twoFactorEnabled: false,
+      createdAt: isoNow,
+      updatedAt: isoNow,
+      lastLoginAt: null,
+      source: 'employee-invite',
+      employeeProfile: {
         position: inviteData.position || inviteData.role,
         department: inviteData.department,
+        salary: inviteData.salary,
         permissions: inviteData.permissions || [],
-      });
-    } catch (usersError) {
-      console.warn('[employee.accept-invite] Failed to add employee to users collection:', usersError);
-      // لا نفشل التسجيل إذا فشل التوحيد
-    }
+        startDate: isoNow,
+        capacity: 40,
+        inviteId: inviteDoc.id,
+        invitedBy: inviteData.invitedBy,
+        invitedAt: inviteData.invitedAt?.toDate?.()?.toISOString() || isoNow,
+        joinedAt: isoNow
+      }
+    });
+
+    await adminDb.collection('user_credentials').doc(userRef.id).set({
+      userId: userRef.id,
+      email: email.toLowerCase(),
+      hashedPassword,
+      createdAt: isoNow,
+      lastPasswordChange: isoNow
+    });
 
     // تحديث حالة الدعوة لمقبولة
-    await adminDb.collection('employee_invites').doc(inviteDoc.id).update({
-      status: 'accepted',
-      acceptedAt: new Date(),
-      employeeId: employeeRef.id
+    await inviteDoc.ref.update({
+      used: true,
+      usedAt: isoNow,
+      employeeId: userRef.id,
+      completedSignup: true
     });
 
     return NextResponse.json({
       success: true,
       message: 'تم إكمال التسجيل بنجاح',
-      employeeId: employeeRef.id,
+  employeeId: userRef.id,
       redirect: '/employees/dashboard'
     });
 

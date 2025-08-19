@@ -1,15 +1,15 @@
-// API موحد لنظام الـ Onboarding الاحترافي
+// API موحد لنظام الـ Onboarding الاحترافي - النظام الموحد
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
-// import { FieldValue } from 'firebase-admin/firestore'; // غير مستخدم حالياً
 import bcrypt from 'bcryptjs';
-import type { 
-  OnboardingFormData, 
+import type {
+  OnboardingFormData,
   SubmitOnboardingRequest,
-  OnboardingApiResponse 
+  OnboardingApiResponse
 } from '@/types/onboarding';
+import type { UnifiedUser, Availability, Equipment, Portfolio, CreatorSpecialty, ExperienceLevel, AvailabilityType } from '@/types/unified-user';
 
 // POST /api/creators/onboarding
 // إرسال نموذج الـ Onboarding الكامل
@@ -147,213 +147,243 @@ export async function POST(req: NextRequest) {
     const email = formData.account.email.toLowerCase().trim();
     const now = new Date().toISOString();
 
-    // التحقق من عدم وجود بريد مكرر
-    console.log('[ONBOARDING] Checking for existing creator with email:', email);
-    const existingCreatorQuery = await adminDb
-      .collection('creators')
-      .where('contact.email', '==', email)
+    // التحقق من عدم وجود بريد مكرر في النظام الموحد
+    console.log('[ONBOARDING] Checking for existing user with email:', email);
+    const existingUserQuery = await adminDb
+      .collection('users')
+      .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
-    let creatorDoc;
-    const isNewCreator = existingCreatorQuery.empty;
-    console.log('[ONBOARDING] Is new creator:', isNewCreator);
+    let userDoc;
+    const isNewUser = existingUserQuery.empty;
+    console.log('[ONBOARDING] Is new user:', isNewUser);
 
-    if (isNewCreator) {
-      // إنشاء مبدع جديد
-      console.log('[ONBOARDING] Creating new creator...');
+    if (isNewUser) {
+      // إنشاء مستخدم جديد في النظام الموحد فقط (دون أي مجموعات قديمة)
+      console.log('[ONBOARDING] Creating new unified creator user...');
       const hashedPassword = await bcrypt.hash(formData.account.password, 12);
 
-      const creatorData = {
-        // 1) معلومات الحساب
-        fullName: formData.account.fullName.trim(),
-        contact: {
-          email: email,
-          phone: formData.account.phone.trim(),
-          whatsapp: formData.account.phone.trim(), // نستخدم نفس الرقم كواتساب مؤقتاً
-        },
-        password: hashedPassword,
-
-        // 2) المعلومات الأساسية
-        role: formData.basicInfo.role,
-        city: formData.basicInfo.city.trim(),
-        canTravel: formData.basicInfo.canTravel,
-        languages: formData.basicInfo.languages,
-        primaryCategories: formData.basicInfo.primaryCategories,
-
-        // 3) الخبرة والمهارات - البنية الموحدة
-        experienceLevel: formData.experience.experienceLevel,
-        experienceYears: formData.experience.experienceYears,
-        skills: formData.experience.skills.map(skill => ({
-          subcategoryId: skill.subcategoryId,
-          level: skill.level,
-          experienceYears: skill.experienceYears || 1, // قيمة افتراضية
-          verified: false, // سيتم التحقق من الإدارة
-          notes: skill.notes || ''
-        })),
-        previousClients: formData.experience.previousClients || [],
-
-        // 4) معرض الأعمال
-        portfolio: {
-          workSamples: formData.portfolio.workSamples,
-          socialMedia: formData.portfolio.socialMedia,
-          portfolioUrl: formData.portfolio.portfolioUrl
-        },
-
-        // 5) التوفر والسعة
-        availability: formData.availability.availability,
-        timeZone: formData.availability.timeZone,
-        urgentWork: formData.availability.urgentWork,
-        capacity: {
-          weeklyHours: formData.availability.weeklyHours,
-          weeklyAvailability: formData.availability.weeklyAvailability || [],
-          maxAssetsPerDay: 10, // قيمة افتراضية
-          standardSLA: 72, // 3 أيام
-          rushSLA: 24 // يوم واحد
-        },
-        // احتفظ بالقديم للتوافق
-        weeklyHours: formData.availability.weeklyHours,
-        preferredWorkdays: formData.availability.preferredWorkdays,
-
-        // 6) المعدات
-        equipment: formData.equipment || {
-          cameras: [],
-          lenses: [],
-          lighting: [],
-          audio: [],
-          accessories: [],
-          specialSetups: []
-        },
-
-        // معلومات النظام
-        status: 'intake_submitted',
-        onboardingCompleted: true,
-        onboardingCompletedAt: now,
-        onboardingVersion: 'unified_v1',
-        createdAt: now,
-        updatedAt: now,
-        createdBy: 'self-onboarding',
-        source: formData.metadata.source || 'web',
-
-        // Metadata
-        completedSteps: formData.completedSteps,
-        skipOptionalSteps: skipOptionalSteps || false
+      // تجهيز بيانات المعدات (تحويل العناصر المخصصة إلى نص)
+      const equipment: Equipment = {
+        cameras: formData.equipment?.cameras?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Camera' : item.catalogId
+        ) || [],
+        lenses: formData.equipment?.lenses?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Lens' : item.catalogId
+        ) || [],
+        lighting: formData.equipment?.lighting?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Lighting' : item.catalogId
+        ) || [],
+        audio: formData.equipment?.audio?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Audio' : item.catalogId
+        ) || [],
+        accessories: formData.equipment?.accessories?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Accessory' : item.catalogId
+        ) || [],
+        specialSetups: formData.equipment?.specialSetups?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Setup' : item.catalogId
+        ) || []
       };
 
-      creatorDoc = await adminDb.collection('creators').add(creatorData);
+      const availability: Availability = {
+        availability: formData.availability.availability as AvailabilityType,
+        weeklyHours: formData.availability.weeklyHours,
+        preferredWorkdays: formData.availability.preferredWorkdays || [],
+        weeklyAvailability: formData.availability.weeklyAvailability || [],
+        timeZone: formData.availability.timeZone || 'Asia/Baghdad',
+        urgentWork: formData.availability.urgentWork || false
+      };
 
-      // ✅ حفظ في users collection للتوحيد
-      try {
-        await adminDb.collection('users').add({
-          name: formData.account.fullName.trim(),
-          email: email,
-          role: 'creator',
-          status: 'intake_submitted',
-          profileId: creatorDoc.id, // ربط مع الملف الشخصي
-          source: 'creator-onboarding',
-          createdAt: now,
-          updatedAt: now,
-          emailVerified: false,
-          twoFactorEnabled: false,
-          // نسخ بعض البيانات المهمة
-          phone: formData.account.phone.trim(),
-          city: formData.basicInfo.city.trim(),
-          specialization: formData.basicInfo.role,
-          experienceLevel: formData.experience.experienceLevel,
-        });
-        console.log('[onboarding] Creator also added to users collection for unification');
-      } catch (usersError) {
-        console.warn('[onboarding] Failed to add creator to users collection:', usersError);
-        // لا نفشل التسجيل إذا فشل التوحيد
-      }
+      const portfolio: Portfolio = {
+        workSamples: formData.portfolio.workSamples || [],
+        socialMedia: formData.portfolio.socialMedia || {},
+        portfolioUrl: formData.portfolio.portfolioUrl
+      };
 
-      console.log('[onboarding] Creator document created successfully:', {
-        creatorId: creatorDoc.id,
+      // بناء المستخدم الموحد مع كامل بيانات المبدع
+      const unifiedUserData: Omit<UnifiedUser, 'id'> = {
+        // البيانات الأساسية
         email: email,
-        weeklyAvailability: creatorData.capacity.weeklyAvailability,
-        preferredWorkdays: creatorData.preferredWorkdays
+        name: formData.account.fullName.trim(),
+        role: 'creator',
+        status: 'intake_submitted',
+        phone: formData.account.phone.trim(),
+        avatar: undefined,
+        emailVerified: false,
+        twoFactorEnabled: false,
+
+        // ملف المبدع الكامل
+        creatorProfile: {
+          // التخصص والموقع
+          specialty: formData.basicInfo.role as CreatorSpecialty,
+          city: formData.basicInfo.city.trim(),
+          canTravel: formData.basicInfo.canTravel,
+          
+          // الخبرة والمهارات
+          experienceLevel: formData.experience.experienceLevel as ExperienceLevel,
+          experienceYears: formData.experience.experienceYears,
+          skills: formData.experience.skills.map(skill => ({
+            subcategoryId: skill.subcategoryId,
+            level: skill.level,
+            experienceYears: skill.experienceYears || 1,
+            verified: false,
+            notes: skill.notes || ''
+          })),
+          previousClients: formData.experience.previousClients || [],
+          
+          // اللغات والمجالات
+          languages: formData.basicInfo.languages,
+          primaryCategories: formData.basicInfo.primaryCategories as ('photo' | 'video' | 'design')[],
+          
+          // معرض الأعمال
+          portfolio,
+          
+          // التوفر والجدولة
+          availability,
+          
+          // المعدات - تحويل من CreatorEquipmentItem[] إلى string[]
+          equipment,
+          
+          // حالة الانضمام
+          onboardingStatus: 'completed',
+          onboardingStep: 5,
+          onboardingData: {
+            completedSteps: formData.completedSteps,
+            skipOptionalSteps: skipOptionalSteps || false,
+            onboardingVersion: 'unified_v1'
+          },
+          onboardingCompletedAt: now,
+          
+          // تقييم الإدارة (قيم افتراضية)
+          tier: 'starter',
+          modifier: 1.0,
+          approvedCategories: formData.basicInfo.primaryCategories,
+          
+          // معلومات إضافية
+          bio: '',
+          preferredVerticals: [],
+          rateOverrides: []
+        },
+
+        // التوقيتات والمتابعة
+        createdAt: now,
+        updatedAt: now,
+        lastLoginAt: undefined,
+        source: formData.metadata?.source || 'web',
+        originalId: undefined,
+        originalCollection: undefined,
+        loginAttempts: 0,
+        lockedUntil: undefined,
+        
+        // الإعدادات
+        preferences: {
+          language: formData.basicInfo.languages?.[0] || 'ar',
+          theme: 'light',
+          notifications: true
+        }
+      };
+
+      // حفظ في النظام الموحد (سجل واحد فقط)
+      userDoc = await adminDb.collection('users').add(unifiedUserData);
+
+      // حفظ كلمة المرور في مجموعة credentials المنفصلة
+      await adminDb.collection('user_credentials').doc(userDoc.id).set({
+        userId: userDoc.id,
+        email,
+        hashedPassword,
+        createdAt: now,
+        lastPasswordChange: now
       });
 
-      // إنشاء حساب في NextAuth users collection
-      try {
-        await adminDb.collection('users').add({
-          name: formData.account.fullName.trim(),
-          email: email,
-          role: 'creator',
-          profileId: creatorDoc.id, // ربط مع الملف الشخصي
-          onboardingStatus: 'completed',
-          status: 'pending', // في انتظار موافقة الإدارة
-          source: 'creator-onboarding',
-          createdAt: now,
-          updatedAt: now,
-          emailVerified: false,
-          twoFactorEnabled: false,
-          // نسخ بعض البيانات المهمة للوصول السريع
-          phone: formData.account.phone.trim(),
-          city: formData.basicInfo.city.trim(),
-          primaryCategories: formData.basicInfo.primaryCategories,
-        });
-        console.log('[onboarding] User record created successfully for:', email);
-      } catch (error) {
-        console.warn('[onboarding] Failed to create user record:', error);
-      }
+      console.log('[ONBOARDING] Unified creator user created:', { userId: userDoc.id, email });
 
     } else {
-      // تحديث مبدع موجود
-      creatorDoc = existingCreatorQuery.docs[0];
+      // تحديث مستخدم موجود
+      userDoc = existingUserQuery.docs[0];
       
-      const updateData = {
-        // تحديث المعلومات (بدون كلمة المرور إذا كان موجود)
-        fullName: formData.account.fullName.trim(),
+      // إعادة بناء المعدات والتوفر والمهارات في التحديث كذلك
+  const equipmentUpdate: Equipment = {
+        cameras: formData.equipment?.cameras?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Camera' : item.catalogId
+        ) || [],
+        lenses: formData.equipment?.lenses?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Lens' : item.catalogId
+        ) || [],
+        lighting: formData.equipment?.lighting?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Lighting' : item.catalogId
+        ) || [],
+        audio: formData.equipment?.audio?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Audio' : item.catalogId
+        ) || [],
+        accessories: formData.equipment?.accessories?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Accessory' : item.catalogId
+        ) || [],
+        specialSetups: formData.equipment?.specialSetups?.map(item =>
+          item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Setup' : item.catalogId
+        ) || []
+      };
+
+      const availabilityUpdate: Availability = {
+        availability: formData.availability.availability as AvailabilityType,
+        weeklyHours: formData.availability.weeklyHours,
+        preferredWorkdays: formData.availability.preferredWorkdays || [],
+        weeklyAvailability: formData.availability.weeklyAvailability || [],
+        timeZone: formData.availability.timeZone || 'Asia/Baghdad',
+        urgentWork: formData.availability.urgentWork || false
+      };
+
+      const portfolioUpdate: Portfolio = {
+        workSamples: formData.portfolio.workSamples || [],
+        socialMedia: formData.portfolio.socialMedia || {},
+        portfolioUrl: formData.portfolio.portfolioUrl
+      };
+
+      await userDoc.ref.update({
+        name: formData.account.fullName.trim(),
         phone: formData.account.phone.trim(),
-        role: formData.basicInfo.role,
-        city: formData.basicInfo.city.trim(),
-        canTravel: formData.basicInfo.canTravel,
-        languages: formData.basicInfo.languages,
-        primaryCategories: formData.basicInfo.primaryCategories,
-        // تحديث البيانات الموجودة - البنية الموحدة
-        experienceLevel: formData.experience.experienceLevel,
-        experienceYears: formData.experience.experienceYears,
-        skills: formData.experience.skills.map(skill => ({
+        'creatorProfile.specialty': formData.basicInfo.role,
+        'creatorProfile.city': formData.basicInfo.city.trim(),
+        'creatorProfile.canTravel': formData.basicInfo.canTravel,
+        'creatorProfile.languages': formData.basicInfo.languages,
+        'creatorProfile.primaryCategories': formData.basicInfo.primaryCategories,
+        'creatorProfile.experienceLevel': formData.experience.experienceLevel,
+        'creatorProfile.experienceYears': formData.experience.experienceYears,
+        'creatorProfile.skills': formData.experience.skills.map(skill => ({
           subcategoryId: skill.subcategoryId,
           level: skill.level,
           experienceYears: skill.experienceYears || 1,
           verified: false,
           notes: skill.notes || ''
         })),
-        previousClients: formData.experience.previousClients || [],
-        portfolio: {
-          workSamples: formData.portfolio.workSamples,
-          socialMedia: formData.portfolio.socialMedia,
-          portfolioUrl: formData.portfolio.portfolioUrl
+        'creatorProfile.previousClients': formData.experience.previousClients || [],
+        'creatorProfile.portfolio': portfolioUpdate,
+        'creatorProfile.availability': availabilityUpdate,
+        'creatorProfile.equipment': equipmentUpdate,
+        'creatorProfile.onboardingStatus': 'completed',
+        'creatorProfile.onboardingStep': 5,
+        'creatorProfile.onboardingData': {
+          completedSteps: formData.completedSteps,
+          skipOptionalSteps: skipOptionalSteps || false,
+          onboardingVersion: 'unified_v1'
         },
-        availability: formData.availability.availability,
-        weeklyHours: formData.availability.weeklyHours,
-        preferredWorkdays: formData.availability.preferredWorkdays,
-        timeZone: formData.availability.timeZone,
-        urgentWork: formData.availability.urgentWork,
+        'creatorProfile.onboardingCompletedAt': now,
         status: 'intake_submitted',
-        onboardingCompleted: true,
-        onboardingCompletedAt: now,
-        onboardingVersion: 'unified_v1',
-        updatedAt: now,
-        completedSteps: formData.completedSteps,
-        skipOptionalSteps: skipOptionalSteps || false
-      };
-
-      await creatorDoc.ref.update(updateData);
+        updatedAt: now
+      });
     }
 
     // تسجيل في audit log
     await adminDb.collection('audit_log').add({
-      action: isNewCreator ? 'creator_onboarding_completed' : 'creator_onboarding_updated',
-      entityType: 'creator',
-      entityId: creatorDoc.id,
+      action: isNewUser ? 'creator_onboarding_completed' : 'creator_onboarding_updated',
+      entityType: 'user',
+      entityId: userDoc.id,
       userId: email,
       timestamp: now,
       requestId,
       details: {
-        isNewCreator,
+        isNewUser,
         fullName: formData.account.fullName,
         role: formData.basicInfo.role,
         city: formData.basicInfo.city,
@@ -370,18 +400,18 @@ export async function POST(req: NextRequest) {
     try {
       await adminDb.collection('notifications').add({
         type: 'creator_onboarding_completed',
-        title: isNewCreator ? 'مبدع جديد أكمل التسجيل' : 'مبدع حديث ملفه الشخصي',
+        title: isNewUser ? 'مبدع جديد أكمل التسجيل' : 'مبدع حدّث ملفه الشخصي',
         message: `${formData.account.fullName} أكمل نموذج الانضمام وجاهز للمراجعة`,
         targetRole: 'admin',
-        entityType: 'creator',
-        entityId: creatorDoc.id,
+        entityType: 'user',
+        entityId: userDoc.id,
         priority: 'high',
         createdAt: now,
         read: false,
         metadata: {
           creatorRole: formData.basicInfo.role,
           creatorCity: formData.basicInfo.city,
-          isNewCreator
+          isNewUser
         }
       });
     } catch (error) {
@@ -397,16 +427,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: isNewCreator 
+      message: isNewUser 
         ? 'تم إنشاء حسابك وإرسال النموذج بنجاح! سيتم مراجعة طلبك خلال 24-48 ساعة.'
         : 'تم تحديث ملفك الشخصي بنجاح! سيتم مراجعة التحديثات خلال 24-48 ساعة.',
       data: {
-        creatorId: creatorDoc.id,
+        creatorId: userDoc.id,
         nextStep: 5,
         completionPercentage: 100
       },
       requestId
-    } as OnboardingApiResponse, { status: isNewCreator ? 201 : 200 });
+    } as OnboardingApiResponse, { status: isNewUser ? 201 : 200 });
 
   } catch (error) {
     console.error('[ONBOARDING] Critical error:', {
@@ -441,81 +471,94 @@ export async function GET() {
     const email = session.user.email.toLowerCase();
 
     // البحث عن المبدع
-    const creatorQuery = await adminDb
-      .collection('creators')
+    const unifiedQuery = await adminDb
+      .collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
-    if (creatorQuery.empty) {
-      // لا يوجد بيانات - إرجاع النموذج الفارغ
+    if (unifiedQuery.empty) {
       return NextResponse.json({
         success: true,
         message: 'لم يتم العثور على بيانات سابقة',
-        data: {
-          hasExistingData: false,
-          formData: null,
-          completionPercentage: 0
-        },
+        data: { hasExistingData: false, formData: null, completionPercentage: 0 },
         requestId
       } as OnboardingApiResponse);
     }
 
-    const creatorDoc = creatorQuery.docs[0];
-    const creatorData = creatorDoc.data();
+    const userDoc = unifiedQuery.docs[0];
+    const userData = userDoc.data() as UnifiedUser;
+    const cp = userData.creatorProfile;
 
-    // تحويل بيانات قاعدة البيانات إلى تنسيق النموذج
+    if (!cp) {
+      return NextResponse.json({
+        success: true,
+        message: 'لم يتم العثور على بيانات سابقة',
+        data: { hasExistingData: false, formData: null, completionPercentage: 0 },
+        requestId
+      } as OnboardingApiResponse);
+    }
+
+    // استخراج خطوات الإكمال مع ضمان النوع (نفترض الخطوات 1..5)
+    const rawSteps = Array.isArray((cp.onboardingData as Record<string, unknown>)?.completedSteps)
+      ? ((cp.onboardingData as { completedSteps?: Array<number | string> }).completedSteps || [])
+          .map(s => (typeof s === 'number' ? s : parseInt(String(s), 10)))
+          .filter(n => [1,2,3,4,5].includes(n))
+      : [];
+
+    const completedStepsTyped = rawSteps as unknown as OnboardingFormData['completedSteps'];
+
+  const stepRaw: number = cp.onboardingStatus === 'completed' ? 5 : (cp.onboardingStep || 1);
+  const allowedSteps = [1,2,3,4,5] as const;
+  const stepClamped = (allowedSteps as readonly number[]).includes(stepRaw) ? (stepRaw as (typeof allowedSteps)[number]) : 1;
+
     const formData: Partial<OnboardingFormData> = {
-      currentStep: creatorData.onboardingCompleted ? 5 : 1,
-      completedSteps: creatorData.completedSteps || [],
-      
+      currentStep: stepClamped,
+      completedSteps: completedStepsTyped,
       account: {
-        fullName: creatorData.fullName || '',
-        email: creatorData.email || '',
-        phone: creatorData.phone || '',
-        password: '', // لا نرجع كلمة المرور
+        fullName: userData.name || '',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        password: '',
         confirmPassword: '',
-        agreeToTerms: true // افتراض الموافقة إذا كان مسجل
+        agreeToTerms: true
       },
-      
       basicInfo: {
-        role: creatorData.role || 'photographer',
-        city: creatorData.city || '',
-        canTravel: creatorData.canTravel || false,
-        languages: creatorData.languages || ['ar'],
-        primaryCategories: creatorData.primaryCategories || []
+  role: cp.specialty || 'photographer',
+        city: cp.city || '',
+        canTravel: cp.canTravel || false,
+        languages: cp.languages || ['ar'],
+        primaryCategories: cp.primaryCategories || []
       },
-      
       experience: {
-        experienceLevel: creatorData.experienceLevel || 'beginner',
-        experienceYears: creatorData.experienceYears || '0-1',
-        skills: creatorData.skills || [],
-        previousClients: creatorData.previousClients || []
+        experienceLevel: cp.experienceLevel || 'beginner',
+        experienceYears: cp.experienceYears || '0-1',
+        skills: cp.skills || [],
+        previousClients: cp.previousClients || []
       },
-      
       portfolio: {
-        portfolioUrl: creatorData.portfolio?.portfolioUrl,
-        workSamples: creatorData.portfolio?.workSamples || [],
-        socialMedia: creatorData.portfolio?.socialMedia || {}
+        portfolioUrl: cp.portfolio?.portfolioUrl,
+        workSamples: cp.portfolio?.workSamples || [],
+        socialMedia: cp.portfolio?.socialMedia || {}
       },
-      
       availability: {
-        availability: creatorData.availability || 'flexible',
-        weeklyHours: creatorData.weeklyHours || 20,
-        preferredWorkdays: creatorData.preferredWorkdays || [],
-        timeZone: creatorData.timeZone || 'Asia/Baghdad',
-        urgentWork: creatorData.urgentWork || false
+  availability: cp.availability?.availability || 'flexible',
+        weeklyHours: cp.availability?.weeklyHours || 20,
+        preferredWorkdays: cp.availability?.preferredWorkdays || [],
+        timeZone: cp.availability?.timeZone || 'Asia/Baghdad',
+        urgentWork: cp.availability?.urgentWork || false
       },
-      
       metadata: {
-        startedAt: creatorData.createdAt || new Date().toISOString(),
-        lastSavedAt: creatorData.updatedAt,
-        source: creatorData.source || 'web'
+        startedAt: userData.createdAt || new Date().toISOString(),
+        lastSavedAt: userData.updatedAt,
+  source: (userData.source === 'admin' || userData.source === 'mobile' ? userData.source : 'web')
       }
     };
 
-    const completionPercentage = creatorData.onboardingCompleted ? 100 : 
-                                (formData.completedSteps?.length || 0) * 20;
+    const completionPercentage = cp.onboardingStatus === 'completed'
+      ? 100
+      : ((formData.completedSteps?.length || 0) * 20);
 
     return NextResponse.json({
       success: true,
@@ -524,8 +567,8 @@ export async function GET() {
         hasExistingData: true,
         formData,
         completionPercentage,
-        status: creatorData.status,
-        onboardingCompleted: creatorData.onboardingCompleted || false
+  status: userData.status,
+  onboardingCompleted: cp.onboardingStatus === 'completed'
       },
       requestId
     } as OnboardingApiResponse);

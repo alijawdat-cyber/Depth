@@ -1,8 +1,9 @@
-// API لإنشاء حساب مبدع جديد من خلال نظام الـ Onboarding
+// API لإنشاء حساب مبدع جديد - النظام الموحد
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import bcrypt from 'bcryptjs';
 import type { AccountCreationData } from '@/types/onboarding';
+import type { UnifiedUser } from '@/types/unified-user';
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,45 +36,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // التحقق من وجود المستخدم مسبقاً في Firebase Auth
-    try {
-      const existingUser = await adminAuth.getUserByEmail(email);
-      if (existingUser) {
-        return NextResponse.json(
-          { error: 'البريد الإلكتروني مستخدم مسبقاً' },
-          { status: 409 }
-        );
-      }
-    } catch (error: unknown) {
-      // إذا لم يجد المستخدم، هذا جيد (نريد إنشاء حساب جديد)
-      const authError = error as { code?: string };
-      if (authError.code !== 'auth/user-not-found') {
-        console.error('Error checking existing user:', error);
-        throw error;
-      }
+    // التحقق من وجود المستخدم مسبقاً
+    const existingUnifiedUser = await adminDb
+      .collection('users')
+      .where('email', '==', email)
+      .limit(1)
+      .get();
+
+    if (!existingUnifiedUser.empty) {
+      return NextResponse.json(
+        { error: 'البريد الإلكتروني مستخدم مسبقاً' },
+        { status: 409 }
+      );
     }
 
-    // التحقق من وجود المستخدم في Firestore أيضاً
-    try {
-      const existingCreator = await adminDb.collection('creators').where('email', '==', email).limit(1).get();
-      if (!existingCreator.empty) {
-        return NextResponse.json(
-          { error: 'البريد الإلكتروني مستخدم مسبقاً' },
-          { status: 409 }
-        );
-      }
-      const existingUserDoc = await adminDb.collection('users').where('email', '==', email).limit(1).get();
-      if (!existingUserDoc.empty) {
-        return NextResponse.json(
-          { error: 'البريد الإلكتروني مستخدم مسبقاً' },
-          { status: 409 }
-        );
-      }
-    } catch (error) {
-      console.error('Error checking existing creator in Firestore:', error);
-    }
-
-    // تشفير كلمة المرور
+    // تشفير كلمة المرور للحفظ المنفصل
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // إنشاء المستخدم في Firebase Auth
@@ -84,95 +61,99 @@ export async function POST(req: NextRequest) {
       disabled: false
     });
 
-    // إنشاء وثيقة المبدع الأولية
-    const creatorData = {
-      uid: userRecord.uid,
+    // إنشاء المستخدم في النظام الموحد
+    const unifiedUserData: Omit<UnifiedUser, 'id'> = {
       email,
-      fullName,
-      phone,
-      role: 'photographer', // سيتم تحديثه في الخطوة التالية
-      status: 'onboarding_started',
-      password: hashedPassword, // للتوافق مع credentials provider
-      hashedPassword, // نسخة احتياطية
-      contact: { email },
-      city: '',
-      canTravel: false,
-      onboardingProgress: {
-        currentStep: 1,
-        completedSteps: [],
-        startedAt: new Date().toISOString()
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    // حفظ في مجموعة creators المتخصصة
-    const creatorDocRef = await adminDb.collection('creators').add(creatorData);
-
-    // ✅ حفظ في users collection للتوحيد
-    try {
-      await adminDb.collection('users').add({
-        name: fullName,
-        email: email,
-        role: 'creator',
-        status: 'onboarding_started',
-        profileId: creatorDocRef.id, // ربط مع الملف الشخصي
-        source: 'creator-account-creation',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        emailVerified: false,
-        twoFactorEnabled: false,
-        // نسخ بعض البيانات المهمة
-        phone: phone,
-        uid: userRecord.uid,
-        specialization: 'photographer', // مؤقت
-      });
-    } catch (usersError) {
-      console.warn('[creator.create-account] Failed to add creator to users collection:', usersError);
-      // لا نفشل التسجيل إذا فشل التوحيد
-    }
-
-    // حفظ في مجموعة users الموحدة
-    const userDocRef = await adminDb.collection('users').add({
       name: fullName,
-      email,
       role: 'creator',
       status: 'onboarding_started',
-      profileId: creatorDocRef.id, // ربط مع الملف الشخصي
-      source: 'creator-onboarding',
-      createdAt: new Date(),
-      updatedAt: new Date(),
       emailVerified: false,
       twoFactorEnabled: false,
       phone,
-      uid: userRecord.uid
+      avatar: undefined,
+      
+      // ملف المبدع الأولي
+      creatorProfile: {
+        specialty: 'photographer',
+        city: '',
+        canTravel: false,
+        experienceLevel: 'beginner',
+        experienceYears: '',
+        skills: [],
+        languages: ['ar'],
+        primaryCategories: ['photo'],
+        portfolio: {
+          workSamples: [],
+          socialMedia: {}
+        },
+        availability: {
+          availability: 'flexible',
+          weeklyHours: 40,
+          preferredWorkdays: [],
+          weeklyAvailability: [],
+          timeZone: 'Asia/Riyadh',
+          urgentWork: false
+        },
+        equipment: {
+          cameras: [],
+          lenses: [],
+          lighting: [],
+          audio: [],
+          accessories: [],
+          specialSetups: []
+        },
+        onboardingStatus: 'in_progress',
+        tier: 'starter',
+        modifier: 1.0,
+        bio: ''
+      },
+      
+      // التوقيتات والمتابعة
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastLoginAt: undefined,
+      source: 'web',
+      loginAttempts: 0,
+      
+      // الإعدادات البسيطة
+      preferences: {
+        language: 'ar',
+        theme: 'light',
+        notifications: true
+      }
+    };
+
+    // حفظ في النظام الموحد
+    const userDocRef = await adminDb.collection('users').add(unifiedUserData);
+
+    // حفظ كلمة المرور المشفرة في مجموعة منفصلة للأمان
+    await adminDb.collection('user_credentials').doc(userDocRef.id).set({
+      userId: userDocRef.id,
+      email,
+      hashedPassword,
+      authUid: userRecord.uid,
+      createdAt: new Date().toISOString(),
+      lastPasswordChange: new Date().toISOString()
     });
 
-    console.log('Account and creator profile created successfully for:', email);
+    console.log('✅ تم إنشاء حساب مبدع جديد في النظام الموحد:', email);
     
     return NextResponse.json({
       success: true,
       message: 'تم إنشاء الحساب بنجاح! يمكنك الآن الانتقال للمرحلة التالية',
       data: {
-        uid: userRecord.uid,
-        creatorId: creatorDocRef.id,
         userId: userDocRef.id,
+        authUid: userRecord.uid,
         email,
-        fullName,
+        name: fullName, // تم تصليحه من fullName
+        role: 'creator',
         status: 'onboarding_started',
         nextStep: 2
       }
     });
 
   } catch (error) {
-    console.error('Account creation error:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
+    console.error('❌ خطأ في إنشاء الحساب:', error);
     
     return NextResponse.json(
       { error: 'حدث خطأ في إنشاء الحساب' },

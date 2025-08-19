@@ -117,20 +117,24 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // جلب بيانات العميل
+    // جلب بيانات العميل من النظام الموحد
     let clientData: ClientData = {};
     if (projectData.clientId) {
       try {
-        const clientDoc = await adminDb
-          .collection('clients')
-          .doc(projectData.clientId)
-          .get();
-        
+        const clientDoc = await adminDb.collection('users').doc(projectData.clientId).get();
         if (clientDoc.exists) {
-          clientData = clientDoc.data() as ClientData || {};
+          const c = clientDoc.data() as { role?: string; name?: string; email?: string; clientProfile?: { company?: string; phone?: string } };
+          if (c.role === 'client') {
+            clientData = {
+              name: c.name,
+              company: c.clientProfile?.company,
+              email: c.email,
+              phone: c.clientProfile?.phone
+            };
+          }
         }
-      } catch (error) {
-        console.warn('Failed to fetch client data:', error);
+      } catch (e) {
+        console.warn('Failed unified client fetch', e);
       }
     }
 
@@ -191,7 +195,7 @@ export async function POST(
 
     // تسجيل في Audit Log
     await adminDb
-      .collection('audit_logs')
+      .collection('audit_log')
       .add({
         action: 'quote_sent',
         entityType: 'project',

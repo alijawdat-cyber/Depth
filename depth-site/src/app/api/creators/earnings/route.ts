@@ -49,22 +49,17 @@ export async function GET() {
 
     const email = session.user.email.toLowerCase();
 
-    // البحث عن المبدع
-    const creatorQuery = await adminDb
-      .collection('creators')
+    // البحث عن المبدع في النظام الموحد
+    const userQuery = await adminDb.collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
-    if (creatorQuery.empty) {
-      return NextResponse.json({
-        success: false,
-        error: 'لم يتم العثور على بيانات المبدع',
-        requestId
-      }, { status: 404 });
+    if (userQuery.empty) {
+      return NextResponse.json({ success: false, error: 'المبدع غير موجود بالنظام الموحد', requestId }, { status: 404 });
     }
-
-    const creatorId = creatorQuery.docs[0].id;
+    const creatorId = userQuery.docs[0].id;
 
     // جلب المشاريع المكتملة للمبدع
     const projectsQuery = await adminDb

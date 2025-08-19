@@ -23,39 +23,19 @@ export async function GET() {
       }, { status: 403 });
     }
 
-    // جلب إحصائيات من المجموعات المختلفة
-    const collections = ['admins', 'employees', 'creators', 'clients'];
-    
-    let totalUsers = 0;
+    // إحصائيات من المجموعة الموحدة فقط
+    const usersSnapshot = await adminDb.collection('users').get();
+  const totalUsers = usersSnapshot.size;
     let activeUsers = 0;
     let users2FA = 0;
     let lockedAccounts = 0;
 
-    // حساب إحصائيات المستخدمين
-    for (const collection of collections) {
-      try {
-        const snapshot = await adminDb.collection(collection).get();
-        
-        for (const doc of snapshot.docs) {
-          const userData = doc.data();
-          totalUsers++;
-          
-          if (userData.status === 'active') {
-            activeUsers++;
-          }
-          
-          if (userData.twoFactorEnabled) {
-            users2FA++;
-          }
-          
-          if (userData.status === 'locked' || userData.status === 'suspended') {
-            lockedAccounts++;
-          }
-        }
-      } catch (error) {
-        console.warn(`Failed to fetch ${collection} for security stats:`, error);
-      }
-    }
+    usersSnapshot.docs.forEach(doc => {
+      const u = doc.data();
+      if (u.status === 'active') activeUsers++;
+      if (u.twoFactorEnabled) users2FA++;
+      if (u.status === 'locked' || u.status === 'suspended') lockedAccounts++;
+    });
 
     // حساب الأحداث الأمنية اليوم
     const today = new Date();

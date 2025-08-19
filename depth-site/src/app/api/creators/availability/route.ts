@@ -3,7 +3,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
 import { z } from 'zod';
-import type { WeeklyAvailability } from '@/types/creators';
+import type { UnifiedUser } from '@/types/unified-user';
+
+// نوع محلي للتوفر الأسبوعي يدعم فترات الاستراحة
+interface ExtendedWeeklyAvailability {
+  day: string;
+  available: boolean;
+  startTime?: string;
+  endTime?: string;
+  breakStart?: string;
+  breakEnd?: string;
+}
 
 // Schema للتحقق من بيانات التوفر الأسبوعي
 const WeeklyAvailabilitySchema = z.object({
@@ -34,24 +44,26 @@ export async function GET() {
       );
     }
 
-    // البحث عن المبدع
-    const creatorsRef = adminDb.collection('creators');
-    const creatorQuery = await creatorsRef.where('contact.email', '==', session.user.email).get();
-    
-    if (creatorQuery.empty) {
+    // البحث في مجموعة المستخدمين الموحدة
+    const userSnap = await adminDb.collection('users')
+      .where('email', '==', session.user.email.toLowerCase())
+      .where('role', '==', 'creator')
+      .limit(1)
+      .get();
+
+    if (userSnap.empty) {
       return NextResponse.json(
-        { success: false, error: 'المبدع غير موجود', requestId },
+        { success: false, error: 'المستخدم غير موجود أو ليس مبدعاً', requestId },
         { status: 404 }
       );
     }
 
-    const creatorDoc = creatorQuery.docs[0];
-    const creatorData = creatorDoc.data();
-
-    // استخراج بيانات التوفر
-    const weeklyAvailability = creatorData.capacity?.weeklyAvailability || [];
-    const timeZone = creatorData.timeZone || 'Asia/Baghdad';
-    const urgentWork = creatorData.urgentWork || false;
+    const userDoc = userSnap.docs[0];
+    const userData = userDoc.data() as UnifiedUser;
+    const availabilityObj = userData.creatorProfile?.availability;
+    const weeklyAvailability = availabilityObj?.weeklyAvailability || [];
+    const timeZone = availabilityObj?.timeZone || 'Asia/Baghdad';
+    const urgentWork = availabilityObj?.urgentWork || false;
 
     return NextResponse.json({
       success: true,
@@ -59,8 +71,7 @@ export async function GET() {
       data: {
         weeklyAvailability,
         timeZone,
-        urgentWork,
-        lastUpdated: creatorData.updatedAt
+        urgentWork
       }
     });
 
@@ -89,22 +100,24 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const validatedData = UpdateAvailabilitySchema.parse(body);
 
-    // البحث عن المبدع
-    const creatorsRef = adminDb.collection('creators');
-    const creatorQuery = await creatorsRef.where('contact.email', '==', session.user.email).get();
-    
-    if (creatorQuery.empty) {
+    // البحث عن المبدع في النظام الموحد
+    const userSnap = await adminDb.collection('users')
+      .where('email', '==', session.user.email.toLowerCase())
+      .where('role', '==', 'creator')
+      .limit(1)
+      .get();
+
+    if (userSnap.empty) {
       return NextResponse.json(
-        { success: false, error: 'المبدع غير موجود', requestId },
+        { success: false, error: 'المستخدم غير موجود أو ليس مبدعاً', requestId },
         { status: 404 }
       );
     }
-
-    const creatorDoc = creatorQuery.docs[0];
-    const creatorId = creatorDoc.id;
+    const userDoc = userSnap.docs[0];
+    const creatorId = userDoc.id;
 
     // حساب إجمالي الساعات الأسبوعية
-    const calculateWeeklyHours = (availability: WeeklyAvailability[]): number => {
+  const calculateWeeklyHours = (availability: ExtendedWeeklyAvailability[]): number => {
       return availability.reduce((total, dayData) => {
         if (!dayData.available || !dayData.startTime || !dayData.endTime) return total;
         
@@ -126,17 +139,17 @@ export async function PUT(req: NextRequest) {
 
     const weeklyHours = calculateWeeklyHours(validatedData.weeklyAvailability);
 
-    // تحديث بيانات المبدع
+    // تحديث بيانات المبدع في النظام الموحد
     const updateData = {
-      'capacity.weeklyAvailability': validatedData.weeklyAvailability,
-      'capacity.weeklyHours': weeklyHours,
-      'timeZone': validatedData.timeZone,
-      'urgentWork': validatedData.urgentWork,
+      'creatorProfile.availability.weeklyAvailability': validatedData.weeklyAvailability,
+      'creatorProfile.availability.weeklyHours': weeklyHours,
+      'creatorProfile.availability.timeZone': validatedData.timeZone,
+      'creatorProfile.availability.urgentWork': validatedData.urgentWork,
       'updatedAt': new Date().toISOString(),
-      'lastAvailabilityUpdate': new Date().toISOString()
-    };
+      'creatorProfile.lastAvailabilityUpdate': new Date().toISOString()
+    } as Record<string, unknown>;
 
-    await adminDb.collection('creators').doc(creatorId).update(updateData);
+    await adminDb.collection('users').doc(creatorId).update(updateData);
 
     // إنشاء سجل في تاريخ التحديثات
     await adminDb.collection('creator_availability_history').add({
@@ -197,9 +210,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // التحقق من صلاحيات الإدارة
-    const user = await adminDb.collection('users').doc(session.user.email).get();
-    if (!user.exists || user.data()?.role !== 'admin') {
+    // التحقق من صلاحيات الإدارة عبر المستخدم الموحد
+    const adminSnap = await adminDb.collection('users')
+      .where('email', '==', session.user.email.toLowerCase())
+      .where('role', '==', 'admin')
+      .limit(1)
+      .get();
+    if (adminSnap.empty) {
       return NextResponse.json(
         { success: false, error: 'غير مصرح - صلاحيات إدارية مطلوبة', requestId },
         { status: 403 }
@@ -220,17 +237,17 @@ export async function POST(req: NextRequest) {
     const batch = adminDb.batch();
     const results = [];
 
-    for (const creatorId of creatorIds) {
-      const creatorRef = adminDb.collection('creators').doc(creatorId);
+  for (const creatorId of creatorIds) {
+      const creatorRef = adminDb.collection('users').doc(creatorId);
       const weeklyHours = calculateWeeklyHours(weeklyAvailability);
-      
+
       batch.update(creatorRef, {
-        'capacity.weeklyAvailability': weeklyAvailability,
-        'capacity.weeklyHours': weeklyHours,
-        'timeZone': timeZone,
-        'urgentWork': urgentWork,
+        'creatorProfile.availability.weeklyAvailability': weeklyAvailability,
+        'creatorProfile.availability.weeklyHours': weeklyHours,
+        'creatorProfile.availability.timeZone': timeZone,
+        'creatorProfile.availability.urgentWork': urgentWork,
         'updatedAt': new Date().toISOString(),
-        'lastAvailabilityUpdate': new Date().toISOString()
+        'creatorProfile.lastAvailabilityUpdate': new Date().toISOString()
       });
 
       results.push({ creatorId, weeklyHours });
@@ -258,7 +275,7 @@ export async function POST(req: NextRequest) {
 }
 
 // دالة مساعدة لحساب الساعات الأسبوعية
-function calculateWeeklyHours(availability: WeeklyAvailability[]): number {
+function calculateWeeklyHours(availability: ExtendedWeeklyAvailability[]): number {
   return availability.reduce((total, dayData) => {
     if (!dayData.available || !dayData.startTime || !dayData.endTime) return total;
     

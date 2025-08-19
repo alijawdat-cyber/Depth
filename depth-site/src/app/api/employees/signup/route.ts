@@ -63,98 +63,71 @@ export async function POST(req: NextRequest) {
       }, { status: 410 });
     }
 
-    // التحقق من عدم وجود موظف بهذا البريد
-    const existingEmployee = await adminDb.collection('employees')
+    // التحقق من عدم وجود مستخدم موظف موحد بنفس البريد
+    const existingUnified = await adminDb.collection('users')
       .where('email', '==', inviteData.email)
+      .where('role', '==', 'employee')
       .limit(1)
       .get();
-
-    if (!existingEmployee.empty) {
-      return NextResponse.json({
-        success: false,
-        error: 'موظف بهذا البريد موجود مسبقاً',
-        requestId
-      }, { status: 409 });
+    if (!existingUnified.empty) {
+      return NextResponse.json({ success: false, error: 'الموظف موجود مسبقاً', requestId }, { status: 409 });
     }
 
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 12);
     const now = new Date();
 
-    // إنشاء بيانات الموظف
-    const employeeData = {
-      // من الدعوة
+    // إنشاء مستخدم موحد جديد بدور employee
+    const isoNow = now.toISOString();
+    const employeeUserRef = await adminDb.collection('users').add({
       email: inviteData.email,
       name: inviteData.name,
-      position: inviteData.position,
-      department: inviteData.department,
-      salary: inviteData.salary,
-      permissions: inviteData.permissions || [],
-      
-      // من التسجيل
-      password: hashedPassword,
-      
-      // حالة الموظف
-      status: 'active',
       role: 'employee',
-      
-      // بيانات النظام
-      createdAt: now,
-      updatedAt: now,
-      joinedAt: now,
+      status: 'active',
+      emailVerified: true,
+      twoFactorEnabled: false,
+      createdAt: isoNow,
+      updatedAt: isoNow,
       lastLoginAt: null,
-      
-      // مراجع الدعوة
-      inviteId: inviteDoc.id,
-      invitedBy: inviteData.invitedBy,
-      invitedAt: inviteData.invitedAt,
-      
-      // audit
-      createdBy: 'invite-signup',
-      source: 'employee-invite'
-    };
-
-    // حفظ الموظف في قاعدة البيانات
-    const employeeDocRef = await adminDb.collection('employees').add(employeeData);
-
-    // ✅ حفظ في users collection للتوحيد
-    try {
-      await adminDb.collection('users').add({
-        name: inviteData.name,
-        email: inviteData.email,
-        role: 'employee',
-        status: 'active',
-        profileId: employeeDocRef.id, // ربط مع الملف الشخصي
-        source: 'employee-invite',
-        createdAt: now,
-        updatedAt: now,
-        emailVerified: true, // الموظفون معتمدون من الإدارة
-        twoFactorEnabled: false,
-        // نسخ بعض البيانات المهمة
+      source: 'employee-invite',
+      employeeProfile: {
         position: inviteData.position,
         department: inviteData.department,
+        salary: inviteData.salary,
         permissions: inviteData.permissions || [],
-      });
-    } catch (usersError) {
-      console.warn('[employee.signup] Failed to add employee to users collection:', usersError);
-      // لا نفشل التسجيل إذا فشل التوحيد
-    }
+        startDate: isoNow,
+        capacity: 40,
+        inviteId: inviteDoc.id,
+        invitedBy: inviteData.invitedBy,
+        invitedAt: inviteData.invitedAt?.toDate?.()?.toISOString() || isoNow,
+        joinedAt: isoNow
+      }
+    });
+
+    // حفظ كلمة المرور في user_credentials
+    await adminDb.collection('user_credentials').doc(employeeUserRef.id).set({
+      userId: employeeUserRef.id,
+      email: inviteData.email,
+      hashedPassword,
+      createdAt: isoNow,
+      lastPasswordChange: isoNow
+    });
 
     // تحديث الدعوة كمستخدمة
     await inviteDoc.ref.update({
       used: true,
-      usedAt: now,
-      employeeId: employeeDocRef.id,
+      usedAt: isoNow,
+      employeeId: employeeUserRef.id,
       completedSignup: true
     });
 
     // تسجيل العملية في audit log
     await adminDb.collection('audit_log').add({
       action: 'employee_signup_completed',
-      entityType: 'employee',
-      entityId: employeeDocRef.id,
+  entityType: 'user',
+  entityId: employeeUserRef.id,
       userId: inviteData.email,
-      timestamp: now,
+  timestamp: isoNow,
       details: {
         name: inviteData.name,
         position: inviteData.position,
@@ -167,7 +140,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'تم إتمام تسجيل الموظف بنجاح',
-      employeeId: employeeDocRef.id,
+  employeeId: employeeUserRef.id,
       requestId
     }, { status: 201 });
 

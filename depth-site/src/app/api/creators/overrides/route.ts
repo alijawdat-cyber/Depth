@@ -32,21 +32,17 @@ export async function GET(req: NextRequest) {
 
     const email = session.user.email.toLowerCase();
 
-    // البحث عن المبدع للحصول على ID
-    const creatorQuery = await adminDb
-      .collection('creators')
+    // البحث في النظام الموحد
+    const userQuery = await adminDb.collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
-    if (creatorQuery.empty) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'لم يتم العثور على بيانات المبدع' 
-      }, { status: 404 });
+    if (userQuery.empty) {
+      return NextResponse.json({ success: false, error: 'المبدع غير موجود بالنظام الموحد' }, { status: 404 });
     }
-
-    const creatorId = creatorQuery.docs[0].id;
+    const creatorId = userQuery.docs[0].id;
 
     // بناء الاستعلام لطلبات Override
     let overridesQuery = adminDb
@@ -282,22 +278,18 @@ export async function POST(req: NextRequest) {
 
     const email = session.user.email.toLowerCase();
 
-    // البحث عن المبدع
-    const creatorQuery = await adminDb
-      .collection('creators')
+    // البحث عن المبدع في النظام الموحد
+    const userQuery = await adminDb.collection('users')
       .where('email', '==', email)
+      .where('role', '==', 'creator')
       .limit(1)
       .get();
 
-    if (creatorQuery.empty) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'لم يتم العثور على بيانات المبدع' 
-      }, { status: 404 });
+    if (userQuery.empty) {
+      return NextResponse.json({ success: false, error: 'المبدع غير موجود بالنظام الموحد' }, { status: 404 });
     }
-
-    const creatorId = creatorQuery.docs[0].id;
-    const creatorData = creatorQuery.docs[0].data();
+    const creatorId = userQuery.docs[0].id;
+    const creatorData = userQuery.docs[0].data();
 
     // التحقق من وجود طلب مماثل قيد المراجعة
     const existingOverrideQuery = await adminDb
@@ -371,7 +363,7 @@ export async function POST(req: NextRequest) {
       userId: email,
       timestamp: now,
       details: {
-        creatorName: creatorData.fullName,
+        creatorName: creatorData.name || creatorData.fullName,
         deliverable,
         vertical,
         currentPriceIQD,
@@ -385,7 +377,7 @@ export async function POST(req: NextRequest) {
       await adminDb.collection('notifications').add({
         type: 'creator_override_request',
         title: 'طلب تعديل سعر جديد',
-        message: `${creatorData.fullName} طلب تعديل سعر لـ ${deliverable}`,
+        message: `${creatorData.name || creatorData.fullName} طلب تعديل سعر لـ ${deliverable}`,
         targetRole: 'admin',
         entityType: 'pricing_override',
         entityId: overrideId,
