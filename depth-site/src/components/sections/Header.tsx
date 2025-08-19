@@ -47,11 +47,14 @@ export default function Header() {
   }, [open, acctOpen]);
 
   // Build nav items؛ استبدل عنصر اللوحة الافتراضي بالمسار والتسمية المناسبين حسب الدور
-  const navItems = NAV_ITEMS.map((item) => 
-    item.href === '/portal'
-      ? { href: dashboardPathForRole(role), label: dashboardLabelForRole(role) }
-      : item
-  );
+  const navItems = NAV_ITEMS.map((item) => {
+    if (item.href === '/portal') {
+      // إذا الدور عميل لا نظهر عنصر لوحة العميل نهائياً
+      if (role === 'client') return null;
+      return { href: dashboardPathForRole(role), label: dashboardLabelForRole(role) };
+    }
+    return item;
+  }).filter(Boolean) as { href: string; label: string }[];
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden" suppressHydrationWarning>
@@ -108,10 +111,12 @@ export default function Header() {
               </button>
               {acctOpen && (
                 <div className="absolute top-full mt-2 right-0 w-44 bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius-sm)] shadow-lg ring-1 ring-[var(--elev)] p-1 text-sm">
-                  <Link href={dashboardPathForRole(role)} className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>
-                    {dashboardLabelForRole(role)}
-                  </Link>
                   <Link href={profilePathForRole(role)} className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>ملفي</Link>
+                  {role !== 'client' && (
+                    <Link href={dashboardPathForRole(role)} className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>
+                      {dashboardLabelForRole(role)}
+                    </Link>
+                  )}
                   {role === 'admin' && (
                     <Link href="/admin" className="block px-3 py-2 rounded hover:bg-[var(--elev)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]" onClick={() => setAcctOpen(false)}>لوحة الأدمن</Link>
                   )}
@@ -157,8 +162,10 @@ export default function Header() {
           </nav>
           {status === 'authenticated' && (
             <div className="mt-3 grid gap-1 text-sm">
-              <Link href={dashboardPathForRole(role)} onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">{dashboardLabelForRole(role)}</Link>
               <Link href={profilePathForRole(role)} onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">ملفي</Link>
+              {role !== 'client' && (
+                <Link href={dashboardPathForRole(role)} onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">{dashboardLabelForRole(role)}</Link>
+              )}
               {role === 'admin' && (
                 <Link href="/admin" onClick={() => setOpen(false)} className="block px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--elev)]">لوحة الأدمن</Link>
               )}
