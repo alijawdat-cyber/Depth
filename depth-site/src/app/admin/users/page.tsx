@@ -18,7 +18,7 @@ interface UnifiedUser {
   name: string;
   email: string;
   role: 'creator' | 'client' | 'employee' | 'admin';
-  status: 'pending' | 'active' | 'inactive' | 'suspended';
+  status: 'pending' | 'active' | 'inactive' | 'suspended' | 'onboarding_started' | 'intake_submitted' | 'under_review';
   createdAt: string;
   location?: string;
   phone?: string;
@@ -27,6 +27,11 @@ interface UnifiedUser {
   specialization?: string;
   department?: string;
   lastActive?: string;
+  adminDecision?: {
+    reason?: string;
+    decidedAt: string;
+    decidedBy: string;
+  };
 }
 
 // Statistics interface - النظام الموحد
@@ -63,6 +68,8 @@ export default function UnifiedUsersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'active' | 'inactive' | 'suspended'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UnifiedUser | null>(null);
+  const [decisionModal, setDecisionModal] = useState<{user: UnifiedUser; action: 'approve' | 'reject'} | null>(null);
+  const [decisionReason, setDecisionReason] = useState('');
 
   // Load users data
   const fetchUsers = useCallback(async () => {
@@ -95,12 +102,12 @@ export default function UnifiedUsersPage() {
     fetchUsers();
   }, [fetchUsers]);
 
-  const updateUserStatus = async (userId: string, newStatus: string) => {
+  const updateUserStatus = async (userId: string, newStatus: string, reason?: string) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, reason })
       });
 
       const result = await response.json();
@@ -149,13 +156,18 @@ export default function UnifiedUsersPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
+    const base = 'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border';
     switch (status) {
-      case 'active': return 'text-green-600';
-      case 'pending': return 'text-yellow-600';
-      case 'inactive': return 'text-gray-600';
-      case 'suspended': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'active': return `${base} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800`;
+      case 'pending': return `${base} bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800`;
+      case 'onboarding_started': return `${base} bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800`;
+      case 'intake_submitted': return `${base} bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800`;
+      case 'under_review': return `${base} bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800`;
+      case 'suspended': return `${base} bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800`;
+      case 'inactive':
+      default:
+        return `${base} bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700`;
     }
   };
 
@@ -173,6 +185,9 @@ export default function UnifiedUsersPage() {
     switch (status) {
       case 'active': return 'نشط';
       case 'pending': return 'في الانتظار';
+      case 'onboarding_started': return 'بدأ الانضمام';
+      case 'intake_submitted': return 'نموذج مكتمل';
+      case 'under_review': return 'قيد المراجعة';
       case 'inactive': return 'غير نشط';
       case 'suspended': return 'معلق';
       default: return status;
@@ -188,10 +203,10 @@ export default function UnifiedUsersPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+  <div className="p-6 max-w-7xl mx-auto text-gray-900 dark:text-gray-100">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">إدارة المستخدمين</h1>
-        <p className="text-gray-600">عرض وإدارة جميع المستخدمين في النظام</p>
+  <h1 className="text-3xl font-bold mb-2">إدارة المستخدمين</h1>
+  <p className="text-gray-600 dark:text-gray-400">عرض وإدارة جميع المستخدمين في النظام</p>
       </div>
 
       {error && (
@@ -202,59 +217,59 @@ export default function UnifiedUsersPage() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center">
             <Users className="h-8 w-8 text-blue-600" />
             <div className="mr-4">
-              <p className="text-sm font-medium text-gray-600">إجمالي المستخدمين</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">إجمالي المستخدمين</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+  <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center">
             <UserPlus className="h-8 w-8 text-purple-600" />
             <div className="mr-4">
-              <p className="text-sm font-medium text-gray-600">المبدعون</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.creator}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">المبدعون</p>
+              <p className="text-2xl font-bold">{stats.byRole.creator}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+  <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center">
             <Users className="h-8 w-8 text-blue-600" />
             <div className="mr-4">
-              <p className="text-sm font-medium text-gray-600">العملاء</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.client}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">العملاء</p>
+              <p className="text-2xl font-bold">{stats.byRole.client}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+  <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center">
             <Users className="h-8 w-8 text-green-600" />
             <div className="mr-4">
-              <p className="text-sm font-medium text-gray-600">الموظفون</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.byRole.employee}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">الموظفون</p>
+              <p className="text-2xl font-bold">{stats.byRole.employee}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+  <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center">
             <CheckCircle className="h-8 w-8 text-yellow-600" />
             <div className="mr-4">
-              <p className="text-sm font-medium text-gray-600">في الانتظار</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">قيد / انتظار</p>
+              <p className="text-2xl font-bold">{stats.pending}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm border mb-6">
+  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-700 mb-6">
         <div className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Role Tabs */}
@@ -272,7 +287,7 @@ export default function UnifiedUsersPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     activeTab === tab.key
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   {tab.label}
@@ -284,7 +299,7 @@ export default function UnifiedUsersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'active' | 'inactive' | 'suspended')}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">جميع الحالات</option>
               <option value="pending">في الانتظار</option>
@@ -301,7 +316,7 @@ export default function UnifiedUsersPage() {
                 placeholder="البحث بالاسم أو البريد الإلكتروني..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pr-12 pl-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
           </div>
@@ -309,10 +324,10 @@ export default function UnifiedUsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800/60">
               <tr>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   المستخدم
@@ -331,21 +346,21 @@ export default function UnifiedUsersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+        <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <span className="text-sm font-medium text-gray-700">
+                        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             {user.name.charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="mr-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm font-medium">{user.name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
                       </div>
                     </div>
                   </td>
@@ -355,9 +370,7 @@ export default function UnifiedUsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`text-sm font-medium ${getStatusColor(user.status)}`}>
-                      {getStatusLabel(user.status)}
-                    </span>
+                    <span className={getStatusBadge(user.status)}>{getStatusLabel(user.status)}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(user.createdAt).toLocaleDateString('ar-SA')}
@@ -366,35 +379,53 @@ export default function UnifiedUsersPage() {
                     <div className="flex space-x-2 rtl:space-x-reverse">
                       <button
                         onClick={() => setSelectedUser(user)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                         title="عرض التفاصيل"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       
-                      {user.status === 'pending' && (
+                      {(user.status === 'pending' || user.status === 'intake_submitted') && (
                         <>
                           <button
-                            onClick={() => updateUserStatus(user.id, 'active')}
-                            className="text-green-600 hover:text-green-900"
+                            onClick={() => setDecisionModal({user, action: 'approve'})}
+                            className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
                             title="موافقة"
                           >
                             <CheckCircle className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => updateUserStatus(user.id, 'inactive')}
-                            className="text-red-600 hover:text-red-900"
+                            onClick={() => setDecisionModal({user, action: 'reject'})}
+                            className="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300"
                             title="رفض"
                           >
                             <XCircle className="h-4 w-4" />
                           </button>
                         </>
                       )}
+                      {user.status === 'under_review' && (
+                        <button
+                          onClick={() => setDecisionModal({user, action: 'approve'})}
+                          className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+                          title="اعتماد نهائي"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                      {user.status === 'onboarding_started' && (
+                        <button
+                          onClick={() => updateUserStatus(user.id, 'under_review')}
+                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                          title="وضع تحت المراجعة"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      )}
                       
                       {user.status === 'active' && (
                         <button
                           onClick={() => updateUserStatus(user.id, 'suspended')}
-                          className="text-yellow-600 hover:text-yellow-900"
+                          className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300"
                           title="تعليق"
                         >
                           <XCircle className="h-4 w-4" />
@@ -404,7 +435,7 @@ export default function UnifiedUsersPage() {
                       {user.status === 'suspended' && (
                         <button
                           onClick={() => updateUserStatus(user.id, 'active')}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
                           title="إلغاء التعليق"
                         >
                           <CheckCircle className="h-4 w-4" />
@@ -413,7 +444,7 @@ export default function UnifiedUsersPage() {
                       
                       <button
                         onClick={() => deleteUser(user.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                         title="حذف"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -429,25 +460,33 @@ export default function UnifiedUsersPage() {
         {users.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد مستخدمين</h3>
-            <p className="mt-1 text-sm text-gray-500">لم يتم العثور على مستخدمين بالمعايير المحددة.</p>
+            <h3 className="mt-2 text-sm font-medium">لا توجد مستخدمين</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">لم يتم العثور على مستخدمين بالمعايير المحددة.</p>
           </div>
         )}
       </div>
 
       {/* User Details Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">تفاصيل المستخدم</h3>
-                <button
-                  onClick={() => setSelectedUser(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircle className="h-6 w-6" />
-                </button>
+                <h3 className="text-lg font-medium">تفاصيل المستخدم</h3>
+                <div className="flex items-center gap-2">
+                  {selectedUser.status === 'under_review' && (
+                    <button
+                      onClick={() => setDecisionModal({user: selectedUser, action: 'approve'})}
+                      className="px-3 py-1 text-xs rounded-md bg-green-600 text-white hover:bg-green-700"
+                    >اعتماد</button>
+                  )}
+                  <button
+                    onClick={() => setSelectedUser(null)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <XCircle className="h-6 w-6" />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -467,47 +506,47 @@ export default function UnifiedUsersPage() {
                     </span>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">الحالة</label>
-                    <span className={`text-sm font-medium ${getStatusColor(selectedUser.status)}`}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">الحالة</label>
+                    <span className={getStatusBadge(selectedUser.status)}>
                       {getStatusLabel(selectedUser.status)}
                     </span>
                   </div>
                 </div>
 
-                {selectedUser.phone && (
+        {selectedUser.phone && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedUser.phone}</p>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">رقم الهاتف</label>
+          <p className="mt-1 text-sm">{selectedUser.phone}</p>
                   </div>
                 )}
 
-                {selectedUser.location && (
+        {selectedUser.location && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">الموقع</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedUser.location}</p>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">الموقع</label>
+          <p className="mt-1 text-sm">{selectedUser.location}</p>
                   </div>
                 )}
 
-                {selectedUser.company && (
+        {selectedUser.company && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">الشركة</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedUser.company}</p>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">الشركة</label>
+          <p className="mt-1 text-sm">{selectedUser.company}</p>
                   </div>
                 )}
 
-                {selectedUser.specialization && (
+        {selectedUser.specialization && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">التخصص</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedUser.specialization}</p>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">التخصص</label>
+          <p className="mt-1 text-sm">{selectedUser.specialization}</p>
                   </div>
                 )}
 
                 {selectedUser.skills && selectedUser.skills.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">المهارات</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">المهارات</label>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {selectedUser.skills.map((skill, index) => (
-                        <span key={index} className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        <span key={index} className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                           {skill}
                         </span>
                       ))}
@@ -515,22 +554,68 @@ export default function UnifiedUsersPage() {
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">تاريخ التسجيل</label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {new Date(selectedUser.createdAt).toLocaleDateString('ar-SA')}
-                  </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">تاريخ التسجيل</label>
+                    <p className="mt-1 text-sm">{new Date(selectedUser.createdAt).toLocaleDateString('ar-SA')}</p>
+                  </div>
+                  {selectedUser.adminDecision?.reason && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">سبب القرار السابق</label>
+                      <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 whitespace-pre-line">{selectedUser.adminDecision.reason}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="mt-6 flex justify-end space-x-3 rtl:space-x-reverse">
                 <button
                   onClick={() => setSelectedUser(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   إغلاق
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {decisionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-semibold mb-2">
+              {decisionModal.action === 'approve' ? 'اعتماد المستخدم' : 'رفض المستخدم'}
+            </h2>
+            {decisionModal.action === 'reject' && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">سبب الرفض (اختياري)</label>
+                <textarea
+                  value={decisionReason}
+                  onChange={(e) => setDecisionReason(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="اكتب ملاحظات مختصرة..."
+                />
+              </div>
+            )}
+            {decisionModal.action === 'approve' && (
+              <p className="text-sm text-gray-600 dark:text-gray-400">سيتم تفعيل المستخدم ومنحه حالة نشط.</p>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => { setDecisionModal(null); setDecisionReason(''); }}
+                className="px-4 py-2 text-sm rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+              >إلغاء</button>
+              <button
+                onClick={async () => {
+                  if (!decisionModal) return;
+                  const targetStatus = decisionModal.action === 'approve' ? 'active' : 'suspended';
+                  await updateUserStatus(decisionModal.user.id, targetStatus, decisionReason.trim() || undefined);
+                  setDecisionModal(null);
+                  setDecisionReason('');
+                }}
+                className={`px-4 py-2 text-sm rounded-md text-white ${decisionModal.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-rose-600 hover:bg-rose-700'}`}
+              >{decisionModal.action === 'approve' ? 'اعتماد' : 'رفض'}</button>
             </div>
           </div>
         </div>

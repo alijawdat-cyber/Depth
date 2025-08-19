@@ -98,11 +98,21 @@ export async function GET(req: Request) {
     allUsersSnapshot.docs.forEach(doc => {
       const userData = doc.data() as UnifiedUser;
       
-      // إحصائيات الحالة
-      if (userData.status === 'active') stats.active++;
-      else if (userData.status === 'pending' || userData.status === 'onboarding_started') stats.pending++;
-      else if (userData.status === 'suspended') stats.suspended++;
-      else stats.inactive++;
+      // إحصائيات الحالة (اعتبار كل حالات الانضمام قيد الانتظار)
+      if (userData.status === 'active') {
+        stats.active++;
+      } else if (
+        userData.status === 'pending' ||
+        userData.status === 'onboarding_started' ||
+        userData.status === 'intake_submitted' ||
+        userData.status === 'under_review'
+      ) {
+        stats.pending++;
+      } else if (userData.status === 'suspended') {
+        stats.suspended++;
+      } else {
+        stats.inactive++;
+      }
 
       // إحصائيات الأدوار
       if (userData.role === 'admin') stats.byRole.admin++;

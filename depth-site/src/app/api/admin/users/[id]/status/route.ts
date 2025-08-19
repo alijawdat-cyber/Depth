@@ -20,7 +20,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { status } = body;
+  const { status, reason } = body;
 
     if (!status) {
       return NextResponse.json({ 
@@ -35,11 +35,22 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'المستخدم غير موجود' }, { status: 404 });
     }
 
-    await userRef.update({
+    // خريطة تبسيط للتحكم بالحالات (مثلاً قبول = active, رفض = suspended مع تعليق بالسبب)
+    const nowIso = new Date().toISOString();
+    const updateData: Record<string, unknown> = {
       status,
-      updatedAt: new Date().toISOString(),
+      updatedAt: nowIso,
       updatedBy: session.user.email
-    });
+    };
+    if (reason) {
+      updateData['adminDecision'] = {
+        reason,
+        decidedAt: nowIso,
+        decidedBy: session.user.email
+      };
+    }
+
+    await userRef.update(updateData);
 
     try {
       await adminDb.collection('audit_log').add({
@@ -47,8 +58,8 @@ export async function POST(
         entityType: 'user',
         entityId: id,
         userId: session.user.email,
-        details: { newStatus: status },
-        timestamp: new Date().toISOString()
+        details: { newStatus: status, reason },
+        timestamp: nowIso
       });
     } catch (e) {
       console.warn('audit_log write failed', e);
