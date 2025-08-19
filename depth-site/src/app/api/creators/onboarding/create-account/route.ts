@@ -88,7 +88,8 @@ export async function POST(req: NextRequest) {
 
     // Build unified user data
     const nowIso = new Date().toISOString();
-    const unifiedUserData: Omit<UnifiedUser, 'id'> = {
+    // ملاحظة: Firestore لا يقبل undefined؛ لذلك نتجنب وضع الحقول الاختيارية إلا عند وجود قيمة
+    const unifiedUserDataBase: Omit<UnifiedUser, 'id'> = {
       email,
       name: fullName.trim(),
       role: 'creator',
@@ -96,7 +97,6 @@ export async function POST(req: NextRequest) {
       emailVerified: false,
       twoFactorEnabled: false,
       phone: normalizedPhone,
-      avatar: undefined,
       creatorProfile: {
         specialty: 'photographer',
         city: '',
@@ -123,11 +123,31 @@ export async function POST(req: NextRequest) {
       },
       createdAt: nowIso,
       updatedAt: nowIso,
-      lastLoginAt: undefined,
       source: 'web',
       loginAttempts: 0,
       preferences: { language: 'ar', theme: 'light', notifications: true }
     };
+
+    // إزالة أي قيم undefined (تحويلها إلى null أو حذفها). نختار الحذف هنا.
+    function deepStripUndefined<T>(obj: T): T {
+      if (Array.isArray(obj)) {
+        // @ts-expect-error preserve typing
+        return obj.map(deepStripUndefined);
+      }
+      if (obj && typeof obj === 'object') {
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+          if (v === undefined) continue;
+          out[k] = deepStripUndefined(v);
+        }
+        // @ts-expect-error cast back
+        return out;
+      }
+      return obj;
+    }
+
+    const unifiedUserData = deepStripUndefined(unifiedUserDataBase) as typeof unifiedUserDataBase;
+    log('Sanitized user data keys', Object.keys(unifiedUserData));
 
     // Use auth uid as document id to simplify joins
     const userDocRef = adminDb.collection('users').doc(userRecord.uid);
@@ -135,7 +155,7 @@ export async function POST(req: NextRequest) {
     try {
       // Batch writes (atomic-ish)
       const batch = adminDb.batch();
-      batch.set(userDocRef, unifiedUserData, { merge: false });
+  batch.set(userDocRef, unifiedUserData, { merge: false });
       batch.set(adminDb.collection('user_credentials').doc(userRecord.uid), {
         userId: userRecord.uid,
         email,
@@ -147,7 +167,7 @@ export async function POST(req: NextRequest) {
       await batch.commit();
       log('Firestore user + credentials stored', { docId: userRecord.uid });
     } catch (firestoreError) {
-      log('Firestore write failed, rolling back auth user', firestoreError);
+  log('Firestore write failed, rolling back auth user', firestoreError);
       try { await adminAuth.deleteUser(userRecord.uid); } catch {}
       return NextResponse.json({ error: 'تعذر حفظ بيانات الحساب' }, { status: 500 });
     }
