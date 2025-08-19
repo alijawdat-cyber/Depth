@@ -94,12 +94,18 @@ export default function CategorySelector({
       try {
         setLoading(true);
         const response = await fetch('/api/catalog/categories');
-        const data = await response.json();
-        
-        if (data.success && data.items) {
-          setCategories(data.items);
+        if (!response.ok) {
+          setApiError(`فشل في تحميل الفئات (${response.status})`);
+          return;
+        }
+        let data: unknown = null;
+        try { data = await response.json(); } catch { /* ignore parse error */ }
+        interface CategoriesResponse { success: boolean; items?: Category[] }
+        const isCategoriesResponse = (val: unknown): val is CategoriesResponse => !!val && typeof val === 'object' && 'success' in val;
+        if (isCategoriesResponse(data) && data.success && Array.isArray(data.items)) {
+          setCategories(data.items as Category[]);
         } else {
-          setApiError('فشل في تحميل الفئات');
+          setApiError('فشل في قراءة بيانات الفئات');
         }
       } catch (err) {
         console.error('Error fetching categories:', err);

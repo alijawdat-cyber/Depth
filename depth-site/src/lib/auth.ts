@@ -135,22 +135,32 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
+      // Admin email whitelist
+      const adminEmails = (process.env.ADMIN_EMAILS || '')
+        .split(',')
+        .map(e => e.trim().toLowerCase())
+        .filter(Boolean);
       // عند تسجيل الدخول الأول
       if (user) {
         token.userId = user.id;
         token.role = (user as { role?: string }).role;
+        // If OAuth user came without role but email in whitelist -> assign admin
+        if (!token.role && user.email && adminEmails.includes(user.email.toLowerCase())) {
+          token.role = 'admin';
+        }
       }
-      
       // ضمان وجود الدور حتى في الاستدعاءات اللاحقة
       if (!token.role && token.email) {
         token.role = await getUserRole(String(token.email));
+        // fallback again to whitelist if still missing
+        if (!token.role && adminEmails.includes(String(token.email).toLowerCase())) {
+          token.role = 'admin';
+        }
       }
-      
       // السماح بتحديث الدور من العميل إذا لزم الأمر
       if (trigger === 'update' && session?.role) {
         token.role = session.role as string;
       }
-      
       return token;
     },
     async session({ session, token }) {

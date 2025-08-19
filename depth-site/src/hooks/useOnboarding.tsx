@@ -392,27 +392,30 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     switch (step) {
       case 1: // Account Creation
         const isValidEmail = formData.account.email.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email);
-        const isValidPassword = formData.account.password.length >= 8;
-        const passwordsMatch = formData.account.password === formData.account.confirmPassword;
         const isValidPhone = formData.account.phone.trim();
         const isValidName = formData.account.fullName.trim();
-        
+        // If already signed in, don't force password validation again
+        if (session?.user) {
+          return !!(isValidName && isValidEmail && isValidPhone && formData.account.agreeToTerms);
+        }
+        const isValidPassword = formData.account.password.length >= 8;
+        const passwordsMatch = formData.account.password === formData.account.confirmPassword;
         logger.onboardingDebug('Step 1 validation', {
           isValidName,
           isValidEmail,
           isValidPassword,
           passwordsMatch,
           isValidPhone,
-          agreeToTerms: formData.account.agreeToTerms
+          agreeToTerms: formData.account.agreeToTerms,
+          sessionPresent: !!session?.user
         });
-        
         return !!(
           isValidName &&
           isValidEmail &&
-          isValidPassword &&
-          passwordsMatch &&
-          isValidPhone &&
-          formData.account.agreeToTerms
+            isValidPassword &&
+            passwordsMatch &&
+            isValidPhone &&
+            formData.account.agreeToTerms
         );
       
       case 2: // Basic Info
@@ -455,7 +458,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       default:
         return false;
     }
-  }, [formData]);
+  }, [formData, session?.user]);
 
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {

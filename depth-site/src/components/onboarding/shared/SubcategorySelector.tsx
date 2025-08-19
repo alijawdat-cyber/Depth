@@ -79,11 +79,21 @@ export default function SubcategorySelector({
         // جلب الفئات الفرعية لكل فئة رئيسية
         await Promise.all(
           selectedCategories.map(async (categoryId) => {
-            const response = await fetch(`/api/catalog/subcategories?categoryId=${categoryId}`);
-            const data = await response.json();
-            
-            if (data.success && data.items) {
-              subcategoriesData[categoryId] = data.items;
+            try {
+              const response = await fetch(`/api/catalog/subcategories?categoryId=${categoryId}`);
+              if (!response.ok) {
+                console.warn('Subcategories fetch failed', categoryId, response.status);
+                return; // skip this category
+              }
+              interface SubcategoriesResponse { success: boolean; items?: Subcategory[] }
+              let data: unknown = null;
+              try { data = await response.json(); } catch { /* ignore parse error */ }
+              const isSubcategoriesResponse = (val: unknown): val is SubcategoriesResponse => !!val && typeof val === 'object' && 'success' in val;
+              if (isSubcategoriesResponse(data) && data.success && Array.isArray(data.items)) {
+                subcategoriesData[categoryId] = data.items;
+              }
+            } catch (e) {
+              console.warn('Subcategories fetch error', categoryId, e);
             }
           })
         );
