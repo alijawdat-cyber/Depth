@@ -290,8 +290,20 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [formData.metadata.startedAt]);
 
-  // دالة مساعدة لإعداد التحميل مع رسالة
-  const setLoadingWithMessage = useCallback((loading: boolean, message: string = '') => {
+    // Helper لتحديد رسالة النجاح لكل خطوة
+  const getStepSuccessMessage = useCallback((step: number): string => {
+    const messages: Record<number, string> = {
+      1: 'تم إنشاء الحساب بنجاح! 🎉',
+      2: 'تم حفظ معلوماتك الأساسية بنجاح! ✅',
+      3: 'تم حفظ محفظة أعمالك بنجاح! 🎨',
+      4: 'تم حفظ معلومات الدفع بنجاح! 💳',
+      5: 'مبروك! تم إكمال عملية التسجيل بنجاح! 🚀'
+    };
+    return messages[step] || 'تم الحفظ بنجاح!';
+  }, []);
+
+  // Helper لتحديث حالة التحميل مع رسالة
+  const setLoadingWithMessage = useCallback((loading: boolean, message: string = 'جارٍ التحميل...') => {
     dispatch({ type: 'SET_LOADING', payload: loading });
     dispatch({ type: 'SET_LOADING_MESSAGE', payload: message });
   }, []);
@@ -485,15 +497,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         // عرض إشعار النجاح مع رسالة واضحة
         showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'مرحباً بك في Depth Agency');
         
-        // إعطاء وقت لعرض الإشعار
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // إعطاء وقت كافي لعرض الإشعار
+        await new Promise(resolve => setTimeout(resolve, 2500));
         
-        // تحديث الحالة لإظهار رسالة تسجيل الدخول
-        setLoadingWithMessage(true, 'جاري تسجيل الدخول...');
-        dispatch({ type: 'SET_ERROR', payload: null });
-        showSuccess('جاري تسجيل الدخول...', 'خطوة تلقائية');
-        
-        // تسجيل دخول مبسط (محاولة واحدة فقط)
+        // تسجيل دخول صامت (بدون إشعارات إضافية)
         try {
           const signInResult = await signIn('credentials', {
             email: formData.account.email.toLowerCase().trim(),
@@ -502,65 +509,66 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           });
           
           if (signInResult?.ok && !signInResult?.error) {
-            // نجح تسجيل الدخول
-            console.log('Sign in successful on first attempt');
-            
-            // إشعار نجاح واضح
-            showSuccess('تم تسجيل الدخول بنجاح! ✅', 'جاري الانتقال للمرحلة التالية...');
+            // نجح تسجيل الدخول - انتقال مباشر للخطوة التالية
+            console.log('Sign in successful, proceeding to step 2');
             
             // تسجيل إكمال الخطوة الأولى
             dispatch({ type: 'COMPLETE_STEP', payload: 1 });
-            
-            // انتظار قصير لعرض الإشعار
-            await new Promise(resolve => setTimeout(resolve, 1500));
             
             // الانتقال للخطوة التالية مباشرة
             dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
             dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
             setLoadingWithMessage(false, '');
             
-            console.log('Account creation and login successful, proceeding to step 2');
+            console.log('Account creation successful, now on step 2');
             return true;
             
           } else {
             // فشل تسجيل الدخول - توجيه لصفحة تسجيل الدخول
             console.log('Sign in failed:', signInResult?.error);
             
-            showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'يرجى تسجيل الدخول الآن');
+            // انتظار قصير ثم توجيه
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            
-            // توجيه لصفحة تسجيل الدخول مع رسالة واضحة
             router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
+            setLoadingWithMessage(false, '');
             return false;
           }
           
         } catch (authError) {
           console.error('Sign in error:', authError);
           
-          // إظهار رسالة نجاح إنشاء الحساب + توجيه لتسجيل الدخول
-          showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'يرجى تسجيل الدخول الآن');
-          
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          // انتظار قصير ثم توجيه
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
           router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
+          setLoadingWithMessage(false, '');
           return false;
         }
-
-        return true;
         
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'حدث خطأ في إنشاء الحساب';
         dispatch({ type: 'SET_ERROR', payload: errorMessage });
-        dispatch({ type: 'SET_LOADING', payload: false });
+        setLoadingWithMessage(false, '');
         return false;
       }
     }
     
     // للخطوات الأخرى: حفظ التقدم قبل الانتقال
     if (formData.currentStep > 1) {
+      setLoadingWithMessage(true, 'جاري حفظ بياناتك...');
       const saved = await saveProgress();
-      if (!saved) return false;
+      if (!saved) {
+        setLoadingWithMessage(false, '');
+        return false;
+      }
+      
+      // عرض رسالة النجاح المخصصة للخطوة
+      const successMessage = getStepSuccessMessage(formData.currentStep);
+      showSuccess(successMessage);
+      
+      // انتظار قصير لعرض الرسالة
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
     
     // تسجيل إكمال الخطوة
@@ -572,11 +580,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       dispatch({ type: 'SET_CURRENT_STEP', payload: nextStepNum });
       // إعادة تعيين validation للخطوة الجديدة
       dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+      setLoadingWithMessage(false, '');
       return true;
     }
     
+    setLoadingWithMessage(false, '');
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, router, setLoadingWithMessage]);
+  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, router, setLoadingWithMessage, getStepSuccessMessage]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
