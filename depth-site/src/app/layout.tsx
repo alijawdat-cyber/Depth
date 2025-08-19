@@ -4,6 +4,8 @@ import "./globals.css";
 import { BRAND } from "@/lib/constants/brand";
 import { getSiteUrl } from "@/lib/constants/site";
 import SiteFrame from "@/components/layout/SiteFrame";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 
 const siteUrl = getSiteUrl();
@@ -58,11 +60,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get session on server to keep initial HTML in sync with client rendered Header/Footer
+  const session = await getServerSession(authOptions);
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
@@ -102,7 +106,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-[var(--accent-500)] text-[var(--text-dark)] px-3 py-2 rounded-[var(--radius-sm)]">تخطّ إلى المحتوى</a>
-        <Providers>
+  <Providers session={session}>
           <div id="main-content">
             <SiteFrame>{children}</SiteFrame>
           </div>

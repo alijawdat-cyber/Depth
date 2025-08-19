@@ -5,12 +5,19 @@ import { ThemeProvider } from "next-themes";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
+import type { Session } from "next-auth";
 
 type ProvidersProps = {
   children: React.ReactNode;
+  /**
+   * Pre-fetched session from the server (getServerSession) to ensure
+   * identical SSR + first client render => prevents hydration mismatch
+   * when Header / nav conditionally render based on auth state & role.
+   */
+  session: Session | null;
 };
 
-export default function Providers({ children }: ProvidersProps) {
+export default function Providers({ children, session }: ProvidersProps) {
   // Optional: smooth scrolling via Lenis (if installed)
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -19,7 +26,8 @@ export default function Providers({ children }: ProvidersProps) {
         const { default: Lenis } = await import("lenis");
         const lenis = new Lenis({
           smoothWheel: true,
-          lerp: 0.08,
+          // رفعت القيمة من 0.08 إلى 0.18 لجعل التمرير أسرع استجابة وأقل لزوجة
+          lerp: 0.3,
         });
         function raf(time: number) {
           lenis.raf(time);
@@ -35,7 +43,7 @@ export default function Providers({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <ThemeProvider 
         attribute="data-theme" 
         defaultTheme="system" 

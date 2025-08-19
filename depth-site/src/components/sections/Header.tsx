@@ -57,7 +57,7 @@ export default function Header() {
   }).filter(Boolean) as { href: string; label: string }[];
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden" suppressHydrationWarning>
+    <header className="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur border-b border-[var(--elev)] overflow-x-hidden">
       <Container className="flex items-center justify-between min-h-14 h-14 overflow-x-hidden">
         <Link href="/" className="flex items-center" aria-label="Depth Home">
           <Image src={BRAND.wordmark} alt="Depth" width={135} height={30} className="h-7 md:h-8 lg:h-9 w-auto min-w-28 brand-logo" priority />
@@ -93,8 +93,13 @@ export default function Header() {
             className="inline-flex"
             suppressHydrationWarning
           >
-            {mounted && resolvedTheme === "dark" ? (
-              <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            {/* إظهار أيقونة ثابتة أثناء SSR لتجنب اختلاف بين الخادم والعميل */}
+            {mounted ? (
+              resolvedTheme === "dark" ? (
+                <Sun size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              ) : (
+                <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              )
             ) : (
               <Moon size={16} strokeWidth={1.25} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             )}
@@ -126,11 +131,11 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <Link href={CTA_ITEMS.signin.href} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')}>
-                {CTA_ITEMS.signin.label}
+              <Link href={CTA_ITEMS.signin.href} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')} suppressHydrationWarning>
+                <span>{CTA_ITEMS.signin.label}</span>
               </Link>
-              <Link href={CTA_ITEMS.book.href} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')}>
-                {CTA_ITEMS.book.label}
+              <Link href={CTA_ITEMS.book.href} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'hidden sm:inline-flex text-[12px] sm:text-[13px] leading-none px-2.5 sm:px-3 whitespace-nowrap')} suppressHydrationWarning>
+                <span>{CTA_ITEMS.book.label}</span>
               </Link>
             </>
           )}
@@ -173,14 +178,14 @@ export default function Header() {
           )}
           <div className="flex items-center gap-2 mt-3">
             <Button variant="secondary" onClick={toggleTheme} aria-label="toggle theme" className="flex-1">
-              <span suppressHydrationWarning>{mounted ? (resolvedTheme === "dark" ? "وضع فاتح" : "وضع داكن") : "تبديل الوضع"}</span>
+              <span>{mounted ? (resolvedTheme === "dark" ? "وضع فاتح" : "وضع داكن") : "تبديل الوضع"}</span>
             </Button>
             {status === 'authenticated' ? (
               <button className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'flex-1 text-center')} onClick={() => { setOpen(false); signOut({ callbackUrl: '/' }); }}>خروج</button>
             ) : (
               <>
-                <Link href={CTA_ITEMS.signin.href} onClick={() => setOpen(false)} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'flex-1 text-center whitespace-nowrap')}>{CTA_ITEMS.signin.label}</Link>
-                <Link href={CTA_ITEMS.book.href} onClick={() => setOpen(false)} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'flex-1 text-center whitespace-nowrap')}>{CTA_ITEMS.book.label}</Link>
+                <Link href={CTA_ITEMS.signin.href} onClick={() => setOpen(false)} className={clsx(buttonStyles({ variant: 'secondary', size: 'md' }), 'flex-1 text-center whitespace-nowrap')} suppressHydrationWarning><span>{CTA_ITEMS.signin.label}</span></Link>
+                <Link href={CTA_ITEMS.book.href} onClick={() => setOpen(false)} className={clsx(buttonStyles({ variant: 'primary', size: 'md' }), 'flex-1 text-center whitespace-nowrap')} suppressHydrationWarning><span>{CTA_ITEMS.book.label}</span></Link>
               </>
             )}
           </div>

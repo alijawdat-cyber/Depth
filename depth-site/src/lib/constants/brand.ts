@@ -5,7 +5,6 @@ export const BRAND = {
   iconApple: '/brand/icon-apple-512.png',
   // PNG مخصص للبريد (Fallback بديل عن SVG)
   logoEmail: '/brand/icon-apple-512.png',
-  qr: '/brand/qr.png',
 } as const;
 
 

@@ -287,17 +287,7 @@ export default function OnboardingLayout({
             )}
           </AnimatePresence>
 
-          {/* Debug Info (في بيئة التطوير فقط) */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mb-4 p-3 bg-gray-100 rounded-lg text-xs font-mono">
-              <div>Step: {formData.currentStep}</div>
-              <div>Can Proceed: {state.canProceed ? 'Yes' : 'No'}</div>
-              <div>Has Interacted: {formData.hasInteracted ? 'Yes' : 'No'}</div>
-              <div>Loading: {state.loading ? 'Yes' : 'No'}</div>
-              <div>Show Validation: {state.showValidation ? 'Yes' : 'No'}</div>
-              <div>Errors: {errors.length}</div>
-            </div>
-          )}
+          {/* Debug Info panel تمت إزالته نهائياً */}
 
           {/* Step Content */}
           <motion.div

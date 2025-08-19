@@ -3,23 +3,26 @@ import Link from "next/link";
 import { ORG } from "@/lib/constants/org";
 import { NAV_ITEMS } from "@/lib/constants/nav";
 
+// استخدم قيمة سنة ثابتة عند وقت البناء لتجنب أي اختلافات بين SSR والعميل
+// لو أردت تحديث تلقائي سنوياً قم بتغييرها أثناء عملية الـ CI أو استعمل متغير بيئة.
+const BUILD_YEAR = 2025; // قيمة ثابتة لضمان تطابق الهيدرشن
+
 export default function Footer() {
   return (
-    <footer className="mt-16 border-t border-[var(--elev)] py-10 text-sm text-[var(--slate-600)]">
+    <footer className="mt-10 border-t border-[var(--elev)] py-6 text-sm text-[var(--slate-600)]">
       <Container>
-        {/* Navigation Links */}
-        <nav className="flex flex-wrap justify-center gap-5 mb-8">
-          {NAV_ITEMS.map((i) => (
+        {/* Navigation Links (compacted) */}
+        <nav className="flex flex-wrap justify-center gap-5 mb-4">
+          {NAV_ITEMS.filter(i => i.href !== '/portal').map((i) => (
             <Link key={i.href} href={i.href} className="hover:text-[var(--text)] transition-colors">{i.label}</Link>
           ))}
-          <Link href="/book" className="hover:text-[var(--text)] transition-colors">حجز</Link>
           <Link href="/legal" className="hover:text-[var(--text)] transition-colors">الشروط</Link>
         </nav>
 
-        {/* Social Media Section */}
-        <div className="text-center mb-8">
-          <p className="text-sm font-medium text-[var(--text)] mb-6">تابعنا على</p>
-          <div className="flex justify-center items-center gap-6">
+        {/* Social Media Section (compacted) */}
+        <div className="text-center mb-5">
+          <p className="text-sm font-medium text-[var(--text)] mb-3">تابعنا على</p>
+          <div className="flex justify-center items-center gap-4">
           {/* Instagram */}
           <a 
             href={ORG.socials.instagram}
@@ -101,10 +104,11 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="text-center">
+  <div className="text-center mt-2">
           <div className="flex items-center justify-center gap-2">
           <span className="font-semibold text-[var(--text)]">Depth</span>
-          <span suppressHydrationWarning>© {new Date().getFullYear()}</span>
+          {/* سنة ثابتة لمنع أي اختلاف Hydration */}
+          <span>© {BUILD_YEAR}</span>
         </div>
           <div className="mt-2 text-xs">
             <a href="mailto:hello@depth-agency.com" className="hover:text-[var(--text)] transition-colors">hello@depth-agency.com</a>

@@ -9,7 +9,6 @@ import FAQ from "@/components/sections/FAQ";
 import FounderSpotlight from "@/components/sections/FounderSpotlight";
 import Link from "next/link";
 import TrustSection from "@/components/sections/TrustSection";
-import QRSection from "@/components/sections/QRSection";
 
 export const revalidate = 3600;
 
@@ -28,8 +27,7 @@ export default function Home() {
       </div>
       <FounderSpotlight />
       <Testimonials />
-      <FAQ />
-      <QRSection />
+  <FAQ />
     </div>
   );
 }

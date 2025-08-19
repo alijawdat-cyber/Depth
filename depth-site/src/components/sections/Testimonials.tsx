@@ -18,7 +18,14 @@ export default function Testimonials() {
             <figure key={t.id} className="min-w-0 shrink-0 basis-full md:basis-[58%] lg:basis-[42%] rounded-[var(--radius)] border border-[var(--elev)] p-6 bg-[var(--card)]">
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
-                  <Image src={t.client.logo} alt={t.client.name} width={240} height={96} className={`${t.client.slug === "blo" ? "h-16 md:h-20" : "h-20 md:h-24"} w-auto object-contain min-w-24 logo-enhanced`} loading="lazy" />
+                  <Image
+                    src={t.client.logo}
+                    alt={t.client.name}
+                    width={240}
+                    height={96}
+                    className="w-[240px] h-[96px] object-contain logo-enhanced"
+                    loading="lazy"
+                  />
                   <div className="flex items-center gap-1 text-[var(--accent-500)]" aria-label={`تقييم ${t.rating} من 5`}>
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span key={i} className={`inline-block w-3 h-3 rounded-full ${i < t.rating ? 'bg-[var(--accent-500)]' : 'bg-[var(--elev)]'}`} />

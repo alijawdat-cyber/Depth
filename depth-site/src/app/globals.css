@@ -128,10 +128,7 @@
     --bg-rgb: 11,15,20;
   }
   
-  /* شعارات العملاء - فاتحة على الخلفية الداكنة */
-  .logo-enhanced { 
-    filter: brightness(0) invert(1); 
-  }
+  /* إزالة التكرار القديم لتعريف الشعار في الوضع الداكن؛ سيتم التحكم بالفلتر في القسم العام لاحقاً */
 }
 
 /* Form controls — force tokens for bg/text/border in all themes */
@@ -257,7 +254,7 @@ html, body {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* تمت إزالة scroll-behavior لتجنب تحذير Next القادم وللسماح بالتحكم في السلوك موضعياً */
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -287,7 +284,8 @@ main {
 }
 
 /* Media elements should never overflow horizontally */
-img,svg,video,canvas { max-width: 100%; height: auto; }
+/* منع كسر نسبة صور Next ذات الأبعاد المحددة (width/height) — لا نغيّر ارتفاع الصور التي حددت أبعادها صراحة */
+img:not([width][height]), svg, video, canvas { max-width: 100%; height: auto; }
 
 /* Ensure border-box sizing to prevent width accumulation */
 *, *::before, *::after { box-sizing: border-box; }
@@ -331,8 +329,7 @@ img,svg,video,canvas { max-width: 100%; height: auto; }
 /* Marquee spacing is handled by react-fast-marquee */
 
 /* تحسين responsive للشعارات */
-@media (min-width: 768px) { .logo-enhanced { max-height: 5.5rem; min-width: 10rem; } }
-@media (min-width: 1024px) { .logo-enhanced { max-height: 7rem; min-width: 12rem; } }
+/* تمت إزالة تغيير الأبعاد التلقائي للشعارات لتجنب تحذير Next بخصوص تعديل بعد واحد */
 
 /* Logo dark mode fix */
 @media (prefers-color-scheme: dark) {
