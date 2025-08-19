@@ -10,25 +10,62 @@ export default function ClientsMarquee() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const groupRef = useRef<HTMLDivElement | null>(null);
   const [groupWidth, setGroupWidth] = useState<number>(0);
-  const SPEED = 45; // px/s
+  const [speed, setSpeed] = useState<number>(36); // px/s adaptive
+  const [prefersReduced, setPrefersReduced] = useState(false);
 
   const logos = useMemo(() => clients, []);
 
+  // Measure content width (debounced via rAF)
   useEffect(() => {
     if (!groupRef.current || !containerRef.current) return;
+    let frame: number | null = null;
     const measure = () => {
-      const w = groupRef.current!.scrollWidth;
-      setGroupWidth(w);
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const w = groupRef.current!.scrollWidth;
+        setGroupWidth(w);
+      });
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(containerRef.current);
     ro.observe(groupRef.current);
-    return () => ro.disconnect();
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      ro.disconnect();
+    };
   }, [logos]);
 
-  // مدة الدورة بالثواني بناءً على عرض المجموعة وسرعة الحركة
-  const durationSec = groupWidth > 0 ? groupWidth / SPEED : 20;
+  // Adaptive speed per viewport & reduced motion preference
+  useEffect(() => {
+    const calc = () => {
+      const w = window.innerWidth;
+      // أبطأ بالموبايل حتى لا يبدو سريع جدا
+      if (w < 480) setSpeed(18);
+      else if (w < 640) setSpeed(20);
+      else if (w < 768) setSpeed(24);
+      else if (w < 1024) setSpeed(30);
+      else setSpeed(36);
+    };
+    calc();
+    window.addEventListener('resize', calc, { passive: true });
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handlePref = () => setPrefersReduced(mql.matches);
+    handlePref();
+    mql.addEventListener('change', handlePref);
+    return () => {
+      window.removeEventListener('resize', calc);
+      mql.removeEventListener('change', handlePref);
+    };
+  }, []);
+
+  // دورة لا تقل عن 25 ثانية حتى تبقى القراءة مريحة
+  const MIN_DURATION = 25;
+  const durationSec = prefersReduced
+    ? 0
+    : groupWidth > 0
+      ? Math.max(groupWidth / speed, MIN_DURATION)
+      : MIN_DURATION;
 
   return (
     <section className="py-10">
@@ -42,7 +79,7 @@ export default function ClientsMarquee() {
           }}
         >
             <div
-              className="flex w-max gap-[clamp(12px,4vw,32px)] will-change-transform transform-gpu animate-[marquee_var(--duration)_linear_infinite]"
+              className={`flex w-max gap-[clamp(12px,4vw,32px)] ${prefersReduced ? '' : 'will-change-transform transform-gpu animate-[marquee_var(--duration)_linear_infinite]'}`}
             >
             {/* Group A */}
             <div ref={groupRef} className="flex w-max gap-[clamp(12px,4vw,32px)]">

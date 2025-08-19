@@ -5,74 +5,81 @@ import bcrypt from 'bcryptjs';
 import type { AccountCreationData } from '@/types/onboarding';
 import type { UnifiedUser } from '@/types/unified-user';
 
+// ضمان التنفيذ في بيئة Node (وليس Edge) لأن firebase-admin + bcryptjs لا يعملان على Edge
+export const runtime = 'nodejs';
+
+function log(label: string, data?: unknown) {
+  // استخدم console فقط: يمكن لاحقاً استبداله بـ logger موحد
+  console.log(`[create-account] ${label}`, data || '');
+}
+
 export async function POST(req: NextRequest) {
+  const startedAt = Date.now();
   try {
     const accountData: AccountCreationData = await req.json();
     const { fullName, password, phone, agreeToTerms } = accountData;
-    const email = String(accountData.email || '').toLowerCase();
+    const email = String(accountData.email || '').toLowerCase().trim();
 
-    // التحقق من البيانات الأساسية
-    if (!fullName?.trim() || !email?.trim() || !password || !phone?.trim() || !agreeToTerms) {
-      return NextResponse.json(
-        { error: 'جميع البيانات مطلوبة' },
-        { status: 400 }
-      );
+    log('Incoming payload', { email, fullNameLength: fullName?.length, phoneMasked: phone?.slice(0,3)+'***', agreeToTerms });
+
+    // Basic validation
+    if (!fullName?.trim() || !email || !password || !phone?.trim() || !agreeToTerms) {
+      return NextResponse.json({ error: 'جميع البيانات مطلوبة' }, { status: 400 });
     }
-
-    // التحقق من صحة البريد الإلكتروني
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'البريد الإلكتروني غير صحيح' },
-        { status: 400 }
-      );
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'البريد الإلكتروني غير صحيح' }, { status: 400 });
     }
-
-    // التحقق من قوة كلمة المرور
     if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' }, { status: 400 });
     }
 
-    // التحقق من وجود المستخدم مسبقاً
+    // Check if user already exists in unified collection (faster than auth query for our needs)
     const existingUnifiedUser = await adminDb
       .collection('users')
       .where('email', '==', email)
       .limit(1)
       .get();
-
     if (!existingUnifiedUser.empty) {
-      return NextResponse.json(
-        { error: 'البريد الإلكتروني مستخدم مسبقاً' },
-        { status: 409 }
-      );
+      log('Email already exists in users collection');
+      return NextResponse.json({ error: 'البريد الإلكتروني مستخدم مسبقاً' }, { status: 409 });
     }
 
-    // تشفير كلمة المرور للحفظ المنفصل
+    // Hash password first
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // إنشاء المستخدم في Firebase Auth
-    const userRecord = await adminAuth.createUser({
-      email,
-      password,
-      displayName: fullName,
-      disabled: false
-    });
+    // Create Auth user (may throw)
+    let userRecord;
+    try {
+      userRecord = await adminAuth.createUser({
+        email,
+        password,
+        displayName: fullName,
+        disabled: false
+      });
+      log('Auth user created', { uid: userRecord.uid });
+    } catch (authError: unknown) {
+      const errObj = authError as { code?: string; message?: string };
+      log('Auth create error', { code: errObj?.code, message: errObj?.message });
+      if (errObj?.code === 'auth/email-already-exists') {
+        return NextResponse.json({ error: 'البريد الإلكتروني مستخدم مسبقاً' }, { status: 409 });
+      }
+      if (errObj?.code === 'auth/invalid-password') {
+        return NextResponse.json({ error: 'كلمة المرور غير مقبولة' }, { status: 400 });
+      }
+      return NextResponse.json({ error: 'تعذر إنشاء حساب الدخول' }, { status: 500 });
+    }
 
-    // إنشاء المستخدم في النظام الموحد
+    // Build unified user data
+    const nowIso = new Date().toISOString();
     const unifiedUserData: Omit<UnifiedUser, 'id'> = {
       email,
-      name: fullName,
+      name: fullName.trim(),
       role: 'creator',
       status: 'onboarding_started',
       emailVerified: false,
       twoFactorEnabled: false,
-      phone,
+      phone: phone.trim(),
       avatar: undefined,
-      
-      // ملف المبدع الأولي
       creatorProfile: {
         specialty: 'photographer',
         city: '',
@@ -82,10 +89,7 @@ export async function POST(req: NextRequest) {
         skills: [],
         languages: ['ar'],
         primaryCategories: ['photo'],
-        portfolio: {
-          workSamples: [],
-          socialMedia: {}
-        },
+        portfolio: { workSamples: [], socialMedia: {} },
         availability: {
           availability: 'flexible',
           weeklyHours: 40,
@@ -94,70 +98,62 @@ export async function POST(req: NextRequest) {
           timeZone: 'Asia/Riyadh',
           urgentWork: false
         },
-        equipment: {
-          cameras: [],
-          lenses: [],
-          lighting: [],
-          audio: [],
-          accessories: [],
-          specialSetups: []
-        },
+        equipment: { cameras: [], lenses: [], lighting: [], audio: [], accessories: [], specialSetups: [] },
         onboardingStatus: 'in_progress',
         tier: 'starter',
         modifier: 1.0,
         bio: ''
       },
-      
-      // التوقيتات والمتابعة
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: nowIso,
+      updatedAt: nowIso,
       lastLoginAt: undefined,
       source: 'web',
       loginAttempts: 0,
-      
-      // الإعدادات البسيطة
-      preferences: {
-        language: 'ar',
-        theme: 'light',
-        notifications: true
-      }
+      preferences: { language: 'ar', theme: 'light', notifications: true }
     };
 
-    // حفظ في النظام الموحد
-    const userDocRef = await adminDb.collection('users').add(unifiedUserData);
+    // Use auth uid as document id to simplify joins
+    const userDocRef = adminDb.collection('users').doc(userRecord.uid);
 
-    // حفظ كلمة المرور المشفرة في مجموعة منفصلة للأمان
-    await adminDb.collection('user_credentials').doc(userDocRef.id).set({
-      userId: userDocRef.id,
-      email,
-      hashedPassword,
-      authUid: userRecord.uid,
-      createdAt: new Date().toISOString(),
-      lastPasswordChange: new Date().toISOString()
-    });
+    try {
+      // Batch writes (atomic-ish)
+      const batch = adminDb.batch();
+      batch.set(userDocRef, unifiedUserData, { merge: false });
+      batch.set(adminDb.collection('user_credentials').doc(userRecord.uid), {
+        userId: userRecord.uid,
+        email,
+        hashedPassword,
+        authUid: userRecord.uid,
+        createdAt: nowIso,
+        lastPasswordChange: nowIso
+      });
+      await batch.commit();
+      log('Firestore user + credentials stored', { docId: userRecord.uid });
+    } catch (firestoreError) {
+      log('Firestore write failed, rolling back auth user', firestoreError);
+      try { await adminAuth.deleteUser(userRecord.uid); } catch {}
+      return NextResponse.json({ error: 'تعذر حفظ بيانات الحساب' }, { status: 500 });
+    }
 
-    console.log('✅ تم إنشاء حساب مبدع جديد في النظام الموحد:', email);
-    
+    const elapsed = Date.now() - startedAt;
+    log('Account fully created', { email, uid: userRecord.uid, ms: elapsed });
+
     return NextResponse.json({
       success: true,
       message: 'تم إنشاء الحساب بنجاح! يمكنك الآن الانتقال للمرحلة التالية',
       data: {
-        userId: userDocRef.id,
+        userId: userRecord.uid,
         authUid: userRecord.uid,
         email,
-        name: fullName, // تم تصليحه من fullName
+        name: fullName.trim(),
         role: 'creator',
         status: 'onboarding_started',
         nextStep: 2
       }
     });
-
-  } catch (error) {
-    console.error('❌ خطأ في إنشاء الحساب:', error);
-    
-    return NextResponse.json(
-      { error: 'حدث خطأ في إنشاء الحساب' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const errObj = error as { message?: string; stack?: string };
+    log('Unhandled error', { message: errObj?.message, stack: errObj?.stack });
+    return NextResponse.json({ error: 'حدث خطأ في إنشاء الحساب' }, { status: 500 });
   }
 }

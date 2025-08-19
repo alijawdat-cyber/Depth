@@ -485,65 +485,64 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           body: JSON.stringify(formData.account)
         });
         
+        const attemptSilentSignIn = async () => {
+          try {
+            const signInResult = await signIn('credentials', {
+              email: formData.account.email.toLowerCase().trim(),
+              password: formData.account.password,
+              redirect: false
+            });
+            logger.onboardingDebug('Silent sign-in result', { ok: signInResult?.ok, error: signInResult?.error });
+            return signInResult?.ok && !signInResult?.error;
+          } catch (e) {
+            logger.onboardingDebug('Silent sign-in exception', { error: String(e) });
+            return false;
+          }
+        };
+
+        if (response.status === 409) {
+          // البريد موجود - نحاول تسجيل الدخول مباشرةً
+            logger.onboardingDebug('Email already exists, trying silent sign-in');
+            const signedIn = await attemptSilentSignIn();
+            if (signedIn) {
+              dispatch({ type: 'COMPLETE_STEP', payload: 1 });
+              dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+              dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+              setLoadingWithMessage(false, '');
+              showSuccess('تم التحقق من حسابك، نكمل للخطوة ٢');
+              return true;
+            } else {
+              // فشل التوقيع - نبقيه في نفس الخطوة لكن نوضح الرسالة
+              const errData = await response.json().catch(() => ({}));
+              dispatch({ type: 'SET_ERROR', payload: errData.error || 'البريد مستخدم مسبقاً، حاول تسجيل الدخول' });
+              setLoadingWithMessage(false, '');
+              return false;
+            }
+        }
+
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({}));
+          logger.onboardingDebug('Account creation failed', { status: response.status, error: errorData.error });
           throw new Error(errorData.error || 'فشل في إنشاء الحساب');
         }
         
         const result = await response.json();
-        console.log('Account created successfully:', result);
-        
-        // عرض إشعار النجاح مع رسالة واضحة
+        logger.onboardingDebug('Account created successfully', { userId: result?.data?.userId, email: formData.account.email });
         showSuccess('تم إنشاء حسابك بنجاح! 🎉', 'مرحباً بك في Depth Agency');
+        await new Promise(resolve => setTimeout(resolve, 1200));
         
-        // إعطاء وقت كافي لعرض الإشعار
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        
-        // تسجيل دخول صامت (بدون إشعارات إضافية)
-        try {
-          const signInResult = await signIn('credentials', {
-            email: formData.account.email.toLowerCase().trim(),
-            password: formData.account.password,
-            redirect: false
-          });
-          
-          if (signInResult?.ok && !signInResult?.error) {
-            // نجح تسجيل الدخول - انتقال مباشر للخطوة التالية
-            console.log('Sign in successful, proceeding to step 2');
-            
-            // تسجيل إكمال الخطوة الأولى
-            dispatch({ type: 'COMPLETE_STEP', payload: 1 });
-            
-            // الانتقال للخطوة التالية مباشرة
-            dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
-            dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
-            setLoadingWithMessage(false, '');
-            
-            console.log('Account creation successful, now on step 2');
-            return true;
-            
-          } else {
-            // فشل تسجيل الدخول - توجيه لصفحة تسجيل الدخول
-            console.log('Sign in failed:', signInResult?.error);
-            
-            // انتظار قصير ثم توجيه
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
-            setLoadingWithMessage(false, '');
-            return false;
-          }
-          
-        } catch (authError) {
-          console.error('Sign in error:', authError);
-          
-          // انتظار قصير ثم توجيه
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          router.push(`/auth/signin?message=account_created&email=${encodeURIComponent(formData.account.email)}`);
-          setLoadingWithMessage(false, '');
-          return false;
+        const signedIn = await attemptSilentSignIn();
+        if (!signedIn) {
+          // السماح بالانتقال مع تنبيه بسيط بدلاً من حبس المستخدم
+          logger.onboardingDebug('Proceeding to step 2 without active session');
+          showError('تم إنشاء الحساب لكن نحتاج تسجيل دخول لاحقاً لإكمال الحفظ');
         }
+        // في كل الأحوال نكمل للخطوة التالية كي لا يعيد المستخدم تعبئة البيانات
+        dispatch({ type: 'COMPLETE_STEP', payload: 1 });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+        dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+        setLoadingWithMessage(false, '');
+        return true;
         
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'حدث خطأ في إنشاء الحساب';
@@ -585,7 +584,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     setLoadingWithMessage(false, '');
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, router, setLoadingWithMessage, getStepSuccessMessage]);
+  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
