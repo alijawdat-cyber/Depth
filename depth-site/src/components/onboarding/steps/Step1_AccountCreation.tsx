@@ -9,7 +9,9 @@ import { StepHeader } from '../OnboardingLayout';
 import Link from 'next/link';
 
 export default function Step1_AccountCreation() {
-  const { formData, updateAccountData, getFieldError, markFieldTouched } = useOnboarding();
+  const { formData, updateAccountData, getFieldError, getFieldErrorV2, markFieldTouched } = useOnboarding();
+  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
   const { account } = formData;
 
   return (
@@ -30,11 +32,11 @@ export default function Step1_AccountCreation() {
           label="الاسم الكامل"
           value={account.fullName}
           onChange={(value) => updateAccountData({ fullName: value })}
-          onBlur={() => markFieldTouched('الاسم')}
+          onBlur={() => markFieldTouched('account.fullName')}
           placeholder="أحمد محمد علي"
           icon={<User size={18} />}
           required
-          error={getFieldError('الاسم')}
+          error={getError('account.fullName') || getFieldError('الاسم')}
           description="اسمك كما تريد أن يظهر للعملاء"
         />
 
@@ -44,11 +46,11 @@ export default function Step1_AccountCreation() {
           type="email"
           value={account.email}
           onChange={(value) => updateAccountData({ email: value })}
-          onBlur={() => markFieldTouched('البريد')}
+          onBlur={() => markFieldTouched('account.email')}
           placeholder="ahmed@example.com"
           icon={<Mail size={18} />}
           required
-          error={getFieldError('البريد') || getFieldError('الإلكتروني')}
+          error={getError('account.email') || getFieldError('البريد') || getFieldError('الإلكتروني')}
           description="سيُستخدم لتسجيل الدخول واستلام الإشعارات"
           name="email"
           autoComplete="email"
@@ -60,11 +62,11 @@ export default function Step1_AccountCreation() {
           type="tel"
           value={account.phone}
           onChange={(value) => updateAccountData({ phone: value })}
-          onBlur={() => markFieldTouched('الهاتف')}
+          onBlur={() => markFieldTouched('account.phone')}
           placeholder="+964 770 123 4567"
           icon={<Phone size={18} />}
           required
-          error={getFieldError('الهاتف')}
+          error={getError('account.phone') || getFieldError('الهاتف')}
           description="للتواصل السريع وتأكيد المشاريع"
           name="phone"
           autoComplete="tel"
@@ -78,12 +80,12 @@ export default function Step1_AccountCreation() {
               type="password"
               value={account.password}
               onChange={(value) => updateAccountData({ password: value })}
-              onBlur={() => markFieldTouched('كلمة المرور')}
+              onBlur={() => markFieldTouched('account.password')}
               placeholder="كلمة مرور قوية"
               icon={<Lock size={18} />}
               showPasswordToggle
               required
-              error={getFieldError('كلمة المرور') || getFieldError('قصيرة')}
+              error={getError('account.password') || getFieldError('كلمة المرور') || getFieldError('قصيرة')}
               description="8 أحرف على الأقل"
               name="new-password"
               autoComplete="new-password"
@@ -96,12 +98,12 @@ export default function Step1_AccountCreation() {
               type="password"
               value={account.confirmPassword}
               onChange={(value) => updateAccountData({ confirmPassword: value })}
-              onBlur={() => markFieldTouched('متطابقة')}
+              onBlur={() => markFieldTouched('account.confirmPassword')}
               placeholder="إعادة كتابة كلمة المرور"
               icon={<Lock size={18} />}
               showPasswordToggle
               required
-              error={getFieldError('متطابقة')}
+              error={getError('account.confirmPassword') || getFieldError('متطابقة')}
               description="يجب أن تطابق كلمة المرور"
               name="confirm-password"
               autoComplete="new-password"
@@ -115,10 +117,10 @@ export default function Step1_AccountCreation() {
           value={account.agreeToTerms}
           onChange={(checked) => {
             updateAccountData({ agreeToTerms: checked });
-            markFieldTouched('الشروط');
+            markFieldTouched('account.agreeToTerms');
           }}
           required
-          error={getFieldError('الشروط')}
+          error={getError('account.agreeToTerms') || getFieldError('الشروط')}
           description={
             <span>
               بالموافقة، أنت تقبل{' '}

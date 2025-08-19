@@ -52,6 +52,38 @@ async function backoff<T>(fn: () => Promise<T>, retries = 2, baseMs = 400): Prom
   }
 }
 
+// Phase 4: Validation V2 (Structured) – يعمل فقط مع FF_ONBOARDING_V2 && FF_VALIDATION_V2
+type FieldError = { field: string; code: string; message: string };
+type ValidationResult = { isValid: boolean; errors: FieldError[]; warnings: FieldError[] };
+const ERR_MSG_AR: Record<string, string> = {
+  req: 'هذا الحقل مطلوب',
+  email: 'صيغة البريد غير صحيحة',
+  min8: 'يجب أن تكون 8 أحرف على الأقل',
+  match: 'كلمتا السر غير متطابقتين',
+  phone: 'رقم الهاتف غير صالح',
+  agree: 'يجب الموافقة على الشروط'
+  // لاحقاً: role, url, time, ...
+};
+const isEmpty = (v: unknown) => v == null || (typeof v === 'string' && v.trim() === '');
+const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+const isPhoneIQ = (s: string) => /^0?7\d{9}$/.test(s);
+
+function validateStepV2(step: number, data: OnboardingFormData): ValidationResult {
+  const errors: FieldError[] = [];
+  const warnings: FieldError[] = [];
+  if (step === 1) {
+    const acc = data.account || ({} as OnboardingFormData['account']);
+    if (isEmpty(acc.fullName)) errors.push({ field: 'account.fullName', code: 'req', message: ERR_MSG_AR.req });
+    if (isEmpty(acc.email) || !isEmail(acc.email)) errors.push({ field: 'account.email', code: 'email', message: ERR_MSG_AR.email });
+    if (isEmpty(acc.password) || (acc.password?.length || 0) < 8) errors.push({ field: 'account.password', code: 'min8', message: ERR_MSG_AR.min8 });
+    if (acc.password !== acc.confirmPassword) errors.push({ field: 'account.confirmPassword', code: 'match', message: ERR_MSG_AR.match });
+    if (!isEmpty(acc.phone) && !isPhoneIQ(acc.phone)) errors.push({ field: 'account.phone', code: 'phone', message: ERR_MSG_AR.phone });
+    if (!acc.agreeToTerms) errors.push({ field: 'account.agreeToTerms', code: 'agree', message: ERR_MSG_AR.agree });
+  }
+  return { isValid: errors.length === 0, errors, warnings };
+}
+
+
 // Phase 2 constants & helpers (Debounce + Hash local save)
 const LOCAL_SAVE_DEBOUNCE_MS = 600;
 function djb2Hash(s: string) { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h) ^ s.charCodeAt(i); return h>>>0; }
@@ -713,11 +745,24 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [formData, session?.user]);
 
+  // Phase 4: واجهات Validation V2 الآمنة
+  const getStepValidationResult = useCallback((): ValidationResult => {
+    if (FF_ONBOARDING_V2 && FF_VALIDATION_V2) {
+      return validateStepV2(formData.currentStep, formData);
+    }
+    return { isValid: true, errors: [], warnings: [] };
+  }, [formData]);
+
+  const canProceedSafe = useCallback((): boolean => {
+    if (FF_ONBOARDING_V2 && FF_VALIDATION_V2) return getStepValidationResult().isValid;
+    return validateCurrentStep();
+  }, [getStepValidationResult, validateCurrentStep]);
+
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {
     logger.onboardingDebug(`Starting step transition from ${formData.currentStep}`);
     logger.onboardingDebug(`Current session: ${session?.user ? 'logged in' : 'not logged in'}`);
-    logger.onboardingDebug(`Form data validation: ${validateCurrentStep()}`);
+    logger.onboardingDebug(`Form data validation: ${canProceedSafe()}`);
     
     // تسجيل الانتقال اليدوي
     isManualNavigationRef.current = true;
@@ -725,7 +770,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     // تفعيل عرض الأخطاء عند محاولة الانتقال
     dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
     
-    if (!validateCurrentStep()) {
+  if (!canProceedSafe()) {
       logger.onboardingDebug(`Validation failed for step ${formData.currentStep}`);
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
       isManualNavigationRef.current = false; // إعادة تعيين عند الفشل
@@ -876,7 +921,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setLoadingWithMessage(false, '');
     isManualNavigationRef.current = false; // إعادة تعيين في النهاية
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave, callRemoteSave]);
+  }, [formData, session, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave, callRemoteSave, canProceedSafe]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
@@ -1135,9 +1180,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // تحديث canProceed عند تغيير البيانات
   useEffect(() => {
-    const canProceed = validateCurrentStep();
+    const canProceed = FF_ONBOARDING_V2 && FF_VALIDATION_V2 ? canProceedSafe() : validateCurrentStep();
     dispatch({ type: 'SET_CAN_PROCEED', payload: canProceed });
-  }, [formData.account, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, formData.currentStep, validateCurrentStep]);
+  }, [formData.account, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, formData.currentStep, canProceedSafe, validateCurrentStep]);
 
   // دالة لتحديد إذا كان الحقل تم لمسه
   const markFieldTouched = useCallback((field: string) => {
@@ -1154,6 +1199,14 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     const stepErrors = getStepErrors(formData.currentStep);
     return stepErrors.find(error => error.includes(field)) || undefined;
   }, [uiState.touchedFields, uiState.showValidation, getStepErrors, formData.currentStep]);
+
+  // تعريف getFieldErrorV2 بعد getFieldError لتفادي استخدام قبل التعريف
+  const getFieldErrorV2 = useCallback((fieldPath: string): string | undefined => {
+    if (!(FF_ONBOARDING_V2 && FF_VALIDATION_V2)) return getFieldError(fieldPath);
+    const vr = getStepValidationResult();
+    const e = vr.errors.find(er => er.field === fieldPath);
+    return e?.message;
+  }, [getStepValidationResult, getFieldError]);
 
   // قيم الـ Context
   const contextValue: OnboardingContextType = {
@@ -1181,7 +1234,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     // Validation
     validateCurrentStep,
     getStepErrors,
-    getFieldError,
+  getFieldError,
+  getFieldErrorV2,
     markFieldTouched,
     
     // UI helpers
