@@ -5,7 +5,7 @@ import { createContext, useContext, useReducer, useCallback, useEffect } from 'r
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
-import { useToast } from '@/components/ui/Toast';
+import { showSuccess, showError } from '@/lib/toast';
 import type {
   OnboardingFormData,
   OnboardingState,
@@ -274,7 +274,6 @@ export function useOnboarding(): OnboardingContextType {
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
   const [{ formData, uiState }, dispatch] = useReducer(onboardingReducer, {
     formData: initialFormData,
     uiState: initialState
@@ -586,7 +585,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     setLoadingWithMessage(false, '');
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, showSuccess, router, setLoadingWithMessage, getStepSuccessMessage]);
+  }, [formData, session, validateCurrentStep, saveProgress, router, setLoadingWithMessage, getStepSuccessMessage]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
@@ -685,7 +684,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [formData, router, uiState.loading, uiState.saving, validateCurrentStep, showSuccess, showError]);
+  }, [formData, router, uiState.loading, uiState.saving, validateCurrentStep]);
 
   // دالة لتحديث حالة التفاعل
   const setHasInteracted = useCallback(() => {

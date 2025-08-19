@@ -9,7 +9,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonStyles } from "@/components/ui/buttonStyles";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { showSuccess, showError } from "@/lib/toast";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -70,7 +70,7 @@ export default function ContactPage() {
 
   const onSubmit = async (data: FormData) => {
     if (!isOnline) {
-      toast.error("لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مرة أخرى");
+      showError("لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مرة أخرى");
       return;
     }
 
@@ -80,7 +80,7 @@ export default function ContactPage() {
         const field = issue.path[0] as keyof FormData;
         setError(field, { type: "manual", message: issue.message });
       });
-      toast.error("يرجى تصحيح الحقول المحددة");
+      showError("يرجى تصحيح الحقول المحددة");
       return;
     }
 
@@ -103,7 +103,7 @@ export default function ContactPage() {
           ? `تم إرسال ${selectedInquiry?.label} بنجاح! سنرد خلال ${selectedInquiry?.sla} • معرف الطلب: ${result.requestId.slice(0, 8)}`
           : `تم إرسال ${selectedInquiry?.label} بنجاح! سنرد خلال ${selectedInquiry?.sla}`;
         
-        toast.success(successMsg, { duration: 6000 });
+        showSuccess(successMsg);
       } else {
         // Enhanced error handling
         const errorMessages = {
@@ -114,10 +114,10 @@ export default function ContactPage() {
         };
 
         const errorMsg = errorMessages[result.error as keyof typeof errorMessages] || "تعذّر الإرسال. حاول مرة أخرى";
-        toast.error(errorMsg);
+        showError(errorMsg);
       }
     } catch {
-      toast.error("تعذّر الاتصال بالخادم. تحقق من الشبكة وحاول مرة أخرى");
+      showError("تعذّر الاتصال بالخادم. تحقق من الشبكة وحاول مرة أخرى");
     }
   };
 

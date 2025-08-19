@@ -33,7 +33,6 @@ import {
 import { Button } from "@/components/ui/Button";
 import { clsx } from "clsx";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
-import { ToastContainer, useToast } from "@/components/ui/Toast";
 import { profilePathForRole } from "@/lib/roles";
 import { BRAND } from "@/lib/constants/brand";
 
@@ -156,7 +155,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { toasts, removeToast } = useToast();
   
   const userRole = (session?.user && (session.user as { role?: string })?.role) || 'client';
   const isAdmin = userRole === 'admin';
@@ -473,9 +471,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
-      {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} position="top-right" />
     </div>
   );
 }

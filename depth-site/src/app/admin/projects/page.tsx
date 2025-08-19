@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import Dropdown from "@/components/ui/Dropdown";
-import { toast } from 'sonner';
+import { showSuccess, showError, showWarning } from '@/lib/toast';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Plus, 
@@ -211,16 +211,16 @@ export default function AdminProjectsPage() {
           deadline: '',
           priority: 'normal'
         });
-        toast.success('تم إنشاء المشروع');
+        showSuccess('تم إنشاء المشروع');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إنشاء المشروع');
-        toast.error(errorData.error || 'فشل في إنشاء المشروع');
+        showError(errorData.error || 'فشل في إنشاء المشروع');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Create project error:', err);
-      toast.error('خطأ في الاتصال');
+      showError('خطأ في الاتصال');
     } finally {
       setSubmitting(false);
     }
@@ -258,16 +258,16 @@ export default function AdminProjectsPage() {
           locationZone: 'baghdad_center',
           assignedTo: ''
         });
-        toast.success('تمت إضافة التسليمة وحساب الأسعار');
+        showSuccess('تمت إضافة التسليمة وحساب الأسعار');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إضافة التسليمة');
-        toast.error(errorData.error || 'فشل في إضافة التسليمة');
+        showError(errorData.error || 'فشل في إضافة التسليمة');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Add deliverable error:', err);
-      toast.error('خطأ في الاتصال');
+      showError('خطأ في الاتصال');
     } finally {
       setSubmitting(false);
       setCalculating(false);
@@ -292,20 +292,20 @@ export default function AdminProjectsPage() {
             ? { ...p, status: 'quote_sent' as const }
             : p
         ));
-        toast.success(`تم إرسال العرض عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
+        showSuccess(`تم إرسال العرض عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
       } else {
         const errorData = await response.json();
         if (errorData.guardrailError) {
-          toast.warning(`فحص Guardrails: ${errorData.error}`);
+          showWarning(`فحص Guardrails: ${errorData.error}`);
         } else {
           setError(errorData.error || 'فشل في إرسال العرض');
-          toast.error(errorData.error || 'فشل في إرسال العرض');
+          showError(errorData.error || 'فشل في إرسال العرض');
         }
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Send quote error:', err);
-      toast.error('خطأ في الاتصال');
+      showError('خطأ في الاتصال');
     } finally {
       setSending(false);
     }
@@ -328,16 +328,16 @@ export default function AdminProjectsPage() {
             ? { ...p, status: 'approved' as const, snapshot: data.snapshot }
             : p
         ));
-        toast.success('تم اعتماد المشروع وإنشاء Snapshot');
+        showSuccess('تم اعتماد المشروع وإنشاء Snapshot');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في اعتماد المشروع');
-        toast.error(errorData.error || 'فشل في اعتماد المشروع');
+        showError(errorData.error || 'فشل في اعتماد المشروع');
       }
     } catch (err) {
       setError('خطأ في الاتصال');
       console.error('Approve project error:', err);
-      toast.error('خطأ في الاتصال');
+      showError('خطأ في الاتصال');
     }
   };
 

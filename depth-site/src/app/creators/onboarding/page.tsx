@@ -13,9 +13,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import { ToastContainer, useToast } from '@/components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Toaster } from 'sonner';
 
 // Component للمحتوى الداخلي
 function OnboardingContent() {
@@ -138,8 +136,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 // الصفحة الرئيسية
 export default function CreatorOnboardingPage() {
-  const { toasts, removeToast } = useToast();
-  
   // تحسين viewport للهواتف
   useEffect(() => {
     const viewport = document.querySelector('meta[name="viewport"]');
@@ -203,17 +199,6 @@ export default function CreatorOnboardingPage() {
           >
             <OnboardingContent />
           </motion.div>
-
-          {/* Toast Notifications */}
-          <ToastContainer toasts={toasts} onRemove={removeToast} />
-          
-          {/* Sonner Toast Provider */}
-          <Toaster 
-            position="top-right"
-            richColors
-            expand={false}
-            closeButton
-          />
 
           {/* تم إزالة الفوتر الخاص بالأونبوردن حسب الطلب. يبقى فوتر الموقع العام فقط. */}
         </div>

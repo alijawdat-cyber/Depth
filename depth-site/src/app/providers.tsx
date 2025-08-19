@@ -55,7 +55,23 @@ export default function Providers({ children }: ProvidersProps) {
         >
           {children}
         </MotionConfig>
-        <Toaster richColors position="top-center" />
+        
+        {/* نظام الإشعارات المركزي - Sonner مخصص للعربية */}
+        <Toaster 
+          richColors 
+          position="top-center"
+          expand={true}
+          closeButton={true}
+          dir="rtl"
+          toastOptions={{
+            style: {
+              fontFamily: 'Dubai, -apple-system, sans-serif',
+              direction: 'rtl',
+            },
+            className: 'rtl-toast',
+            duration: 4000,
+          }}
+        />
       </ThemeProvider>
     </SessionProvider>
   );

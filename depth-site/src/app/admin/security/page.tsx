@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import Dropdown from "@/components/ui/Dropdown";
-import { toast } from 'sonner';
+import { showSuccess, showInfo } from '@/lib/toast';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Shield, 
@@ -295,7 +295,7 @@ export default function AdminSecurityPage() {
             ? { ...p, failedAttempts: 0, status: 'active', lastFailedAttempt: undefined }
             : p
         ));
-        toast.success('تم إعادة تعيين محاولات تسجيل الدخول الفاشلة');
+        showSuccess('تم إعادة تعيين محاولات تسجيل الدخول الفاشلة');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إعادة التعيين');
@@ -315,7 +315,7 @@ export default function AdminSecurityPage() {
       });
 
       if (response.ok) {
-        toast.success('تم إجبار المستخدم على تسجيل الخروج');
+        showSuccess('تم إجبار المستخدم على تسجيل الخروج');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إجبار تسجيل الخروج');
@@ -335,7 +335,7 @@ export default function AdminSecurityPage() {
       });
 
       if (response.ok) {
-        toast.success('تم حظر المستخدم');
+        showSuccess('تم حظر المستخدم');
         loadSecurityData();
       } else {
         const errorData = await response.json();
@@ -350,7 +350,7 @@ export default function AdminSecurityPage() {
   // نسخ معرف المستخدم
   const handleCopyUserId = (userId: string) => {
     navigator.clipboard.writeText(userId);
-    toast.info('تم نسخ معرف المستخدم');
+    showInfo('تم نسخ معرف المستخدم');
   };
 
   // تحميل تقرير الأمان
