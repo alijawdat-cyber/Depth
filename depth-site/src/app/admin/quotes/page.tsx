@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 // ملاحظة: نستغني عن AdminLayout القديم لأن الغلاف الموحد موجود في app/admin/layout.tsx
-import { Button } from '@/components/ui/Button';
+import { Button } from "@/components/ui/Button";
+import { showSuccess, showError } from '@/lib/toast';
 import Loader from '@/components/loaders/Loader';
 import { formatCurrency } from '@/lib/pricing/fx';
 import Dropdown from '@/components/ui/Dropdown';
@@ -96,7 +97,9 @@ export default function AdminQuotesPage() {
 
     } catch (err) {
       console.error('خطأ في تحميل البيانات:', err);
-      setError(err instanceof Error ? err.message : 'خطأ غير معروف');
+      const errorMsg = err instanceof Error ? err.message : 'خطأ غير معروف';
+      setError(errorMsg);
+      showError('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
     }
@@ -319,7 +322,7 @@ export default function AdminQuotesPage() {
       }
 
       const data = await response.json();
-      alert(`تم توليد SOW بنجاح!\nرابط الملف: ${data.pdfUrl}`);
+      showSuccess(`تم توليد SOW بنجاح!\nرابط الملف: ${data.pdfUrl}`);
 
     } catch (err) {
       console.error('خطأ في توليد SOW:', err);

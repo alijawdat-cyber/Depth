@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { showSuccess, showError } from '@/lib/toast';
 import { 
   Users, 
   Search, 
@@ -82,6 +83,7 @@ export default function UnifiedUsersPage() {
       }
     } catch (err) {
       setError('خطأ في الاتصال بالخادم');
+      showError('خطأ في الاتصال بالخادم');
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
@@ -123,11 +125,15 @@ export default function UnifiedUsersPage() {
       const result = await response.json();
       if (result.success) {
         fetchUsers(); // Refresh data
+        showSuccess('تم حذف المستخدم بنجاح');
       } else {
-        setError(result.error || 'خطأ في حذف المستخدم');
+        const errorMsg = result.error || 'خطأ في حذف المستخدم';
+        setError(errorMsg);
+        showError(errorMsg);
       }
     } catch (err) {
       setError('خطأ في حذف المستخدم');
+      showError('خطأ في حذف المستخدم');
       console.error('Error deleting user:', err);
     }
   };

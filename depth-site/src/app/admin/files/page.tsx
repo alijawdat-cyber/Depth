@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { Button } from "@/components/ui/Button";
+import { showSuccess, showError, showInfo } from '@/lib/toast';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Folder,
@@ -195,6 +196,7 @@ export default function AdminFilesPage() {
 
     } catch (err) {
       setError('فشل في تحميل الملفات');
+      showError('فشل في تحميل الملفات');
       console.error('Load files data error:', err);
     } finally {
       setLoading(false);
@@ -231,7 +233,7 @@ export default function AdminFilesPage() {
         setReviewingFile(null);
         setReviewNotes('');
         
-        alert(`تم ${action === 'approve' ? 'اعتماد' : 'رفض'} الملف بنجاح`);
+        showSuccess(`تم ${action === 'approve' ? 'اعتماد' : 'رفض'} الملف بنجاح`);
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في مراجعة الملف');
@@ -255,13 +257,16 @@ export default function AdminFilesPage() {
 
       if (response.ok) {
         setFiles(prev => prev.filter(f => f.id !== fileId));
-        alert('تم حذف الملف بنجاح');
+        showSuccess('تم حذف الملف بنجاح');
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'فشل في حذف الملف');
+        const errorMsg = errorData.error || 'فشل في حذف الملف';
+        setError(errorMsg);
+        showError(errorMsg);
       }
     } catch (err) {
       setError('خطأ في الاتصال');
+      showError('خطأ في الاتصال');
       console.error('Delete file error:', err);
     }
   };
@@ -282,7 +287,7 @@ export default function AdminFilesPage() {
             : f
         ));
         setSelectedFiles([]);
-        alert('تم أرشفة الملفات بنجاح');
+        showSuccess('تم أرشفة الملفات بنجاح');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في أرشفة الملفات');
@@ -340,7 +345,7 @@ export default function AdminFilesPage() {
         const result = await response.json();
         setFiles(prev => [...result.files, ...prev]);
         setShowUploadModal(false);
-        alert(`تم رفع ${files.length} ملف بنجاح`);
+        showSuccess(`تم رفع ${files.length} ملف بنجاح`);
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في رفع الملفات');
@@ -441,7 +446,7 @@ export default function AdminFilesPage() {
   const handleShareFile = (file: FileItem) => {
     const shareUrl = `${window.location.origin}/admin/files/${file.id}`;
     navigator.clipboard.writeText(shareUrl);
-    alert('تم نسخ رابط الملف');
+    showInfo('تم نسخ رابط الملف');
   };
 
   // دالة لعرض معلومات الوقت
@@ -902,7 +907,7 @@ export default function AdminFilesPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => alert('ميزة الإيقاف المؤقت قيد التطوير')}
+                            onClick={() => showSuccess('ميزة الإيقاف المؤقت قيد التطوير')}
                             title="إيقاف مؤقت"
                           >
                             <Pause size={14} />

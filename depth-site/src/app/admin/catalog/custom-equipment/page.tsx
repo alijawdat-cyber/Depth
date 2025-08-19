@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { showSuccess, showError } from '@/lib/toast';
 import { motion } from 'framer-motion';
 import { 
   Package, 
@@ -104,12 +105,13 @@ export default function CustomEquipmentManagement() {
         setFeedback('');
         setModifications({ name: '', brand: '', model: '', description: '' });
         fetchCustomEquipment(); // إعادة تحميل البيانات
+        showSuccess(`تم ${reviewAction === 'approve' ? 'اعتماد' : 'رفض'} الطلب بنجاح`);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'حدث خطأ في المراجعة');
+        showError(errorData.error || 'حدث خطأ في المراجعة');
       }
     } catch {
-      alert('خطأ في الاتصال بالخادم');
+      showError('خطأ في الاتصال بالخادم');
     }
   };
 

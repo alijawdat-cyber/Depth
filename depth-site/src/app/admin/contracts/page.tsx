@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import Dropdown from "@/components/ui/Dropdown";
+import { showSuccess, showError } from '@/lib/toast';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   Plus, 
@@ -265,6 +266,7 @@ export default function AdminContractsPage() {
       }
     } catch (err) {
       setError('فشل في تحميل العقود');
+      showError('فشل في تحميل العقود');
       console.error('Load contracts error:', err);
     } finally {
       setLoading(false);
@@ -326,7 +328,7 @@ export default function AdminContractsPage() {
         const result = await response.json();
         // إضافة SOW الجديد للقائمة
         setContracts(prev => [result.sow, ...prev]);
-        alert(`تم توليد SOW بنجاح! سيتم تحميل PDF تلقائياً.`);
+        showSuccess(`تم توليد SOW بنجاح! سيتم تحميل PDF تلقائياً.`);
         
         // فتح PDF في تبويب جديد
         if (result.pdfUrl) {
@@ -355,14 +357,14 @@ export default function AdminContractsPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         // تحديث حالة العقد
         setContracts(prev => prev.map(contract => 
           contract.id === sowId 
             ? { ...contract, status: 'signed' as const, signedAt: new Date().toISOString() }
             : contract
         ));
-        alert('تم توقيع المستند بنجاح!');
+        showSuccess('تم توقيع المستند بنجاح!');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في توقيع المستند');
@@ -391,7 +393,7 @@ export default function AdminContractsPage() {
             : c
         ));
         
-        alert(`تم إرسال العقد بنجاح عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
+        showSuccess(`تم إرسال العقد بنجاح عبر ${method === 'email' ? 'البريد الإلكتروني' : 'واتساب'}`);
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في إرسال العقد');

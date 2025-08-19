@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { showSuccess, showError } from '@/lib/toast';
 import Image from "next/image";
 import Link from "next/link";
 import { cloudflareImageUrl } from "@/lib/cloudflare-public";
@@ -137,12 +138,25 @@ export default function PortalClientReal() {
         // reset inputs for this approval
         setCommentById(prev => ({ ...prev, [approvalId]: '' }));
         setAttachUrlById(prev => ({ ...prev, [approvalId]: '' }));
+        
+        // إشعار نجاح بناء على الحالة
+        if (status === 'approved') {
+          showSuccess('تم اعتماد التسليمة بنجاح');
+        } else if (status === 'rejected') {
+          showSuccess('تم رفض التسليمة');
+        } else if (status === 'needs_revision') {
+          showSuccess('تم طلب المراجعة');
+        } else {
+          showSuccess('تم تحديث التسليمة بنجاح');
+        }
       } else {
         setError('فشل في تحديث الموافقة');
+        showError('فشل في تحديث الموافقة');
       }
     } catch (err) {
       console.error('Error updating approval:', err);
       setError('فشل في تحديث الموافقة');
+      showError('فشل في تحديث الموافقة');
     }
   };
 
@@ -854,11 +868,11 @@ export default function PortalClientReal() {
                           a.click();
                           window.URL.revokeObjectURL(url);
                         } else {
-                          alert('فشل في تصدير التقرير. يرجى المحاولة مرة أخرى.');
+                          showError('فشل في تصدير التقرير. يرجى المحاولة مرة أخرى.');
                         }
                       } catch (error) {
                         console.error('Export error:', error);
-                        alert('حدث خطأ أثناء تصدير التقرير.');
+                        showError('حدث خطأ أثناء تصدير التقرير.');
                       }
                     }}
                     className="flex items-center gap-2"

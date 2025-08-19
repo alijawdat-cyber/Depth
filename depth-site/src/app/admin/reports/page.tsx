@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import Dropdown from "@/components/ui/Dropdown";
+import { showSuccess } from '@/lib/toast';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { 
   BarChart3,
@@ -176,7 +177,7 @@ export default function AdminReportsPage() {
       if (response.ok) {
         const result = await response.json();
         setReports(prev => [result.report, ...prev]);
-        alert('تم توليد التقرير بنجاح');
+        showSuccess('تم توليد التقرير بنجاح');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في توليد التقرير');
