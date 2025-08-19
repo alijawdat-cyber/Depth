@@ -277,6 +277,22 @@ export async function POST(req: NextRequest) {
       userDoc = existingUserQuery.docs[0];
       
       // إعادة بناء المعدات والتوفر والمهارات في التحديث كذلك
+      // ملاحظة: Firestore يرفض أي undefined داخل كائن مركب في update => نطبق تعقيم عميق
+      const stripUndefinedDeep = <T>(val: T): T => {
+        if (Array.isArray(val)) {
+          return (val as unknown[]).map(item => stripUndefinedDeep(item)) as unknown as T;
+        }
+        if (val && typeof val === 'object') {
+          const out: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
+            if (v === undefined) continue;
+            out[k] = stripUndefinedDeep(v);
+          }
+          return out as T;
+        }
+        return val;
+      };
+      
   const equipmentUpdate: Equipment = {
         cameras: formData.equipment?.cameras?.map(item =>
           item.isCustom ? `${item.customData?.brand || ''} ${item.customData?.name || ''}`.trim() || 'Custom Camera' : item.catalogId
@@ -312,7 +328,10 @@ export async function POST(req: NextRequest) {
         socialMedia: formData.portfolio.socialMedia || {},
         portfolioUrl: formData.portfolio.portfolioUrl
       };
-
+      const sanitizedAvailability = stripUndefinedDeep(availabilityUpdate);
+      const sanitizedPortfolio = stripUndefinedDeep(portfolioUpdate);
+      const sanitizedEquipment = stripUndefinedDeep(equipmentUpdate);
+      
       await userDoc.ref.update({
         name: formData.account.fullName.trim(),
         phone: formData.account.phone.trim(),
@@ -331,9 +350,9 @@ export async function POST(req: NextRequest) {
           notes: skill.notes || ''
         })),
         'creatorProfile.previousClients': formData.experience.previousClients || [],
-        'creatorProfile.portfolio': portfolioUpdate,
-        'creatorProfile.availability': availabilityUpdate,
-        'creatorProfile.equipment': equipmentUpdate,
+        'creatorProfile.portfolio': sanitizedPortfolio,
+        'creatorProfile.availability': sanitizedAvailability,
+        'creatorProfile.equipment': sanitizedEquipment,
         'creatorProfile.onboardingStatus': 'completed',
         'creatorProfile.onboardingStep': 5,
         'creatorProfile.onboardingData': {
