@@ -10,7 +10,9 @@ import { useState } from 'react';
 import type { WorkSample } from '@/types/onboarding';
 
 export default function Step4_Portfolio() {
-  const { formData, updatePortfolio, getFieldError } = useOnboarding();
+  const { formData, updatePortfolio, getFieldError, getFieldErrorV2 } = useOnboarding();
+  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
   const { portfolio } = formData;
   
   const [newSampleUrl, setNewSampleUrl] = useState('');
@@ -323,8 +325,8 @@ export default function Step4_Portfolio() {
             </div>
           )}
 
-          {getFieldError('عينات') && (
-            <p className="text-sm text-red-600 mt-2">{getFieldError('عينات')}</p>
+          {(getError('portfolio.workSamples') || getFieldError('عينات')) && (
+            <p className="text-sm text-red-600 mt-2">{getError('portfolio.workSamples') || getFieldError('عينات')}</p>
           )}
         </div>
       </div>

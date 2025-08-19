@@ -61,7 +61,18 @@ const ERR_MSG_AR: Record<string, string> = {
   min8: 'يجب أن تكون 8 أحرف على الأقل',
   match: 'كلمتا السر غير متطابقتين',
   phone: 'رقم الهاتف غير صالح',
-  agree: 'يجب الموافقة على الشروط'
+  agree: 'يجب الموافقة على الشروط',
+  role: 'يجب اختيار التخصص',
+  city: 'المدينة مطلوبة',
+  categories: 'اختر مجالاً واحداً على الأقل',
+  lang_min: 'يجب اختيار لغة واحدة على الأقل',
+  lang_max: 'لا يمكن اختيار أكثر من 3 لغات',
+  exp_level: 'مستوى الخبرة مطلوب',
+  availability: 'نوع التوفر مطلوب',
+  hours_range: 'عدد الساعات يجب أن يكون بين 1 و 60',
+  day_required: 'اختر يوماً واحداً على الأقل للعمل',
+  time_order: 'وقت البداية يجب أن يكون قبل وقت النهاية',
+  time_overlap: 'هناك تداخل في أوقات يوم واحد'
   // لاحقاً: role, url, time, ...
 };
 const isEmpty = (v: unknown) => v == null || (typeof v === 'string' && v.trim() === '');
@@ -79,6 +90,71 @@ function validateStepV2(step: number, data: OnboardingFormData): ValidationResul
     if (acc.password !== acc.confirmPassword) errors.push({ field: 'account.confirmPassword', code: 'match', message: ERR_MSG_AR.match });
     if (!isEmpty(acc.phone) && !isPhoneIQ(acc.phone)) errors.push({ field: 'account.phone', code: 'phone', message: ERR_MSG_AR.phone });
     if (!acc.agreeToTerms) errors.push({ field: 'account.agreeToTerms', code: 'agree', message: ERR_MSG_AR.agree });
+  }
+  else if (step === 2) {
+    const b = data.basicInfo || ({} as OnboardingFormData['basicInfo']);
+    if (isEmpty(b.role)) errors.push({ field: 'basicInfo.role', code: 'role', message: ERR_MSG_AR.role });
+    if (isEmpty(b.city)) errors.push({ field: 'basicInfo.city', code: 'city', message: ERR_MSG_AR.city });
+    if (!Array.isArray(b.primaryCategories) || b.primaryCategories.length === 0) {
+      errors.push({ field: 'basicInfo.primaryCategories', code: 'categories', message: ERR_MSG_AR.categories });
+    }
+    const langs = b.languages || [];
+    if (langs.length < 1) errors.push({ field: 'basicInfo.languages', code: 'lang_min', message: ERR_MSG_AR.lang_min });
+    if (langs.length > 3) errors.push({ field: 'basicInfo.languages', code: 'lang_max', message: ERR_MSG_AR.lang_max });
+  }
+  else if (step === 3) {
+    const exp = data.experience || ({} as OnboardingFormData['experience']);
+    if (isEmpty(exp.experienceLevel)) errors.push({ field: 'experience.experienceLevel', code: 'exp_level', message: ERR_MSG_AR.exp_level });
+    // تجربة التحقق من الاتساق (غير حاجب حالياً) – يمكن تفعيل warnings لاحقاً
+    // if (exp.experienceYears && !matchesLevel(exp.experienceLevel, exp.experienceYears)) {
+    //   warnings.push({ field: 'experience.experienceYears', code: 'exp_years_inconsistent', message: ERR_MSG_AR.exp_years_inconsistent });
+    // }
+  }
+  else if (step === 4) {
+    // خطوة اختيارية حالياً – لا أخطاء حاجبة
+  }
+  else if (step === 5) {
+    const av = data.availability || ({} as OnboardingFormData['availability']);
+    if (isEmpty(av.availability)) errors.push({ field: 'availability.availability', code: 'availability', message: ERR_MSG_AR.availability });
+    const hours = av.weeklyHours;
+    if (typeof hours !== 'number' || hours < 1 || hours > 60) {
+      errors.push({ field: 'availability.weeklyHours', code: 'hours_range', message: ERR_MSG_AR.hours_range });
+    }
+    // شرط اليوم الواحد فقط في وضع "مرن" (interpreted as flexible/custom)
+    if (av.availability === 'flexible') {
+      const hasPreferred = Array.isArray(av.preferredWorkdays) && av.preferredWorkdays.length > 0;
+      const hasWeekly = Array.isArray(av.weeklyAvailability) && av.weeklyAvailability.some(d => d.available);
+      if (!hasPreferred && !hasWeekly) {
+        errors.push({ field: 'availability.availability', code: 'day_required', message: ERR_MSG_AR.day_required });
+      }
+    }
+    // التحقق من النطاقات الزمنية (start < end) وعدم التداخل داخل اليوم
+    if (Array.isArray(av.weeklyAvailability)) {
+      const byDay: Record<string, { start: number; end: number }[]> = {};
+      av.weeklyAvailability.forEach(slot => {
+        if (!slot.available) return;
+        if (slot.startTime && slot.endTime) {
+          const start = Date.parse(`2000-01-01T${slot.startTime}`);
+            const end = Date.parse(`2000-01-01T${slot.endTime}`);
+          if (isNaN(start) || isNaN(end) || start >= end) {
+            errors.push({ field: 'availability.availability', code: 'time_order', message: ERR_MSG_AR.time_order });
+            return;
+          }
+          const rec = { start, end };
+          if (!byDay[slot.day]) byDay[slot.day] = [];
+          byDay[slot.day].push(rec);
+        }
+      });
+      Object.keys(byDay).forEach(day => {
+        const arr = byDay[day].sort((a,b)=>a.start-b.start);
+        for (let i=1;i<arr.length;i++) {
+          if (arr[i].start < arr[i-1].end) {
+            errors.push({ field: 'availability.availability', code: 'time_overlap', message: ERR_MSG_AR.time_overlap });
+            break;
+          }
+        }
+      });
+    }
   }
   return { isValid: errors.length === 0, errors, warnings };
 }

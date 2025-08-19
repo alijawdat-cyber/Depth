@@ -138,6 +138,8 @@ export interface OnboardingContextType {
   validateCurrentStep: () => boolean;
   getStepErrors: (step: OnboardingStep) => string[];
   getFieldError: (field: string) => string | undefined;
+  // Phase 4 Validation V2 (اختياري تحت العلم)
+  getFieldErrorV2?: (field: string) => string | undefined;
   markFieldTouched: (field: string) => void;
   
   // UI helpers

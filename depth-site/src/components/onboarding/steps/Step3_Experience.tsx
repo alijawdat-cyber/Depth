@@ -12,7 +12,9 @@ import { useState } from 'react';
 import type { ExperienceLevel, UnifiedCreatorSkill } from '@/types/onboarding';
 
 export default function Step3_Experience() {
-  const { formData, updateExperience, updateEquipment, getFieldError } = useOnboarding();
+  const { formData, updateExperience, updateEquipment, getFieldError, getFieldErrorV2 } = useOnboarding();
+  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
   const { experience } = formData;
   const [newClient, setNewClient] = useState('');
 
@@ -63,7 +65,7 @@ export default function Step3_Experience() {
               { value: 'professional', label: '🏆 محترف (أكثر من 5 سنوات)' }
             ]}
             required
-            error={getFieldError('الخبرة')}
+            error={getError('experience.experienceLevel') || getFieldError('الخبرة')}
             description="اختر المستوى الذي يناسب خبرتك الفعلية - سيتم تحديد سنوات الخبرة تلقائياً"
           />
         </div>

@@ -10,7 +10,9 @@ import CategorySelector from '../shared/CategorySelector';
 import { StepHeader } from '../OnboardingLayout';
 
 export default function Step2_BasicInfo() {
-  const { formData, updateBasicInfo, getFieldError } = useOnboarding();
+  const { formData, updateBasicInfo, getFieldError, getFieldErrorV2 } = useOnboarding();
+  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
   const { basicInfo } = formData;
 
   const handleLanguageToggle = (lang: string) => {
@@ -47,7 +49,7 @@ export default function Step2_BasicInfo() {
           <RoleSelector
             value={basicInfo.role}
             onChange={(role) => updateBasicInfo({ role })}
-            error={getFieldError('التخصص')}
+            error={getError('basicInfo.role') || getFieldError('التخصص')}
           />
         </div>
 
@@ -60,7 +62,7 @@ export default function Step2_BasicInfo() {
             placeholder="بغداد"
             icon={<MapPin size={18} />}
             required
-            error={getFieldError('المدينة')}
+            error={getError('basicInfo.city') || getFieldError('المدينة')}
             description="المدينة التي تقيم فيها حالياً"
           />
 
@@ -134,9 +136,12 @@ export default function Step2_BasicInfo() {
           <CategorySelector
             value={basicInfo.primaryCategories}
             onChange={(categories) => updateBasicInfo({ primaryCategories: categories as ('photo' | 'video' | 'design')[] })}
-            error={getFieldError('مجال')}
+            error={getError('basicInfo.primaryCategories') || getFieldError('مجال')}
             maxSelections={2}
           />
+          {FF_VALIDATION_V2 && getError('basicInfo.languages') && (
+            <p className="text-sm text-red-600 mt-2">{getError('basicInfo.languages')}</p>
+          )}
         </div>
       </div>
 

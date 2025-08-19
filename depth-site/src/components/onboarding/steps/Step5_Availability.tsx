@@ -10,7 +10,9 @@ import EnhancedAvailabilityGrid from '../shared/EnhancedAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
 
 export default function Step5_Availability() {
-  const { formData, updateAvailability, getFieldError } = useOnboarding();
+  const { formData, updateAvailability, getFieldError, getFieldErrorV2 } = useOnboarding();
+  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
   const { availability } = formData;
 
   const AVAILABILITY_OPTIONS = [
@@ -158,8 +160,8 @@ export default function Step5_Availability() {
             })}
           </div>
 
-          {getFieldError('التوفر') && (
-            <p className="text-sm text-red-600 mt-2">{getFieldError('التوفر')}</p>
+          {(getError('availability.availability') || getFieldError('التوفر')) && (
+            <p className="text-sm text-red-600 mt-2">{getError('availability.availability') || getFieldError('التوفر')}</p>
           )}
         </div>
 
@@ -173,7 +175,7 @@ export default function Step5_Availability() {
             placeholder="25"
             icon={<Clock size={18} />}
             required
-            error={getFieldError('الساعات')}
+            error={getError('availability.weeklyHours') || getFieldError('الساعات')}
             description="كم ساعة يمكنك العمل أسبوعياً؟"
             min="1"
             max="60"
@@ -224,7 +226,7 @@ export default function Step5_Availability() {
                 updateAvailability({ weeklyHours: Math.min(totalAvailableHours, 40) });
               }
             }}
-            error={getFieldError('التوفر')}
+            error={getError('availability.availability') || getFieldError('التوفر')}
             disabled={false}
           />
         </div>
