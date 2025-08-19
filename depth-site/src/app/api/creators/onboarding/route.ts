@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { adminDb } from '@/lib/firebase/admin';
+import { adminDb, adminAuth } from '@/lib/firebase/admin';
 import bcrypt from 'bcryptjs';
 import type {
   OnboardingFormData,
@@ -51,21 +51,7 @@ export async function POST(req: NextRequest) {
       } as OnboardingApiResponse, { status: 400 });
     }
 
-    if (!formData.account.password || formData.account.password.length < 8) {
-      return NextResponse.json({
-        success: false,
-        error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-        requestId
-      } as OnboardingApiResponse, { status: 400 });
-    }
-
-    if (formData.account.password !== formData.account.confirmPassword) {
-      return NextResponse.json({
-        success: false,
-        error: 'كلمات المرور غير متطابقة',
-        requestId
-      } as OnboardingApiResponse, { status: 400 });
-    }
+  // لاحقاً سنقرر التحقق من كلمة المرور فقط إذا كان المستخدم جديد فعلياً (لم تُنشأ وثيقة من قبل)
 
     if (!formData.account.agreeToTerms) {
       return NextResponse.json({
@@ -134,14 +120,7 @@ export async function POST(req: NextRequest) {
 
     // المعرض اختياري حالياً: لا نمنع الإرسال إذا كانت العينات أقل من 2
 
-    // التحقق من التوفر (مطلوب: النوع + على الأقل يوم واحد سواء من الشبكة أو preferredWorkdays)
-    if (!formData.availability.availability) {
-      return NextResponse.json({
-        success: false,
-        error: 'معلومات التوفر مطلوبة',
-        requestId
-      } as OnboardingApiResponse, { status: 400 });
-    }
+  // تم التحقق من availability أعلاه (نوع التوفر)، لا نكرر الشرط
 
     console.log('[ONBOARDING] Starting database operations...');
     const email = formData.account.email.toLowerCase().trim();
@@ -163,7 +142,44 @@ export async function POST(req: NextRequest) {
     if (isNewUser) {
       // إنشاء مستخدم جديد في النظام الموحد فقط (دون أي مجموعات قديمة)
       console.log('[ONBOARDING] Creating new unified creator user...');
+      // تحقق كلمة المرور (مطلوب فقط للمستخدم الجديد)
+      if (!formData.account.password || formData.account.password.length < 8) {
+        return NextResponse.json({
+          success: false,
+          error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+          requestId
+        } as OnboardingApiResponse, { status: 400 });
+      }
+      if (formData.account.password !== formData.account.confirmPassword) {
+        return NextResponse.json({
+          success: false,
+          error: 'كلمات المرور غير متطابقة',
+          requestId
+        } as OnboardingApiResponse, { status: 400 });
+      }
       const hashedPassword = await bcrypt.hash(formData.account.password, 12);
+
+      // ضمان وجود مستخدم Auth (قد تكون خطوة create-account سُقطت بالخطأ)
+      try {
+        await adminAuth.getUserByEmail(email);
+      } catch {
+        try {
+          const createdAuth = await adminAuth.createUser({
+            email,
+            password: formData.account.password,
+            displayName: formData.account.fullName.trim(),
+            disabled: false
+          });
+          console.log('[ONBOARDING] Inline auth user created', { uid: createdAuth.uid });
+        } catch (authErr) {
+          console.error('[ONBOARDING] Failed to create auth user inline', authErr);
+          return NextResponse.json({
+            success: false,
+            error: 'تعذر إنشاء مستخدم المصادقة، حاول التسجيل من البداية',
+            requestId
+          } as OnboardingApiResponse, { status: 500 });
+        }
+      }
 
       // تجهيز بيانات المعدات (تحويل العناصر المخصصة إلى نص)
       const equipment: Equipment = {
