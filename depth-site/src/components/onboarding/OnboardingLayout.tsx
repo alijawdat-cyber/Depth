@@ -2,6 +2,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 import { useOnboarding, useOnboardingProgress } from '@/hooks/useOnboarding';
 import { 
   CheckCircle, 
@@ -81,12 +82,26 @@ export default function OnboardingLayout({
     prevStep, 
     goToStep,
     submitOnboarding,
-    getStepErrors
+  getStepErrors,
+  setLoadingWithMessage
   } = useOnboarding();
   
   const progress = useOnboardingProgress();
   const currentStepConfig = STEPS_CONFIG.find(s => s.id === formData.currentStep);
   const errors = getStepErrors(formData.currentStep);
+
+  // حارس: في حال بقي loading عالق بعد الانتقال للخطوة التالية يتم تصفيره
+  useEffect(() => {
+    // حارس أمان: إذا بقيت حالة التحميل فعّالة أكثر من 4 ثوان بدون saving نقوم بإيقافها
+    if (state.loading && !state.saving) {
+      const timeout = setTimeout(() => {
+        if (state.loading && !state.saving) {
+          setLoadingWithMessage(false, '');
+        }
+      }, 4000);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.loading, state.saving, setLoadingWithMessage]);
 
   const handleNext = async () => {
     if (formData.currentStep === 5) {
@@ -95,6 +110,14 @@ export default function OnboardingLayout({
     } else {
       await nextStep();
     }
+  };
+
+  // دعم الإرسال عبر Enter داخل الحقول (Form Semantics)
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (state.saving || state.loading) return;
+    // إعادة استخدام منطق التنقل الحالي
+    handleNext();
   };
 
   return (
@@ -313,8 +336,13 @@ export default function OnboardingLayout({
               </div>
             </div>
 
-            {/* Step Content */}
-            <div className="p-8">
+            {/* Step Content داخل <form> لإزالة تحذيرات الحقول خارج النماذج + دعم Enter */}
+            <form
+              id="onboarding-step-form"
+              onSubmit={handleFormSubmit}
+              noValidate
+              className="p-8"
+            >
               {state.loading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
@@ -325,7 +353,7 @@ export default function OnboardingLayout({
               ) : (
                 children
               )}
-            </div>
+            </form>
           </motion.div>
 
           {/* Navigation */}
@@ -347,10 +375,13 @@ export default function OnboardingLayout({
                 </Button>
 
                 <Button
-                  onClick={handleNext}
+                  // نجعل الزر Submit مرتبطاً بالنموذج عبر الخاصية form
+                  type="submit"
+                  form="onboarding-step-form"
                   disabled={(!state.canProceed && formData.hasInteracted) || state.saving || state.loading}
                   className="flex items-center gap-2 px-8 py-3 min-w-[140px]"
                   variant={formData.currentStep === 5 ? "primary" : "secondary"}
+                  aria-busy={state.loading || state.saving}
                 >
                   {state.loading ? (
                     <>

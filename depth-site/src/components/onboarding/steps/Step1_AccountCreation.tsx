@@ -50,6 +50,8 @@ export default function Step1_AccountCreation() {
           required
           error={getFieldError('البريد') || getFieldError('الإلكتروني')}
           description="سيُستخدم لتسجيل الدخول واستلام الإشعارات"
+          name="email"
+          autoComplete="email"
         />
 
         {/* رقم الهاتف */}
@@ -64,6 +66,8 @@ export default function Step1_AccountCreation() {
           required
           error={getFieldError('الهاتف')}
           description="للتواصل السريع وتأكيد المشاريع"
+          name="phone"
+          autoComplete="tel"
         />
 
         {/* كلمات المرور */}
@@ -81,6 +85,8 @@ export default function Step1_AccountCreation() {
               required
               error={getFieldError('كلمة المرور') || getFieldError('قصيرة')}
               description="8 أحرف على الأقل"
+              name="new-password"
+              autoComplete="new-password"
             />
           </div>
 
@@ -97,6 +103,8 @@ export default function Step1_AccountCreation() {
               required
               error={getFieldError('متطابقة')}
               description="يجب أن تطابق كلمة المرور"
+              name="confirm-password"
+              autoComplete="new-password"
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
 // Hook مخصص لإدارة حالة الـ Onboarding
 'use client';
 
-import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
@@ -279,6 +279,94 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     uiState: initialState
   });
 
+  // مفاتيح التخزين المحلي
+  const LOCAL_STORAGE_KEY = 'onboarding_progress_v1';
+  const localPersistedOnceRef = useRef(false); // منع الكتابة المكررة دون داعٍ عند أول تحميل
+  const sessionPersistRef = useRef(false); // للتأكد أننا حفظنا في الخادم بعد توفر الجلسة مرة واحدة مبكرًا
+  const hasLoadedRef = useRef(false); // منع تحميل البيانات المحفوظة أكثر من مرة
+  const isManualNavigationRef = useRef(false); // تتبع الانتقال اليدوي مقابل الاستعادة
+
+  // تحميل التقدم من localStorage (تفاؤلي قبل طلب الشبكة)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return;
+      // تحقق من بنية أساسية
+      const localStep = typeof parsed.currentStep === 'number' ? parsed.currentStep : 1;
+      if (localStep <= 1) return; // لا حاجة لتطبيق إذا ما زال في الخطوة الأولى
+      
+      // منع الاستعادة إذا كان هناك انتقال يدوي حديث
+      if (isManualNavigationRef.current) return;
+      
+      // منع الداونجريد
+      const mergedCurrentStep = Math.max(formData.currentStep, localStep) as OnboardingStep;
+      const mergedCompleted = Array.from(new Set([
+        ...formData.completedSteps,
+        ...(Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [])
+      ])).sort();
+      
+      // فقط تطبيق إذا كانت البيانات مختلفة
+      if (mergedCurrentStep !== formData.currentStep || 
+          JSON.stringify(mergedCompleted) !== JSON.stringify(formData.completedSteps)) {
+        logger.onboardingDebug('Local restore snapshot', { raw, parsed, mergedCurrentStep, mergedCompleted });
+        dispatch({ type: 'LOAD_SAVED_DATA', payload: {
+          ...parsed,
+          currentStep: mergedCurrentStep,
+          completedSteps: mergedCompleted
+        }});
+        dispatch({ type: 'SET_CURRENT_STEP', payload: mergedCurrentStep });
+      }
+    } catch {
+      // ignore parsing errors
+    }
+  // نريد التشغيل مرة واحدة فقط عند mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // دالة لحفظ التقدم محليًا (تفاؤليًا) – فقط بعد الخطوة 1
+  const persistLocalProgress = useCallback((data: OnboardingFormData) => {
+    if (typeof window === 'undefined') return;
+    if (data.currentStep <= 1) return;
+    try {
+      const snapshot = {
+        currentStep: data.currentStep,
+        completedSteps: data.completedSteps,
+        account: {
+          fullName: data.account.fullName,
+          email: data.account.email,
+          phone: data.account.phone,
+          agreeToTerms: data.account.agreeToTerms
+        },
+        basicInfo: data.basicInfo,
+        experience: data.experience,
+        portfolio: data.portfolio,
+        availability: data.availability,
+        equipment: data.equipment,
+        metadata: { startedAt: data.metadata.startedAt, source: data.metadata.source }
+      };
+      logger.onboardingDebug('Local persist snapshot', { snapshot });
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snapshot));
+    } catch {
+      // ignore localStorage write
+    }
+  }, []);
+
+  // حفظ محلي عند تغير الخطوة أو إكمال خطوة (مع حراسة لمنع انفجار الكتابات)
+  useEffect(() => {
+    if (!localPersistedOnceRef.current && formData.currentStep > 1) {
+      persistLocalProgress(formData);
+      localPersistedOnceRef.current = true;
+      return;
+    }
+    // تحديث تزايدي
+    if (formData.currentStep > 1) persistLocalProgress(formData);
+  }, [formData.currentStep, formData.completedSteps, formData.account.fullName, formData.account.email, persistLocalProgress, formData]);
+
+  // سيتم إضافة تأثير حفظ في الخادم بعد تعريف saveProgress
+
   // تحديث startedAt بعد mount لتجنب hydration mismatch
   useEffect(() => {
     if (!formData.metadata.startedAt) {
@@ -308,25 +396,61 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   // تحميل البيانات المحفوظة عند بدء الجلسة
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData; // تحديث ref في كل render
+  
   const loadSavedProgress = useCallback(async () => {
-    // للمستخدمين الجدد، لا نحمل بيانات محفوظة
-    if (!session?.user?.email) return;
-    
+    // لا نحمل بدون جلسة أو إذا تم التحميل مسبقاً أو إذا كان انتقال يدوي حديث
+    if (!session?.user?.email || hasLoadedRef.current || isManualNavigationRef.current) return;
+
     dispatch({ type: 'SET_LOADING', payload: true });
-    
+
     try {
       const response = await fetch('/api/creators/onboarding/progress');
-      if (response.ok) {
-        const result = await response.json();
-        if (result.data) {
-          const savedFormData = result.data.formData || result.data;
-          if (savedFormData) {
-            dispatch({ type: 'LOAD_SAVED_DATA', payload: savedFormData });
-            if (typeof savedFormData.currentStep === 'number') {
-              dispatch({ type: 'SET_CURRENT_STEP', payload: savedFormData.currentStep });
-            }
-          }
-        }
+      if (!response.ok) {
+        // تجاهل بصمت ولكن نضمن إيقاف التحميل
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return;
+      }
+      
+      const result = await response.json();
+      const savedFormData = result?.data?.formData || result?.data;
+      if (!savedFormData) {
+        // لا توجد بيانات محفوظة - إيقاف التحميل
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return;
+      }
+
+      // استخدام ref للحصول على أحدث بيانات
+      const currentFormData = formDataRef.current;
+      const mergedCurrentStep: number = Math.max(
+        currentFormData.currentStep || 1,
+        typeof savedFormData.currentStep === 'number' ? savedFormData.currentStep : 1
+      );
+
+      // دمج completedSteps (اتحاد)
+      const mergedCompleted = Array.from(
+        new Set([
+          ...(currentFormData.completedSteps || []),
+          ...(savedFormData.completedSteps || [])
+        ])
+      ).sort();
+
+      // فقط تطبيق البيانات المحفوظة إذا كانت مختلفة عن الحالية
+      if (mergedCurrentStep !== currentFormData.currentStep || 
+          JSON.stringify(mergedCompleted) !== JSON.stringify(currentFormData.completedSteps)) {
+        
+        // إستراتيجية الدمج: نُفضل البيانات المحلية للحقل إذا كان المستخدم تفاعل (hasInteracted)
+        // وإلا نأخذ المحفوظ. (مبسطة)
+        const merged: Partial<OnboardingFormData> = {
+          ...savedFormData,
+          ...currentFormData,
+          completedSteps: mergedCompleted as OnboardingFormData['completedSteps'],
+          currentStep: mergedCurrentStep as OnboardingStep
+        };
+
+        dispatch({ type: 'LOAD_SAVED_DATA', payload: merged });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: mergedCurrentStep as OnboardingStep });
       }
     } catch (error) {
       console.error('Failed to load saved progress:', error);
@@ -384,6 +508,14 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       dispatch({ type: 'SET_SAVING', payload: false });
     }
   }, [session?.user?.email, formData, uiState.autoSaveEnabled]);
+
+  // حفظ في الخادم بمجرد توفر الجلسة لأول مرة بعد الانتقال (بعد تعريف saveProgress)
+  useEffect(() => {
+    if (session?.user?.email && formData.currentStep > 1 && !sessionPersistRef.current) {
+      saveProgress();
+      sessionPersistRef.current = true;
+    }
+  }, [session?.user?.email, formData.currentStep, saveProgress]);
 
   // التحقق من صحة الخطوة الحالية
   const validateCurrentStep = useCallback((): boolean => {
@@ -466,12 +598,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     logger.onboardingDebug(`Current session: ${session?.user ? 'logged in' : 'not logged in'}`);
     logger.onboardingDebug(`Form data validation: ${validateCurrentStep()}`);
     
+    // تسجيل الانتقال اليدوي
+    isManualNavigationRef.current = true;
+    
     // تفعيل عرض الأخطاء عند محاولة الانتقال
     dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
     
     if (!validateCurrentStep()) {
       logger.onboardingDebug(`Validation failed for step ${formData.currentStep}`);
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
+      isManualNavigationRef.current = false; // إعادة تعيين عند الفشل
       return false;
     }
     
@@ -530,10 +666,17 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
         const result = await response.json();
         logger.onboardingDebug('Account created successfully', { userId: result?.data?.userId });
+        
+        // تسجيل الانتقال اليدوي لمنع تضارب مع loadSavedProgress
+        isManualNavigationRef.current = true;
+        
         // انتقال فوري قبل محاولة تسجيل الدخول لخفض زمن الإدراك
         dispatch({ type: 'COMPLETE_STEP', payload: 1 });
         dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
         dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+        
+        // حفظ محلي تفاؤلي فوري ليضمن الاسترجاع بعد refresh حتى قبل تسجيل الدخول
+        persistLocalProgress({ ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] });
         setLoadingWithMessage(false, '');
         showSuccess('تم إنشاء الحساب! نجهز الخطوة التالية...');
 
@@ -543,6 +686,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
             showError('تم إنشاء الحساب، أعد تسجيل الدخول لاحقًا لضمان الحفظ السحابي');
           } else {
             logger.onboardingDebug('Silent sign-in completed post-transition');
+            // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد تسجيل الدخول الناجح
+            setTimeout(() => {
+              isManualNavigationRef.current = false;
+            }, 1000); // انتظار ثانية واحدة للتأكد من استقرار الحالة
           }
         });
         return true;
@@ -558,7 +705,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     if (formData.currentStep > 1) {
       setLoadingWithMessage(true, 'حفظ سريع...');
       const saved = await saveProgress();
-      if (!saved) { setLoadingWithMessage(false, ''); return false; }
+      if (!saved) { 
+        setLoadingWithMessage(false, '');
+        isManualNavigationRef.current = false; // إعادة تعيين عند الفشل
+        return false; 
+      }
       showSuccess(getStepSuccessMessage(formData.currentStep));
       // لا نضيف انتظار مصطنع؛ الانتقال الفوري يبدو أكثر احترافية
     }
@@ -573,18 +724,30 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       // إعادة تعيين validation للخطوة الجديدة
       dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
       setLoadingWithMessage(false, '');
+      
+      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
+      setTimeout(() => {
+        isManualNavigationRef.current = false;
+      }, 500);
+      
       return true;
     }
     
     setLoadingWithMessage(false, '');
+    isManualNavigationRef.current = false; // إعادة تعيين في النهاية
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage]);
+  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
     if (formData.currentStep > 1) {
+      isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
       const prevStepNum = (formData.currentStep - 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: prevStepNum });
+      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
+      setTimeout(() => {
+        isManualNavigationRef.current = false;
+      }, 500);
     }
   }, [formData.currentStep]);
 
@@ -592,7 +755,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const goToStep = useCallback((step: OnboardingStep) => {
     // التحقق من إمكانية الانتقال
     if (step <= formData.currentStep || formData.completedSteps.includes(step - 1 as OnboardingStep)) {
+      isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
       dispatch({ type: 'SET_CURRENT_STEP', payload: step });
+      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
+      setTimeout(() => {
+        isManualNavigationRef.current = false;
+      }, 500);
     }
   }, [formData.currentStep, formData.completedSteps]);
 
@@ -773,9 +941,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     return errors;
   }, [formData]);
 
-  // تحميل البيانات المحفوظة عند البدء
+  // تحميل البيانات المحفوظة عند البدء (مرة واحدة فقط عند تسجيل الدخول)
   useEffect(() => {
-    if (session?.user?.email) {
+    if (session?.user?.email && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
       loadSavedProgress();
     }
   }, [session?.user?.email, loadSavedProgress]);

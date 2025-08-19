@@ -540,7 +540,7 @@ img:not([width][height]), svg, video, canvas { max-width: 100%; height: auto; }
 
   /* تقليل مدة بعض الـ transitions الإفتراضية بدون كسر الـ animations */
   * {
-    transition-duration: 0.25s; /* قيمة معتدلة بدل 0.2s + بدون !important لإتاحة التخصيص */
+    transition-duration: 0.24s; /* قيمة معتدلة بدل 0.2s + بدون !important لإتاحة التخصيص */
   }
 
   /* إن احتجنا لاحقاً تقليل أنيميشن ثقيل نضع له كلاس محدد بدل التعميم */
