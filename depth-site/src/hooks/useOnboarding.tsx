@@ -36,6 +36,22 @@ const _ONBOARDING_FLAGS_SNAPSHOT = {
   FF_PATCH_SAVE
 };
 
+// Phase 3: Serial Remote Save Queue refs & helpers (يُستخدم فقط عندما تكون الأعلام مفعّلة)
+// استخدام كائن بسيط بدلاً من useRef هنا لأننا في أعلى الملف خارج المكوّن.
+// نسمح بأنواع مختلفة داخل السلسلة (نتجاهل النتيجة ونكتفي بالتسلسل)
+const saveChainRefGlobal: { current: Promise<unknown> } = { current: Promise.resolve() };
+async function backoff<T>(fn: () => Promise<T>, retries = 2, baseMs = 400): Promise<T> {
+  let attempt = 0;
+  while (true) {
+    try { return await fn(); }
+    catch (e) {
+      if (attempt >= retries) throw e;
+      await new Promise(r => setTimeout(r, baseMs * (2 ** attempt)));
+      attempt++;
+    }
+  }
+}
+
 // Phase 2 constants & helpers (Debounce + Hash local save)
 const LOCAL_SAVE_DEBOUNCE_MS = 600;
 function djb2Hash(s: string) { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h) ^ s.charCodeAt(i); return h>>>0; }
@@ -601,13 +617,26 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [session?.user?.email, formData, uiState.autoSaveEnabled]);
 
+  // Phase 3: غلاف تسلسلي لاستدعاء الحفظ البعيد
+  const callRemoteSave = useCallback(() => {
+    if (!FF_ONBOARDING_V2 || !FF_SERIAL_SAVE_QUEUE) return saveProgress();
+
+    saveChainRefGlobal.current = saveChainRefGlobal.current
+      .then(() => backoff(() => saveProgress()).then(() => undefined))
+      .catch(err => {
+        console.error('[onboarding] save failed (queued)', err);
+      });
+    return saveChainRefGlobal.current;
+  }, [saveProgress]);
+
   // حفظ في الخادم بمجرد توفر الجلسة لأول مرة بعد الانتقال (بعد تعريف saveProgress)
   useEffect(() => {
     if (session?.user?.email && formData.currentStep > 1 && !sessionPersistRef.current) {
-      saveProgress();
+      // Phase 3 queue wrap
+      callRemoteSave();
       sessionPersistRef.current = true;
     }
-  }, [session?.user?.email, formData.currentStep, saveProgress]);
+  }, [session?.user?.email, formData.currentStep, callRemoteSave, saveProgress]);
 
   // التحقق من صحة الخطوة الحالية
   const validateCurrentStep = useCallback((): boolean => {
@@ -805,14 +834,22 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // للخطوات الأخرى: حفظ التقدم قبل الانتقال
     if (formData.currentStep > 1) {
-      setLoadingWithMessage(true, 'حفظ سريع...');
-      const saved = await saveProgress();
-      if (!saved) { 
-        setLoadingWithMessage(false, '');
-        isManualNavigationRef.current = false; // إعادة تعيين عند الفشل
-        return false; 
+      if (FF_ONBOARDING_V2 && FF_SERIAL_SAVE_QUEUE) {
+        // انتقال تفاؤلي: جدولة الحفظ وعدم الانتظار
+        setLoadingWithMessage(true, 'حفظ سريع...');
+        callRemoteSave(); // لا await
+        showSuccess(getStepSuccessMessage(formData.currentStep));
+      } else {
+        // السلوك القديم (انتظار الحفظ)
+        setLoadingWithMessage(true, 'حفظ سريع...');
+        const saved = await saveProgress();
+        if (!saved) {
+          setLoadingWithMessage(false, '');
+          isManualNavigationRef.current = false;
+          return false;
+        }
+        showSuccess(getStepSuccessMessage(formData.currentStep));
       }
-      showSuccess(getStepSuccessMessage(formData.currentStep));
       // لا نضيف انتظار مصطنع؛ الانتقال الفوري يبدو أكثر احترافية
     }
     
@@ -839,7 +876,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setLoadingWithMessage(false, '');
     isManualNavigationRef.current = false; // إعادة تعيين في النهاية
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave]);
+  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave, callRemoteSave]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
@@ -1064,16 +1101,26 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const currentHash = JSON.stringify(lightObj);
         if (currentHash !== lastAutoHashRef.current && !uiState.saving) {
           lastAutoHashRef.current = currentHash;
-          saveProgress();
+          // Phase 3 queue wrap
+          callRemoteSave();
         }
         return;
       }
       if (!uiState.saving && formData.currentStep > 1) {
-        saveProgress();
+  // Phase 3 queue wrap
+  callRemoteSave();
       }
     }, 30000);
     return () => clearInterval(id);
-  }, [uiState.autoSaveEnabled, uiState.loading, uiState.saving, formData.currentStep, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, saveProgress]);
+  }, [uiState.autoSaveEnabled, uiState.loading, uiState.saving, formData.currentStep, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, saveProgress, callRemoteSave]);
+
+  // Phase 3: beforeunload محاولة تفريغ آخر عملية (best-effort)
+  useEffect(() => {
+    if (!FF_ONBOARDING_V2 || !FF_SERIAL_SAVE_QUEUE) return;
+    const handler = () => { /* best-effort: لا await */ };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
 
   // Phase 2: flush on beforeunload / unmount
   useEffect(() => {
@@ -1127,7 +1174,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     goToStep,
     
     // Data management
-    saveProgress,
+  saveProgress, // إبقاء الأصل للتوافق
     submitOnboarding,
     resetForm,
     
