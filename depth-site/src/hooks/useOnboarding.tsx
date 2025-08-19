@@ -20,6 +20,22 @@ import type {
 } from '@/types/onboarding';
 import type { EquipmentInventory } from '@/types/creators';
 
+// Feature Flags (Phase 0 baseline) - يمكن تعطيلها سريعاً
+const FF_ONBOARDING_V2 = process.env.NEXT_PUBLIC_ONBOARDING_V2 === 'true';
+const FF_COALESCE_TOASTS = process.env.NEXT_PUBLIC_ONBOARDING_COALESCE_TOASTS === 'true';
+const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
+const FF_SERIAL_SAVE_QUEUE = process.env.NEXT_PUBLIC_ONBOARDING_SERIAL_SAVE_QUEUE === 'true';
+const FF_PATCH_SAVE = process.env.NEXT_PUBLIC_ONBOARDING_PATCH_SAVE === 'true';
+// تجميع للاطلاع فقط لتفادي تحذيرات unused حالياً – ستُستخدم تدريجياً بالمراحل القادمة
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _ONBOARDING_FLAGS_SNAPSHOT = {
+  FF_ONBOARDING_V2,
+  FF_COALESCE_TOASTS,
+  FF_VALIDATION_V2,
+  FF_SERIAL_SAVE_QUEUE,
+  FF_PATCH_SAVE
+};
+
 // الحالة الأولية للنموذج
 const initialFormData: OnboardingFormData = {
   currentStep: 1,
@@ -379,12 +395,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
     // Helper لتحديد رسالة النجاح لكل خطوة
   const getStepSuccessMessage = useCallback((step: number): string => {
+    // توحيد الرسائل (Phase 1)
     const messages: Record<number, string> = {
       1: 'تم إنشاء الحساب بنجاح! 🎉',
-      2: 'تم حفظ معلوماتك الأساسية بنجاح! ✅',
-      3: 'تم حفظ محفظة أعمالك بنجاح! 🎨',
-      4: 'تم حفظ معلومات الدفع بنجاح! 💳',
-      5: 'مبروك! تم إكمال عملية التسجيل بنجاح! 🚀'
+      2: 'تم حفظ المعلومات الأساسية ✅',
+      3: 'تم حفظ الخبرة والمهارات �',
+      4: 'تم حفظ معرض الأعمال 🎨',
+      5: 'اكتمل التسجيل بنجاح 🚀'
     };
     return messages[step] || 'تم الحفظ بنجاح!';
   }, []);
@@ -471,12 +488,23 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: 'SET_SAVING', payload: true });
     
     try {
+      // Sanitization للبيانات الحساسة عند الحفظ (Phase 1)
+      const safeFormData = FF_ONBOARDING_V2 ? {
+        ...formData,
+        account: {
+          ...formData.account,
+          // منع إرسال كلمات المرور بعد الإنشاء
+          password: '',
+          confirmPassword: ''
+        }
+      } : formData;
+
       const response = await fetch('/api/creators/onboarding/progress', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           step: formData.currentStep,
-          data: formData,
+          data: safeFormData,
           autoSave: true
         })
       });
@@ -674,9 +702,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         dispatch({ type: 'COMPLETE_STEP', payload: 1 });
         dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
         dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
+
+        // Phase 1: تصفير كلمات المرور في الذاكرة بعد نجاح الإنشاء (لوضع أمني أفضل)
+        if (FF_ONBOARDING_V2) {
+          dispatch({ type: 'UPDATE_ACCOUNT', payload: { password: '', confirmPassword: '' } });
+        }
         
         // حفظ محلي تفاؤلي فوري ليضمن الاسترجاع بعد refresh حتى قبل تسجيل الدخول
-        persistLocalProgress({ ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] });
+  // لا نحفظ كلمات المرور محلياً (هي أصلاً مستبعدة) لكن نضمن snapshot بدونها
+  const sanitizedForLocal = FF_ONBOARDING_V2 ? { ...formData, account: { ...formData.account, password: '', confirmPassword: '' }, currentStep: 2, completedSteps: [...formData.completedSteps, 1] } : { ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] };
+  persistLocalProgress(sanitizedForLocal as OnboardingFormData);
         setLoadingWithMessage(false, '');
         showSuccess('تم إنشاء الحساب! نجهز الخطوة التالية...');
 
