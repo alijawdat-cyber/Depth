@@ -36,6 +36,24 @@ const _ONBOARDING_FLAGS_SNAPSHOT = {
   FF_PATCH_SAVE
 };
 
+// Phase 2 constants & helpers (Debounce + Hash local save)
+const LOCAL_SAVE_DEBOUNCE_MS = 600;
+function djb2Hash(s: string) { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h) ^ s.charCodeAt(i); return h>>>0; }
+function writeLocalSnapshot(key: string, data: unknown) { try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* ignore */ } }
+function sanitizeForLocal(data: OnboardingFormData) {
+  return {
+    currentStep: data.currentStep,
+    completedSteps: data.completedSteps,
+    account: { fullName: data.account.fullName, email: data.account.email, phone: data.account.phone, agreeToTerms: data.account.agreeToTerms },
+    basicInfo: data.basicInfo,
+    experience: data.experience,
+    portfolio: data.portfolio,
+    availability: data.availability,
+    equipment: data.equipment,
+    metadata: { startedAt: data.metadata.startedAt, source: data.metadata.source }
+  };
+}
+
 // الحالة الأولية للنموذج
 const initialFormData: OnboardingFormData = {
   currentStep: 1,
@@ -301,6 +319,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const sessionPersistRef = useRef(false); // للتأكد أننا حفظنا في الخادم بعد توفر الجلسة مرة واحدة مبكرًا
   const hasLoadedRef = useRef(false); // منع تحميل البيانات المحفوظة أكثر من مرة
   const isManualNavigationRef = useRef(false); // تتبع الانتقال اليدوي مقابل الاستعادة
+  // Phase 2 refs
+  const localSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const localHashRef = useRef<number>(0);
+  const lastAutoHashRef = useRef<string>('');
 
   // تحميل التقدم من localStorage (تفاؤلي قبل طلب الشبكة)
   useEffect(() => {
@@ -370,16 +392,58 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
+  // Phase 2 schedule & flush (guarded by flag)
+  const scheduleLocalSave = useCallback((data: OnboardingFormData) => {
+    if (!FF_ONBOARDING_V2) return;
+    if (typeof window === 'undefined') return;
+    if (data.currentStep <= 1) return;
+    if (localSaveTimerRef.current) clearTimeout(localSaveTimerRef.current);
+    localSaveTimerRef.current = setTimeout(() => {
+      const clean = sanitizeForLocal(data);
+      const str = JSON.stringify(clean);
+      const h = djb2Hash(str);
+      if (h !== localHashRef.current) {
+        writeLocalSnapshot('onboarding:data', clean);
+        localHashRef.current = h;
+        logger.onboardingDebug('Local debounce save (hash changed)', { h, step: data.currentStep });
+      }
+    }, LOCAL_SAVE_DEBOUNCE_MS);
+  }, []);
+
+  const flushLocalSave = useCallback((data?: OnboardingFormData) => {
+    if (!FF_ONBOARDING_V2) return;
+    if (typeof window === 'undefined') return;
+    if (localSaveTimerRef.current) { clearTimeout(localSaveTimerRef.current); localSaveTimerRef.current = null; }
+    const target = data ?? formData;
+    if (target.currentStep <= 1) return;
+    const clean = sanitizeForLocal(target);
+    const str = JSON.stringify(clean);
+    const h = djb2Hash(str);
+    if (h !== localHashRef.current) {
+      writeLocalSnapshot('onboarding:data', clean);
+      localHashRef.current = h;
+      logger.onboardingDebug('Local flush save (hash changed)', { h, step: target.currentStep });
+    }
+  }, [formData]);
+
   // حفظ محلي عند تغير الخطوة أو إكمال خطوة (مع حراسة لمنع انفجار الكتابات)
   useEffect(() => {
+    if (FF_ONBOARDING_V2) {
+      if (!localPersistedOnceRef.current && formData.currentStep > 1) {
+        flushLocalSave(formData); // baseline
+        localPersistedOnceRef.current = true;
+        return;
+      }
+      scheduleLocalSave(formData);
+      return;
+    }
     if (!localPersistedOnceRef.current && formData.currentStep > 1) {
       persistLocalProgress(formData);
       localPersistedOnceRef.current = true;
       return;
     }
-    // تحديث تزايدي
     if (formData.currentStep > 1) persistLocalProgress(formData);
-  }, [formData.currentStep, formData.completedSteps, formData.account.fullName, formData.account.email, persistLocalProgress, formData]);
+  }, [formData, formData.currentStep, formData.completedSteps, formData.account.fullName, formData.account.email, persistLocalProgress, scheduleLocalSave, flushLocalSave]);
 
   // سيتم إضافة تأثير حفظ في الخادم بعد تعريف saveProgress
 
@@ -708,10 +772,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           dispatch({ type: 'UPDATE_ACCOUNT', payload: { password: '', confirmPassword: '' } });
         }
         
-        // حفظ محلي تفاؤلي فوري ليضمن الاسترجاع بعد refresh حتى قبل تسجيل الدخول
-  // لا نحفظ كلمات المرور محلياً (هي أصلاً مستبعدة) لكن نضمن snapshot بدونها
-  const sanitizedForLocal = FF_ONBOARDING_V2 ? { ...formData, account: { ...formData.account, password: '', confirmPassword: '' }, currentStep: 2, completedSteps: [...formData.completedSteps, 1] } : { ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] };
-  persistLocalProgress(sanitizedForLocal as OnboardingFormData);
+        // حفظ محلي تفاؤلي فوري
+        const sanitizedForLocal = FF_ONBOARDING_V2 ? { ...formData, account: { ...formData.account, password: '', confirmPassword: '' }, currentStep: 2, completedSteps: [...formData.completedSteps, 1] } : { ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] };
+        if (FF_ONBOARDING_V2) {
+          flushLocalSave(sanitizedForLocal as OnboardingFormData);
+        } else {
+          persistLocalProgress(sanitizedForLocal as OnboardingFormData);
+        }
         setLoadingWithMessage(false, '');
         showSuccess('تم إنشاء الحساب! نجهز الخطوة التالية...');
 
@@ -754,7 +821,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // الانتقال للخطوة التالية
     if (formData.currentStep < 5) {
-      const nextStepNum = (formData.currentStep + 1) as OnboardingStep;
+  if (FF_ONBOARDING_V2) flushLocalSave(formData);
+  const nextStepNum = (formData.currentStep + 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: nextStepNum });
       // إعادة تعيين validation للخطوة الجديدة
       dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
@@ -771,33 +839,35 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setLoadingWithMessage(false, '');
     isManualNavigationRef.current = false; // إعادة تعيين في النهاية
     return false;
-  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress]);
+  }, [formData, session, validateCurrentStep, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
     if (formData.currentStep > 1) {
       isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
-      const prevStepNum = (formData.currentStep - 1) as OnboardingStep;
+  if (FF_ONBOARDING_V2) flushLocalSave(formData);
+  const prevStepNum = (formData.currentStep - 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: prevStepNum });
       // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
       setTimeout(() => {
         isManualNavigationRef.current = false;
       }, 500);
     }
-  }, [formData.currentStep]);
+  }, [formData, flushLocalSave]);
 
   // الانتقال لخطوة محددة
   const goToStep = useCallback((step: OnboardingStep) => {
     // التحقق من إمكانية الانتقال
     if (step <= formData.currentStep || formData.completedSteps.includes(step - 1 as OnboardingStep)) {
       isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
-      dispatch({ type: 'SET_CURRENT_STEP', payload: step });
+  if (FF_ONBOARDING_V2) flushLocalSave(formData);
+  dispatch({ type: 'SET_CURRENT_STEP', payload: step });
       // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
       setTimeout(() => {
         isManualNavigationRef.current = false;
       }, 500);
     }
-  }, [formData.currentStep, formData.completedSteps]);
+  }, [formData, flushLocalSave]);
 
   // إرسال الـ Onboarding الكامل
   const submitOnboarding = useCallback(async (): Promise<boolean> => {
@@ -984,18 +1054,37 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [session?.user?.email, loadSavedProgress]);
 
-  // Auto-save كل 30 ثانية
+  // Auto-save كل 30 ثانية (Phase 2 hash gate)
   useEffect(() => {
     if (!uiState.autoSaveEnabled || uiState.loading) return;
-    
-    const autoSaveInterval = setInterval(() => {
+    const id = setInterval(() => {
+      if (FF_ONBOARDING_V2) {
+        if (formData.currentStep <= 1) return;
+        const lightObj = { step: formData.currentStep, basic: formData.basicInfo, exp: formData.experience, port: formData.portfolio, avail: formData.availability };
+        const currentHash = JSON.stringify(lightObj);
+        if (currentHash !== lastAutoHashRef.current && !uiState.saving) {
+          lastAutoHashRef.current = currentHash;
+          saveProgress();
+        }
+        return;
+      }
       if (!uiState.saving && formData.currentStep > 1) {
         saveProgress();
       }
-    }, 30000); // 30 ثانية
-    
-    return () => clearInterval(autoSaveInterval);
-  }, [uiState.autoSaveEnabled, uiState.loading, uiState.saving, formData.currentStep, saveProgress]);
+    }, 30000);
+    return () => clearInterval(id);
+  }, [uiState.autoSaveEnabled, uiState.loading, uiState.saving, formData.currentStep, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, saveProgress]);
+
+  // Phase 2: flush on beforeunload / unmount
+  useEffect(() => {
+    if (!FF_ONBOARDING_V2) return;
+    const handler = () => flushLocalSave();
+    window.addEventListener('beforeunload', handler);
+    return () => {
+      flushLocalSave();
+      window.removeEventListener('beforeunload', handler);
+    };
+  }, [flushLocalSave]);
 
   // تحديث canProceed عند تغيير البيانات
   useEffect(() => {
