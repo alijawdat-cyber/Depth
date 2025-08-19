@@ -3,27 +3,44 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import bcrypt from 'bcryptjs';
 import type { AccountCreationData } from '@/types/onboarding';
+import { checkRateLimit, extractClientIp } from '@/lib/rate-limit';
 import type { UnifiedUser } from '@/types/unified-user';
 
 // ضمان التنفيذ في بيئة Node (وليس Edge) لأن firebase-admin + bcryptjs لا يعملان على Edge
 export const runtime = 'nodejs';
 
 function log(label: string, data?: unknown) {
-  // استخدم console فقط: يمكن لاحقاً استبداله بـ logger موحد
   console.log(`[create-account] ${label}`, data || '');
+}
+
+// تطبيع رقم الهاتف (إزالة الفراغات والرموز غير الرقمية عدا +) وتحويل 00 إلى +
+function normalizePhone(raw: string): string {
+  if (!raw) return '';
+  let p = raw.trim().replace(/[^0-9+]/g, '');
+  if (p.startsWith('00')) p = '+' + p.slice(2);
+  // مثال: لو يبدأ بصفر محلي نحاول (اختياري)؛ نتركه كما هو الآن لتفادي أخطاء
+  return p;
 }
 
 export async function POST(req: NextRequest) {
   const startedAt = Date.now();
   try {
     const accountData: AccountCreationData = await req.json();
-    const { fullName, password, phone, agreeToTerms } = accountData;
+    // Rate limit: 5 طلبات خلال 5 دقائق لكل IP + بريد
+    const ip = extractClientIp(req.headers);
+    const rateKey = `create_account:${ip}`;
+    const rl = await checkRateLimit({ key: rateKey, limit: 5, windowMs: 5 * 60 * 1000 });
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'محاولات كثيرة، حاول لاحقاً' }, { status: 429 });
+    }
+  const { fullName, password, phone, agreeToTerms } = accountData;
     const email = String(accountData.email || '').toLowerCase().trim();
+  const normalizedPhone = normalizePhone(phone || '');
 
-    log('Incoming payload', { email, fullNameLength: fullName?.length, phoneMasked: phone?.slice(0,3)+'***', agreeToTerms });
+  log('Incoming payload', { email, fullNameLength: fullName?.length, phoneMasked: normalizedPhone.slice(0,3)+'***', agreeToTerms });
 
     // Basic validation
-    if (!fullName?.trim() || !email || !password || !phone?.trim() || !agreeToTerms) {
+  if (!fullName?.trim() || !email || !password || !normalizedPhone || !agreeToTerms) {
       return NextResponse.json({ error: 'جميع البيانات مطلوبة' }, { status: 400 });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -78,24 +95,24 @@ export async function POST(req: NextRequest) {
       status: 'onboarding_started',
       emailVerified: false,
       twoFactorEnabled: false,
-      phone: phone.trim(),
+      phone: normalizedPhone,
       avatar: undefined,
       creatorProfile: {
         specialty: 'photographer',
         city: '',
         canTravel: false,
         experienceLevel: 'beginner',
-        experienceYears: '',
+        experienceYears: '0-1',
         skills: [],
         languages: ['ar'],
-        primaryCategories: ['photo'],
+        primaryCategories: [],
         portfolio: { workSamples: [], socialMedia: {} },
         availability: {
           availability: 'flexible',
-          weeklyHours: 40,
+          weeklyHours: 20,
           preferredWorkdays: [],
           weeklyAvailability: [],
-          timeZone: 'Asia/Riyadh',
+          timeZone: 'Asia/Baghdad',
           urgentWork: false
         },
         equipment: { cameras: [], lenses: [], lighting: [], audio: [], accessories: [], specialSetups: [] },

@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { adminDb, adminAuth } from '@/lib/firebase/admin';
-import bcrypt from 'bcryptjs';
+import { adminDb } from '@/lib/firebase/admin';
 import type {
   OnboardingFormData,
   SubmitOnboardingRequest,
@@ -140,46 +139,12 @@ export async function POST(req: NextRequest) {
     console.log('[ONBOARDING] Is new user:', isNewUser);
 
     if (isNewUser) {
-      // إنشاء مستخدم جديد في النظام الموحد فقط (دون أي مجموعات قديمة)
-      console.log('[ONBOARDING] Creating new unified creator user...');
-      // تحقق كلمة المرور (مطلوب فقط للمستخدم الجديد)
-      if (!formData.account.password || formData.account.password.length < 8) {
-        return NextResponse.json({
-          success: false,
-          error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-          requestId
-        } as OnboardingApiResponse, { status: 400 });
-      }
-      if (formData.account.password !== formData.account.confirmPassword) {
-        return NextResponse.json({
-          success: false,
-          error: 'كلمات المرور غير متطابقة',
-          requestId
-        } as OnboardingApiResponse, { status: 400 });
-      }
-      const hashedPassword = await bcrypt.hash(formData.account.password, 12);
-
-      // ضمان وجود مستخدم Auth (قد تكون خطوة create-account سُقطت بالخطأ)
-      try {
-        await adminAuth.getUserByEmail(email);
-      } catch {
-        try {
-          const createdAuth = await adminAuth.createUser({
-            email,
-            password: formData.account.password,
-            displayName: formData.account.fullName.trim(),
-            disabled: false
-          });
-          console.log('[ONBOARDING] Inline auth user created', { uid: createdAuth.uid });
-        } catch (authErr) {
-          console.error('[ONBOARDING] Failed to create auth user inline', authErr);
-          return NextResponse.json({
-            success: false,
-            error: 'تعذر إنشاء مستخدم المصادقة، حاول التسجيل من البداية',
-            requestId
-          } as OnboardingApiResponse, { status: 500 });
-        }
-      }
+      // نرفض الآن الإنشاء هنا لإجبار المرور بمسار create-account لضمان تهيئة Auth + بيانات أساسية موحدة
+      return NextResponse.json({
+        success: false,
+        error: 'يجب إنشاء الحساب أولاً عبر الخطوة الأولى قبل إكمال النموذج',
+        requestId
+      } as OnboardingApiResponse, { status: 400 });
 
       // تجهيز بيانات المعدات (تحويل العناصر المخصصة إلى نص)
       const equipment: Equipment = {
@@ -305,15 +270,7 @@ export async function POST(req: NextRequest) {
       userDoc = await adminDb.collection('users').add(unifiedUserData);
 
       // حفظ كلمة المرور في مجموعة credentials المنفصلة
-      await adminDb.collection('user_credentials').doc(userDoc.id).set({
-        userId: userDoc.id,
-        email,
-        hashedPassword,
-        createdAt: now,
-        lastPasswordChange: now
-      });
-
-      console.log('[ONBOARDING] Unified creator user created:', { userId: userDoc.id, email });
+  console.log('[ONBOARDING] Unified creator user created (legacy path should be unreachable now)', { userId: userDoc.id, email });
 
     } else {
       // تحديث مستخدم موجود
@@ -414,22 +371,32 @@ export async function POST(req: NextRequest) {
 
     // إشعار الأدمن
     try {
-      await adminDb.collection('notifications').add({
-        type: 'creator_onboarding_completed',
-        title: isNewUser ? 'مبدع جديد أكمل التسجيل' : 'مبدع حدّث ملفه الشخصي',
-        message: `${formData.account.fullName} أكمل نموذج الانضمام وجاهز للمراجعة`,
-        targetRole: 'admin',
-        entityType: 'user',
-        entityId: userDoc.id,
-        priority: 'high',
-        createdAt: now,
-        read: false,
-        metadata: {
-          creatorRole: formData.basicInfo.role,
-          creatorCity: formData.basicInfo.city,
-          isNewUser
-        }
-      });
+      // لا ترسل إشعاراً جديداً إذا كانت الحالة مكتملة مسبقاً ولم يتغير specialty أو المدينة
+      const prevData = !isNewUser ? existingUserQuery.docs[0].data() as UnifiedUser : null;
+      const wasCompleted = prevData?.creatorProfile?.onboardingStatus === 'completed';
+      const profileChanged = wasCompleted && (
+        prevData?.creatorProfile?.specialty !== formData.basicInfo.role ||
+        prevData?.creatorProfile?.city !== formData.basicInfo.city
+      );
+      if (!wasCompleted || profileChanged) {
+        await adminDb.collection('notifications').add({
+          type: 'creator_onboarding_completed',
+          title: isNewUser ? 'مبدع جديد أكمل التسجيل' : 'مبدع حدّث ملفه الشخصي',
+          message: `${formData.account.fullName} أكمل نموذج الانضمام وجاهز للمراجعة`,
+          targetRole: 'admin',
+          entityType: 'user',
+          entityId: userDoc.id,
+          priority: 'high',
+          createdAt: now,
+          read: false,
+          metadata: {
+            creatorRole: formData.basicInfo.role,
+            creatorCity: formData.basicInfo.city,
+            isNewUser,
+            profileChanged
+          }
+        });
+      }
     } catch (error) {
       console.warn('[onboarding] Failed to create notification:', error);
     }
