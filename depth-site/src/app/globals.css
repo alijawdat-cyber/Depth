@@ -530,12 +530,22 @@ img:not([width][height]), svg, video, canvas { max-width: 100%; height: auto; }
 
 /* تحسين الأداء على الهواتف */
 @media (max-width: 768px) {
-  /* تقليل الحركات على الهواتف للأداء */
+  /* ملاحظة مهمة:
+     كان هناك سطر عام:
+       * { animation-duration: 0.2s !important; transition-duration: 0.2s !important; }
+     هذا كان يُجبر كل الـ keyframe animations (مثل marquee و spinner و carousels) أن تنفذ خلال 0.2 ثانية فقط
+     مما سبب تسارع غير طبيعي على Safari (خاصة مع ProMotion 120Hz) وظهر كأن كل شيء "يركض".
+     الحل: لا نلمس animation-duration عالمياً. نكتفي بتقصير بعض الـ transitions فقط لو كانت طويلة.
+  */
+
+  /* تقليل مدة بعض الـ transitions الإفتراضية بدون كسر الـ animations */
   * {
-    animation-duration: 0.2s !important;
-    transition-duration: 0.2s !important;
+    transition-duration: 0.25s; /* قيمة معتدلة بدل 0.2s + بدون !important لإتاحة التخصيص */
   }
-  
+
+  /* إن احتجنا لاحقاً تقليل أنيميشن ثقيل نضع له كلاس محدد بدل التعميم */
+  .reduce-motion-fast { animation-duration: 0.6s !important; }
+
   /* تحسين اللمس */
   button, input, select, textarea {
     touch-action: manipulation;
