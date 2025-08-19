@@ -29,7 +29,7 @@ interface CreatorData {
   id: string;
   fullName: string;
   role: string;
-  status: 'pending' | 'onboarding_started' | 'onboarding_completed' | 'under_review' | 'approved' | 'rejected';
+  status: 'pending' | 'onboarding_started' | 'under_review' | 'approved' | 'rejected';
   city: string;
   phone: string;
   canTravel: boolean;
@@ -96,7 +96,6 @@ export default function CreatorsPortalPage() {
     switch (status) {
       case 'approved': return 'text-green-600 bg-green-50';
       case 'under_review': return 'text-yellow-600 bg-yellow-50';
-      case 'onboarding_completed': return 'text-blue-600 bg-blue-50';
       case 'onboarding_started': return 'text-purple-600 bg-purple-50';
       case 'rejected': return 'text-red-600 bg-red-50';
       default: return 'text-gray-600 bg-gray-50';
@@ -107,7 +106,6 @@ export default function CreatorsPortalPage() {
     switch (status) {
       case 'approved': return 'معتمد';
       case 'under_review': return 'قيد المراجعة';
-      case 'onboarding_completed': return 'تم إكمال التسجيل';
       case 'onboarding_started': return 'جاري التسجيل';
       case 'rejected': return 'مرفوض';
       default: return 'في الانتظار';
@@ -214,17 +212,7 @@ export default function CreatorsPortalPage() {
             </div>
           )}
 
-          {creatorData.status === 'onboarding_completed' && (
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 text-purple-800 mb-2">
-                <CheckCircle size={20} />
-                <span className="font-medium">تم إكمال نموذج الانضمام!</span>
-              </div>
-              <p className="text-purple-700 text-sm">
-                تم إرسال طلبك للمراجعة، سنتواصل معك قريباً
-              </p>
-            </div>
-          )}
+          {/* عند الإكمال ننتقل مباشرة إلى under_review لذا لم نعد نعرض بلوك onboarding_completed */}
 
           {creatorData.status === 'under_review' && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">

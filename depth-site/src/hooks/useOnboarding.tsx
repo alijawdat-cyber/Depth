@@ -651,16 +651,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       
       if (response.ok && responseData.success) {
         dispatch({ type: 'SET_SUCCESS', payload: true });
-        showSuccess('تم إرسال طلبك بنجاح! سيتم مراجعته خلال 24-48 ساعة.');
+  showSuccess('تم إرسال طلبك بنجاح ووضعه قيد المراجعة ✅');
         
         // توجيه للصفحة التالية بعد النجاح
         setTimeout(() => {
           try {
-            router.push('/creators?onboarding=completed');
+            router.push('/creators');
           } catch (routerError) {
             logger.onboardingDebug('Router push error', { error: String(routerError) });
             // fallback لإعادة تحميل الصفحة
-            window.location.href = '/creators?onboarding=completed';
+            window.location.href = '/creators';
           }
         }, 2000);
         

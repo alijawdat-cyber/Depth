@@ -139,13 +139,8 @@ export async function POST(req: NextRequest) {
     console.log('[ONBOARDING] Is new user:', isNewUser);
 
     if (isNewUser) {
-      // نرفض الآن الإنشاء هنا لإجبار المرور بمسار create-account لضمان تهيئة Auth + بيانات أساسية موحدة
-      return NextResponse.json({
-        success: false,
-        error: 'يجب إنشاء الحساب أولاً عبر الخطوة الأولى قبل إكمال النموذج',
-        requestId
-      } as OnboardingApiResponse, { status: 400 });
-
+      // إذا لم يتم إنشاء مستخدم (قد يكون جلسة موجودة مسبقاً بدون وثيقة users)
+      // ننشئ وثيقة كاملة الآن بدلاً من الإرجاع بالخطأ لضمان تجربة سلسة
       // تجهيز بيانات المعدات (تحويل العناصر المخصصة إلى نص)
       const equipment: Equipment = {
         cameras: formData.equipment?.cameras?.map(item =>
@@ -189,7 +184,8 @@ export async function POST(req: NextRequest) {
         email: email,
         name: formData.account.fullName.trim(),
         role: 'creator',
-        status: 'intake_submitted',
+        // ندفع مباشرة لحالة under_review حسب المتطلبات الجديدة
+        status: 'under_review',
         phone: formData.account.phone.trim(),
         avatar: undefined,
         emailVerified: false,
@@ -267,7 +263,7 @@ export async function POST(req: NextRequest) {
       };
 
       // حفظ في النظام الموحد (سجل واحد فقط)
-      userDoc = await adminDb.collection('users').add(unifiedUserData);
+  userDoc = await adminDb.collection('users').add(unifiedUserData);
 
       // حفظ كلمة المرور في مجموعة credentials المنفصلة
   console.log('[ONBOARDING] Unified creator user created (legacy path should be unreachable now)', { userId: userDoc.id, email });
@@ -332,7 +328,7 @@ export async function POST(req: NextRequest) {
       const sanitizedPortfolio = stripUndefinedDeep(portfolioUpdate);
       const sanitizedEquipment = stripUndefinedDeep(equipmentUpdate);
       
-      await userDoc.ref.update({
+  await userDoc.ref.update({
         name: formData.account.fullName.trim(),
         phone: formData.account.phone.trim(),
         'creatorProfile.specialty': formData.basicInfo.role,
@@ -353,7 +349,7 @@ export async function POST(req: NextRequest) {
         'creatorProfile.portfolio': sanitizedPortfolio,
         'creatorProfile.availability': sanitizedAvailability,
         'creatorProfile.equipment': sanitizedEquipment,
-        'creatorProfile.onboardingStatus': 'completed',
+  'creatorProfile.onboardingStatus': 'completed',
         'creatorProfile.onboardingStep': 5,
         'creatorProfile.onboardingData': {
           completedSteps: formData.completedSteps,
@@ -361,7 +357,8 @@ export async function POST(req: NextRequest) {
           onboardingVersion: 'unified_v1'
         },
         'creatorProfile.onboardingCompletedAt': now,
-        status: 'intake_submitted',
+  // انتقال تلقائي لحالة under_review بعد التحديث النهائي
+  status: 'under_review',
         updatedAt: now
       });
     }
@@ -430,8 +427,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: isNewUser 
-        ? 'تم إنشاء حسابك وإرسال النموذج بنجاح! سيتم مراجعة طلبك خلال 24-48 ساعة.'
-        : 'تم تحديث ملفك الشخصي بنجاح! سيتم مراجعة التحديثات خلال 24-48 ساعة.',
+        ? 'اكتمل تسجيلك ووُضع طلبك قيد المراجعة ✅'
+        : 'تم تحديث ملفك ووضعه قيد المراجعة ✅',
       data: {
         creatorId: userDoc.id,
         nextStep: 5,

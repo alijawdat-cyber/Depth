@@ -70,6 +70,7 @@ export default function UnifiedUsersPage() {
   const [selectedUser, setSelectedUser] = useState<UnifiedUser | null>(null);
   const [decisionModal, setDecisionModal] = useState<{user: UnifiedUser; action: 'approve' | 'reject'} | null>(null);
   const [decisionReason, setDecisionReason] = useState('');
+  const [openCardActions, setOpenCardActions] = useState<string | null>(null);
 
   // Load users data
   const fetchUsers = useCallback(async () => {
@@ -192,6 +193,29 @@ export default function UnifiedUsersPage() {
       case 'suspended': return 'معلق';
       default: return status;
     }
+  };
+
+  const buildUserActions = (user: UnifiedUser) => {
+    const actions: { key: string; label: string; color: string; onClick: () => void; icon: React.ReactNode }[] = [];
+    actions.push({ key: 'view', label: 'عرض', color: 'text-blue-600', onClick: () => setSelectedUser(user), icon: <Eye className="h-4 w-4" /> });
+    if (user.status === 'pending' || user.status === 'intake_submitted') {
+      actions.push({ key: 'approve', label: 'اعتماد', color: 'text-green-600', onClick: () => setDecisionModal({ user, action: 'approve' }), icon: <CheckCircle className="h-4 w-4" /> });
+      actions.push({ key: 'reject', label: 'رفض', color: 'text-rose-600', onClick: () => setDecisionModal({ user, action: 'reject' }), icon: <XCircle className="h-4 w-4" /> });
+    }
+    if (user.status === 'under_review') {
+      actions.push({ key: 'finalApprove', label: 'اعتماد نهائي', color: 'text-green-600', onClick: () => setDecisionModal({ user, action: 'approve' }), icon: <CheckCircle className="h-4 w-4" /> });
+    }
+    if (user.status === 'onboarding_started') {
+      actions.push({ key: 'moveReview', label: 'للمراجعة', color: 'text-indigo-600', onClick: () => updateUserStatus(user.id, 'under_review'), icon: <Eye className="h-4 w-4" /> });
+    }
+    if (user.status === 'active') {
+      actions.push({ key: 'suspend', label: 'تعليق', color: 'text-yellow-600', onClick: () => updateUserStatus(user.id, 'suspended'), icon: <XCircle className="h-4 w-4" /> });
+    }
+    if (user.status === 'suspended') {
+      actions.push({ key: 'unsuspend', label: 'رفع التعليق', color: 'text-green-600', onClick: () => updateUserStatus(user.id, 'active'), icon: <CheckCircle className="h-4 w-4" /> });
+    }
+    actions.push({ key: 'delete', label: 'حذف', color: 'text-red-600', onClick: () => deleteUser(user.id), icon: <Trash2 className="h-4 w-4" /> });
+    return actions;
   };
 
   if (loading) {
@@ -323,8 +347,8 @@ export default function UnifiedUsersPage() {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
+      {/* Users Table (Desktop) */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800/60">
@@ -456,12 +480,67 @@ export default function UnifiedUsersPage() {
             </tbody>
           </table>
         </div>
-        
         {users.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium">لا توجد مستخدمين</h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">لم يتم العثور على مستخدمين بالمعايير المحددة.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {users.map(user => {
+          const actions = buildUserActions(user);
+          const open = openCardActions === user.id;
+          return (
+            <div key={user.id} className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-semibold">
+                    {user.name.charAt(0)}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-medium leading-tight">{user.name}</div>
+                    <div className="text-xs text-gray-500 break-all">{user.email}</div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <span className={`inline-flex px-2 py-0.5 text-[10px] font-semibold rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
+                      <span className={`${getStatusBadge(user.status)} text-[10px]`}>{getStatusLabel(user.status)}</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400 mt-1">{new Date(user.createdAt).toLocaleDateString('ar-SA')}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setOpenCardActions(open ? null : user.id)}
+                  className="px-2 py-1 text-xs rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  aria-expanded={open}
+                  aria-controls={`actions-${user.id}`}
+                >
+                  {open ? 'إغلاق' : 'إجراءات'}
+                </button>
+              </div>
+              {open && (
+                <div id={`actions-${user.id}`} className="mt-3 border-t pt-3 grid gap-2 sm:grid-cols-2">
+                  {actions.map(a => (
+                    <button
+                      key={a.key}
+                      onClick={a.onClick}
+                      className={`flex items-center justify-center gap-1 rounded-md border text-[12px] py-2 px-2 font-medium transition-colors ${a.color.replace('text-', 'hover:bg-').split(' ')[0]} border-gray-300 dark:border-gray-600`}
+                    >
+                      {a.icon}
+                      <span>{a.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {users.length === 0 && (
+          <div className="text-center py-12 border rounded-lg">
+            <Users className="mx-auto h-10 w-10 text-gray-400" />
+            <p className="mt-2 text-sm text-gray-500">لا توجد نتائج</p>
           </div>
         )}
       </div>
