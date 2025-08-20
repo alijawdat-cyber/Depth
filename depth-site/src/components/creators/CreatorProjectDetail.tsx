@@ -12,7 +12,8 @@ import {
   MessageSquare, 
   Activity,
   DollarSign,
-  Package
+  Package,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { CreatorTelemetry } from '@/lib/telemetry/creator';
@@ -136,15 +137,40 @@ export default function CreatorProjectDetail({ projectId }: Props) {
   if (error || !project) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'المشروع غير موجود'}</p>
-          {metaNote === 'forbidden' && (
-            <p className="text-sm text-[var(--text-muted)] mb-4">التحقق: تم رفض الوصول بناءً على assignedCreators/includes</p>
+        <div className="max-w-md w-full mx-4">
+          {metaNote === 'forbidden' ? (
+            // Enhanced 403 Access Denied Banner
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center" data-testid="access-denied-banner">
+              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-red-800 mb-2">
+                ليس لديك صلاحية للوصول
+              </h3>
+              <p className="text-red-600 mb-4">
+                هذا المشروع غير مُسند إليك أو تم إلغاء صلاحيتك للوصول إليه
+              </p>
+              <p className="text-sm text-red-500 mb-6">
+                التحقق: تم رفض الوصول بناءً على assignedCreators.includes()
+              </p>
+              <Button 
+                onClick={() => router.push('/creators/projects')}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                العودة لقائمة المشاريع
+              </Button>
+            </div>
+          ) : (
+            // Generic Error State
+            <div className="text-center">
+              <p className="text-red-600 mb-4">{error || 'المشروع غير موجود'}</p>
+              <Button onClick={() => router.push('/creators/projects')}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                العودة للمشاريع
+              </Button>
+            </div>
           )}
-          <Button onClick={() => router.push('/creators/projects')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            العودة للمشاريع
-          </Button>
         </div>
       </div>
     );

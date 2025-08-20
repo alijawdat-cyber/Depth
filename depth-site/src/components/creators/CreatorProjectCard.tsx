@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { formatIQD } from '@/lib/currency';
+import type { CreatorLineItemSummary } from '@/types/creator-project';
 import { 
   Clock, 
   DollarSign, 
@@ -46,17 +48,7 @@ interface CreatorProject {
     averageCompletionTime: number;
     totalCompletedTasks: number;
   } | null;
-  lineItemsSummary?: Array<{
-    id?: string; // optional for key stability
-    subcategory: string;
-    subcategoryName?: string; // قد يأتي من API مستقبلًا
-    quantity: number;
-    processing: string;
-    processingLabel?: string; // وسم العرض البشري
-    baseUnit: number;
-    creatorUnit: number;
-    lineSubtotal: number;
-  }>;
+  lineItemsSummary?: CreatorLineItemSummary[];
 }
 
 interface CreatorProjectCardProps {
@@ -116,15 +108,6 @@ export default function CreatorProjectCard({ project, onProjectClick, metaNote }
     if (!deadline) return false;
     return new Date(deadline) < new Date() && !['completed', 'delivered'].includes(project.status);
   };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ', {
-      style: 'currency',
-      currency: 'IQD',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
-  const formatIQD = (amount: number) => formatCurrency(amount);
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('ar-EG', {
@@ -226,7 +209,7 @@ export default function CreatorProjectCard({ project, onProjectClick, metaNote }
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">السعر الصافي</span>
               <span className="font-semibold text-emerald-600">
-                {project.creatorNetRate ? formatCurrency(project.creatorNetRate) : 'غير محدد'}
+                {project.creatorNetRate ? formatIQD(project.creatorNetRate) : 'غير محدد'}
               </span>
             </div>
 
@@ -241,7 +224,7 @@ export default function CreatorProjectCard({ project, onProjectClick, metaNote }
                       <span className="text-gray-600 font-medium">أرباحي التفصيلية</span>
                     </div>
                     <span className="font-bold text-emerald-700">
-                      {formatCurrency(project.myEarnings)}
+                      {formatIQD(project.myEarnings)}
                     </span>
                   </div>
                   
@@ -338,7 +321,7 @@ export default function CreatorProjectCard({ project, onProjectClick, metaNote }
               )}
               {project.speedBonus > 0 && (
                 <span className="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                  ⚡ مكافأة سرعة: {formatCurrency(project.speedBonus)}
+                  ⚡ مكافأة سرعة: {formatIQD(project.speedBonus)}
                 </span>
               )}
               {project.isEarlyDelivery && (

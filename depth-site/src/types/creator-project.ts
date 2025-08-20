@@ -4,6 +4,20 @@
 // Processing levels (previously from feature-flags)
 export type ProcessingLevel = 'raw' | 'raw_basic' | 'full_retouch';
 
+// Creator Line Item Summary for quick display
+export type CreatorLineItemSummary = {
+  id?: string;                // optional for key stability
+  subcategoryId: string;
+  subcategoryName?: string;   // human-readable category name
+  subcategory: string;        // fallback identifier
+  processing: string;         // processing level
+  processingLabel?: string;   // human-readable processing label
+  quantity: number;           // qty
+  baseUnit: number;          // base price per unit
+  creatorUnit: number;       // creator price per unit
+  lineSubtotal: number;      // quantity × creatorUnit
+};
+
 // Creator Line Item (مخفي منه clientUnit وagencyMargin)
 export interface CreatorLineItem {
   id: string;

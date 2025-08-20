@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
+import { formatIQD } from '@/lib/currency';
 import { 
   Briefcase,
   Calendar,
@@ -25,6 +26,7 @@ import {
   Timer,
   Target
 } from 'lucide-react';
+import type { CreatorLineItemSummary } from '@/types/creator-project';
 
 interface CreatorProject {
   id: string;
@@ -60,14 +62,7 @@ interface CreatorProject {
     totalCompletedTasks: number;
   } | null;
   // Added summary + earnings support
-  lineItemsSummary?: Array<{
-    subcategory: string;
-    quantity: number;
-    processing: string;
-    baseUnit: number;
-    creatorUnit: number;
-    lineSubtotal: number;
-  }>;
+  lineItemsSummary?: CreatorLineItemSummary[];
 }
 
 interface ProjectStats {
@@ -220,15 +215,6 @@ export default function CreatorProjectsPage() {
     if (!deadline) return false;
     return new Date(deadline) < new Date();
   };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ', {
-      style: 'currency',
-      currency: 'IQD',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
-  const formatIQD = (amount: number) => formatCurrency(amount);
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('ar-EG', {
@@ -442,7 +428,7 @@ export default function CreatorProjectsPage() {
                         {project.creatorNetRate && (
                           <div className="flex items-center gap-1">
                             <DollarSign size={16} />
-                            {formatCurrency(project.creatorNetRate)} (سعر صافي)
+                            {formatIQD(project.creatorNetRate)} (سعر صافي)
                           </div>
                         )}
 
@@ -452,7 +438,7 @@ export default function CreatorProjectsPage() {
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-gray-600">أرباحي التفصيلية</span>
                               <span className="font-medium text-emerald-700">
-                                {formatCurrency(project.myEarnings)}
+                                {formatIQD(project.myEarnings)}
                               </span>
                             </div>
                             {project.totalLineItems && (
@@ -621,7 +607,7 @@ export default function CreatorProjectsPage() {
                         {project.lineItemsSummary.map((li, liIdx) => (
                           <li key={liIdx} className="text-sm flex justify-between gap-2">
                             <span className="truncate">
-                              {(li as any).subcategoryName || li.subcategory} · {(li as any).processingLabel || li.processing} · ×{li.quantity}
+                              {li.subcategoryName || li.subcategory} · {li.processingLabel || li.processing} · ×{li.quantity}
                             </span>
                             <span className="whitespace-nowrap">
                               {formatIQD(li.creatorUnit)} → {formatIQD(li.lineSubtotal)}
