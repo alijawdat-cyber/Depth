@@ -13,8 +13,8 @@ import type { ExperienceLevel, UnifiedCreatorSkill } from '@/types/onboarding';
 
 export default function Step3_Experience() {
   const { formData, updateExperience, updateEquipment, getFieldError, getFieldErrorV2 } = useOnboarding();
-  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
-  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
+  // V2 validation and skill processing capture are permanently enabled
+  const getError = getFieldErrorV2 || getFieldError;
   const { experience } = formData;
   const [newClient, setNewClient] = useState('');
 
@@ -97,13 +97,62 @@ export default function Step3_Experience() {
                 experienceYears: experience.experienceLevel === 'beginner' ? 1 : 
                                 experience.experienceLevel === 'intermediate' ? 3 : 6,
                 notes: skill.notes,
-                verified: skill.verified
+                verified: skill.verified,
+                // ✨ Sprint 3: Processing term permanently enabled (raw_basic default)
+                processing: 'raw_basic' as const
               }));
               updateExperience({ skills: unifiedSkills });
             }}
             error={getFieldError('تخصص')}
             disabled={formData.basicInfo.primaryCategories.length === 0}
           />
+          
+          {/* Phase 4: Output levels for each skill - permanently enabled */}
+          {experience.skills && experience.skills.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 p-4 bg-[var(--card)] border border-[var(--border)] rounded-xl"
+            >
+              <h4 className="font-semibold text-[var(--text)] mb-4">مستوى الإخراج لكل مهارة</h4>
+              <div className="space-y-4">
+                {experience.skills.map((skill, index) => (
+                  <div key={skill.subcategoryId} className="flex items-center justify-between p-3 bg-[var(--bg-alt)] rounded-lg">
+                    <div className="flex-1">
+                      <span className="font-medium text-[var(--text)]">
+                        {skill.subcategoryId} ({skill.level})
+                      </span>
+                    </div>
+                    <div className="w-48">
+                      <SelectField
+                        label=""
+                        value={skill.processing || 'raw_basic'}
+                        onChange={(value) => {
+                          const updatedSkills = [...experience.skills];
+                          updatedSkills[index] = {
+                            ...updatedSkills[index],
+                            processing: value as 'raw' | 'raw_basic' | 'full_retouch'
+                          };
+                          updateExperience({ skills: updatedSkills });
+                        }}
+                        options={[
+                          { value: 'raw', label: '📸 خام فقط' },
+                          { value: 'raw_basic', label: '✨ خام + تعديل أساسي' },
+                          { value: 'full_retouch', label: '🎨 إنتاج كامل' }
+                        ]}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-[var(--muted)] mt-3">
+                حدد نوع المعالجة المطلوب لكل مهارة (يؤثر على السعر)
+              </p>
+              {getError('experience.skills[0].processing') && (
+                <p className="text-sm text-red-600 mt-2">{getError('experience.skills[0].processing')}</p>
+              )}
+            </motion.div>
+          )}
         </div>
 
         {/* المعدات والأدوات */}

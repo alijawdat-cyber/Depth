@@ -10,8 +10,8 @@ import Link from 'next/link';
 
 export default function Step1_AccountCreation() {
   const { formData, updateAccountData, getFieldError, getFieldErrorV2, markFieldTouched } = useOnboarding();
-  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
-  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
+  // V2 validation is permanently enabled
+  const getError = getFieldErrorV2 || getFieldError;
   const { account } = formData;
 
   return (

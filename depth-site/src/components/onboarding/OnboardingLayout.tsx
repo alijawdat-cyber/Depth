@@ -2,8 +2,11 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useOnboarding, useOnboardingProgress } from '@/hooks/useOnboarding';
+import { useConnectivity } from '@/hooks/useConnectivity';
+import { telemetry } from '@/lib/telemetry/client';
+import OfflineBar from './OfflineBar';
 import { 
   CheckCircle, 
   Clock, 
@@ -90,6 +93,15 @@ export default function OnboardingLayout({
   const currentStepConfig = STEPS_CONFIG.find(s => s.id === formData.currentStep);
   const errors = getStepErrors(formData.currentStep);
 
+  // Phase 7: تتبع عرض الخطوة
+  useEffect(() => {
+    telemetry.stepView(formData.currentStep);
+  }, [formData.currentStep]);
+
+  // Phase 5: اتصال الإنترنت - دائم التفعيل
+  const { isOnline, addReconnectCallback } = useConnectivity();
+  const [retryStatus, setRetryStatus] = useState<'idle' | 'retrying' | 'success' | 'failed'>('idle');
+
   // حارس: في حال بقي loading عالق بعد الانتقال للخطوة التالية يتم تصفيره
   useEffect(() => {
     // حارس أمان: إذا بقيت حالة التحميل فعّالة أكثر من 4 ثوان بدون saving نقوم بإيقافها
@@ -103,6 +115,54 @@ export default function OnboardingLayout({
     }
   }, [state.loading, state.saving, setLoadingWithMessage]);
 
+  // معالج إعادة المحاولة عند عودة الاتصال - دائم التفعيل
+  const handleRetryConnection = () => {
+    setRetryStatus('retrying');
+    // Track manual retry attempt
+    telemetry.saveRetry(1);
+    
+    // محاولة إعادة الاتصال
+    const timeoutId = setTimeout(() => {
+      if (navigator.onLine) {
+        setRetryStatus('success');
+        // إخفاء رسالة النجاح بعد ثانيتين
+        setTimeout(() => setRetryStatus('idle'), 2000);
+      } else {
+        setRetryStatus('failed');
+        // إعادة تعيين بعد 3 ثوان
+        setTimeout(() => setRetryStatus('idle'), 3000);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timeoutId);
+  };
+
+  // إضافة callback لإعادة المحاولة عند عودة الاتصال - دائم التفعيل
+  useEffect(() => {
+    const retryCallback = () => {
+      setRetryStatus('retrying');
+      // Track retry attempt
+      telemetry.saveRetry(1);
+      
+      // محاولة إعادة الاتصال
+      const timeoutId = setTimeout(() => {
+        if (navigator.onLine) {
+          setRetryStatus('success');
+          // إخفاء رسالة النجاح بعد ثانيتين
+          setTimeout(() => setRetryStatus('idle'), 2000);
+        } else {
+          setRetryStatus('failed');
+          // إعادة تعيين بعد 3 ثوان
+          setTimeout(() => setRetryStatus('idle'), 3000);
+        }
+      }, 1500);
+
+      return () => clearTimeout(timeoutId);
+    };
+    
+    addReconnectCallback(retryCallback);
+  }, [addReconnectCallback]);
+
   const handleNext = async () => {
     if (formData.currentStep === 5) {
       // الخطوة الأخيرة - إرسال النموذج
@@ -110,14 +170,6 @@ export default function OnboardingLayout({
     } else {
       await nextStep();
     }
-  };
-
-  // دعم الإرسال عبر Enter داخل الحقول (Form Semantics)
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (state.saving || state.loading) return;
-    // إعادة استخدام منطق التنقل الحالي
-    handleNext();
   };
 
   return (
@@ -129,6 +181,14 @@ export default function OnboardingLayout({
       </div>
 
       <div className="relative z-10">
+        {/* Phase 5: شريط الاتصال المفقود - دائم التفعيل */}
+        <OfflineBar 
+          isOffline={!isOnline}
+          hasUnsavedChanges={state.saving}
+          onRetryConnection={handleRetryConnection}
+          retryStatus={retryStatus}
+        />
+
         {/* Header */}
         <header className="bg-[var(--card)]/80 backdrop-blur-sm border-b border-[var(--border)] sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 py-4">
@@ -336,13 +396,8 @@ export default function OnboardingLayout({
               </div>
             </div>
 
-            {/* Step Content داخل <form> لإزالة تحذيرات الحقول خارج النماذج + دعم Enter */}
-            <form
-              id="onboarding-step-form"
-              onSubmit={handleFormSubmit}
-              noValidate
-              className="p-8"
-            >
+            {/* Step Content - Remove form wrapper to prevent auto-submit */}
+            <div className="p-8">
               {state.loading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
@@ -353,7 +408,7 @@ export default function OnboardingLayout({
               ) : (
                 children
               )}
-            </form>
+            </div>
           </motion.div>
 
           {/* Navigation */}
@@ -375,9 +430,7 @@ export default function OnboardingLayout({
                 </Button>
 
                 <Button
-                  // نجعل الزر Submit مرتبطاً بالنموذج عبر الخاصية form
-                  type="submit"
-                  form="onboarding-step-form"
+                  onClick={handleNext}
                   disabled={(!state.canProceed && formData.hasInteracted) || state.saving || state.loading}
                   className="flex items-center gap-2 px-8 py-3 min-w-[140px]"
                   variant={formData.currentStep === 5 ? "primary" : "secondary"}

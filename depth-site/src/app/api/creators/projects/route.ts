@@ -24,10 +24,19 @@ interface TaskData {
   [key: string]: unknown;
 }
 
+interface LineItem {
+  assignedCreator?: string;
+  baseUnit?: number;
+  quantity?: number;
+  creatorFactor?: number;
+  [key: string]: unknown;
+}
+
 interface ProjectData {
   tasks?: TaskData[];
   slaHours?: number;
   deliverables?: unknown[];
+  lineItems?: LineItem[];
   [key: string]: unknown;
 }
 
@@ -134,6 +143,44 @@ function calculateAverageCompletionTime(tasks: TaskData[]): number {
   return Math.round(timesInHours.reduce((sum, time) => sum + time, 0) / timesInHours.length);
 }
 
+// ✨ Sprint 3: حساب أرباح المبدع من Line Items (always enabled)
+function calculateCreatorEarnings(projectData: ProjectData, creatorId: string): {
+  myEarnings: number;
+  totalLineItems: number;
+  totalQuantity: number;
+} | null {
+  const lineItems = projectData.lineItems || [];
+  
+  if (!Array.isArray(lineItems) || lineItems.length === 0) {
+    return null;
+  }
+  
+  let totalEarnings = 0;
+  let totalQuantity = 0;
+  let itemCount = 0;
+  
+  lineItems.forEach((item: LineItem) => {
+    // نحسب فقط العناصر التي تخص هذا المبدع
+    if (item.assignedCreator === creatorId) {
+      const baseUnit = item.baseUnit || 0;
+      const quantity = item.quantity || 1;
+      const creatorFactor = item.creatorFactor || 0.7; // 70% افتراضي للمبدع
+      
+      // earnings = baseUnit × creatorFactor × quantity
+      const itemEarnings = baseUnit * creatorFactor * quantity;
+      totalEarnings += itemEarnings;
+      totalQuantity += quantity;
+      itemCount++;
+    }
+  });
+  
+  return {
+    myEarnings: Math.round(totalEarnings),
+    totalLineItems: itemCount,
+    totalQuantity: Math.round(totalQuantity)
+  };
+}
+
 // GET /api/creators/projects
 // جلب المشاريع المُسندة للمبدع المسجل دخوله
 export async function GET(req: NextRequest) {
@@ -234,7 +281,10 @@ export async function GET(req: NextRequest) {
         task.status === 'completed'
       );
 
-      projects.push({
+      // ✨ Sprint 3: حساب الأرباح التفصيلية (عند تفعيل feature flag)
+      const earningsData = calculateCreatorEarnings(projectData, creatorId);
+
+      const projectInfo = {
         id: doc.id,
         title: projectData.title || 'مشروع بدون عنوان',
         description: projectData.description || '',
@@ -266,8 +316,17 @@ export async function GET(req: NextRequest) {
         rating: projectData.creatorRatings?.[creatorId] || null,
         feedback: projectData.creatorFeedback?.[creatorId] || null,
         qualityScore: calculateQualityScore(projectData, creatorId),
-        performanceMetrics: calculatePerformanceMetrics(projectData, creatorId)
-      });
+        performanceMetrics: calculatePerformanceMetrics(projectData, creatorId),
+        
+        // ✨ Sprint 3: أرباح تفصيلية من Line Items (عندما متوفرة)
+        ...(earningsData && {
+          myEarnings: earningsData.myEarnings,
+          totalLineItems: earningsData.totalLineItems,
+          totalQuantity: earningsData.totalQuantity
+        })
+      };
+
+      projects.push(projectInfo);
     }
 
     // إحصائيات سريعة

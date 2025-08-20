@@ -211,6 +211,7 @@ export default function SubcategorySelector({
             return (
               <button
                 key={categoryId}
+                type="button"
                 onClick={() => setActiveCategory(categoryId)}
                 className={`
                   flex-1 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200

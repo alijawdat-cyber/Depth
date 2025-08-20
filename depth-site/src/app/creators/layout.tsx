@@ -242,7 +242,7 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
   }
 
   // في مسار الانضمام: اعرض المحتوى مباشرة بدون تخطيط المبدعين
-  if (isOnboardingRoute && !session) {
+  if (isOnboardingRoute) {
     return <>{children}</>;
   }
 
@@ -253,6 +253,13 @@ export default function CreatorLayout({ children }: CreatorLayoutProps) {
 
   if (session.user.role !== 'creator') {
     return null; // سيتم التوجيه في useEffect
+  }
+
+  // التحقق من إكمال الأونبوردنغ قبل عرض الـSidebar
+  if (creatorData && creatorData.status === 'onboarding_started') {
+    // إعادة توجيه لإكمال الأونبوردنغ
+    router.push('/creators/onboarding');
+    return null;
   }
 
   return (

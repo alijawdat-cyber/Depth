@@ -47,6 +47,12 @@ interface CreatorProject {
   rating: number | null;
   feedback: string | null;
   qualityScore: number; // نقاط الجودة
+  
+  // ✅ Sprint 3: Creator earnings (always enabled)
+  myEarnings?: number;      // إجمالي أرباحي من Line Items
+  totalLineItems?: number;  // عدد سطور العمل
+  totalQuantity?: number;   // إجمالي الكمية
+  
   performanceMetrics: {
     onTimePercentage: number;
     firstPassPercentage: number;
@@ -76,6 +82,9 @@ export default function CreatorProjectsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // ✨ Earnings card always enabled (feature flag removed)
+  const creatorEarningsCardEnabled = true;
   
   // فلاتر
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
@@ -422,6 +431,24 @@ export default function CreatorProjectsPage() {
                           <div className="flex items-center gap-1">
                             <DollarSign size={16} />
                             {formatCurrency(project.creatorNetRate)} (سعر صافي)
+                          </div>
+                        )}
+
+                        {/* ✨ Sprint 3: Enhanced earnings display (when feature flag enabled) */}
+                        {creatorEarningsCardEnabled && project.myEarnings && (
+                          <div className="mt-2 pt-2 border-t border-gray-100">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">أرباحي التفصيلية</span>
+                              <span className="font-medium text-emerald-700">
+                                {formatCurrency(project.myEarnings)}
+                              </span>
+                            </div>
+                            {project.totalLineItems && (
+                              <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                                <span>عدد بنود العمل</span>
+                                <span>{project.totalLineItems}</span>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

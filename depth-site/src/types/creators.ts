@@ -96,6 +96,14 @@ export interface CreatorEquipmentItem {
     model: string;
     description: string;
   };
+  // Phase 4: Equipment factor placeholder (under flag)
+  factorRef?: {
+    brand?: string;
+    model?: string;
+    usage?: 'light' | 'pro' | 'heavy';
+    level?: 'entry' | 'mid' | 'pro';
+    factor?: number; // Default 0 if no model/brand/usage
+  };
 }
 
 export interface EquipmentInventory {

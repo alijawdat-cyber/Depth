@@ -5,36 +5,14 @@ import { createContext, useContext, useReducer, useCallback, useEffect, useRef }
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
-import { showSuccess, showError } from '@/lib/toast';
-import type {
-  OnboardingFormData,
-  OnboardingState,
-  OnboardingContextType,
-  OnboardingStep,
-  AccountCreationData,
-  BasicInfoData,
-  ExperienceData,
-  PortfolioData,
-  AvailabilityData,
-  OnboardingProgress
-} from '@/types/onboarding';
+import { enqueueSuccess, enqueueError } from '@/lib/toast-coalescer';
+import { telemetry } from '@/lib/telemetry/client';
+import type { OnboardingFormData, OnboardingContextType, OnboardingStep, AccountCreationData, BasicInfoData, ExperienceData, PortfolioData, AvailabilityData, OnboardingProgress } from '@/types/onboarding';
 import type { EquipmentInventory } from '@/types/creators';
-
-// Feature Flags (Phase 0 baseline) - يمكن تعطيلها سريعاً
-const FF_ONBOARDING_V2 = process.env.NEXT_PUBLIC_ONBOARDING_V2 === 'true';
-const FF_COALESCE_TOASTS = process.env.NEXT_PUBLIC_ONBOARDING_COALESCE_TOASTS === 'true';
-const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
-const FF_SERIAL_SAVE_QUEUE = process.env.NEXT_PUBLIC_ONBOARDING_SERIAL_SAVE_QUEUE === 'true';
-const FF_PATCH_SAVE = process.env.NEXT_PUBLIC_ONBOARDING_PATCH_SAVE === 'true';
-// تجميع للاطلاع فقط لتفادي تحذيرات unused حالياً – ستُستخدم تدريجياً بالمراحل القادمة
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _ONBOARDING_FLAGS_SNAPSHOT = {
-  FF_ONBOARDING_V2,
-  FF_COALESCE_TOASTS,
-  FF_VALIDATION_V2,
-  FF_SERIAL_SAVE_QUEUE,
-  FF_PATCH_SAVE
-};
+import { initialFormData, initialState, LOCAL_STORAGE_LEGACY_KEY as LEGACY_KEY, LOCAL_STORAGE_KEY as NEW_KEY } from './onboarding/constants';
+import { onboardingReducer } from './onboarding/reducer';
+import { validateStructured, ValidationResult } from './onboarding/validation';
+// Feature flags removed: behavior now default. TODO: remove outputLevel fallback once legacy data migrated.
 
 // Phase 3: Serial Remote Save Queue refs & helpers (يُستخدم فقط عندما تكون الأعلام مفعّلة)
 // استخدام كائن بسيط بدلاً من useRef هنا لأننا في أعلى الملف خارج المكوّن.
@@ -48,122 +26,19 @@ async function backoff<T>(fn: () => Promise<T>, retries = 2, baseMs = 400): Prom
       if (attempt >= retries) throw e;
       await new Promise(r => setTimeout(r, baseMs * (2 ** attempt)));
       attempt++;
+      // Track retry attempts
+      telemetry.saveRetry(attempt);
     }
   }
 }
 
-// Phase 4: Validation V2 (Structured) – يعمل فقط مع FF_ONBOARDING_V2 && FF_VALIDATION_V2
-type FieldError = { field: string; code: string; message: string };
-type ValidationResult = { isValid: boolean; errors: FieldError[]; warnings: FieldError[] };
-const ERR_MSG_AR: Record<string, string> = {
-  req: 'هذا الحقل مطلوب',
-  email: 'صيغة البريد غير صحيحة',
-  min8: 'يجب أن تكون 8 أحرف على الأقل',
-  match: 'كلمتا السر غير متطابقتين',
-  phone: 'رقم الهاتف غير صالح',
-  agree: 'يجب الموافقة على الشروط',
-  role: 'يجب اختيار التخصص',
-  city: 'المدينة مطلوبة',
-  categories: 'اختر مجالاً واحداً على الأقل',
-  lang_min: 'يجب اختيار لغة واحدة على الأقل',
-  lang_max: 'لا يمكن اختيار أكثر من 3 لغات',
-  exp_level: 'مستوى الخبرة مطلوب',
-  availability: 'نوع التوفر مطلوب',
-  hours_range: 'عدد الساعات يجب أن يكون بين 1 و 60',
-  day_required: 'اختر يوماً واحداً على الأقل للعمل',
-  time_order: 'وقت البداية يجب أن يكون قبل وقت النهاية',
-  time_overlap: 'هناك تداخل في أوقات يوم واحد'
-  // لاحقاً: role, url, time, ...
-};
-const isEmpty = (v: unknown) => v == null || (typeof v === 'string' && v.trim() === '');
-const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-const isPhoneIQ = (s: string) => /^0?7\d{9}$/.test(s);
-
-function validateStepV2(step: number, data: OnboardingFormData): ValidationResult {
-  const errors: FieldError[] = [];
-  const warnings: FieldError[] = [];
-  if (step === 1) {
-    const acc = data.account || ({} as OnboardingFormData['account']);
-    if (isEmpty(acc.fullName)) errors.push({ field: 'account.fullName', code: 'req', message: ERR_MSG_AR.req });
-    if (isEmpty(acc.email) || !isEmail(acc.email)) errors.push({ field: 'account.email', code: 'email', message: ERR_MSG_AR.email });
-    if (isEmpty(acc.password) || (acc.password?.length || 0) < 8) errors.push({ field: 'account.password', code: 'min8', message: ERR_MSG_AR.min8 });
-    if (acc.password !== acc.confirmPassword) errors.push({ field: 'account.confirmPassword', code: 'match', message: ERR_MSG_AR.match });
-    if (!isEmpty(acc.phone) && !isPhoneIQ(acc.phone)) errors.push({ field: 'account.phone', code: 'phone', message: ERR_MSG_AR.phone });
-    if (!acc.agreeToTerms) errors.push({ field: 'account.agreeToTerms', code: 'agree', message: ERR_MSG_AR.agree });
-  }
-  else if (step === 2) {
-    const b = data.basicInfo || ({} as OnboardingFormData['basicInfo']);
-    if (isEmpty(b.role)) errors.push({ field: 'basicInfo.role', code: 'role', message: ERR_MSG_AR.role });
-    if (isEmpty(b.city)) errors.push({ field: 'basicInfo.city', code: 'city', message: ERR_MSG_AR.city });
-    if (!Array.isArray(b.primaryCategories) || b.primaryCategories.length === 0) {
-      errors.push({ field: 'basicInfo.primaryCategories', code: 'categories', message: ERR_MSG_AR.categories });
-    }
-    const langs = b.languages || [];
-    if (langs.length < 1) errors.push({ field: 'basicInfo.languages', code: 'lang_min', message: ERR_MSG_AR.lang_min });
-    if (langs.length > 3) errors.push({ field: 'basicInfo.languages', code: 'lang_max', message: ERR_MSG_AR.lang_max });
-  }
-  else if (step === 3) {
-    const exp = data.experience || ({} as OnboardingFormData['experience']);
-    if (isEmpty(exp.experienceLevel)) errors.push({ field: 'experience.experienceLevel', code: 'exp_level', message: ERR_MSG_AR.exp_level });
-    // تجربة التحقق من الاتساق (غير حاجب حالياً) – يمكن تفعيل warnings لاحقاً
-    // if (exp.experienceYears && !matchesLevel(exp.experienceLevel, exp.experienceYears)) {
-    //   warnings.push({ field: 'experience.experienceYears', code: 'exp_years_inconsistent', message: ERR_MSG_AR.exp_years_inconsistent });
-    // }
-  }
-  else if (step === 4) {
-    // خطوة اختيارية حالياً – لا أخطاء حاجبة
-  }
-  else if (step === 5) {
-    const av = data.availability || ({} as OnboardingFormData['availability']);
-    if (isEmpty(av.availability)) errors.push({ field: 'availability.availability', code: 'availability', message: ERR_MSG_AR.availability });
-    const hours = av.weeklyHours;
-    if (typeof hours !== 'number' || hours < 1 || hours > 60) {
-      errors.push({ field: 'availability.weeklyHours', code: 'hours_range', message: ERR_MSG_AR.hours_range });
-    }
-    // شرط اليوم الواحد فقط في وضع "مرن" (interpreted as flexible/custom)
-    if (av.availability === 'flexible') {
-      const hasPreferred = Array.isArray(av.preferredWorkdays) && av.preferredWorkdays.length > 0;
-      const hasWeekly = Array.isArray(av.weeklyAvailability) && av.weeklyAvailability.some(d => d.available);
-      if (!hasPreferred && !hasWeekly) {
-        errors.push({ field: 'availability.availability', code: 'day_required', message: ERR_MSG_AR.day_required });
-      }
-    }
-    // التحقق من النطاقات الزمنية (start < end) وعدم التداخل داخل اليوم
-    if (Array.isArray(av.weeklyAvailability)) {
-      const byDay: Record<string, { start: number; end: number }[]> = {};
-      av.weeklyAvailability.forEach(slot => {
-        if (!slot.available) return;
-        if (slot.startTime && slot.endTime) {
-          const start = Date.parse(`2000-01-01T${slot.startTime}`);
-            const end = Date.parse(`2000-01-01T${slot.endTime}`);
-          if (isNaN(start) || isNaN(end) || start >= end) {
-            errors.push({ field: 'availability.availability', code: 'time_order', message: ERR_MSG_AR.time_order });
-            return;
-          }
-          const rec = { start, end };
-          if (!byDay[slot.day]) byDay[slot.day] = [];
-          byDay[slot.day].push(rec);
-        }
-      });
-      Object.keys(byDay).forEach(day => {
-        const arr = byDay[day].sort((a,b)=>a.start-b.start);
-        for (let i=1;i<arr.length;i++) {
-          if (arr[i].start < arr[i-1].end) {
-            errors.push({ field: 'availability.availability', code: 'time_overlap', message: ERR_MSG_AR.time_overlap });
-            break;
-          }
-        }
-      });
-    }
-  }
-  return { isValid: errors.length === 0, errors, warnings };
-}
+// Phase 4: Validation V2 is handled by validateStructured (imported). Legacy inline implementation removed.
+function toastSuccess(message: string): void { enqueueSuccess(message); }
+function toastError(message: string): void { enqueueError(message); }
 
 
-// Phase 2 constants & helpers (Debounce + Hash local save)
-const LOCAL_SAVE_DEBOUNCE_MS = 600;
+// Phase 2 constants & helpers (Debounce + Hash local save) imported
 function djb2Hash(s: string) { let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h) ^ s.charCodeAt(i); return h>>>0; }
-function writeLocalSnapshot(key: string, data: unknown) { try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* ignore */ } }
 function sanitizeForLocal(data: OnboardingFormData) {
   return {
     currentStep: data.currentStep,
@@ -174,247 +49,14 @@ function sanitizeForLocal(data: OnboardingFormData) {
     portfolio: data.portfolio,
     availability: data.availability,
     equipment: data.equipment,
-    metadata: { startedAt: data.metadata.startedAt, source: data.metadata.source }
+    metadata: { startedAt: data.metadata.startedAt, source: data.metadata.source },
+    snapshotSchemaVersion: 1
   };
 }
 
-// الحالة الأولية للنموذج
-const initialFormData: OnboardingFormData = {
-  currentStep: 1,
-  completedSteps: [],
-  hasInteracted: false, // متغير لتتبع التفاعل مع النموذج
-  account: {
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    agreeToTerms: false
-  },
-  basicInfo: {
-    role: 'photographer',
-    city: '',
-    canTravel: false,
-    languages: ['ar'],
-    primaryCategories: []
-  },
-  experience: {
-    experienceLevel: 'beginner',
-    experienceYears: '0-1',
-    skills: [],
-    previousClients: []
-  },
-  portfolio: {
-    workSamples: [],
-    socialMedia: {}
-  },
-  availability: {
-    availability: 'flexible',
-    weeklyHours: 20,
-    preferredWorkdays: [],
-    weeklyAvailability: [], // الجدول الأسبوعي المفصل
-    timeZone: 'Asia/Baghdad',
-    urgentWork: false
-  },
-  equipment: {
-    cameras: [],
-    lenses: [],
-    lighting: [],
-    audio: [],
-    accessories: [],
-    specialSetups: []
-  },
-  metadata: {
-    startedAt: '', // سيتم تحديثه في useEffect لتجنب hydration mismatch
-    source: 'web'
-  }
-};
+// initial state imported
 
-// الحالة الأولية للـ UI
-const initialState: OnboardingState = {
-  loading: false,
-  saving: false,
-  error: null,
-  success: false,
-  canProceed: false,
-  autoSaveEnabled: true,
-  touchedFields: new Set<string>(),
-  showValidation: false,
-  loadingMessage: '' // رسالة التحميل المخصصة
-};
-
-// Action types للـ Reducer
-type OnboardingAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_LOADING_MESSAGE'; payload: string }
-  | { type: 'SET_SAVING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_SUCCESS'; payload: boolean }
-  | { type: 'SET_CAN_PROCEED'; payload: boolean }
-  | { type: 'MARK_FIELD_TOUCHED'; payload: string }
-  | { type: 'SET_SHOW_VALIDATION'; payload: boolean }
-  | { type: 'UPDATE_ACCOUNT'; payload: Partial<AccountCreationData> }
-  | { type: 'UPDATE_BASIC_INFO'; payload: Partial<BasicInfoData> }
-  | { type: 'UPDATE_EXPERIENCE'; payload: Partial<ExperienceData> }
-  | { type: 'UPDATE_PORTFOLIO'; payload: Partial<PortfolioData> }
-  | { type: 'UPDATE_AVAILABILITY'; payload: Partial<AvailabilityData> }
-  | { type: 'UPDATE_EQUIPMENT'; payload: Partial<EquipmentInventory> }
-  | { type: 'UPDATE_METADATA'; payload: Partial<OnboardingFormData['metadata']> }
-  | { type: 'SET_CURRENT_STEP'; payload: OnboardingStep }
-  | { type: 'COMPLETE_STEP'; payload: OnboardingStep }
-  | { type: 'SET_HAS_INTERACTED'; payload: boolean }
-  | { type: 'RESET_FORM' }
-  | { type: 'LOAD_SAVED_DATA'; payload: Partial<OnboardingFormData> };
-
-// Reducer للـ Onboarding
-function onboardingReducer(
-  state: { formData: OnboardingFormData; uiState: OnboardingState },
-  action: OnboardingAction
-): { formData: OnboardingFormData; uiState: OnboardingState } {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return { ...state, uiState: { ...state.uiState, loading: action.payload } };
-    
-    case 'SET_LOADING_MESSAGE':
-      return { ...state, uiState: { ...state.uiState, loadingMessage: action.payload } };
-    
-    case 'SET_SAVING':
-      return { ...state, uiState: { ...state.uiState, saving: action.payload } };
-    
-    case 'SET_ERROR':
-      return { ...state, uiState: { ...state.uiState, error: action.payload } };
-    
-    case 'SET_SUCCESS':
-      return { ...state, uiState: { ...state.uiState, success: action.payload } };
-    
-    case 'SET_CAN_PROCEED':
-      return { ...state, uiState: { ...state.uiState, canProceed: action.payload } };
-    
-    case 'MARK_FIELD_TOUCHED':
-      return { 
-        ...state, 
-        uiState: { 
-          ...state.uiState, 
-          touchedFields: new Set([...state.uiState.touchedFields, action.payload]) 
-        } 
-      };
-    
-    case 'SET_SHOW_VALIDATION':
-      return { ...state, uiState: { ...state.uiState, showValidation: action.payload } };
-    
-    case 'UPDATE_ACCOUNT':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          account: { ...state.formData.account, ...action.payload }
-        }
-      };
-    
-    case 'UPDATE_BASIC_INFO':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          basicInfo: { ...state.formData.basicInfo, ...action.payload }
-        }
-      };
-    
-    case 'UPDATE_EXPERIENCE':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          experience: { ...state.formData.experience, ...action.payload }
-        }
-      };
-    
-    case 'UPDATE_PORTFOLIO':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          portfolio: { ...state.formData.portfolio, ...action.payload }
-        }
-      };
-    
-    case 'UPDATE_AVAILABILITY':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          availability: { ...state.formData.availability, ...action.payload }
-        }
-      };
-    
-    case 'UPDATE_EQUIPMENT':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          equipment: { 
-            cameras: [],
-            lenses: [],
-            lighting: [],
-            audio: [],
-            accessories: [],
-            specialSetups: [],
-            ...state.formData.equipment, 
-            ...action.payload 
-          }
-        }
-      };
-    
-    case 'UPDATE_METADATA':
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          metadata: { ...state.formData.metadata, ...action.payload }
-        }
-      };
-    
-    case 'SET_CURRENT_STEP':
-      return {
-        ...state,
-        formData: { ...state.formData, currentStep: action.payload }
-      };
-    
-    case 'COMPLETE_STEP':
-      const completedSteps = [...state.formData.completedSteps];
-      if (!completedSteps.includes(action.payload)) {
-        completedSteps.push(action.payload);
-      }
-      return {
-        ...state,
-        formData: {
-          ...state.formData,
-          completedSteps: completedSteps.sort()
-        }
-      };
-    
-    case 'SET_HAS_INTERACTED':
-      return {
-        ...state,
-        formData: { ...state.formData, hasInteracted: action.payload }
-      };
-    
-    case 'RESET_FORM':
-      return {
-        formData: initialFormData,
-        uiState: initialState
-      };
-    
-    case 'LOAD_SAVED_DATA':
-      return {
-        ...state,
-        formData: { ...state.formData, ...action.payload }
-      };
-    
-    default:
-      return state;
-  }
-}
+// (Inline duplicate reducer removed – using imported onboardingReducer)
 
 // Context للـ Onboarding
 export const OnboardingContext = createContext<OnboardingContextType | null>(null);
@@ -437,232 +79,129 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     uiState: initialState
   });
 
-  // مفاتيح التخزين المحلي
-  const LOCAL_STORAGE_KEY = 'onboarding_progress_v1';
-  const localPersistedOnceRef = useRef(false); // منع الكتابة المكررة دون داعٍ عند أول تحميل
+  // مفاتيح التخزين المحلي (مستوردة من constants)
+  const LOCAL_STORAGE_KEY = LEGACY_KEY;
+  const LOCAL_STORAGE_NEW_KEY = NEW_KEY;
+  // removed unused localPersistedOnceRef
   const sessionPersistRef = useRef(false); // للتأكد أننا حفظنا في الخادم بعد توفر الجلسة مرة واحدة مبكرًا
   const hasLoadedRef = useRef(false); // منع تحميل البيانات المحفوظة أكثر من مرة
-  const isManualNavigationRef = useRef(false); // تتبع الانتقال اليدوي مقابل الاستعادة
   // Phase 2 refs
-  const localSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // removed legacy debounce timer ref (no longer used)
   const localHashRef = useRef<number>(0);
   const lastAutoHashRef = useRef<string>('');
+  // Phase 1 storage migration refs
+  const loadedFromRef = useRef<'new'|'old'|'none'>('none');
+  // removed oldKeyDeletedRef & firstSuccessfulNewWriteRef (migration complete)
 
-  // تحميل التقدم من localStorage (تفاؤلي قبل طلب الشبكة)
+  // Helper: set loading with message
+  const setLoadingWithMessage = useCallback((loading: boolean, msg?: string) => {
+    dispatch({ type: 'SET_LOADING', payload: loading });
+    dispatch({ type: 'SET_LOADING_MESSAGE', payload: msg || '' });
+  }, []);
+
+  // Helper: step success message
+  const getStepSuccessMessage = useCallback((step: number) => {
+    switch (step) {
+      case 1: return 'تم حفظ بيانات الحساب ✅';
+      case 2: return 'تم حفظ المعلومات الأساسية ✅';
+      case 3: return 'تم حفظ الخبرة ✅';
+      case 4: return 'تم حفظ الملف ✅';
+      case 5: return 'تم حفظ التوفر ✅';
+      default: return 'تم الحفظ ✅';
+    }
+  }, []);
+
+  // Local snapshot flush
+  const flushLocalSave = useCallback((data?: OnboardingFormData) => {
+    try {
+      if (typeof window === 'undefined') return;
+      const target = data || formData;
+      if (target.currentStep <= 1) return;
+      const sanitized = sanitizeForLocal(target);
+      const serialized = JSON.stringify(sanitized);
+      const hash = djb2Hash(serialized);
+      if (hash === localHashRef.current) return;
+      window.localStorage.setItem(LOCAL_STORAGE_NEW_KEY, serialized);
+      localHashRef.current = hash;
+      lastAutoHashRef.current = Date.now().toString();
+    } catch {/* ignore */}
+  }, [formData, LOCAL_STORAGE_NEW_KEY]);
+
+  // Remote load
+  const loadSavedProgress = useCallback(async () => {
+    if (!session?.user?.email) return;
+    try {
+      const res = await fetch('/api/creators/onboarding/progress');
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json?.data?.data) {
+        const data = json.data.data as Partial<OnboardingFormData>;
+        const mergedStep = Math.max(formData.currentStep, data.currentStep || 1) as OnboardingStep;
+        const mergedCompleted = Array.from(new Set([...(formData.completedSteps||[]), ...(data.completedSteps||[])])).sort();
+        dispatch({ type: 'LOAD_SAVED_DATA', payload: { ...data, currentStep: mergedStep, completedSteps: mergedCompleted } });
+        if (mergedStep !== formData.currentStep) dispatch({ type: 'SET_CURRENT_STEP', payload: mergedStep });
+      }
+    } catch (e) {
+      logger.onboardingDebug('Remote load progress failed', { error: String(e) });
+    }
+  }, [session?.user?.email, formData.currentStep, formData.completedSteps]);
+
+  // تحميل التقدم من localStorage (عرض فقط، بدون تنقل)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return;
-      // تحقق من بنية أساسية
-      const localStep = typeof parsed.currentStep === 'number' ? parsed.currentStep : 1;
-      if (localStep <= 1) return; // لا حاجة لتطبيق إذا ما زال في الخطوة الأولى
-      
-      // منع الاستعادة إذا كان هناك انتقال يدوي حديث
-      if (isManualNavigationRef.current) return;
-      
-      // منع الداونجريد
-      const mergedCurrentStep = Math.max(formData.currentStep, localStep) as OnboardingStep;
-      const mergedCompleted = Array.from(new Set([
-        ...formData.completedSteps,
-        ...(Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [])
-      ])).sort();
-      
-      // فقط تطبيق إذا كانت البيانات مختلفة
-      if (mergedCurrentStep !== formData.currentStep || 
-          JSON.stringify(mergedCompleted) !== JSON.stringify(formData.completedSteps)) {
-        logger.onboardingDebug('Local restore snapshot', { raw, parsed, mergedCurrentStep, mergedCompleted });
-        dispatch({ type: 'LOAD_SAVED_DATA', payload: {
-          ...parsed,
-          currentStep: mergedCurrentStep,
-          completedSteps: mergedCompleted
-        }});
-        dispatch({ type: 'SET_CURRENT_STEP', payload: mergedCurrentStep });
+      {
+        // Phase 1: قراءة البيانات المحفوظة للعرض فقط
+        const rawNew = window.localStorage.getItem(LOCAL_STORAGE_NEW_KEY);
+        if (rawNew) {
+          loadedFromRef.current = 'new';
+          logger.onboardingDebug('Local restore snapshot (new key)', { key: LOCAL_STORAGE_NEW_KEY });
+          const parsed = JSON.parse(rawNew);
+          if (parsed && typeof parsed === 'object') {
+            // حفظ البيانات فقط بدون تغيير الخطوة الحالية
+            if (parsed.currentStep > 1) {
+              const mergedCompleted = Array.from(new Set([
+                ...formData.completedSteps,
+                ...(Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [])
+              ])).sort();
+              // تحديث البيانات فقط، الخطوة تبقى كما هي
+              dispatch({ type: 'LOAD_SAVED_DATA', payload: { ...parsed, currentStep: formData.currentStep, completedSteps: mergedCompleted }});
+            }
+          }
+        } else {
+          // fallback legacy once
+            const rawLegacy = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (rawLegacy) {
+              loadedFromRef.current = 'old';
+              logger.onboardingDebug('Local restore snapshot (legacy key)', { key: LOCAL_STORAGE_KEY });
+              const parsed = JSON.parse(rawLegacy);
+              if (parsed && typeof parsed === 'object') {
+                // حفظ البيانات فقط بدون تغيير الخطوة الحالية
+                if (parsed.currentStep > 1) {
+                  const mergedCompleted = Array.from(new Set([
+                    ...formData.completedSteps,
+                    ...(Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [])
+                  ])).sort();
+                  // تحديث البيانات فقط، الخطوة تبقى كما هي
+                  dispatch({ type: 'LOAD_SAVED_DATA', payload: { ...parsed, currentStep: formData.currentStep, completedSteps: mergedCompleted }});
+                }
+              }
+            } else {
+              loadedFromRef.current = 'none';
+            }
+        }
+        if (loadedFromRef.current !== 'none') { logger.onboardingDebug('Local load source', { source: loadedFromRef.current }); }
       }
-    } catch {
+    } catch (e) {
       // ignore parsing errors
+      console.warn('[onboarding] local restore error', e);
     }
-  // نريد التشغيل مرة واحدة فقط عند mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // دالة لحفظ التقدم محليًا (تفاؤليًا) – فقط بعد الخطوة 1
-  const persistLocalProgress = useCallback((data: OnboardingFormData) => {
-    if (typeof window === 'undefined') return;
-    if (data.currentStep <= 1) return;
-    try {
-      const snapshot = {
-        currentStep: data.currentStep,
-        completedSteps: data.completedSteps,
-        account: {
-          fullName: data.account.fullName,
-          email: data.account.email,
-          phone: data.account.phone,
-          agreeToTerms: data.account.agreeToTerms
-        },
-        basicInfo: data.basicInfo,
-        experience: data.experience,
-        portfolio: data.portfolio,
-        availability: data.availability,
-        equipment: data.equipment,
-        metadata: { startedAt: data.metadata.startedAt, source: data.metadata.source }
-      };
-      logger.onboardingDebug('Local persist snapshot', { snapshot });
-      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snapshot));
-    } catch {
-      // ignore localStorage write
-    }
-  }, []);
+  // Removed legacy persistLocalProgress (migration complete, only flushLocalSave used)
 
   // Phase 2 schedule & flush (guarded by flag)
-  const scheduleLocalSave = useCallback((data: OnboardingFormData) => {
-    if (!FF_ONBOARDING_V2) return;
-    if (typeof window === 'undefined') return;
-    if (data.currentStep <= 1) return;
-    if (localSaveTimerRef.current) clearTimeout(localSaveTimerRef.current);
-    localSaveTimerRef.current = setTimeout(() => {
-      const clean = sanitizeForLocal(data);
-      const str = JSON.stringify(clean);
-      const h = djb2Hash(str);
-      if (h !== localHashRef.current) {
-        writeLocalSnapshot('onboarding:data', clean);
-        localHashRef.current = h;
-        logger.onboardingDebug('Local debounce save (hash changed)', { h, step: data.currentStep });
-      }
-    }, LOCAL_SAVE_DEBOUNCE_MS);
-  }, []);
-
-  const flushLocalSave = useCallback((data?: OnboardingFormData) => {
-    if (!FF_ONBOARDING_V2) return;
-    if (typeof window === 'undefined') return;
-    if (localSaveTimerRef.current) { clearTimeout(localSaveTimerRef.current); localSaveTimerRef.current = null; }
-    const target = data ?? formData;
-    if (target.currentStep <= 1) return;
-    const clean = sanitizeForLocal(target);
-    const str = JSON.stringify(clean);
-    const h = djb2Hash(str);
-    if (h !== localHashRef.current) {
-      writeLocalSnapshot('onboarding:data', clean);
-      localHashRef.current = h;
-      logger.onboardingDebug('Local flush save (hash changed)', { h, step: target.currentStep });
-    }
-  }, [formData]);
-
-  // حفظ محلي عند تغير الخطوة أو إكمال خطوة (مع حراسة لمنع انفجار الكتابات)
-  useEffect(() => {
-    if (FF_ONBOARDING_V2) {
-      if (!localPersistedOnceRef.current && formData.currentStep > 1) {
-        flushLocalSave(formData); // baseline
-        localPersistedOnceRef.current = true;
-        return;
-      }
-      scheduleLocalSave(formData);
-      return;
-    }
-    if (!localPersistedOnceRef.current && formData.currentStep > 1) {
-      persistLocalProgress(formData);
-      localPersistedOnceRef.current = true;
-      return;
-    }
-    if (formData.currentStep > 1) persistLocalProgress(formData);
-  }, [formData, formData.currentStep, formData.completedSteps, formData.account.fullName, formData.account.email, persistLocalProgress, scheduleLocalSave, flushLocalSave]);
-
-  // سيتم إضافة تأثير حفظ في الخادم بعد تعريف saveProgress
-
-  // تحديث startedAt بعد mount لتجنب hydration mismatch
-  useEffect(() => {
-    if (!formData.metadata.startedAt) {
-      dispatch({ 
-        type: 'UPDATE_METADATA', 
-        payload: { startedAt: new Date().toISOString() } 
-      });
-    }
-  }, [formData.metadata.startedAt]);
-
-    // Helper لتحديد رسالة النجاح لكل خطوة
-  const getStepSuccessMessage = useCallback((step: number): string => {
-    // توحيد الرسائل (Phase 1)
-    const messages: Record<number, string> = {
-      1: 'تم إنشاء الحساب بنجاح! 🎉',
-      2: 'تم حفظ المعلومات الأساسية ✅',
-      3: 'تم حفظ الخبرة والمهارات �',
-      4: 'تم حفظ معرض الأعمال 🎨',
-      5: 'اكتمل التسجيل بنجاح 🚀'
-    };
-    return messages[step] || 'تم الحفظ بنجاح!';
-  }, []);
-
-  // Helper لتحديث حالة التحميل مع رسالة
-  const setLoadingWithMessage = useCallback((loading: boolean, message: string = 'جارٍ التحميل...') => {
-    dispatch({ type: 'SET_LOADING', payload: loading });
-    dispatch({ type: 'SET_LOADING_MESSAGE', payload: message });
-  }, []);
-
-  // تحميل البيانات المحفوظة عند بدء الجلسة
-  const formDataRef = useRef(formData);
-  formDataRef.current = formData; // تحديث ref في كل render
-  
-  const loadSavedProgress = useCallback(async () => {
-    // لا نحمل بدون جلسة أو إذا تم التحميل مسبقاً أو إذا كان انتقال يدوي حديث
-    if (!session?.user?.email || hasLoadedRef.current || isManualNavigationRef.current) return;
-
-    dispatch({ type: 'SET_LOADING', payload: true });
-
-    try {
-      const response = await fetch('/api/creators/onboarding/progress');
-      if (!response.ok) {
-        // تجاهل بصمت ولكن نضمن إيقاف التحميل
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
-      
-      const result = await response.json();
-      const savedFormData = result?.data?.formData || result?.data;
-      if (!savedFormData) {
-        // لا توجد بيانات محفوظة - إيقاف التحميل
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
-
-      // استخدام ref للحصول على أحدث بيانات
-      const currentFormData = formDataRef.current;
-      const mergedCurrentStep: number = Math.max(
-        currentFormData.currentStep || 1,
-        typeof savedFormData.currentStep === 'number' ? savedFormData.currentStep : 1
-      );
-
-      // دمج completedSteps (اتحاد)
-      const mergedCompleted = Array.from(
-        new Set([
-          ...(currentFormData.completedSteps || []),
-          ...(savedFormData.completedSteps || [])
-        ])
-      ).sort();
-
-      // فقط تطبيق البيانات المحفوظة إذا كانت مختلفة عن الحالية
-      if (mergedCurrentStep !== currentFormData.currentStep || 
-          JSON.stringify(mergedCompleted) !== JSON.stringify(currentFormData.completedSteps)) {
-        
-        // إستراتيجية الدمج: نُفضل البيانات المحلية للحقل إذا كان المستخدم تفاعل (hasInteracted)
-        // وإلا نأخذ المحفوظ. (مبسطة)
-        const merged: Partial<OnboardingFormData> = {
-          ...savedFormData,
-          ...currentFormData,
-          completedSteps: mergedCompleted as OnboardingFormData['completedSteps'],
-          currentStep: mergedCurrentStep as OnboardingStep
-        };
-
-        dispatch({ type: 'LOAD_SAVED_DATA', payload: merged });
-        dispatch({ type: 'SET_CURRENT_STEP', payload: mergedCurrentStep as OnboardingStep });
-      }
-    } catch (error) {
-      console.error('Failed to load saved progress:', error);
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  }, [session?.user?.email]);
 
   // حفظ التقدم تلقائياً
   const saveProgress = useCallback(async (): Promise<boolean> => {
@@ -677,15 +216,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     try {
       // Sanitization للبيانات الحساسة عند الحفظ (Phase 1)
-      const safeFormData = FF_ONBOARDING_V2 ? {
+      const safeFormData = {
         ...formData,
-        account: {
-          ...formData.account,
-          // منع إرسال كلمات المرور بعد الإنشاء
-          password: '',
-          confirmPassword: ''
-        }
-      } : formData;
+        account: { ...formData.account, password: '', confirmPassword: '' }
+      };
 
       const response = await fetch('/api/creators/onboarding/progress', {
         method: 'PUT',
@@ -727,39 +261,40 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   // Phase 3: غلاف تسلسلي لاستدعاء الحفظ البعيد
   const callRemoteSave = useCallback(() => {
-    if (!FF_ONBOARDING_V2 || !FF_SERIAL_SAVE_QUEUE) return saveProgress();
-
     saveChainRefGlobal.current = saveChainRefGlobal.current
       .then(() => backoff(() => saveProgress()).then(() => undefined))
-      .catch(err => {
-        console.error('[onboarding] save failed (queued)', err);
-      });
+      .catch(err => console.error('[onboarding] save failed (queued)', err));
     return saveChainRefGlobal.current;
   }, [saveProgress]);
 
-  // حفظ في الخادم بمجرد توفر الجلسة لأول مرة بعد الانتقال (بعد تعريف saveProgress)
+  // حفظ في الخادم بمجرد توفر الجلسة لأول مرة (بعد تعريف saveProgress)
   useEffect(() => {
     if (session?.user?.email && formData.currentStep > 1 && !sessionPersistRef.current) {
-      // Phase 3 queue wrap
+      // حفظ تلقائي عند توفر الجلسة
       callRemoteSave();
       sessionPersistRef.current = true;
     }
-  }, [session?.user?.email, formData.currentStep, callRemoteSave, saveProgress]);
+  }, [session?.user?.email, formData.currentStep, callRemoteSave]);
 
   // التحقق من صحة الخطوة الحالية
   const validateCurrentStep = useCallback((): boolean => {
     const step = formData.currentStep;
     
+    // فحص أمان لبيانات النموذج
+    if (!formData || !formData.account || !formData.basicInfo || !formData.experience || !formData.availability) {
+      return false;
+    }
+    
     switch (step) {
       case 1: // Account Creation
-        const isValidEmail = formData.account.email.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email);
-        const isValidPhone = formData.account.phone.trim();
-        const isValidName = formData.account.fullName.trim();
+        const isValidEmail = formData.account.email?.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email);
+        const isValidPhone = formData.account.phone?.trim();
+        const isValidName = formData.account.fullName?.trim();
         // If already signed in, don't force password validation again
         if (session?.user) {
           return !!(isValidName && isValidEmail && isValidPhone && formData.account.agreeToTerms);
         }
-        const isValidPassword = formData.account.password.length >= 8;
+        const isValidPassword = formData.account.password && formData.account.password.length >= 8;
         const passwordsMatch = formData.account.password === formData.account.confirmPassword;
         logger.onboardingDebug('Step 1 validation', {
           isValidName,
@@ -782,8 +317,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 2: // Basic Info
         return !!(
           formData.basicInfo.role &&
-          formData.basicInfo.city.trim() &&
-          formData.basicInfo.primaryCategories.length > 0
+          formData.basicInfo.city?.trim() &&
+          formData.basicInfo.primaryCategories && formData.basicInfo.primaryCategories.length > 0
         );
       
       case 3: // Experience
@@ -799,7 +334,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       case 5: // Availability
         const hasBasicAvailability = !!(
           formData.availability.availability &&
-          formData.availability.weeklyHours > 0
+          formData.availability.weeklyHours && formData.availability.weeklyHours > 0
         );
         
         const hasWorkdays = (formData.availability.preferredWorkdays?.length || 0) > 0;
@@ -822,17 +357,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   }, [formData, session?.user]);
 
   // Phase 4: واجهات Validation V2 الآمنة
-  const getStepValidationResult = useCallback((): ValidationResult => {
-    if (FF_ONBOARDING_V2 && FF_VALIDATION_V2) {
-      return validateStepV2(formData.currentStep, formData);
-    }
-    return { isValid: true, errors: [], warnings: [] };
-  }, [formData]);
-
-  const canProceedSafe = useCallback((): boolean => {
-    if (FF_ONBOARDING_V2 && FF_VALIDATION_V2) return getStepValidationResult().isValid;
-    return validateCurrentStep();
-  }, [getStepValidationResult, validateCurrentStep]);
+  const getStepValidationResult = useCallback((): ValidationResult => validateStructured(formData.currentStep, formData), [formData]);
+  const canProceedSafe = useCallback(() => getStepValidationResult().isValid, [getStepValidationResult]);
 
   // الانتقال للخطوة التالية
   const nextStep = useCallback(async (): Promise<boolean> => {
@@ -840,16 +366,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     logger.onboardingDebug(`Current session: ${session?.user ? 'logged in' : 'not logged in'}`);
     logger.onboardingDebug(`Form data validation: ${canProceedSafe()}`);
     
-    // تسجيل الانتقال اليدوي
-    isManualNavigationRef.current = true;
-    
     // تفعيل عرض الأخطاء عند محاولة الانتقال
     dispatch({ type: 'SET_SHOW_VALIDATION', payload: true });
     
-  if (!canProceedSafe()) {
+    if (!canProceedSafe()) {
       logger.onboardingDebug(`Validation failed for step ${formData.currentStep}`);
       dispatch({ type: 'SET_ERROR', payload: 'يرجى إكمال جميع الحقول المطلوبة' });
-      isManualNavigationRef.current = false; // إعادة تعيين عند الفشل
       return false;
     }
     
@@ -888,7 +410,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           logger.onboardingDebug('Email exists: attempting immediate silent sign-in');
           const signedIn = await silentSignInWithRetry();
           if (signedIn) {
-            showSuccess('تم التحقق من الحساب ✅');
+            toastSuccess('تم التحقق من الحساب ✅');
             dispatch({ type: 'COMPLETE_STEP', payload: 1 });
             dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
             dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
@@ -909,39 +431,26 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const result = await response.json();
         logger.onboardingDebug('Account created successfully', { userId: result?.data?.userId });
         
-        // تسجيل الانتقال اليدوي لمنع تضارب مع loadSavedProgress
-        isManualNavigationRef.current = true;
-        
-        // انتقال فوري قبل محاولة تسجيل الدخول لخفض زمن الإدراك
+        // انتقال فوري بدون انتظار تسجيل الدخول لتجنب الفلاش
         dispatch({ type: 'COMPLETE_STEP', payload: 1 });
         dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
         dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
 
         // Phase 1: تصفير كلمات المرور في الذاكرة بعد نجاح الإنشاء (لوضع أمني أفضل)
-        if (FF_ONBOARDING_V2) {
-          dispatch({ type: 'UPDATE_ACCOUNT', payload: { password: '', confirmPassword: '' } });
-        }
+        dispatch({ type: 'UPDATE_ACCOUNT', payload: { password: '', confirmPassword: '' } });
         
         // حفظ محلي تفاؤلي فوري
-        const sanitizedForLocal = FF_ONBOARDING_V2 ? { ...formData, account: { ...formData.account, password: '', confirmPassword: '' }, currentStep: 2, completedSteps: [...formData.completedSteps, 1] } : { ...formData, currentStep: 2, completedSteps: [...formData.completedSteps, 1] };
-        if (FF_ONBOARDING_V2) {
-          flushLocalSave(sanitizedForLocal as OnboardingFormData);
-        } else {
-          persistLocalProgress(sanitizedForLocal as OnboardingFormData);
-        }
+        const sanitizedForLocal = { ...formData, account: { ...formData.account, password: '', confirmPassword: '' }, currentStep: 2, completedSteps: [...formData.completedSteps, 1] };
+        flushLocalSave(sanitizedForLocal as OnboardingFormData);
         setLoadingWithMessage(false, '');
-        showSuccess('تم إنشاء الحساب! نجهز الخطوة التالية...');
+        toastSuccess('تم إنشاء الحساب بنجاح ✅');
 
-        // تشغيل تسجيل الدخول بصمت في الخلفية بدون حجب الانتقال
+        // تشغيل تسجيل الدخول بصمت في الخلفية بدون تأثير على التنقل
         silentSignInWithRetry().then(ok => {
           if (!ok) {
-            showError('تم إنشاء الحساب، أعد تسجيل الدخول لاحقًا لضمان الحفظ السحابي');
+            toastError('تم إنشاء الحساب، أعد تسجيل الدخول لاحقًا لضمان الحفظ السحابي');
           } else {
             logger.onboardingDebug('Silent sign-in completed post-transition');
-            // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد تسجيل الدخول الناجح
-            setTimeout(() => {
-              isManualNavigationRef.current = false;
-            }, 1000); // انتظار ثانية واحدة للتأكد من استقرار الحالة
           }
         });
         return true;
@@ -955,23 +464,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // للخطوات الأخرى: حفظ التقدم قبل الانتقال
     if (formData.currentStep > 1) {
-      if (FF_ONBOARDING_V2 && FF_SERIAL_SAVE_QUEUE) {
-        // انتقال تفاؤلي: جدولة الحفظ وعدم الانتظار
-        setLoadingWithMessage(true, 'حفظ سريع...');
-        callRemoteSave(); // لا await
-        showSuccess(getStepSuccessMessage(formData.currentStep));
-      } else {
-        // السلوك القديم (انتظار الحفظ)
-        setLoadingWithMessage(true, 'حفظ سريع...');
-        const saved = await saveProgress();
-        if (!saved) {
-          setLoadingWithMessage(false, '');
-          isManualNavigationRef.current = false;
-          return false;
-        }
-        showSuccess(getStepSuccessMessage(formData.currentStep));
+      setLoadingWithMessage(true, 'حفظ سريع...');
+      const saved = await saveProgress();
+      if (!saved) { 
+        setLoadingWithMessage(false, ''); 
+        return false; 
       }
-      // لا نضيف انتظار مصطنع؛ الانتقال الفوري يبدو أكثر احترافية
+      toastSuccess(getStepSuccessMessage(formData.currentStep));
     }
     
     // تسجيل إكمال الخطوة
@@ -979,37 +478,26 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     
     // الانتقال للخطوة التالية
     if (formData.currentStep < 5) {
-  if (FF_ONBOARDING_V2) flushLocalSave(formData);
-  const nextStepNum = (formData.currentStep + 1) as OnboardingStep;
+      flushLocalSave(formData);
+      const nextStepNum = (formData.currentStep + 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: nextStepNum });
       // إعادة تعيين validation للخطوة الجديدة
       dispatch({ type: 'SET_SHOW_VALIDATION', payload: false });
       setLoadingWithMessage(false, '');
       
-      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
-      setTimeout(() => {
-        isManualNavigationRef.current = false;
-      }, 500);
-      
       return true;
     }
     
     setLoadingWithMessage(false, '');
-    isManualNavigationRef.current = false; // إعادة تعيين في النهاية
     return false;
-  }, [formData, session, saveProgress, setLoadingWithMessage, getStepSuccessMessage, persistLocalProgress, flushLocalSave, callRemoteSave, canProceedSafe]);
+  }, [formData, session, saveProgress, setLoadingWithMessage, getStepSuccessMessage, flushLocalSave, canProceedSafe]);
 
   // العودة للخطوة السابقة
   const prevStep = useCallback(() => {
     if (formData.currentStep > 1) {
-      isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
-  if (FF_ONBOARDING_V2) flushLocalSave(formData);
-  const prevStepNum = (formData.currentStep - 1) as OnboardingStep;
+      flushLocalSave(formData);
+      const prevStepNum = (formData.currentStep - 1) as OnboardingStep;
       dispatch({ type: 'SET_CURRENT_STEP', payload: prevStepNum });
-      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
-      setTimeout(() => {
-        isManualNavigationRef.current = false;
-      }, 500);
     }
   }, [formData, flushLocalSave]);
 
@@ -1017,13 +505,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const goToStep = useCallback((step: OnboardingStep) => {
     // التحقق من إمكانية الانتقال
     if (step <= formData.currentStep || formData.completedSteps.includes(step - 1 as OnboardingStep)) {
-      isManualNavigationRef.current = true; // تسجيل الانتقال اليدوي
-  if (FF_ONBOARDING_V2) flushLocalSave(formData);
-  dispatch({ type: 'SET_CURRENT_STEP', payload: step });
-      // السماح لـ loadSavedProgress بالعمل مرة أخرى بعد انتهاء الانتقال
-      setTimeout(() => {
-        isManualNavigationRef.current = false;
-      }, 500);
+      flushLocalSave(formData);
+      dispatch({ type: 'SET_CURRENT_STEP', payload: step });
     }
   }, [formData, flushLocalSave]);
 
@@ -1082,16 +565,17 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       
       if (response.ok && responseData.success) {
         dispatch({ type: 'SET_SUCCESS', payload: true });
-  showSuccess('تم إرسال طلبك بنجاح ووضعه قيد المراجعة ✅');
+        toastSuccess('تم إرسال طلبك بنجاح ووضعه قيد المراجعة ✅');
         
-        // توجيه للصفحة التالية بعد النجاح
+        // Phase 7: تتبع نجاح الإرسال
+        telemetry.submitSuccess();        // توجيه للصفحة التالية بعد النجاح
         setTimeout(() => {
           try {
-            router.push('/creators');
+            router.push('/creators/projects');
           } catch (routerError) {
             logger.onboardingDebug('Router push error', { error: String(routerError) });
             // fallback لإعادة تحميل الصفحة
-            window.location.href = '/creators';
+            window.location.href = '/creators/projects';
           }
         }, 2000);
         
@@ -1103,7 +587,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
       logger.onboardingDebug('Submit error', { error: errorMessage, originalError: error });
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
-      showError(errorMessage);
+      toastError(errorMessage);
+      
+      // Phase 7: تتبع فشل الإرسال  
+      telemetry.submitFail(errorMessage);
       return false;
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
@@ -1140,7 +627,20 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   const updateAvailability = useCallback((data: Partial<AvailabilityData>) => {
     setHasInteracted();
-    dispatch({ type: 'UPDATE_AVAILABILITY', payload: data });
+    // Phase 2: اشتقاق weeklyHours ومنع كتابة preferredWorkdays تحت العلم الموحد
+  const payload: Partial<AvailabilityData> = { ...data };
+    if (payload.weeklyAvailability) {
+      const hrs = payload.weeklyAvailability
+        .filter(d => d.available && d.startTime && d.endTime)
+        .reduce((sum, d) => {
+          const start = Date.parse(`2000-01-01T${d.startTime}`);
+          const end = Date.parse(`2000-01-01T${d.endTime}`);
+          if (isNaN(start) || isNaN(end) || end <= start) return sum;
+          return sum + (end - start) / (1000 * 60 * 60);
+        }, 0);
+      payload.weeklyHours = parseFloat(hrs.toFixed(1));
+    }
+    dispatch({ type: 'UPDATE_AVAILABILITY', payload });
   }, [setHasInteracted]);
 
   const updateEquipment = useCallback((data: Partial<EquipmentInventory>) => {
@@ -1157,22 +657,27 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const getStepErrors = useCallback((step: OnboardingStep): string[] => {
     const errors: string[] = [];
     
+    // فحص أمان لبيانات النموذج
+    if (!formData || !formData.account || !formData.basicInfo || !formData.experience || !formData.availability) {
+      return ['بيانات النموذج غير مكتملة'];
+    }
+    
     switch (step) {
       case 1:
-        if (!formData.account.fullName.trim()) errors.push('الاسم الكامل مطلوب');
-        if (!formData.account.email.trim()) errors.push('البريد الإلكتروني مطلوب');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email)) errors.push('البريد الإلكتروني غير صحيح');
+        if (!formData.account.fullName?.trim()) errors.push('الاسم الكامل مطلوب');
+        if (!formData.account.email?.trim()) errors.push('البريد الإلكتروني مطلوب');
+        if (formData.account.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.account.email)) errors.push('البريد الإلكتروني غير صحيح');
         if (!formData.account.password) errors.push('كلمة المرور مطلوبة');
-        if (formData.account.password.length < 8) errors.push('كلمة المرور قصيرة جداً');
+        if (formData.account.password && formData.account.password.length < 8) errors.push('كلمة المرور قصيرة جداً');
         if (formData.account.password !== formData.account.confirmPassword) errors.push('كلمات المرور غير متطابقة');
-        if (!formData.account.phone.trim()) errors.push('رقم الهاتف مطلوب');
+        if (!formData.account.phone?.trim()) errors.push('رقم الهاتف مطلوب');
         if (!formData.account.agreeToTerms) errors.push('يجب الموافقة على الشروط');
         break;
       
       case 2:
         if (!formData.basicInfo.role) errors.push('التخصص مطلوب');
-        if (!formData.basicInfo.city.trim()) errors.push('المدينة مطلوبة');
-        if (formData.basicInfo.primaryCategories.length === 0) errors.push('يجب اختيار مجال واحد على الأقل');
+        if (!formData.basicInfo.city?.trim()) errors.push('المدينة مطلوبة');
+        if (!formData.basicInfo.primaryCategories || formData.basicInfo.primaryCategories.length === 0) errors.push('يجب اختيار مجال واحد على الأقل');
         break;
       
       case 3:
@@ -1188,12 +693,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       
       case 5:
         if (!formData.availability.availability) errors.push('نوع التوفر مطلوب');
-        if (formData.availability.weeklyHours <= 0) errors.push('عدد الساعات الأسبوعية مطلوب');
+        if (!formData.availability.weeklyHours || formData.availability.weeklyHours <= 0) errors.push('عدد الساعات الأسبوعية مطلوب');
         
         // التحقق من التوفر الأسبوعي أو الأيام المفضلة
         const hasWeeklyAvailability = formData.availability.weeklyAvailability && 
           formData.availability.weeklyAvailability.some(day => day.available);
-        const hasPreferredWorkdays = formData.availability.preferredWorkdays.length > 0;
+        const hasPreferredWorkdays = formData.availability.preferredWorkdays && formData.availability.preferredWorkdays.length > 0;
         
         if (!hasWeeklyAvailability && !hasPreferredWorkdays) {
           errors.push('يجب اختيار يوم واحد على الأقل للعمل');
@@ -1212,58 +717,68 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [session?.user?.email, loadSavedProgress]);
 
-  // Auto-save كل 30 ثانية (Phase 2 hash gate)
+  // Phase 2: Debounced auto-save (600-800ms)
+  const debouncedSaveRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const debouncedAutoSave = useCallback(() => {
+    // Clear previous timer
+    if (debouncedSaveRef.current) {
+      clearTimeout(debouncedSaveRef.current);
+    }
+    
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    debouncedSaveRef.current = setTimeout(() => {
+      if (!uiState.saving && formData.currentStep > 1 && session?.user?.email) {
+        abortControllerRef.current = new AbortController();
+        callRemoteSave();
+      }
+    }, 700); // 700ms debounce
+  }, [formData.currentStep, session?.user?.email, uiState.saving, callRemoteSave]);
+
+  // Auto-save every 30 seconds (reduced from previous implementation)
   useEffect(() => {
     if (!uiState.autoSaveEnabled || uiState.loading) return;
-    const id = setInterval(() => {
-      if (FF_ONBOARDING_V2) {
-        if (formData.currentStep <= 1) return;
-        const lightObj = { step: formData.currentStep, basic: formData.basicInfo, exp: formData.experience, port: formData.portfolio, avail: formData.availability };
-        const currentHash = JSON.stringify(lightObj);
-        if (currentHash !== lastAutoHashRef.current && !uiState.saving) {
-          lastAutoHashRef.current = currentHash;
-          // Phase 3 queue wrap
-          callRemoteSave();
-        }
-        return;
-      }
-      if (!uiState.saving && formData.currentStep > 1) {
-  // Phase 3 queue wrap
-  callRemoteSave();
-      }
-    }, 30000);
+    const id = setInterval(() => debouncedAutoSave(), 30000);
     return () => clearInterval(id);
-  }, [uiState.autoSaveEnabled, uiState.loading, uiState.saving, formData.currentStep, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, saveProgress, callRemoteSave]);
+  }, [uiState.autoSaveEnabled, uiState.loading, debouncedAutoSave]);
 
   // Phase 3: beforeunload محاولة تفريغ آخر عملية (best-effort)
   useEffect(() => {
-    if (!FF_ONBOARDING_V2 || !FF_SERIAL_SAVE_QUEUE) return;
-    const handler = () => { /* best-effort: لا await */ };
+    const handler = () => { /* best-effort */ };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, []);
 
   // Phase 2: flush on beforeunload / unmount
   useEffect(() => {
-    if (!FF_ONBOARDING_V2) return;
     const handler = () => flushLocalSave();
     window.addEventListener('beforeunload', handler);
-    return () => {
-      flushLocalSave();
-      window.removeEventListener('beforeunload', handler);
-    };
+    return () => { flushLocalSave(); window.removeEventListener('beforeunload', handler); };
   }, [flushLocalSave]);
 
   // تحديث canProceed عند تغيير البيانات
-  useEffect(() => {
-    const canProceed = FF_ONBOARDING_V2 && FF_VALIDATION_V2 ? canProceedSafe() : validateCurrentStep();
-    dispatch({ type: 'SET_CAN_PROCEED', payload: canProceed });
-  }, [formData.account, formData.basicInfo, formData.experience, formData.portfolio, formData.availability, formData.currentStep, canProceedSafe, validateCurrentStep]);
+  useEffect(() => { dispatch({ type: 'SET_CAN_PROCEED', payload: canProceedSafe() }); }, [formData, canProceedSafe]);
 
   // دالة لتحديد إذا كان الحقل تم لمسه
   const markFieldTouched = useCallback((field: string) => {
     dispatch({ type: 'MARK_FIELD_TOUCHED', payload: field });
   }, []);
+
+  // دالة للحصول على قيمة حقل محدد
+  const getFieldValue = useCallback((field: string): string | boolean | string[] => {
+    const parts = field.split('.');
+    if (parts[0] === 'account') {
+      return formData.account[parts[1] as keyof typeof formData.account] || '';
+    } else if (parts[0] === 'basicInfo') {
+      return formData.basicInfo[parts[1] as keyof typeof formData.basicInfo] || '';
+    }
+    return '';
+  }, [formData]);
 
   // دالة للحصول على خطأ حقل محدد (بس إذا تم لمسه أو حاول الانتقال)
   const getFieldError = useCallback((field: string): string | undefined => {
@@ -1272,17 +787,44 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       return undefined;
     }
     
+    // لا تظهر خطأ إذا الحقل فارغ ولم يتم المس فعلياً
+    const fieldValue = getFieldValue(field);
+    const isEmpty = typeof fieldValue === 'string' ? !fieldValue.trim() : 
+                   typeof fieldValue === 'boolean' ? false :
+                   Array.isArray(fieldValue) ? fieldValue.length === 0 : false;
+    
+    if (isEmpty && !uiState.touchedFields.has(field) && !uiState.showValidation) {
+      return undefined;
+    }
+    
     const stepErrors = getStepErrors(formData.currentStep);
     return stepErrors.find(error => error.includes(field)) || undefined;
-  }, [uiState.touchedFields, uiState.showValidation, getStepErrors, formData.currentStep]);
+  }, [uiState.touchedFields, uiState.showValidation, getStepErrors, formData.currentStep, getFieldValue]);
 
   // تعريف getFieldErrorV2 بعد getFieldError لتفادي استخدام قبل التعريف
   const getFieldErrorV2 = useCallback((fieldPath: string): string | undefined => {
-    if (!(FF_ONBOARDING_V2 && FF_VALIDATION_V2)) return getFieldError(fieldPath);
+    // نفس المنطق: لا تظهر أخطاء إذا لم يتم المس وما أكو validation صريح
+    if (!uiState.showValidation && !uiState.touchedFields.has(fieldPath)) {
+      return undefined;
+    }
+    
     const vr = getStepValidationResult();
     const e = vr.errors.find(er => er.field === fieldPath);
+    
+    // تحقق إضافي: لا تظهر خطأ إذا الحقل فارغ ولم يتم المس
+    if (e) {
+      const fieldValue = getFieldValue(fieldPath);
+      const isEmpty = typeof fieldValue === 'string' ? !fieldValue.trim() : 
+                     typeof fieldValue === 'boolean' ? false :
+                     Array.isArray(fieldValue) ? fieldValue.length === 0 : false;
+      
+      if (isEmpty && !uiState.touchedFields.has(fieldPath) && !uiState.showValidation) {
+        return undefined;
+      }
+    }
+    
     return e?.message;
-  }, [getStepValidationResult, getFieldError]);
+  }, [getStepValidationResult, uiState.showValidation, uiState.touchedFields, getFieldValue]);
 
   // قيم الـ Context
   const contextValue: OnboardingContextType = {

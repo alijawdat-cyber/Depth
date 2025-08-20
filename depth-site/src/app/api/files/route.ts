@@ -1,4 +1,4 @@
-// Client Portal - Files API
+// Client - Files API
 export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';

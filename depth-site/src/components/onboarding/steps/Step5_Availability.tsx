@@ -4,15 +4,15 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Zap, CheckCircle, AlertTriangle, Briefcase, Timer, Target, RefreshCw } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { SelectField, InputField, CheckboxField } from '../shared/FormField';
+import { CheckboxField } from '../shared/FormField';
 import { StepHeader } from '../OnboardingLayout';
 import EnhancedAvailabilityGrid from '../shared/EnhancedAvailabilityGrid';
 import type { AvailabilityType } from '@/types/onboarding';
 
 export default function Step5_Availability() {
   const { formData, updateAvailability, getFieldError, getFieldErrorV2 } = useOnboarding();
-  const FF_VALIDATION_V2 = process.env.NEXT_PUBLIC_ONBOARDING_VALIDATION_V2 === 'true';
-  const getError = FF_VALIDATION_V2 && getFieldErrorV2 ? getFieldErrorV2 : getFieldError;
+  // V2 validation is permanently enabled
+  const getError = getFieldErrorV2 || getFieldError;
   const { availability } = formData;
 
   const AVAILABILITY_OPTIONS = [
@@ -54,34 +54,17 @@ export default function Step5_Availability() {
     }
   ];
 
-  const WORKDAYS = [
-    { id: 'sunday', label: 'الأحد' },
-    { id: 'monday', label: 'الإثنين' },
-    { id: 'tuesday', label: 'الثلاثاء' },
-    { id: 'wednesday', label: 'الأربعاء' },
-    { id: 'thursday', label: 'الخميس' },
-    { id: 'friday', label: 'الجمعة' },
-    { id: 'saturday', label: 'السبت' }
-  ];
-
   const handleAvailabilityChange = (value: string) => {
     updateAvailability({ availability: value as AvailabilityType });
     
     // تحديث الساعات الأسبوعية حسب نوع التوفر
     const option = AVAILABILITY_OPTIONS.find(opt => opt.value === value);
     if (option) {
-      const hours = option.value === 'full-time' ? 40 : 
-                   option.value === 'part-time' ? 25 : 
-                   option.value === 'weekends' ? 16 : 20;
-      updateAvailability({ weeklyHours: hours });
+      // Weekly hours are now derived automatically - no manual setting needed
+      // Unified 30M grid is permanently enabled
       
-      // إضافة أيام افتراضية إذا لم تكن موجودة
-      if (!availability.preferredWorkdays || availability.preferredWorkdays.length === 0) {
-        const defaultWorkdays = option.value === 'weekends' ? ['friday', 'saturday'] :
-                               option.value === 'full-time' ? ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'] :
-                               ['sunday', 'monday', 'tuesday'];
-        updateAvailability({ preferredWorkdays: defaultWorkdays });
-      }
+      // No need to set default workdays with unified grid
+      console.log('[Step5] Availability type selected:', value);
     }
   };
 
@@ -165,34 +148,22 @@ export default function Step5_Availability() {
           )}
         </div>
 
-        {/* الساعات الأسبوعية */}
+        {/* الساعات الأسبوعية - مشتقة من Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <InputField
-            label="عدد الساعات الأسبوعية"
-            type="number"
-            value={availability.weeklyHours.toString()}
-            onChange={(value) => updateAvailability({ weeklyHours: parseInt(value) || 0 })}
-            placeholder="25"
-            icon={<Clock size={18} />}
-            required
-            error={getError('availability.weeklyHours') || getFieldError('الساعات')}
-            description="كم ساعة يمكنك العمل أسبوعياً؟"
-            min="1"
-            max="60"
-          />
-
-          <SelectField
-            label="المنطقة الزمنية"
-            value={availability.timeZone}
-            onChange={(value) => updateAvailability({ timeZone: value })}
-            options={[
-              { value: 'Asia/Baghdad', label: 'بغداد (GMT+3)' },
-              { value: 'Asia/Erbil', label: 'أربيل (GMT+3)' },
-              { value: 'Asia/Kuwait', label: 'الكويت (GMT+3)' },
-              { value: 'Asia/Riyadh', label: 'الرياض (GMT+3)' }
-            ]}
-            description="منطقتك الزمنية الأساسية"
-          />
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-[var(--text)]">الساعات الأسبوعية (مشتقة)</label>
+            <div className="px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--accent-600)] font-semibold">
+              {availability.weeklyHours.toFixed(1)} ساعة
+            </div>
+            <p className="text-xs text-[var(--muted)]">يتم حسابها تلقائياً من الفترات المختارة</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-[var(--text)]">المنطقة الزمنية</label>
+            <div className="px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--accent-600)] font-semibold">
+              {availability.timeZone}
+            </div>
+            <p className="text-xs text-[var(--muted)]">يمكن تعديل المنطقة الزمنية من الخطوة 2</p>
+          </div>
         </div>
 
         {/* جدول التوفر الأسبوعي المحسن */}
@@ -200,34 +171,25 @@ export default function Step5_Availability() {
           <EnhancedAvailabilityGrid
             value={availability.weeklyAvailability || []}
             onChange={(weeklyAvailability) => {
-              // تحديث البيانات الجديدة
               updateAvailability({ weeklyAvailability });
-              
-              // تحديث الأيام المفضلة للتوافق مع النظام القديم
-              const preferredWorkdays = weeklyAvailability
+              // Auto-calculate weekly hours from grid
+              const totalAvailableHours = weeklyAvailability
                 .filter(day => day.available)
-                .map(day => day.day);
-              updateAvailability({ preferredWorkdays });
-              
-              // تحديث الساعات بناءً على التوفر إذا لم تكن محددة
-              if (!availability.weeklyHours || availability.weeklyHours === 0) {
-                const totalAvailableHours = weeklyAvailability
-                  .filter(day => day.available)
-                  .reduce((total, day) => {
-                    // حساب الساعات بناءً على start/end time أو افتراض 8 ساعات
-                    let dayHours = 8; // القيمة الافتراضية
-                    if (day.startTime && day.endTime) {
+                .reduce((total, day) => {
+                  if (day.available && day.startTime && day.endTime) {
+                    try {
                       const start = new Date(`2000-01-01T${day.startTime}`);
                       const end = new Date(`2000-01-01T${day.endTime}`);
-                      dayHours = Math.max(1, (end.getTime() - start.getTime()) / (1000 * 60 * 60));
+                      const diffHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                      return total + diffHours;
+                    } catch {
+                      return total;
                     }
-                    return total + dayHours;
-                  }, 0);
-                updateAvailability({ weeklyHours: Math.min(totalAvailableHours, 40) });
-              }
+                  }
+                  return total;
+                }, 0);
+              updateAvailability({ weeklyHours: Math.round(totalAvailableHours * 10) / 10 });
             }}
-            error={getError('availability.availability') || getFieldError('التوفر')}
-            disabled={false}
           />
         </div>
 
@@ -242,7 +204,7 @@ export default function Step5_Availability() {
         </div>
 
         {/* ملخص التوفر */}
-        {availability.availability && availability.preferredWorkdays.length > 0 && (
+  {availability.availability && (availability.weeklyAvailability || []).some(d=>d.available) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -260,34 +222,12 @@ export default function Step5_Availability() {
                     <p>{AVAILABILITY_OPTIONS.find(opt => opt.value === availability.availability)?.label}</p>
                   </div>
                   <div>
-                    <p className="font-medium mb-1">الساعات الأسبوعية:</p>
-                    <p>{availability.weeklyHours} ساعة</p>
-                  </div>
-                  <div>
-                    <p className="font-medium mb-1">أيام العمل:</p>
-                    <p>{availability.preferredWorkdays.length} أيام في الأسبوع</p>
+                    <p className="font-medium mb-1">الساعات الأسبوعية (مشتقة):</p>
+                    <p>{availability.weeklyHours.toFixed(1)} ساعة</p>
                   </div>
                   <div>
                     <p className="font-medium mb-1">العمل العاجل:</p>
                     <p>{availability.urgentWork ? 'متاح' : 'غير متاح'}</p>
-                  </div>
-                </div>
-                
-                {/* أيام العمل المختارة */}
-                <div className="mt-4">
-                  <p className="font-medium mb-2">الأيام المختارة:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {availability.preferredWorkdays.map(dayId => {
-                      const day = WORKDAYS.find(d => d.id === dayId);
-                      return (
-                        <span
-                          key={dayId}
-                          className="px-3 py-1 bg-[var(--accent-100)] text-[var(--accent-700)] rounded-full text-xs font-medium"
-                        >
-                          {day?.label}
-                        </span>
-                      );
-                    })}
                   </div>
                 </div>
               </div>

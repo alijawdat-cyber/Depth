@@ -42,6 +42,10 @@ export interface UnifiedCreatorSkill {
   experienceYears: number; // بدلاً من string
   verified?: boolean; // تم التحقق من الإدارة
   notes?: string; // ملاحظات إضافية
+  // ✨ Sprint 3: Processing terminology (preferred) + backward compatibility
+  processing?: 'raw' | 'raw_basic' | 'full_retouch'; // نوع المعالجة (جديد)
+  outputLevel?: 'raw' | 'raw_basic' | 'full_retouch'; // مستوى الإخراج (قديم - للتوافق)
+  experienceFactor?: number; // معامل خبرة فرعية (placeholder)
 }
 
 // المرحلة 4: معرض الأعمال

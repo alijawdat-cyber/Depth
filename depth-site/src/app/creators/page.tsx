@@ -44,7 +44,7 @@ interface ProjectStats {
   earnings: number;
 }
 
-export default function CreatorsPortalPage() {
+export default function CreatorsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [creatorData, setCreatorData] = useState<CreatorData | null>(null);
@@ -85,7 +85,7 @@ export default function CreatorsPortalPage() {
     }
 
     if (session.user.role !== 'creator') {
-      router.push('/portal');
+      router.push('/client');
       return;
     }
 

@@ -171,7 +171,7 @@ function calculateLinePricing(
  * حساب معامل المعالجة
  */
 function getProcessingModifier(processing: string, rateCard: RateCard): number {
-  const levels = rateCard.processingLevels;
+  const levels = rateCard.processingLevels; // unchanged; feature flags removed so always present
   if (!levels) return 0;
   
   switch (processing) {

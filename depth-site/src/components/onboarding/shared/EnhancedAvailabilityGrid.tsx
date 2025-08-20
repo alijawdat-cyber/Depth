@@ -13,6 +13,7 @@ import {
 import TimePicker from '@/components/ui/TimePicker';
 import { DayToggleGroup } from '@/components/ui/DayToggle';
 import type { WeeklyAvailability } from '@/types/creators';
+// Phase 2: 30-minute unified grid is permanently enabled
 
 interface EnhancedAvailabilityGridProps {
   value: WeeklyAvailability[];
@@ -78,11 +79,43 @@ export default function EnhancedAvailabilityGrid({
     const updatedValue = value.filter(item => item.day !== dayId);
     if (updates.available !== false) {
       const existingData = getDayData(dayId);
+      let startTime = updates.startTime ?? existingData.startTime ?? '09:00';
+      let endTime = updates.endTime ?? existingData.endTime ?? '17:00';
+      
+      // 30-minute rounding is permanently enabled
+      const roundTo30 = (t: string) => {
+        const [h,m] = t.split(':').map(Number);
+        const total = h*60 + m;
+        const rem = total % 30;
+        // nearest 30m: <15 down, >=15 up
+        let adjusted = rem < 15 ? total - rem : total + (30 - rem);
+        if (adjusted >= 24*60) adjusted = (23*60) + 30; // clamp to 23:30
+        const hh = Math.floor(adjusted/60);
+        const mm = adjusted % 60;
+        return `${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')}`;
+      };
+      const origStart = startTime;
+      const origEnd = endTime;
+      startTime = roundTo30(startTime);
+      endTime = roundTo30(endTime);
+      // zero-length guard
+        if (startTime === endTime) {
+          const [sh,sm] = startTime.split(':').map(Number);
+          let minutes = sh*60 + sm + 30;
+          if (minutes >= 24*60) minutes = (23*60)+30; // clamp
+          const hh = Math.floor(minutes/60);
+          const mm = minutes % 60;
+          endTime = `${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')}`;
+        }
+        if (origStart !== startTime || origEnd !== endTime) {
+          console.log('[EnhancedAvailabilityGrid] Rounded times', { day: dayId, from: { origStart, origEnd }, to: { startTime, endTime } });
+        }
+      
       const newDayData: WeeklyAvailability = {
         day: dayId as WeeklyAvailability['day'],
         available: updates.available ?? true,
-        startTime: updates.startTime ?? existingData.startTime ?? '09:00',
-        endTime: updates.endTime ?? existingData.endTime ?? '17:00'
+        startTime,
+        endTime
       };
       updatedValue.push(newDayData);
       console.log('[EnhancedAvailabilityGrid] Updated day data:', newDayData);
@@ -353,7 +386,7 @@ export default function EnhancedAvailabilityGrid({
                       value={dayData.startTime || '09:00'}
                       onChange={(time) => updateDayData(day.id, { startTime: time })}
                       disabled={disabled}
-                      step={15}
+                      step={30}
                     />
                     
                     <TimePicker
@@ -361,7 +394,7 @@ export default function EnhancedAvailabilityGrid({
                       value={dayData.endTime || '17:00'}
                       onChange={(time) => updateDayData(day.id, { endTime: time })}
                       disabled={disabled}
-                      step={15}
+                      step={30}
                       minTime={dayData.startTime || '09:00'}
                     />
                   </motion.div>

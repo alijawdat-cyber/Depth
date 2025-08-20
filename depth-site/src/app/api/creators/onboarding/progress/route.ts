@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
+import { 
+  deriveWeeklyHours 
+} from '@/lib/validation/onboarding.server';
 import type { 
   SaveProgressRequest,
   OnboardingApiResponse,
@@ -30,11 +33,54 @@ export async function PUT(req: NextRequest) {
     const email = session.user.email.toLowerCase();
     const now = new Date().toISOString();
 
+    // Phase 6: Soft validation للـ progress مع اشتقاق ساعات - permanently enabled
+    let processedData = data;
+    if (data.availability?.weeklyAvailability) {
+      try {
+        // فحص 30 دقيقة + اشتقاق ساعات
+        const availability = data.availability.weeklyAvailability;
+        for (const day of availability) {
+          if (day.available && day.startTime && day.endTime) {
+            // فحص خطوة 30 دقيقة
+            const startMin = parseInt(day.startTime.split(':')[1]);
+            const endMin = parseInt(day.endTime.split(':')[1]);
+            if (startMin % 30 !== 0 || endMin % 30 !== 0) {
+              console.warn('[PROGRESS] Non-30m step detected:', day);
+              // تطبيع للدقيقة الأقرب
+              const normalizeTime = (time: string) => {
+                const [hours, minutes] = time.split(':');
+                const normalizedMin = Math.round(parseInt(minutes) / 30) * 30;
+                return `${hours.padStart(2, '0')}:${normalizedMin.toString().padStart(2, '0')}`;
+              };
+              day.startTime = normalizeTime(day.startTime);
+              day.endTime = normalizeTime(day.endTime);
+            }
+          }
+        }
+
+        // اشتقاق weeklyHours
+        const derivedHours = deriveWeeklyHours(availability);
+        processedData = {
+          ...data,
+          availability: {
+            ...data.availability,
+            weeklyHours: derivedHours
+            // تجاهل preferredWorkdays - لا نخزنها
+          }
+        };
+
+        console.log('[PROGRESS] V2 soft validation applied, derived hours:', derivedHours);
+      } catch (error) {
+        console.warn('[PROGRESS] Soft validation warning:', error);
+        // لا نرجع 400 - فقط تحذير
+      }
+    }
+
     // حفظ في collection مؤقت للتقدم
     const progressData = {
       userId: email,
       currentStep: step,
-      formData: data,
+      formData: processedData, // استخدام البيانات المُعالجة
       autoSave: autoSave || false,
       updatedAt: now,
       sessionId: session.user.id || email
@@ -105,6 +151,24 @@ export async function GET() {
     const currentStep = progressData?.currentStep || 1;
     const totalSteps = 5;
     
+    // Phase 6: تطبيع البيانات المُسترجعة - permanently enabled
+    let returnedFormData = progressData?.formData;
+    if (returnedFormData?.availability) {
+      // لا نُرجع preferredWorkdays عند تفعيل V2
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { preferredWorkdays: _removed, ...cleanAvailability } = returnedFormData.availability;
+      returnedFormData = {
+        ...returnedFormData,
+        availability: cleanAvailability
+      };
+      
+      // تأكيد أن weeklyHours مشتق
+      if (returnedFormData.availability.weeklyAvailability) {
+        const derivedHours = deriveWeeklyHours(returnedFormData.availability.weeklyAvailability);
+        returnedFormData.availability.weeklyHours = derivedHours;
+      }
+    }
+    
     const progress: OnboardingProgress = {
       currentStep,
       completedSteps,
@@ -118,7 +182,7 @@ export async function GET() {
       success: true,
       message: 'تم جلب التقدم المحفوظ',
       data: {
-        formData: progressData?.formData,
+        formData: returnedFormData,
         progress,
         autoSaved: progressData?.autoSave || false
       },
