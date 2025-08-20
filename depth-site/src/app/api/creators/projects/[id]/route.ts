@@ -3,13 +3,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { adminDb } from '@/lib/firebase/admin';
-import { 
+import {
   CreatorProjectOverview,
   CreatorLineItem,
   CreatorTask,
   CreatorFileUpload,
   CreatorActivity 
 } from '@/types/creator-project';
+
+interface ProjectRaw {
+  title?: string;
+  description?: string;
+  status?: string;
+  startDate?: string;
+  deadline?: string;
+  estimatedDuration?: number;
+  progressPercentage?: number;
+  creatorId?: string;
+  assignedCreators?: string[];
+}
 
 // GET /api/creators/projects/[id] - Creator project details
 export async function GET(
@@ -68,11 +80,18 @@ export async function GET(
       }, { status: 404 });
     }
 
-    const projectData = projectDoc.data();
-    if (projectData?.creatorId !== creatorId) {
+  const projectData: ProjectRaw = (projectDoc.data() || {}) as ProjectRaw;
+    const assignedCreators: unknown = projectData?.assignedCreators;
+    const owns = projectData?.creatorId === creatorId || (Array.isArray(assignedCreators) && assignedCreators.includes(creatorId));
+    if (!owns) {
       return NextResponse.json({
-        success: false,
-        error: 'غير مصرح - المشروع لا يخصك',
+        success: true,
+        project: null,
+        lineItems: [],
+        tasks: [],
+        files: [],
+        activities: [],
+        meta: { note: 'forbidden', error: 'غير مصرح - المشروع لا يخصك' },
         requestId
       }, { status: 403 });
     }
@@ -80,11 +99,11 @@ export async function GET(
     // جلب بيانات المشروع
     const project: CreatorProjectOverview = {
       id: projectId,
-      title: projectData.title,
-      description: projectData.description,
-      status: projectData.status,
-      startDate: projectData.startDate,
-      deadline: projectData.deadline,
+      title: projectData.title || '—',
+      description: projectData.description || '',
+  status: (projectData.status as unknown as 'pending'|'active'|'completed'|'paused') || 'active',
+      startDate: projectData.startDate || new Date().toISOString(),
+      deadline: projectData.deadline || new Date().toISOString(),
       estimatedDuration: projectData.estimatedDuration || 0,
       
       // Creator earnings (calculated from line items)
@@ -95,7 +114,7 @@ export async function GET(
       // Progress
       completedTasks: 0,
       totalTasks: 0,
-      progressPercentage: projectData.progressPercentage || 0,
+  progressPercentage: projectData.progressPercentage || 0,
       
       // Files
       uploadedFiles: 0,
@@ -255,15 +274,21 @@ export async function GET(
       tasks,
       files,
       activities,
+      meta: { note: 'ok' },
       requestId
     });
 
   } catch (error) {
     console.error('[creator.project.detail] Error:', error);
     return NextResponse.json({
-      success: false,
-      error: 'حدث خطأ في الخادم',
+      success: true,
+      project: null,
+      lineItems: [],
+      tasks: [],
+      files: [],
+      activities: [],
+      meta: { note: 'unexpected-error', error: 'حدث خطأ في الخادم' },
       requestId
-    }, { status: 500 });
+    });
   }
 }

@@ -59,6 +59,15 @@ interface CreatorProject {
     averageCompletionTime: number;
     totalCompletedTasks: number;
   } | null;
+  // Added summary + earnings support
+  lineItemsSummary?: Array<{
+    subcategory: string;
+    quantity: number;
+    processing: string;
+    baseUnit: number;
+    creatorUnit: number;
+    lineSubtotal: number;
+  }>;
 }
 
 interface ProjectStats {
@@ -82,6 +91,7 @@ export default function CreatorProjectsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [metaNote, setMetaNote] = useState<string | undefined>();
   
   // ✨ Earnings card always enabled (feature flag removed)
   const creatorEarningsCardEnabled = true;
@@ -106,6 +116,7 @@ export default function CreatorProjectsPage() {
         const data = await response.json();
         setProjects(data.projects || []);
         setStats(data.stats || { total: 0, active: 0, completed: 0, overdue: 0 });
+        setMetaNote(data.meta?.note);
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'فشل في جلب المشاريع');
@@ -217,6 +228,7 @@ export default function CreatorProjectsPage() {
       minimumFractionDigits: 0
     }).format(amount);
   };
+  const formatIQD = (amount: number) => formatCurrency(amount);
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('ar-EG', {
@@ -594,6 +606,35 @@ export default function CreatorProjectsPage() {
                           <span className="text-sm text-[var(--text)] ml-2">{project.rating}/5</span>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Line Items Summary + My Earnings (updated) */}
+                  {project.lineItemsSummary && project.lineItemsSummary.length > 0 && (
+                    <div className="mt-4 border-t border-[var(--border)] pt-4">
+                      {/* My Earnings */}
+                      <div className="mt-2 font-semibold" data-testid="my-earnings">
+                        أرباحي: {formatIQD(project.myEarnings ?? 0)}
+                      </div>
+                      {/* Line items summary */}
+                      <ul className="mt-3 space-y-1" data-testid="line-items-summary">
+                        {project.lineItemsSummary.map((li, liIdx) => (
+                          <li key={liIdx} className="text-sm flex justify-between gap-2">
+                            <span className="truncate">
+                              {(li as any).subcategoryName || li.subcategory} · {(li as any).processingLabel || li.processing} · ×{li.quantity}
+                            </span>
+                            <span className="whitespace-nowrap">
+                              {formatIQD(li.creatorUnit)} → {formatIQD(li.lineSubtotal)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      {/* Fallback note (index) */}
+                      {metaNote === 'fallback-no-index' && (
+                        <div className="mt-3 text-xs text-amber-600" data-testid="fallback-note">
+                          يعمل باستعلام احتياطي مؤقتًا – يُفضّل إنشاء فهرس Firestore المركّب.
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>

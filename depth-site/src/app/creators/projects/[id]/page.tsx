@@ -11,7 +11,6 @@ interface Props {
 }
 
 export default async function CreatorProjectDetailPage({ params }: Props) {
-  // Feature is permanently enabled - no flag needed
   const { id } = await params;
   return <CreatorProjectDetail projectId={id} />;
 }

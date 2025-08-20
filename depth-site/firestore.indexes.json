@@ -1,6 +1,15 @@
 {
   "indexes": [
     {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "assignedCreators", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "quote_lines",
       "queryScope": "COLLECTION",
       "fields": [
@@ -176,7 +185,7 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-  },
+    },
   {
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
@@ -203,7 +212,7 @@
         { "fieldPath": "creatorProfile.onboardingStatus", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-  },
+    },
     {
       "collectionGroup": "price_overrides",
       "queryScope": "COLLECTION",

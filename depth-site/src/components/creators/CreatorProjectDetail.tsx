@@ -41,6 +41,7 @@ export default function CreatorProjectDetail({ projectId }: Props) {
   const [activities, setActivities] = useState<CreatorActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [metaNote, setMetaNote] = useState<string | undefined>();
 
   const tabs = [
     { id: 'overview', label: 'نظرة عامة', icon: BarChart3 },
@@ -60,11 +61,16 @@ export default function CreatorProjectDetail({ projectId }: Props) {
       const projectResponse = await fetch(`/api/creators/projects/${projectId}`);
       if (projectResponse.ok) {
         const projectData = await projectResponse.json();
-        setProject(projectData.project);
-        setLineItems(projectData.lineItems || []);
-        setTasks(projectData.tasks || []);
-        setFiles(projectData.files || []);
-        setActivities(projectData.activities || []);
+        setMetaNote(projectData.meta?.note);
+        if (projectData.meta?.note === 'forbidden') {
+          setError('ما عندك صلاحية الوصول لهذا المشروع');
+        } else {
+          setProject(projectData.project);
+          setLineItems(projectData.lineItems || []);
+          setTasks(projectData.tasks || []);
+          setFiles(projectData.files || []);
+          setActivities(projectData.activities || []);
+        }
       } else {
         setError('فشل في تحميل بيانات المشروع');
       }
@@ -132,6 +138,9 @@ export default function CreatorProjectDetail({ projectId }: Props) {
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error || 'المشروع غير موجود'}</p>
+          {metaNote === 'forbidden' && (
+            <p className="text-sm text-[var(--text-muted)] mb-4">التحقق: تم رفض الوصول بناءً على assignedCreators/includes</p>
+          )}
           <Button onClick={() => router.push('/creators/projects')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             العودة للمشاريع

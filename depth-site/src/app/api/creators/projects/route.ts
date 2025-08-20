@@ -29,6 +29,10 @@ interface LineItem {
   baseUnit?: number;
   quantity?: number;
   creatorFactor?: number;
+  processing?: string;
+  outputLevel?: string;
+  subcategory?: string;
+  subcategoryId?: string;
   [key: string]: unknown;
 }
 
@@ -245,7 +249,53 @@ export async function GET(req: NextRequest) {
       // مؤقتاً نتجاهل offset
     }
 
-    const projectsSnapshot = await projectsQuery.get();
+    let projectsSnapshot;
+    let usedFallback = false;
+    try {
+      projectsSnapshot = await projectsQuery.get();
+    } catch (fireErr: unknown) {
+      // Graceful degradation if Firestore composite index is missing
+      const errObj = fireErr as { message?: string; code?: string; status?: string } | undefined;
+      const msg = String(errObj?.message || '');
+      const code = errObj?.code || errObj?.status;
+      const needsIndex = msg.includes('index') || msg.includes('FAILED_PRECONDITION');
+      if (needsIndex) {
+        console.warn('[creators.projects] Missing index, applying degraded fallback (no orderBy / in‑memory status filter)', { code, message: msg });
+        try {
+          // Fallback: fetch by assignedCreators only (no orderBy) and filter client-side
+            const baseSnap = await adminDb
+              .collection('projects')
+              .where('assignedCreators', 'array-contains', creatorId)
+              .limit(150) // safety cap
+              .get();
+            const tempDocs = status && status !== 'all'
+              ? baseSnap.docs.filter(d => {
+                  const s = d.data().status;
+                  if (status === 'active') return ['assigned','in_progress','review_pending'].includes(s);
+                  if (status === 'completed') return ['completed','delivered'].includes(s);
+                  return s === status;
+                })
+              : baseSnap.docs;
+            // Simulate Firestore snapshot shape needed below
+            projectsSnapshot = { docs: tempDocs } as typeof baseSnap;
+            usedFallback = true;
+        } catch (fallbackErr) {
+          console.error('[creators.projects] Fallback query also failed:', fallbackErr);
+          return NextResponse.json({
+            success: true,
+            projects: [],
+            stats: { total: 0, active: 0, completed: 0, overdue: 0 },
+            meta: {
+              note: 'fallback-failed-index-required',
+              indexHint: 'Create composite index on: projects(assignedCreators array-contains, status asc, createdAt desc)',
+              error: 'يتطلب إنشاء فهرس Firestore (assignedCreators,status,createdAt)'
+            }
+          });
+        }
+      } else {
+        throw fireErr; // rethrow non-index errors
+      }
+    }
     const projects = [];
 
     for (const doc of projectsSnapshot.docs) {
@@ -284,6 +334,29 @@ export async function GET(req: NextRequest) {
       // ✨ Sprint 3: حساب الأرباح التفصيلية (عند تفعيل feature flag)
       const earningsData = calculateCreatorEarnings(projectData, creatorId);
 
+      // Build optional line items summary for quick card display
+      let lineItemsSummary: Array<{ subcategory: string; quantity: number; processing: string; baseUnit: number; creatorUnit: number; lineSubtotal: number; }> = [];
+      try {
+        const rawItems = Array.isArray(projectData.lineItems) ? projectData.lineItems as LineItem[] : [];
+        lineItemsSummary = rawItems
+          .filter(li => li.assignedCreator === creatorId)
+          .slice(0, 6)
+          .map(li => {
+            const baseUnit = li.baseUnit || 0;
+            const creatorFactor = li.creatorFactor || 0.7;
+            const quantity = li.quantity || 1;
+            const creatorUnit = Math.round(baseUnit * creatorFactor);
+            return {
+              subcategory: (li.subcategory || li.subcategoryId || '—') as string,
+              quantity,
+              processing: (li.processing || li.outputLevel || 'raw_basic') as string,
+              baseUnit,
+              creatorUnit,
+              lineSubtotal: creatorUnit * quantity
+            };
+          });
+      } catch {/* ignore */}
+
       const projectInfo = {
         id: doc.id,
         title: projectData.title || 'مشروع بدون عنوان',
@@ -319,11 +392,12 @@ export async function GET(req: NextRequest) {
         performanceMetrics: calculatePerformanceMetrics(projectData, creatorId),
         
         // ✨ Sprint 3: أرباح تفصيلية من Line Items (عندما متوفرة)
-        ...(earningsData && {
+  ...(earningsData && {
           myEarnings: earningsData.myEarnings,
           totalLineItems: earningsData.totalLineItems,
           totalQuantity: earningsData.totalQuantity
-        })
+  }),
+  ...(lineItemsSummary.length > 0 && { lineItemsSummary })
       };
 
       projects.push(projectInfo);
@@ -347,15 +421,18 @@ export async function GET(req: NextRequest) {
       pagination: {
         limit,
         offset,
-        hasMore: projects.length === limit // تقدير بسيط
-      }
+        hasMore: projects.length === limit
+      },
+      meta: { note: usedFallback ? 'fallback-no-index' : 'ok' }
     });
 
   } catch (error) {
     console.error('[creators.projects] Error:', error);
     return NextResponse.json({
-      success: false,
-      error: 'حدث خطأ في الخادم'
-    }, { status: 500 });
+      success: true,
+      projects: [],
+      stats: { total: 0, active: 0, completed: 0, overdue: 0 },
+      meta: { note: 'unexpected-error', error: 'حدث خطأ في الخادم' }
+    });
   }
 }
