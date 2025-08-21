@@ -3,803 +3,267 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Depth Documentation</title>
+  <meta name="description" content="Depth Platform - منصة متكاملة لإدارة المشاريع الإبداعية" />
+  <title>Depth Documentation v2.0</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  
+  <!-- Docsify Core -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  
+  <!-- Custom Theme -->
   <link rel="stylesheet" href="custom-theme.css" />
-  <style>
-    /* === CORE FIXES === */
-    :root {
-      --sidebar-width: 280px;
-    }
-
-    body {
-      font-family: var(--font-primary, 'Dubai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif);
-      background: var(--bg-primary, #ffffff);
-      color: var(--text-primary, #111827);
-      direction: rtl;
-    }
-
-    /* === SIDEBAR === */
-    .sidebar {
-      position: fixed !important;
-      top: 0;
-      right: 0 !important;
-      left: auto !important; /* cancel theme's left positioning */
-      width: var(--sidebar-width);
-      height: 100vh;
-      background: var(--sidebar-bg, #f9fafb) !important;
-      border-left: 1px solid var(--border-primary, #e5e7eb) !important;
-      border-right: none !important;
-      overflow-y: auto;
-      z-index: 100;
-      transform: none !important; /* ensure visible by default */
-    }
-
-    /* Hide default elements */
-    .sidebar-toggle,
-    .app-name,
-    .sidebar-mask,
-    .mask {
-      display: none !important;
-    }
-
-    /* === SIDEBAR HEADER === */
-    .sidebar-header {
-      padding: 24px 20px;
-      text-align: center;
-      background: linear-gradient(135deg, var(--depth-purple-500, #6C2BFF), var(--depth-purple-600, #4A1FC9));
-      border-bottom: 1px solid var(--border-primary, #e5e7eb);
-      margin-bottom: 16px;
-    }
-
-    .sidebar-logo {
-      width: 48px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px;
-    }
-
-    .sidebar-logo svg {
-      width: 28px;
-      height: 28px;
-      fill: white;
-    }
-
-    .sidebar-title {
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .sidebar-version {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .version-badge {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 600;
-    }
-
-    /* === CONTENT === */
-    .content {
-      margin-right: var(--sidebar-width) !important; /* override theme default */
-      margin-left: 0 !important;
-      padding: 32px;
-      min-height: 100vh;
-      background: var(--bg-primary, #ffffff);
-    }
-
-    .markdown-section {
-      max-width: 900px;
-      color: var(--text-primary, #111827);
-    }
-
-    /* === MOBILE === */
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 200;
-      background: var(--interactive-primary, #6C2BFF);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .content {
-        margin-right: 0 !important;
-        margin-left: 0 !important;
-        padding: 24px 16px;
-      }
-
-      .sidebar {
-        right: -280px !important;
-        left: auto !important;
-        transition: right 0.3s ease;
-        transform: none !important;
-      }
-
-      body.sidebar-open .sidebar {
-        right: 0 !important;
-      }
-
-      .mobile-menu {
-        display: block;
-      }
-    }
-
-    /* Ensure desktop always shows sidebar */
-    @media (min-width: 769px) {
-      .sidebar { right: 0 !important; transform: none !important; }
-      .content { margin-right: var(--sidebar-width) !important; margin-left: 0 !important; }
-    }
-
-    /* === ENHANCED NAVIGATION === */
-    .sidebar-nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .sidebar-nav li {
-      margin: 2px 0;
-    }
-
-    .sidebar-nav a,
-    .section-label {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--sidebar-text, #374151);
-      font-size: 14px;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .sidebar-nav a:hover,
-    .section-label:hover {
-      background: var(--sidebar-hover, #f3f4f6);
-      color: var(--text-primary, #111827);
-    }
-
-    .sidebar-nav a.active {
-      background: var(--sidebar-active, #e6dfff);
-      color: var(--interactive-primary, #6C2BFF);
-      font-weight: 600;
-    }
-
-    /* Icons */
-    .nav-icon {
-      width: 18px;
-      height: 18px;
-      margin-left: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .nav-icon svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
-    }
-
-    /* Collapsible sections */
-    .section-arrow {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
-      transition: transform 0.2s ease;
-    }
-
-    .sidebar-nav li.open .section-arrow {
-      transform: translateY(-50%) rotate(-90deg);
-    }
-
-    .sidebar-nav > ul > li > ul {
-      display: none;
-      padding: 4px 0;
-    }
-
-    .sidebar-nav > ul > li.open > ul {
-      display: block;
-    }
-
-    .sidebar-nav > ul > li > ul a {
-      padding: 8px 16px 8px 40px;
-      font-size: 13px;
-      color: var(--text-secondary, #6b7280);
-    }
-  </style>
+  
+  <!-- Prism Theme for Code Highlighting -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css" />
 </head>
 <body>
-  <div id="app"></div>
-  
-  <button id="menuToggle" class="mobile-menu">القائمة</button>
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">جاري تحميل التوثيق...</div>
+    </div>
+  </div>
 
+  <!-- Main App Container -->
+  <div id="app">يرجى الانتظار...</div>
+
+  <!-- Mobile Menu Toggle -->
+  <button id="menuToggle" class="mobile-menu" type="button" aria-label="فتح القائمة">
+    <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="menu-text">القائمة</span>
+  </button>
+
+  <!-- Back to Top Button -->
+  <button id="backToTop" class="back-to-top" aria-label="العودة للأعلى">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="theme-toggle" aria-label="تبديل الوضع">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 1v2m0 18v2m9-11h-2M5 12H3m16.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" style="display: none;">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Reading Progress Bar -->
+  <div id="readingProgress" class="reading-progress"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="shortcutsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>اختصارات لوحة المفاتيح</h3>
+        <button class="modal-close" onclick="toggleShortcuts()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcut-item">
+          <kbd>/</kbd> أو <kbd>Ctrl</kbd> + <kbd>K</kbd>
+          <span>البحث السريع</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>G</kbd> ثم <kbd>H</kbd>
+          <span>الذهاب للصفحة الرئيسية</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>←</kbd> / <kbd>→</kbd>
+          <span>التنقل بين الصفحات</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>T</kbd>
+          <span>تبديل الوضع الليلي</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>?</kbd>
+          <span>عرض الاختصارات</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script>
-    // Icons
-    window.DEPTH_ICONS = {
-      home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
-      requirements: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>',
-      database: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
-      api: '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>',
-      features: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
-      admin: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-      integrations: '<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-      development: '<svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
-      mobile: '<svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>',
-      security: '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-      operations: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>',
-      reference: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/></svg>',
-      arrow: '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'
-    };
-
-    // Docsify configuration
+    // ============================================
+    // Configuration
+    // ============================================
     window.$docsify = {
-      name: 'Depth Documentation',
+      name: 'Depth',
+      repo: 'https://github.com/depth-platform/docs',
       homepage: 'main.md',
       loadSidebar: true,
-      subMaxLevel: 2,
+      loadNavbar: false,
+      subMaxLevel: 3,
       auto2top: true,
+      maxLevel: 4,
+      
+      // Search Configuration
       search: {
         paths: 'auto',
-        placeholder: 'البحث...',
-        noData: 'لا توجد نتائج'
+        placeholder: 'ابحث في التوثيق...',
+        noData: 'لم يتم العثور على نتائج',
+        depth: 6,
+        hideOtherSidebarContent: false,
+        namespace: 'depth-docs-v2'
       },
+      
+      // Copy Code Configuration
+      copyCode: {
+        buttonText: 'نسخ',
+        errorText: 'خطأ',
+        successText: 'تم النسخ!'
+      },
+      
+      // Pagination
+      pagination: {
+        previousText: 'السابق',
+        nextText: 'التالي',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      
+      // Custom 404 Page
+      notFoundPage: {
+        '/': '404.md'
+      },
+      
+      // Plugins
       plugins: [
-        function(hook) {
-          // Add sidebar header
-          hook.mounted(function() {
-            setTimeout(() => {
-              const sidebar = document.querySelector('.sidebar');
-              if (sidebar && !sidebar.querySelector('.sidebar-header')) {
-                const header = document.createElement('div');
-                header.className = 'sidebar-header';
-                header.innerHTML = `
-                  <div class="sidebar-logo">
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="white"/>
-                      <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                    </svg>
-                  </div>
-                  <div class="sidebar-title">Depth Documentation</div>
-                  <div class="sidebar-version">
-                    <span class="version-badge">v3.0</span>
-                    <span class="version-badge">RTL</span>
-                  </div>
-                `;
-                sidebar.insertBefore(header, sidebar.firstChild);
+        // Main Enhancement Plugin
+        function(hook, vm) {
+          // ========================================
+          // Initialize
+          // ========================================
+          hook.init(function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            
+            // Load saved sidebar state
+            const sidebarState = localStorage.getItem('sidebarState');
+            if (sidebarState) {
+              try {
+                window.sidebarOpenSections = JSON.parse(sidebarState);
+              } catch(e) {
+                window.sidebarOpenSections = [];
               }
-            }, 100);
+            }
           });
-
-          // Enhance navigation
+          
+          // ========================================
+          // Before Each Page Render
+          // ========================================
+          hook.beforeEach(function(content) {
+            // Add breadcrumbs placeholder
+            const breadcrumbs = '<div id="breadcrumbs" class="breadcrumbs"></div>';
+            
+            // Add reading time
+            const wordCount = content.split(/\s+/).length;
+            const readingTime = Math.ceil(wordCount / 200);
+            const readingTimeHtml = `
+              <div class="reading-meta">
+                <span class="reading-time">⏱️ ${readingTime} دقائق قراءة</span>
+                <span class="word-count">📝 ${wordCount} كلمة</span>
+              </div>
+            `;
+            
+            return breadcrumbs + readingTimeHtml + content;
+          });
+          
+          // ========================================
+          // After Each Page Render
+          // ========================================
           hook.doneEach(function() {
-            setTimeout(() => {
-              const root = document.querySelector('.sidebar-nav > ul');
-              if (!root) return;
-
-              // Clean old enhancements
-              root.querySelectorAll('.nav-icon, .section-arrow').forEach(el => el.remove());
-
-              // Process each item
-              root.querySelectorAll(':scope > li').forEach(li => {
-                const sub = li.querySelector('ul');
-                let link = li.querySelector(':scope > a');
-                let label = li.querySelector(':scope > .section-label');
-
-                // Get icon based on text
-                const text = (link?.textContent || label?.textContent || '').trim();
-                let iconName = 'home';
-                
-                if (text.includes('الرئيسية')) iconName = 'home';
-                else if (text.includes('البداية') || text.includes('المتطلبات')) iconName = 'requirements';
-                else if (text.includes('قاعدة البيانات')) iconName = 'database';
-                else if (text.includes('الأساسيات')) iconName = 'api';
-                else if (text.includes('المميزات')) iconName = 'features';
-                else if (text.includes('الإدارة')) iconName = 'admin';
-                else if (text.includes('التكاملات')) iconName = 'integrations';
-                else if (text.includes('التطوير')) iconName = 'development';
-                else if (text.includes('الجوال') || text.includes('الواجهات')) iconName = 'mobile';
-                else if (text.includes('الأمان')) iconName = 'security';
-                else if (text.includes('العمليات')) iconName = 'operations';
-                else if (text.includes('المراجع')) iconName = 'reference';
-
-                // Create section label if needed
-                if (!link && !label && sub) {
-                  let titleText = '';
-                  li.childNodes.forEach(n => {
-                    if (n.nodeType === 3) {
-                      titleText += n.textContent.trim();
-                      n.textContent = '';
-                    }
-                  });
-                  
-                  label = document.createElement('span');
-                  label.className = 'section-label';
-                  label.innerHTML = `
-                    <span class="nav-icon">${window.DEPTH_ICONS[iconName]}</span>
-                    <span>${titleText}</span>
-                  `;
-                  li.insertBefore(label, sub);
-                }
-
-                // Add icon to link
-                if (link && !link.querySelector('.nav-icon')) {
-                  const linkText = link.textContent;
-                  link.innerHTML = `
-                    <span class="nav-icon">${window.DEPTH_ICONS[iconName]}</span>
-                    <span>${linkText}</span>
-                  `;
-                }
-
-                // Add collapsible functionality
-                if (sub) {
-                  const arrow = document.createElement('span');
-                  arrow.className = 'section-arrow';
-                  arrow.innerHTML = window.DEPTH_ICONS.arrow;
-                  
-                  if (label) {
-                    label.appendChild(arrow);
-                    label.addEventListener('click', () => li.classList.toggle('open'));
-                  } else if (link) {
-                    link.appendChild(arrow);
-                    link.addEventListener('click', (e) => {
-                      if (e.target.closest('.section-arrow')) {
-                        e.preventDefault();
-                        li.classList.toggle('open');
-                      }
-                    });
-                  }
-                }
-              });
-
-              // Auto-expand active section
-              const active = root.querySelector('a.active');
-              if (active) {
-                let parent = active.parentElement;
-                while (parent && parent !== root) {
-                  if (parent.tagName === 'LI') parent.classList.add('open');
-                  parent = parent.parentElement;
-                }
-              }
-            }, 100);
+            // Hide loading screen
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+              loadingScreen.style.opacity = '0';
+              setTimeout(() => {
+                loadingScreen.style.display = 'none';
+              }, 300);
+            }
+            
+            // Update breadcrumbs
+            updateBreadcrumbs();
+            
+            // Setup floating TOC
+            setupFloatingTOC();
+            
+            // Enhance headings with anchors
+            enhanceHeadings();
+            
+            // Setup sidebar enhancements
+            enhanceSidebar();
+            
+            // Update reading progress
+            updateReadingProgress();
+            
+            // Setup feedback widget
+            setupFeedbackWidget();
+            
+            // Initialize tooltips
+            initTooltips();
+            
+            // Save scroll position
+            saveScrollPosition();
+          });
+          
+          // ========================================
+          // Mounted
+          // ========================================
+          hook.mounted(function() {
+            // Setup keyboard shortcuts
+            setupKeyboardShortcuts();
+            
+            // Setup back to top button
+            setupBackToTop();
+            
+            // Setup theme toggle
+            setupThemeToggle();
+            
+            // Setup mobile menu
+            setupMobileMenu();
+            
+            // Restore scroll position
+            restoreScrollPosition();
+          });
+          
+          // ========================================
+          // Ready
+          // ========================================
+          hook.ready(function() {
+            // Add version selector
+            addVersionSelector();
+            
+            // Track search queries
+            trackSearchQueries();
+            
+            // Show welcome message for first-time visitors
+            if (!localStorage.getItem('welcomed')) {
+              showToast('مرحباً بك في توثيق Depth! استخدم / للبحث السريع', 'info', 5000);
+              localStorage.setItem('welcomed', 'true');
+            }
           });
         }
       ]
     };
-
-    // Mobile menu + ensure sidebar injection doesn't hide content
-    document.addEventListener('DOMContentLoaded', () => {
-      const menuBtn = document.getElementById('menuToggle');
-      if (menuBtn) {
-        menuBtn.onclick = () => document.body.classList.toggle('sidebar-open');
-      }
-
-      // Safety: If Docsify theme applied left-positioned sidebar, fix to right
-      const fixSidebarPosition = () => {
-        const sb = document.querySelector('.sidebar');
-        if (sb) {
-          sb.style.left = 'auto';
-          sb.style.right = '0px';
-          sb.style.transform = 'none';
-        }
-        const content = document.querySelector('.content');
-        if (content) {
-          content.style.marginRight = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '280px';
-          content.style.marginLeft = '0px';
-        }
-      };
-      setTimeout(fixSidebarPosition, 300);
-      window.addEventListener('resize', fixSidebarPosition);
-    });
-  </script>
-
-  <!-- Docsify Scripts -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
-</body>
-</html>
-
-    /* === LOADING STATES === */
-    .content.loading {
-      opacity: 0.7;
-    }
-
-    .content.loading::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      right: 50%;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--interactive-primary);
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* === EMPTY CONTENT PLACEHOLDER === */
-    .empty-content {
-      text-align: center;
-      padding: var(--space-3xl) var(--space-lg);
-      color: var(--text-secondary);
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: var(--space-lg);
-      opacity: 0.6;
-    }
-
-    .empty-content h2 {
-      color: var(--text-primary);
-      margin-bottom: var(--space-md);
-      font-weight: 600;
-    }
-
-    .empty-content p {
-      margin-bottom: var(--space-sm);
-      line-height: 1.6;
-    }
-
-    .empty-content a {
-      color: var(--interactive-primary);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color var(--transition-fast);
-    }
-
-    .empty-content a:hover {
-      border-bottom-color: var(--interactive-primary);
-    }
-
-    /* === NOTIFICATION SYSTEM === */
-    .notification {
-      position: fixed;
-      top: var(--space-lg);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-primary);
-      border: 1px solid var(--border-primary);
-      border-radius: var(--radius-md);
-      padding: var(--space-md) var(--space-lg);
-      box-shadow: var(--shadow-lg);
-      z-index: 1001;
-      opacity: 0;
-      transform: translateX(-50%) translateY(-20px);
-      transition: all var(--transition-base);
-    }
-
-    .notification.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .notification.success {
-      border-color: var(--success);
-      background: rgba(16, 185, 129, 0.1);
-    }
-
-    .notification.error {
-      border-color: var(--error);
-      background: rgba(239, 68, 68, 0.1);
-    }
-
-    /* === ENHANCED SEARCH === */
-    .search-results {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      left: 0;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-primary);
-      border-top: none;
-      border-radius: 0 0 var(--radius-md) var(--radius-md);
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 50;
-      display: none;
-    }
-
-    .search-result-item {
-      padding: var(--space-sm) var(--space-md);
-      border-bottom: 1px solid var(--border-primary);
-      cursor: pointer;
-      transition: background var(--transition-fast);
-    }
-
-    .search-result-item:hover {
-      background: var(--sidebar-hover);
-    }
-
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-
-    .search-result-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-
-    .search-result-content {
-      font-size: 12px;
-      color: var(--text-secondary);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* === ENHANCED TYPOGRAPHY === */
-    .markdown-section {
-      font-size: 16px;
-      line-height: 1.7;
-    }
-
-    .markdown-section h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: var(--space-xl);
-      line-height: 1.2;
-      color: var(--text-primary);
-    }
-
-    .markdown-section h2 {
-      font-size: 2rem;
-      font-weight: 600;
-      margin: var(--space-xl) 0 var(--space-lg);
-      line-height: 1.3;
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--border-primary);
-      padding-bottom: var(--space-sm);
-    }
-
-    .markdown-section h3 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: var(--space-lg) 0 var(--space-md);
-      line-height: 1.4;
-      color: var(--text-primary);
-    }
-
-    .markdown-section h4 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: var(--space-lg) 0 var(--space-sm);
-      line-height: 1.4;
-      color: var(--text-primary);
-    }
-
-    .markdown-section p {
-      margin-bottom: var(--space-md);
-      line-height: 1.7;
-    }
-
-    .markdown-section blockquote {
-      margin: var(--space-md) 0;
-      padding: var(--space-md) var(--space-lg);
-      border-right: 4px solid var(--interactive-primary);
-      background: var(--bg-secondary);
-      border-radius: var(--radius-sm);
-      font-style: italic;
-    }
-
-    .markdown-section ul,
-    .markdown-section ol {
-      margin: var(--space-md) 0;
-      padding-right: var(--space-lg);
-    }
-
-    .markdown-section li {
-      margin-bottom: var(--space-xs);
-    }
-
-    .markdown-section table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: var(--space-lg) 0;
-      border: 1px solid var(--border-primary);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .markdown-section th,
-    .markdown-section td {
-      padding: var(--space-sm) var(--space-md);
-      text-align: right;
-      border-bottom: 1px solid var(--border-primary);
-    }
-
-    .markdown-section th {
-      background: var(--bg-secondary);
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .markdown-section tr:last-child td {
-      border-bottom: none;
-    }
-
-    .markdown-section tr:nth-child(even) {
-      background: var(--bg-secondary);
-    }
-
-    /* === IMPROVED INLINE CODE === */
-    .markdown-section code {
-      background: var(--code-bg);
-      color: var(--code-text);
-      padding: 2px 6px;
-      border-radius: var(--radius-sm);
-      font-size: 0.9em;
-      font-family: var(--font-code);
-      border: 1px solid var(--code-border);
-    }
-
-    .markdown-section pre code {
-      background: transparent;
-      border: none;
-      padding: 0;
-    }
-
-    /* === BETTER IMAGES === */
-    .markdown-section img {
-      max-width: 100%;
-      height: auto;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-md);
-      margin: var(--space-md) 0;
-    }
-
-    /* === PERFORMANCE OPTIMIZATIONS === */
-    .sidebar-nav,
-    .toc {
-      contain: layout style;
-    }
-
-    .markdown-section {
-      contain: layout;
-    }
-
-    /* === PRINT STYLES === */
-    @media print {
-      .sidebar,
-      .mobile-menu,
-      .back-to-top,
-      .reading-progress,
-      .toc-wrapper {
-        display: none !important;
-      }
-
-      .app-main {
-        margin-right: 0 !important;
-      }
-
-      .content {
-        padding: 0 !important;
-      }
-
-      .breadcrumbs {
-        position: static !important;
-        border: none !important;
-        background: transparent !important;
-      }
-    }
-
-    /* === HIGH CONTRAST MODE === */
-    @media (prefers-contrast: high) {
-      :root {
-        --border-primary: #000000;
-        --text-secondary: #000000;
-        --text-tertiary: #333333;
-      }
-    }
-
-    /* === REDUCED MOTION === */
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-
-      .reading-progress {
-        transition: none;
-      }
-
-      html {
-        scroll-behavior: auto;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Reading Progress Bar -->
-  <div class="reading-progress" id="readingProgress"></div>
-  
-  <!-- Mobile Menu Button -->
-  <button id="menuToggle" class="mobile-menu" type="button" aria-label="فتح القائمة">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    القائمة
-  </button>
-
-  <!-- Main App Container -->
-  <div id="app">
-    <!-- Breadcrumbs will be inserted here -->
-    <nav class="breadcrumbs" id="breadcrumbs" style="display: none;">
-      <ol class="breadcrumb-list" id="breadcrumbList"></ol>
-    </nav>
     
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-      <!-- Main Content -->
-      <main class="content" id="main">
-        <div class="markdown-section" id="main-content"></div>
-      </main>
-      
-      <!-- Table of Contents -->
-      <aside class="toc-wrapper" id="tocWrapper">
-        <div class="toc" id="toc">
-          <div class="toc-title">في هذه الصفحة</div>
-          <ul class="toc-list" id="tocList"></ul>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <!-- Back to Top Button -->
-  <button class="back-to-top" id="backToTop" aria-label="العودة للأعلى">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path d="m18 15-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-
-  <script>
-    /* ===============================================
-       DEPTH DOCUMENTATION - ENHANCED FUNCTIONALITY v3.0
-       =============================================== */
-
-    // === GLOBAL CONFIGURATION ===
-    const config = {
-      wordsPerMinute: 200,
-      scrollThreshold: 300,
-      tocMinHeadings: 3,
-      debounceDelay: 100
-    };
-
-    // === ICONS LIBRARY ===
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    // Icons Library
     const icons = {
       home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
       requirements: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
@@ -813,618 +277,548 @@
       security: '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       operations: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 12h6m6 6l4.24 4.24"/></svg>',
       reference: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
-      arrow: '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'
+      arrow: '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>',
+      copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>',
+      check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
     };
-
-    // === UTILITY FUNCTIONS ===
-    const utils = {
-      debounce: (func, delay) => {
-        let timeoutId;
-        return (...args) => {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => func(...args), delay);
-        };
-      },
-
-      throttle: (func, delay) => {
-        let inThrottle;
-        return function() {
-          const args = arguments;
-          const context = this;
-          if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, delay);
+    
+    // Update Breadcrumbs
+    function updateBreadcrumbs() {
+      const breadcrumbsEl = document.getElementById('breadcrumbs');
+      if (!breadcrumbsEl) return;
+      
+      const path = window.location.hash.replace('#/', '').split('/');
+      let breadcrumbs = '<a href="#/">الرئيسية</a>';
+      let currentPath = '#/';
+      
+      path.forEach((segment, index) => {
+        if (segment) {
+          currentPath += segment + '/';
+          const name = segment.replace(/-/g, ' ');
+          if (index === path.length - 1) {
+            breadcrumbs += ` › <span class="current">${name}</span>`;
+          } else {
+            breadcrumbs += ` › <a href="${currentPath}">${name}</a>`;
           }
-        };
-      },
-
-      slugify: (text) => {
-        return text
-          .toLowerCase()
-          .replace(/[^\w\u0600-\u06FF\s-]/g, '')
-          .replace(/[\s_-]+/g, '-')
-          .replace(/^-+|-+$/g, '');
-      },
-
-      getTextContent: (element) => {
-        return element.textContent || element.innerText || '';
-      },
-
-      countWords: (text) => {
-        return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-      },
-
-      formatReadingTime: (minutes) => {
-        if (minutes < 1) return 'أقل من دقيقة';
-        if (minutes === 1) return 'دقيقة واحدة';
-        if (minutes === 2) return 'دقيقتان';
-        if (minutes <= 10) return `${minutes} دقائق`;
-        return `${minutes} دقيقة`;
-      }
-    };
-
-    // === READING PROGRESS ===
-    class ReadingProgress {
-      constructor() {
-        this.progressBar = document.getElementById('readingProgress');
-        this.init();
-      }
-
-      init() {
-        window.addEventListener('scroll', utils.throttle(() => {
-          this.updateProgress();
-        }, 16));
-      }
-
-      updateProgress() {
-        const scrollTop = window.pageYOffset;
-        const documentHeight = document.documentElement.scrollHeight;
-        const windowHeight = window.innerHeight;
-        const scrollable = documentHeight - windowHeight;
-        const scrolled = (scrollTop / scrollable) * 100;
-
-        this.progressBar.style.width = `${Math.min(100, Math.max(0, scrolled))}%`;
-      }
-    }
-
-    // === BREADCRUMBS ===
-    class Breadcrumbs {
-      constructor() {
-        this.container = document.getElementById('breadcrumbs');
-        this.list = document.getElementById('breadcrumbList');
-      }
-
-      update(route) {
-        if (!route || route === '/') {
-          this.container.style.display = 'none';
-          return;
         }
-
-        const parts = route.split('/').filter(part => part);
-        const breadcrumbs = [{ text: 'الرئيسية', href: '#/' }];
-
-        let currentPath = '';
-        parts.forEach((part, index) => {
-          currentPath += `/${part}`;
-          const isLast = index === parts.length - 1;
+      });
+      
+      breadcrumbsEl.innerHTML = breadcrumbs;
+    }
+    
+    // Setup Floating TOC
+    function setupFloatingTOC() {
+      const content = document.querySelector('.markdown-section');
+      if (!content) return;
+      
+      const headings = content.querySelectorAll('h2, h3');
+      if (headings.length < 3) return; // Only show for longer content
+      
+      // Remove existing TOC
+      const existingTOC = document.getElementById('floating-toc');
+      if (existingTOC) existingTOC.remove();
+      
+      // Create TOC
+      const toc = document.createElement('div');
+      toc.id = 'floating-toc';
+      toc.className = 'floating-toc';
+      toc.innerHTML = '<div class="toc-title">في هذه الصفحة</div><ul class="toc-list"></ul>';
+      
+      const tocList = toc.querySelector('.toc-list');
+      
+      headings.forEach((heading, index) => {
+        const id = `heading-${index}`;
+        heading.id = id;
+        
+        const li = document.createElement('li');
+        li.className = heading.tagName.toLowerCase();
+        
+        const a = document.createElement('a');
+        a.href = `#${id}`;
+        a.textContent = heading.textContent;
+        a.onclick = (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+      
+      content.appendChild(toc);
+      
+      // Highlight current section on scroll
+      let scrollTimeout;
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          const scrollPos = window.scrollY + 100;
           
-          breadcrumbs.push({
-            text: this.formatPartName(part),
-            href: isLast ? null : `#${currentPath}`,
-            isLast
-          });
-        });
-
-        this.render(breadcrumbs);
-        this.container.style.display = 'block';
-      }
-
-      formatPartName(part) {
-        // Remove file extensions and numbers
-        const cleaned = part.replace(/\.(md|html)$/, '').replace(/^\d+-/, '');
-        
-        // Convert kebab-case to readable text
-        return cleaned
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-      }
-
-      render(breadcrumbs) {
-        this.list.innerHTML = breadcrumbs
-          .map((crumb, index) => {
-            if (crumb.isLast) {
-              return `<li class="breadcrumb-item"><span class="breadcrumb-current">${crumb.text}</span></li>`;
+          headings.forEach((heading, index) => {
+            const link = tocList.children[index].querySelector('a');
+            if (heading.offsetTop <= scrollPos && 
+                (!headings[index + 1] || headings[index + 1].offsetTop > scrollPos)) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
             }
-            return `<li class="breadcrumb-item"><a href="${crumb.href}" class="breadcrumb-link">${crumb.text}</a></li>`;
-          })
-          .join('');
-      }
+          });
+        }, 50);
+      });
     }
-
-    // === TABLE OF CONTENTS ===
-    class TableOfContents {
-      constructor() {
-        this.wrapper = document.getElementById('tocWrapper');
-        this.container = document.getElementById('toc');
-        this.list = document.getElementById('tocList');
-        this.currentActive = null;
-      }
-
-      generate(content) {
-        const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        
-        if (headings.length < config.tocMinHeadings) {
-          this.wrapper.style.display = 'none';
-          return;
-        }
-
-        const tocItems = Array.from(headings).map((heading, index) => {
-          const id = heading.id || `heading-${index}`;
-          if (!heading.id) {
-            heading.id = id;
-          }
-
-          return {
-            id,
-            text: utils.getTextContent(heading),
-            level: parseInt(heading.tagName.charAt(1)),
-            element: heading
-          };
-        });
-
-        this.render(tocItems);
-        this.wrapper.style.display = 'block';
-        this.initScrollSpy(tocItems);
-        this.addHeadingAnchors(headings);
-      }
-
-      render(items) {
-        this.list.innerHTML = items
-          .map(item => `
-            <li class="toc-item">
-              <a href="#${item.id}" class="toc-link h${item.level}">${item.text}</a>
-            </li>
-          `)
-          .join('');
-      }
-
-      initScrollSpy(items) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            const id = entry.target.id;
-            const link = this.list.querySelector(`a[href="#${id}"]`);
-            
-            if (entry.isIntersecting) {
-              if (this.currentActive) {
-                this.currentActive.classList.remove('active');
-              }
-              this.currentActive = link;
-              link?.classList.add('active');
-            }
-          });
-        }, {
-          rootMargin: '-20% 0px -35% 0px'
-        });
-
-        items.forEach(item => observer.observe(item.element));
-      }
-
-      addHeadingAnchors(headings) {
-        headings.forEach(heading => {
+    
+    // Enhance Headings with Anchors
+    function enhanceHeadings() {
+      const headings = document.querySelectorAll('.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4');
+      
+      headings.forEach(heading => {
+        if (!heading.querySelector('.heading-anchor')) {
           const anchor = document.createElement('a');
-          anchor.href = `#${heading.id}`;
-          anchor.className = 'anchor-link';
+          anchor.className = 'heading-anchor';
+          anchor.href = '#' + heading.id;
           anchor.innerHTML = '#';
-          anchor.title = 'رابط مباشر لهذا القسم';
-          
-          anchor.addEventListener('click', (e) => {
+          anchor.onclick = (e) => {
             e.preventDefault();
-            heading.scrollIntoView({ behavior: 'smooth' });
-            
-            // Copy link to clipboard
-            const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
-            navigator.clipboard?.writeText(url);
-          });
-
+            const url = window.location.href.split('#')[0] + anchor.getAttribute('href');
+            navigator.clipboard.writeText(url);
+            showToast('تم نسخ الرابط!', 'success');
+          };
           heading.appendChild(anchor);
-        });
-      }
-    }
-
-    // === ARTICLE ENHANCEMENTS ===
-    class ArticleEnhancements {
-      constructor() {
-        this.readingTimeCache = new Map();
-      }
-
-      enhance(content) {
-        this.addReadingTime(content);
-        this.enhanceCodeBlocks(content);
-        this.addArticleHeader(content);
-      }
-
-      addReadingTime(content) {
-        const text = utils.getTextContent(content);
-        const wordCount = utils.countWords(text);
-        const minutes = Math.ceil(wordCount / config.wordsPerMinute);
-        
-        // Find or create article header
-        let header = content.querySelector('.article-header');
-        if (!header) {
-          header = document.createElement('div');
-          header.className = 'article-header';
-          content.insertBefore(header, content.firstChild);
         }
-
-        // Add meta information
-        const meta = document.createElement('div');
-        meta.className = 'article-meta';
-        meta.innerHTML = `
-          <span class="reading-time">${utils.formatReadingTime(minutes)}</span>
-          <span class="word-count">${wordCount} كلمة</span>
-        `;
-        
-        header.appendChild(meta);
-      }
-
-      enhanceCodeBlocks(content) {
-        const codeBlocks = content.querySelectorAll('pre[data-lang], pre > code');
-        
-        codeBlocks.forEach((block, index) => {
-          const pre = block.tagName === 'PRE' ? block : block.parentElement;
-          if (pre.querySelector('.code-header')) return; // Already enhanced
-          
-          const lang = block.getAttribute('data-lang') || 
-                      block.className.match(/language-(\w+)/)?.[1] || 
-                      'text';
-          
-          const header = document.createElement('div');
-          header.className = 'code-header';
-          header.innerHTML = `
-            <span class="code-lang">${lang}</span>
-            <button class="copy-button" data-code-index="${index}">نسخ</button>
-          `;
-          
-          pre.insertBefore(header, pre.firstChild);
-          
-          // Add copy functionality
-          const copyBtn = header.querySelector('.copy-button');
-          copyBtn.addEventListener('click', () => {
-            const code = utils.getTextContent(block);
-            navigator.clipboard?.writeText(code).then(() => {
-              copyBtn.textContent = 'تم النسخ!';
-              copyBtn.classList.add('copied');
-              setTimeout(() => {
-                copyBtn.textContent = 'نسخ';
-                copyBtn.classList.remove('copied');
-              }, 2000);
-            });
-          });
-        });
-      }
-
-      addArticleHeader(content) {
-        const firstHeading = content.querySelector('h1');
-        if (!firstHeading) return;
-
+      });
+    }
+    
+    // Enhance Sidebar
+    function enhanceSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      if (!sidebar) return;
+      
+      // Add custom header if not exists
+      if (!sidebar.querySelector('.sidebar-header')) {
         const header = document.createElement('div');
-        header.className = 'article-header';
+        header.className = 'sidebar-header';
+        header.innerHTML = `
+          <div class="sidebar-logo">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" fill="white"/>
+              <circle cx="12" cy="12" r="3" fill="var(--depth-purple-500)"/>
+            </svg>
+          </div>
+          <div class="sidebar-title">Depth Documentation</div>
+          <div class="sidebar-version">
+            <span class="version-badge">v2.0</span>
+            <span class="version-badge">RTL</span>
+          </div>
+        `;
+        sidebar.insertBefore(header, sidebar.firstChild);
+      }
+      
+      // Enhance navigation items
+      const navRoot = document.querySelector('.sidebar-nav > ul');
+      if (!navRoot) return;
+      
+      // Clean up old enhancements
+      navRoot.querySelectorAll('.nav-icon, .section-arrow').forEach(el => el.remove());
+      
+      // Process each navigation item
+      navRoot.querySelectorAll(':scope > li').forEach((li) => {
+        const hasSubmenu = li.querySelector('ul');
+        let link = li.querySelector(':scope > a');
+        let sectionLabel = li.querySelector(':scope > .section-label');
         
-        // Move the h1 into the header if it's not already there
-        if (!firstHeading.closest('.article-header')) {
-          content.insertBefore(header, firstHeading);
-          header.appendChild(firstHeading);
-        }
-      }
-    }
-
-    // === MOBILE NAVIGATION ===
-    class MobileNavigation {
-      constructor() {
-        this.menuButton = document.getElementById('menuToggle');
-        this.init();
-      }
-
-      init() {
-        this.menuButton?.addEventListener('click', () => {
-          document.body.classList.toggle('sidebar-open');
-        });
-
-        // Close sidebar when clicking on content (mobile only)
-        document.addEventListener('click', (e) => {
-          if (window.innerWidth <= 767 && 
-              !e.target.closest('.sidebar') && 
-              !e.target.closest('.mobile-menu')) {
-            document.body.classList.remove('sidebar-open');
-          }
-        });
-      }
-    }
-
-    // === BACK TO TOP ===
-    class BackToTop {
-      constructor() {
-        this.button = document.getElementById('backToTop');
-        this.init();
-      }
-
-      init() {
-        window.addEventListener('scroll', utils.throttle(() => {
-          const shouldShow = window.pageYOffset > config.scrollThreshold;
-          this.button.classList.toggle('visible', shouldShow);
-        }, 100));
-
-        this.button?.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
-    }
-
-    // === KEYBOARD SHORTCUTS ===
-    class KeyboardShortcuts {
-      constructor() {
-        this.init();
-      }
-
-      init() {
-        document.addEventListener('keydown', (e) => {
-          // Search shortcut: / or Ctrl+K
-          if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
-            e.preventDefault();
-            const searchInput = document.querySelector('.search input');
-            searchInput?.focus();
-          }
-          
-          // Home shortcut: G then H
-          if (this.isSequence && e.key === 'h') {
-            window.location.hash = '/';
-            this.isSequence = false;
-          }
-          
-          if (e.key === 'g') {
-            this.isSequence = true;
-            setTimeout(() => { this.isSequence = false; }, 1000);
-          }
-        });
-      }
-    }
-
-    // === MAIN APPLICATION ===
-    class DepthDocs {
-      constructor() {
-        this.breadcrumbs = new Breadcrumbs();
-        this.toc = new TableOfContents();
-        this.articleEnhancements = new ArticleEnhancements();
-        this.readingProgress = new ReadingProgress();
-        this.mobileNav = new MobileNavigation();
-        this.backToTop = new BackToTop();
-        this.keyboardShortcuts = new KeyboardShortcuts();
+        // Determine icon based on text
+        let iconName = 'home';
+        const text = (link?.textContent || sectionLabel?.textContent || '').trim();
         
-        this.init();
-      }
-
-      init() {
-        // Initialize Docsify configuration
-        this.initDocsify();
-      }
-
-      initDocsify() {
-        window.$docsify = {
-          name: 'Depth Documentation',
-          homepage: 'main.md',
-          loadSidebar: true,
-          subMaxLevel: 2,
-          auto2top: true,
-          search: {
-            paths: 'auto',
-            placeholder: 'البحث في الوثائق...',
-            noData: 'لا توجد نتائج',
-            depth: 4
-          },
-          plugins: [
-            // Custom plugin for enhancements
-            (hook) => {
-              // Add sidebar header
-              hook.mounted(() => {
-                this.addSidebarHeader();
-              });
-
-              // Process content after each page load
-              hook.doneEach(() => {
-                const content = document.querySelector('.markdown-section');
-                if (content) {
-                  // Update breadcrumbs
-                  const route = window.location.hash.replace('#/', '');
-                  this.breadcrumbs.update(route);
-                  
-                  // Generate table of contents
-                  this.toc.generate(content);
-                  
-                  // Enhance article
-                  this.articleEnhancements.enhance(content);
-                  
-                  // Update navigation
-                  this.updateNavigation();
-                  
-                  // Handle empty content
-                  this.handleEmptyContent(content);
-                }
-              });
-
-              // Handle route changes
-              hook.beforeEach((content, next) => {
-                next(content);
-              });
+        if (text.includes('الرئيسية')) iconName = 'home';
+        else if (text.includes('البداية') || text.includes('المتطلبات')) iconName = 'requirements';
+        else if (text.includes('قاعدة البيانات')) iconName = 'database';
+        else if (text.includes('الأساسيات')) iconName = 'api';
+        else if (text.includes('المميزات')) iconName = 'features';
+        else if (text.includes('الإدارة')) iconName = 'admin';
+        else if (text.includes('التكاملات')) iconName = 'integrations';
+        else if (text.includes('التطوير')) iconName = 'development';
+        else if (text.includes('الجوال') || text.includes('الواجهات')) iconName = 'mobile';
+        else if (text.includes('الأمان')) iconName = 'security';
+        else if (text.includes('العمليات')) iconName = 'operations';
+        else if (text.includes('المراجع')) iconName = 'reference';
+        
+        // Create section label if needed
+        if (!link && !sectionLabel && hasSubmenu) {
+          let titleText = '';
+          Array.from(li.childNodes).forEach(node => {
+            if (node.nodeType === 3) {
+              titleText += node.textContent.trim();
+              node.textContent = '';
             }
-          ]
-        };
-      }
-
-      addSidebarHeader() {
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar && !sidebar.querySelector('.sidebar-header')) {
-          const header = document.createElement('div');
-          header.className = 'sidebar-header';
-          header.innerHTML = `
-            <div class="sidebar-logo">
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="white"/>
-                <circle cx="12" cy="12" r="3" fill="var(--depth-purple-500)"/>
-              </svg>
-            </div>
-            <div class="sidebar-title">Depth Documentation</div>
-            <div class="sidebar-version">
-              <span class="version-badge">v3.0</span>
-              <span class="version-badge">RTL</span>
-            </div>
+          });
+          
+          sectionLabel = document.createElement('span');
+          sectionLabel.className = 'section-label';
+          sectionLabel.innerHTML = `
+            <span class="nav-icon">${icons[iconName]}</span>
+            <span>${titleText || 'قسم'}</span>
           `;
-          sidebar.insertBefore(header, sidebar.firstChild);
+          li.insertBefore(sectionLabel, hasSubmenu);
         }
-      }
-
-      updateNavigation() {
-        const root = document.querySelector('.sidebar-nav > ul');
-        if (!root) return;
-
-        // Clean up old enhancements
-        root.querySelectorAll('.nav-icon, .section-arrow, .nav-badge').forEach(el => el.remove());
-
-        // Process each navigation item
-        root.querySelectorAll(':scope > li').forEach((li, index) => {
-          const sub = Array.from(li.children).find(el => el.tagName === 'UL');
-          let link = li.querySelector(':scope > a');
-          let label = li.querySelector(':scope > .section-label');
-
-          // Determine appropriate icon
-          const text = (link?.textContent || label?.textContent || '').trim();
-          const iconName = this.getIconForText(text);
-
-          // Create section label if needed
-          if (!link && !label && sub) {
-            let titleText = '';
-            Array.from(li.childNodes).forEach(n => {
-              if (n.nodeType === 3) {
-                titleText += n.textContent.trim();
-                n.textContent = '';
-              } else if (n.nodeType === 1 && n.tagName !== 'UL' && n.tagName !== 'A') {
-                titleText += (n.textContent || '').trim();
-                n.remove();
+        
+        // Add icon to link
+        if (link && !link.querySelector('.nav-icon')) {
+          const linkText = link.textContent;
+          link.innerHTML = `
+            <span class="nav-icon">${icons[iconName]}</span>
+            <span>${linkText}</span>
+          `;
+        }
+        
+        // Add collapse arrow for sections
+        if (hasSubmenu) {
+          const arrow = document.createElement('span');
+          arrow.className = 'section-arrow';
+          arrow.innerHTML = icons.arrow;
+          
+          const clickTarget = sectionLabel || link;
+          if (clickTarget) {
+            clickTarget.appendChild(arrow);
+            clickTarget.style.cursor = 'pointer';
+            clickTarget.addEventListener('click', function(e) {
+              if (!link || e.target.closest('.section-arrow')) {
+                e.preventDefault();
+                li.classList.toggle('open');
+                
+                // Save state
+                const openSections = Array.from(navRoot.querySelectorAll('li.open')).map(el => {
+                  return Array.from(navRoot.querySelectorAll('li')).indexOf(el);
+                });
+                localStorage.setItem('sidebarState', JSON.stringify(openSections));
               }
             });
-            
-            label = document.createElement('span');
-            label.className = 'section-label';
-            label.innerHTML = `
-              <span class="nav-icon">${icons[iconName]}</span>
-              <span>${titleText || 'قسم'}</span>
-            `;
-            li.insertBefore(label, sub);
           }
-
-          // Add icon to link
-          if (link && !link.querySelector('.nav-icon')) {
-            const linkText = link.textContent;
-            link.innerHTML = `
-              <span class="nav-icon">${icons[iconName]}</span>
-              <span>${linkText}</span>
-            `;
-          }
-
-          // Add collapsible functionality
-          if (sub) {
-            const arrow = document.createElement('span');
-            arrow.className = 'section-arrow';
-            arrow.innerHTML = icons.arrow;
-            
-            const clickHandler = (e) => {
-              e.preventDefault();
-              li.classList.toggle('open');
-            };
-
-            if (label) {
-              label.appendChild(arrow);
-              label.addEventListener('click', clickHandler);
-            } else if (link) {
-              link.appendChild(arrow);
-              link.addEventListener('click', (e) => {
-                if (e.target.closest('.section-arrow')) {
-                  clickHandler(e);
-                }
-              });
-            }
-          }
-
-          // Add badges (examples)
-          if (text.includes('المشاريع') && link) {
-            const badge = document.createElement('span');
-            badge.className = 'nav-badge';
-            badge.textContent = '8';
-            link.appendChild(badge);
-          } else if (text.includes('التسعير') && link) {
-            const badge = document.createElement('span');
-            badge.className = 'nav-badge add';
-            badge.textContent = '+3';
-            link.appendChild(badge);
-          }
-        });
-
-        // Auto-expand active section
-        const active = root.querySelector('a.active');
-        if (active) {
-          let parent = active.parentElement;
-          while (parent && parent !== root) {
-            if (parent.tagName === 'LI') parent.classList.add('open');
-            parent = parent.parentElement;
+          
+          // Restore open state
+          const savedState = localStorage.getItem('sidebarState');
+          if (savedState) {
+            try {
+              const openIndices = JSON.parse(savedState);
+              const allItems = Array.from(navRoot.querySelectorAll('li'));
+              const currentIndex = allItems.indexOf(li);
+              if (openIndices.includes(currentIndex)) {
+                li.classList.add('open');
+              }
+            } catch(e) {}
           }
         }
-      }
-
-      getIconForText(text) {
-        if (text.includes('الرئيسية')) return 'home';
-        if (text.includes('البداية') || text.includes('المتطلبات')) return 'requirements';
-        if (text.includes('قاعدة البيانات')) return 'database';
-        if (text.includes('الأساسيات')) return 'api';
-        if (text.includes('المميزات')) return 'features';
-        if (text.includes('الإدارة')) return 'admin';
-        if (text.includes('التكاملات')) return 'integrations';
-        if (text.includes('التطوير')) return 'development';
-        if (text.includes('الجوال') || text.includes('الواجهات')) return 'mobile';
-        if (text.includes('الأمان')) return 'security';
-        if (text.includes('العمليات')) return 'operations';
-        if (text.includes('المراجع')) return 'reference';
-        return 'home';
-      }
-
-      handleEmptyContent(content) {
-        const isEmpty = !content.textContent.trim() || 
-                       content.textContent.trim().length < 50;
-        
-        if (isEmpty) {
-          content.innerHTML = `
-            <div class="empty-content">
-              <div class="empty-icon">📝</div>
-              <h2>هذه الصفحة قيد الإنشاء</h2>
-              <p>نعمل حالياً على إنشاء محتوى هذه الصفحة. ستكون متاحة قريباً.</p>
-              <p>للمساعدة أو الاستفسارات، يرجى <a href="#contact">التواصل مع الفريق</a>.</p>
-            </div>
-          `;
+      });
+      
+      // Auto-open active section
+      const activeLink = navRoot.querySelector('a.active');
+      if (activeLink) {
+        let parent = activeLink.parentElement;
+        while (parent && parent !== navRoot) {
+          if (parent.tagName === 'LI') {
+            parent.classList.add('open');
+          }
+          parent = parent.parentElement;
         }
       }
     }
-
-    // === INITIALIZE APPLICATION ===
-    document.addEventListener('DOMContentLoaded', () => {
-      new DepthDocs();
-    });
+    
+    // Update Reading Progress
+    function updateReadingProgress() {
+      const progressBar = document.getElementById('readingProgress');
+      if (!progressBar) return;
+      
+      const updateProgress = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = (scrollTop / scrollHeight) * 100;
+        progressBar.style.width = progress + '%';
+      };
+      
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+    
+    // Setup Feedback Widget
+    function setupFeedbackWidget() {
+      const content = document.querySelector('.markdown-section');
+      if (!content || document.getElementById('feedback-widget')) return;
+      
+      const widget = document.createElement('div');
+      widget.id = 'feedback-widget';
+      widget.className = 'feedback-widget';
+      widget.innerHTML = `
+        <div class="feedback-question">هل كانت هذه الصفحة مفيدة؟</div>
+        <div class="feedback-buttons">
+          <button class="feedback-btn positive" onclick="submitFeedback(true)">
+            👍 نعم
+          </button>
+          <button class="feedback-btn negative" onclick="submitFeedback(false)">
+            👎 لا
+          </button>
+        </div>
+      `;
+      
+      content.appendChild(widget);
+    }
+    
+    // Submit Feedback
+    window.submitFeedback = function(isPositive) {
+      const widget = document.getElementById('feedback-widget');
+      if (widget) {
+        widget.innerHTML = '<div class="feedback-thanks">شكراً لك على رأيك! 💜</div>';
+        
+        // Save feedback (in real app, send to backend)
+        const feedback = {
+          page: window.location.hash,
+          positive: isPositive,
+          timestamp: new Date().toISOString()
+        };
+        console.log('Feedback submitted:', feedback);
+      }
+    };
+    
+    // Setup Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+      let lastKey = '';
+      
+      document.addEventListener('keydown', (e) => {
+        // Search shortcut: / or Ctrl+K
+        if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
+          e.preventDefault();
+          const searchInput = document.querySelector('.search input');
+          if (searchInput) searchInput.focus();
+        }
+        
+        // Go home: G then H
+        if (lastKey === 'g' && e.key === 'h') {
+          e.preventDefault();
+          window.location.hash = '/';
+        }
+        
+        // Navigate with arrows
+        if (e.key === 'ArrowLeft') {
+          const nextBtn = document.querySelector('.pagination-item-next a');
+          if (nextBtn) nextBtn.click();
+        }
+        if (e.key === 'ArrowRight') {
+          const prevBtn = document.querySelector('.pagination-item-prev a');
+          if (prevBtn) prevBtn.click();
+        }
+        
+        // Toggle theme: T
+        if (e.key === 't' && !e.ctrlKey && !e.metaKey) {
+          const activeElement = document.activeElement;
+          if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            toggleTheme();
+          }
+        }
+        
+        // Show shortcuts: ?
+        if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          toggleShortcuts();
+        }
+        
+        lastKey = e.key.toLowerCase();
+      });
+    }
+    
+    // Setup Back to Top
+    function setupBackToTop() {
+      const btn = document.getElementById('backToTop');
+      if (!btn) return;
+      
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 500) {
+          btn.classList.add('visible');
+        } else {
+          btn.classList.remove('visible');
+        }
+      }, { passive: true });
+      
+      btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+    
+    // Setup Theme Toggle
+    function setupThemeToggle() {
+      const btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      
+      btn.addEventListener('click', toggleTheme);
+    }
+    
+    // Toggle Theme
+    window.toggleTheme = function() {
+      const currentTheme = document.body.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+      
+      showToast(`تم التبديل إلى الوضع ${newTheme === 'dark' ? 'الليلي' : 'النهاري'}`, 'success');
+    };
+    
+    // Update Theme Icon
+    function updateThemeIcon(theme) {
+      const btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      
+      const sunIcon = btn.querySelector('.sun-icon');
+      const moonIcon = btn.querySelector('.moon-icon');
+      
+      if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    }
+    
+    // Setup Mobile Menu
+    function setupMobileMenu() {
+      const btn = document.getElementById('menuToggle');
+      if (!btn) return;
+      
+      btn.addEventListener('click', () => {
+        document.body.classList.toggle('sidebar-open');
+      });
+      
+      // Close on link click
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('.sidebar a') && window.innerWidth < 768) {
+          setTimeout(() => {
+            document.body.classList.remove('sidebar-open');
+          }, 300);
+        }
+      });
+    }
+    
+    // Toggle Shortcuts Modal
+    window.toggleShortcuts = function() {
+      const modal = document.getElementById('shortcutsModal');
+      if (modal) {
+        modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+      }
+    };
+    
+    // Show Toast Notification
+    window.showToast = function(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 10);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, duration);
+    };
+    
+    // Initialize Tooltips
+    function initTooltips() {
+      document.querySelectorAll('[title]').forEach(el => {
+        const title = el.getAttribute('title');
+        el.removeAttribute('title');
+        el.setAttribute('data-tooltip', title);
+      });
+    }
+    
+    // Add Version Selector
+    function addVersionSelector() {
+      const sidebar = document.querySelector('.sidebar');
+      if (!sidebar || document.getElementById('version-selector')) return;
+      
+      const selector = document.createElement('div');
+      selector.id = 'version-selector';
+      selector.className = 'version-selector';
+      selector.innerHTML = `
+        <select onchange="changeVersion(this.value)">
+          <option value="v2.0" selected>v2.0 (الحالي)</option>
+          <option value="v1.9">v1.9</option>
+          <option value="v1.8">v1.8</option>
+        </select>
+        <a href="#/changelog" class="changelog-link">سجل التغييرات</a>
+      `;
+      
+      const searchBox = sidebar.querySelector('.search');
+      if (searchBox) {
+        searchBox.parentNode.insertBefore(selector, searchBox.nextSibling);
+      }
+    }
+    
+    // Change Version
+    window.changeVersion = function(version) {
+      showToast(`جاري التبديل إلى الإصدار ${version}...`, 'info');
+      // In real app, redirect to different version
+    };
+    
+    // Track Search Queries
+    function trackSearchQueries() {
+      const searchInput = document.querySelector('.search input');
+      if (!searchInput) return;
+      
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          if (e.target.value.length > 2) {
+            // Save recent searches
+            const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+            searches.unshift(e.target.value);
+            const uniqueSearches = [...new Set(searches)].slice(0, 5);
+            localStorage.setItem('recentSearches', JSON.stringify(uniqueSearches));
+            
+            // Track for analytics (in real app)
+            console.log('Search query:', e.target.value);
+          }
+        }, 500);
+      });
+    }
+    
+    // Save/Restore Scroll Position
+    function saveScrollPosition() {
+      const key = `scrollPos_${window.location.hash}`;
+      localStorage.setItem(key, window.pageYOffset);
+    }
+    
+    function restoreScrollPosition() {
+      const key = `scrollPos_${window.location.hash}`;
+      const scrollPos = localStorage.getItem(key);
+      if (scrollPos) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(scrollPos));
+        }, 100);
+      }
+    }
   </script>
   
-  <!-- Docsify Scripts -->
+  <!-- Load Docsify and Plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
 </body>
 </html>
