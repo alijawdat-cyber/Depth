@@ -519,9 +519,9 @@ logger.error('Database connection failed', {
 
 ## 🔗 الملفات ذات الصلة
 
-- [نظرة عامة](./00-overview.md)
+- [نظرة عامة](../../00-overview/00-introduction.md)
 - [المصادقة والأمان](./01-authentication.md)
-- [الأمان والحوكمة](./11-governance-api.md)
-- [قاموس البيانات](../02-database/00-data-dictionary.md)
-- [متطلبات النظام](../01-requirements/00-requirements-v2.0.md)
+- [الأمان والحوكمة](../admin/02-governance.md)
+- [قاموس البيانات](../../02-database/00-data-dictionary.md)
+- [متطلبات النظام](../../01-requirements/00-requirements-v2.0.md)
 
