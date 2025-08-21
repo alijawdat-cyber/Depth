@@ -42,4 +42,4 @@ npm run type-check   # TypeScript checking
 ## Getting Help
 - [API Documentation](../03-api/)
 - [Database Schema](../02-database/00-data-dictionary.md)
-- [Project Requirements](../01-requirements/00-requirements-v2.0.md)
+- [Project Requirements](../01-requirements/00-01-requirements/00-requirements-v2.0.md)

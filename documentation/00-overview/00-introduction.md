@@ -300,7 +300,7 @@ X-Request-ID: unique_request_id (optional)
 - [نظام العملاء](./03-clients-api.md)
 - [إدارة المشاريع](./04-projects-api.md)
 - [رموز الأخطاء](./12-error-codes.md)
-- [قاموس البيانات](../data-dictionary-and-domain-model.md)
+- [قاموس البيانات](../02-database/00-data-dictionary.md)
 
 ---
 
@@ -314,8 +314,8 @@ X-Request-ID: unique_request_id (optional)
 
 ### 🌟 نظرة عامة
 - [`00-overview.md`](00-overview.md) - النظرة العامة والمقدمة الشاملة
-- [`data-dictionary-and-domain-model.md`](../data-dictionary-and-domain-model.md) - قاموس البيانات ونموذج النطاق
-- [`requirements-v2.0.md`](../requirements-v2.0.md) - **المرجع الأساسي** لجميع المتطلبات
+- [`02-database/00-data-dictionary.md`](../02-database/00-data-dictionary.md) - قاموس البيانات ونموذج النطاق
+- [`01-requirements/00-requirements-v2.0.md`](../01-requirements/00-requirements-v2.0.md) - **المرجع الأساسي** لجميع المتطلبات
 
 ---
 
@@ -618,7 +618,7 @@ X-Request-ID: unique_request_id (optional)
 - **Creators** → [نظام المبدعين](./02-creators-api.md)
 
 ### D-F
-- **Data Dictionary** → [قاموس البيانات](../data-dictionary-and-domain-model.md)
+- **Data Dictionary** → [قاموس البيانات](../02-database/00-data-dictionary.md)
 - **Error Codes** → [رموز الأخطاء](./12-error-codes.md)
 - **FCM Notifications** → [الإشعارات](./07-notifications-api.md)
 - **File Upload** → [الملفات والتخزين](./06-storage-api.md#رفع-الملفات)
@@ -690,8 +690,8 @@ X-Request-ID: unique_request_id (optional)
 ## 🔗 روابط سريعة
 
 - [🏠 العودة للصفحة الرئيسية](../README.md)
-- [📋 متطلبات النظام](../requirements-v2.0.md)
-- [📊 قاموس البيانات](../data-dictionary-and-domain-model.md)
+- [📋 متطلبات النظام](../01-requirements/00-requirements-v2.0.md)
+- [📊 قاموس البيانات](../02-database/00-data-dictionary.md)
 - [🔧 دليل API](./00-overview.md)
 
 ---

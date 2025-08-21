@@ -1247,5 +1247,5 @@
 - [لوحة الأدمن](./08-admin-api.md)
 - [التكاملات الخارجية](./10-integrations-api.md)
 - [رموز الأخطاء](./12-error-codes.md)
-- [قاموس البيانات](../data-dictionary-and-domain-model.md)
+- [قاموس البيانات](../02-database/00-data-dictionary.md)
 

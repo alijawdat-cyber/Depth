@@ -1018,5 +1018,5 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
 - [التكاملات الخارجية](./10-integrations-api.md)
 - [الأمان والحوكمة](./11-governance-api.md)
 - [رموز الأخطاء](./12-error-codes.md)
-- [قاموس البيانات](../data-dictionary-and-domain-model.md)
+- [قاموس البيانات](../02-database/00-data-dictionary.md)
 

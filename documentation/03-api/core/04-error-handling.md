@@ -522,6 +522,6 @@ logger.error('Database connection failed', {
 - [نظرة عامة](./00-overview.md)
 - [المصادقة والأمان](./01-authentication.md)
 - [الأمان والحوكمة](./11-governance-api.md)
-- [قاموس البيانات](../data-dictionary-and-domain-model.md)
-- [متطلبات النظام](../requirements-v2.0.md)
+- [قاموس البيانات](../02-database/00-data-dictionary.md)
+- [متطلبات النظام](../01-requirements/00-requirements-v2.0.md)
 

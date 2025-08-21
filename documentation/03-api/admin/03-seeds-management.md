@@ -732,6 +732,6 @@
 - [نظام التسعير](./05-pricing-api.md)
 - [نظام المبدعين](./02-creators-api.md)
 - [نظام العملاء](./03-clients-api.md)
-- [قاموس البيانات](../data-dictionary-and-domain-model.md)
+- [قاموس البيانات](../02-database/00-data-dictionary.md)
 
 *آخر تحديث: 2025-08-21 | النسخة: 2.0.1 | الحالة: Active*

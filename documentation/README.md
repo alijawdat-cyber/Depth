@@ -9,7 +9,7 @@
 
 ### للمصممين
 - [نظرة عامة](./00-overview/00-introduction.md)
-- [المتطلبات](./01-requirements/00-requirements-v2.0.md)
+- [المتطلبات](./01-requirements/00-01-requirements/00-requirements-v2.0.md)
 
 ### للمدراء
 - [خارطة الطريق](./TODO.md)

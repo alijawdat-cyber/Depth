@@ -576,7 +576,7 @@
 
 ## 🔗 المراجع الأساسية
 
-- **المتطلبات**: `01-requirements/00-requirements-v2.0.md`
+- **المتطلبات**: `01-requirements/00-01-requirements/00-requirements-v2.0.md`
 - **قاعدة البيانات**: `02-database/00-data-dictionary.md`
 - **APIs**: `03-api/`
 - **الأمان**: `07-security/`
