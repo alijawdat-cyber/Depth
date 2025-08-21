@@ -1,4 +1,33 @@
-/* ===== DEPTH DOCUMENTATION THEME ===== */
+/* ===== DEPTH DOCUMENTATION THEME - RTL FORCED ===== */
+
+/* ===== CRITICAL RTL BASE STYLES ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl !important;
+  text-align: right !important;
+  font-size: 16px;
+}
+
+body {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: 'Dubai', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  background: #0B0F14 !important;
+  color: #ffffff !important;
+  line-height: 1.7;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Force Docsify app container RTL */
+#app {
+  direction: rtl !important;
+  text-align: right !important;
+}
 
 /* ===== FONTS SETUP ===== */
 @font-face {
@@ -23,6 +52,67 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+}
+
+/* ===== DEPTH BRAND COLORS ===== */
+:root {
+  --brand-200: #D7C7FF;
+  --brand-300: #B79AFF;
+  --brand-400: #8E5BFF;
+  --brand-500: #6C2BFF;
+  --brand-600: #4A1FC9;
+  --brand-700: #4A1FC9;
+  
+  --primary-color: var(--brand-500);
+  --primary-light: var(--brand-400);
+  --primary-dark: var(--brand-700);
+  
+  --accent-color: var(--brand-400);
+  --accent-light: var(--brand-300);
+  --accent-dark: var(--brand-600);
+  
+  --ink-900: #0B0F14;
+  --ink-800: #1A232C;
+  --neutral-0: #FFFFFF;
+  --neutral-50: #F6F8FA;
+  --neutral-100: #EDF2F6;
+  --neutral-200: #D9E1E9;
+  --neutral-300: #C2CDD8;
+  --neutral-400: #A9B7C5;
+  --neutral-500: #90A1B2;
+  --neutral-600: #6A7D8F;
+  --neutral-700: #44515D;
+  --neutral-800: #28313A;
+  --neutral-900: #0B0F14;
+  
+  --bg-primary: var(--ink-900);
+  --bg-secondary: var(--ink-800);
+  --bg-card: rgba(255, 255, 255, 0.08);
+  --bg-hover: rgba(255, 255, 255, 0.12);
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #C9D3DD;
+  --text-muted: #6A7D8F;
+  
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+  
+  --gradient-primary: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-700) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--brand-400) 0%, var(--brand-600) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--brand-300) 0%, var(--brand-500) 100%);
+  
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.15);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.2);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.25);
+  
+  --radius: 14px;
+  --radius-sm: 10px;
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
 }
 
 /* ===== DEPTH BRAND COLOR PALETTE ===== */
@@ -149,27 +239,236 @@ body {
   transform: translateX(-5px);
 }
 
-/* ===== DEPTH SIDEBAR - PROFESSIONAL RTL DESIGN ===== */
-
-/* Sidebar Container */
+/* ===== SIDEBAR - RTL CORRECTED ===== */
 .sidebar {
-  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--ink-800) 100%);
-  border-left: 1px solid rgba(142, 91, 255, 0.2);
-  border-right: none;
-  width: 350px;
-  padding: 0;
-  transition: var(--transition-normal);
-  box-shadow: 
-    4px 0 15px rgba(0, 0, 0, 0.1),
-    inset -1px 0 0 rgba(142, 91, 255, 0.1);
-  backdrop-filter: blur(20px);
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  z-index: 20;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--ink-800) 100%) !important;
+  border-left: 1px solid rgba(142, 91, 255, 0.2) !important;
+  border-right: none !important;
+  width: 300px !important;
+  padding: 0 !important;
+  transition: var(--transition-normal) !important;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: auto !important;
+  height: 100vh !important;
+  z-index: 20 !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Sidebar Header */
+.depth-sidebar-header {
+  padding: 25px 20px 20px !important;
+  text-align: center !important;
+  background: var(--gradient-primary) !important;
+  border-bottom: 2px solid rgba(142, 91, 255, 0.3) !important;
+  margin-bottom: 0 !important;
+  direction: rtl !important;
+}
+
+.depth-logo {
+  margin-bottom: 15px !important;
+}
+
+.depth-logo img {
+  height: 50px !important;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.1)) !important;
+  transition: var(--transition-fast) !important;
+}
+
+.depth-version {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  direction: rtl !important;
+}
+
+.version-badge {
+  background: var(--accent-color) !important;
+  color: var(--bg-primary) !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.docs-label {
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* Sidebar Navigation */
+.sidebar ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.sidebar li {
+  margin: 0 !important;
+  position: relative !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.sidebar a {
+  display: block !important;
+  padding: 12px 25px !important;
+  color: var(--text-secondary) !important;
+  text-decoration: none !important;
+  transition: all var(--transition-fast) !important;
+  border-right: 3px solid transparent !important;
+  border-left: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  position: relative !important;
+  line-height: 1.4 !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.sidebar a:hover {
+  background: linear-gradient(270deg, rgba(142, 91, 255, 0.1) 0%, transparent 100%) !important;
+  color: var(--text-primary) !important;
+  border-right-color: var(--accent-color) !important;
+  transform: translateX(3px) !important;
+}
+
+.sidebar .active > a {
+  background: linear-gradient(270deg, rgba(142, 91, 255, 0.15) 0%, rgba(142, 91, 255, 0.05) 100%) !important;
+  color: var(--accent-color) !important;
+  border-right-color: var(--accent-color) !important;
+  font-weight: 700 !important;
+}
+
+/* Section Headers */
+.sidebar h1,
+.sidebar h2 {
+  color: var(--accent-color) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 20px 25px 8px !important;
+  margin: 15px 0 0 !important;
+  border-bottom: none !important;
+  position: relative !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.sidebar h2::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -5px !important;
+  right: 25px !important;
+  width: 40px !important;
+  height: 2px !important;
+  background: var(--gradient-accent) !important;
+  border-radius: 1px !important;
+}
+
+/* Content Area RTL */
+.content {
+  background: var(--bg-primary) !important;
+  padding: 40px !important;
+  margin-right: 300px !important;
+  margin-left: 0 !important;
+  min-height: 100vh !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.markdown-section {
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Typography RTL */
+h1, h2, h3, h4, h5, h6 {
+  direction: rtl !important;
+  text-align: right !important;
+  color: var(--text-primary) !important;
+  font-family: 'Dubai', sans-serif !important;
+  font-weight: 700 !important;
+  margin: 30px 0 20px !important;
+}
+
+p, div, span, li {
+  direction: rtl !important;
+  text-align: right !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Keep code LTR */
+pre, code, .token, .hljs {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: 'Monaco', 'Consolas', monospace !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100% !important;
+    transform: translateX(100%) !important;
+    transition: transform var(--transition-normal) !important;
+    z-index: 100 !important;
+  }
+  
+  .sidebar.open,
+  body.close .sidebar {
+    transform: translateX(0) !important;
+  }
+  
+  .content {
+    margin-right: 0 !important;
+    padding: 20px !important;
+  }
+  
+  .sidebar-toggle {
+    display: flex !important;
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: var(--radius) !important;
+    z-index: 999 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--accent-color) !important;
+  border-radius: 4px !important;
 }
 
 /* Sidebar Header - Depth Platform Logo */

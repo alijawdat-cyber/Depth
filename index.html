@@ -34,6 +34,86 @@
   <!-- Custom Depth Theme - MUST BE AFTER DOCSIFY -->
   <link rel="stylesheet" href="custom-theme.css">
   
+  <!-- FORCE RTL STYLES -->
+  <style>
+    /* CRITICAL RTL FIXES */
+    html, body {
+      direction: rtl !important;
+      text-align: right !important;
+      background: #0B0F14 !important;
+      color: #ffffff !important;
+      font-family: 'Dubai', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      overflow-x: hidden;
+    }
+    
+    /* Force Docsify containers to RTL */
+    #app, .app, .main {
+      direction: rtl !important;
+      text-align: right !important;
+    }
+    
+    /* Force sidebar to right */
+    .sidebar {
+      left: auto !important;
+      right: 0 !important;
+      border-left: 1px solid rgba(142, 91, 255, 0.2) !important;
+      border-right: none !important;
+      direction: rtl !important;
+    }
+    
+    /* Force content margin for RTL */
+    .content {
+      margin-left: 0 !important;
+      margin-right: 350px !important;
+      direction: rtl !important;
+      text-align: right !important;
+    }
+    
+    /* Fix navigation RTL */
+    .app-nav {
+      position: fixed !important;
+      top: 25px !important;
+      left: 80px !important;
+      right: auto !important;
+      direction: ltr !important; /* Keep nav items LTR for better UX */
+    }
+    
+    /* GitHub corner position */
+    .github-corner {
+      left: 0 !important;
+      right: auto !important;
+    }
+    
+    /* Force all text elements to RTL */
+    h1, h2, h3, h4, h5, h6, p, div, span, li, a {
+      direction: rtl !important;
+      text-align: right !important;
+    }
+    
+    /* Keep code blocks LTR */
+    pre, code, .token {
+      direction: ltr !important;
+      text-align: left !important;
+    }
+    
+    /* Mobile fixes */
+    @media (max-width: 768px) {
+      .content {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+      }
+      
+      .sidebar {
+        transform: translateX(100%) !important;
+      }
+      
+      .sidebar.show,
+      body.close .sidebar {
+        transform: translateX(0) !important;
+      }
+    }
+  </style>
+  
   <!-- Additional RTL Fixes and Enhanced Styling -->
   <style>
     /* Enhanced Navigation Styling */
