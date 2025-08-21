@@ -532,11 +532,11 @@ Content-Disposition: attachment; filename="invoice-INV-2025-001234.pdf"
 
 ## 🔗 الملفات ذات الصلة
 
-- [نظرة عامة](./00-overview.md)
-- [المصادقة والأمان](./01-authentication.md)
-- [نظام المبدعين](./02-creators-api.md)
-- [إدارة المشاريع](./04-projects-api.md)
-- [نظام التسعير](./05-pricing-api.md)
-- [نظام الإشعارات](./07-notifications-api.md)
-- [لوحة الأدمن](./08-admin-api.md)
-- [رموز الأخطاء](./12-error-codes.md)
+- [نظرة عامة](../../00-overview/00-introduction.md)
+- [المصادقة والأمان](../core/01-authentication.md)
+- [نظام المبدعين](./01-creators.md)
+- [إدارة المشاريع](./03-projects.md)
+- [نظام التسعير](./04-pricing.md)
+- [نظام الإشعارات](./06-notifications.md)
+- [لوحة الأدمن](../admin/01-admin-panel.md)
+- [رموز الأخطاء](../core/04-error-handling.md)
