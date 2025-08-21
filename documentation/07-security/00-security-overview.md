@@ -1,28 +1,28 @@
-# 🔐 Security Overview
+# 🔐 نظرة عامة على الأمان
 
-## Security Architecture
+## البنية الأمنية
 
-### Defense in Depth Strategy
-The Depth platform implements multiple layers of security:
+### استراتيجية الدفاع المتعدد الطبقات
+تطبق منصة Depth طبقات متعددة من الأمان:
 
-1. **Network Security** - HTTPS, CORS, Rate Limiting
-2. **Authentication** - Multi-factor authentication, JWT tokens
-3. **Authorization** - Role-based access control (RBAC)
-4. **Data Security** - Encryption at rest and in transit
-5. **Application Security** - Input validation, sanitization
-6. **Infrastructure Security** - Firewall, VPN, monitoring
+1. **أمان الشبكة** - HTTPS، CORS، تحديد معدل الطلبات
+2. **المصادقة** - المصادقة متعددة العوامل، رموز JWT
+3. **التخويل** - التحكم في الوصول القائم على الأدوار (RBAC)
+4. **أمان البيانات** - التشفير أثناء الراحة والنقل
+5. **أمان التطبيق** - التحقق من صحة الإدخال والتطهير
+6. **أمان البنية التحتية** - جدار الحماية، VPN، المراقبة
 
-## Authentication & Authorization
+## المصادقة والتخويل
 
-### Multi-Factor Authentication (MFA)
-- **Primary**: Email/Password or Phone/OTP
-- **Secondary**: SMS verification for sensitive operations
-- **Backup**: Email verification codes
-- **Enterprise**: SAML/OAuth2 integration
+### المصادقة متعددة العوامل (MFA)
+- **الأساسي**: البريد الإلكتروني/كلمة المرور أو الهاتف/OTP
+- **الثانوي**: التحقق عبر الرسائل القصيرة للعمليات الحساسة
+- **النسخ الاحتياطي**: رموز التحقق عبر البريد الإلكتروني
+- **المؤسسات**: تكامل SAML/OAuth2
 
-### JWT Token Management
+### إدارة رموز JWT
 ```javascript
-// Token structure
+// هيكل الرمز المميز
 {
   "sub": "user_id",
   "role": "creator|client|admin",

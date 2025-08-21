@@ -1,45 +1,45 @@
-# 🔧 Local Development Setup
+# 🔧 إعداد بيئة التطوير المحلية
 
-## Prerequisites
-- **Node.js**: v20.0.0 or higher
-- **npm**: v10.0.0 or higher
-- **Git**: Latest version
-- **Firebase CLI**: Latest version
+## المتطلبات الأساسية
+- **Node.js**: الإصدار 20.0.0 أو أحدث
+- **npm**: الإصدار 10.0.0 أو أحدث
+- **Git**: أحدث إصدار
+- **Firebase CLI**: أحدث إصدار
 
-## Installation Steps
+## خطوات التثبيت
 
-### 1. Clone the Repository
+### 1. استنساخ المستودع
 ```bash
 git clone https://github.com/alijawdat-cyber/Depth.git
 cd Depth
 ```
 
-### 2. Install Dependencies
+### 2. تثبيت التبعيات
 ```bash
 npm install
 ```
 
-### 3. Install Firebase CLI
+### 3. تثبيت Firebase CLI
 ```bash
 npm install -g firebase-tools
 firebase login
 ```
 
-### 4. Environment Setup
+### 4. إعداد البيئة
 ```bash
-# Copy environment template
+# نسخ قالب البيئة
 cp .env.example .env.local
 
-# Edit environment variables
+# تحرير متغيرات البيئة
 nano .env.local
 ```
 
-### 5. Firebase Project Setup
+### 5. إعداد مشروع Firebase
 ```bash
-# Initialize Firebase
+# تهيئة Firebase
 firebase init
 
-# Select:
+# اختر:
 # - Firestore
 # - Functions  
 # - Hosting
@@ -47,25 +47,25 @@ firebase init
 # - Emulators
 ```
 
-### 6. Start Development Server
+### 6. بدء خادم التطوير
 ```bash
 npm run dev
 ```
 
-## Development Workflow
+## سير عمل التطوير
 
-### Daily Workflow
-1. Pull latest changes: `git pull`
-2. Install new dependencies: `npm install`
-3. Start dev server: `npm run dev`
-4. Make changes
-5. Test: `npm test`
-6. Commit: `git commit -m "feat: description"`
-7. Push: `git push`
+### سير العمل اليومي
+1. سحب أحدث التغييرات: `git pull`
+2. تثبيت التبعيات الجديدة: `npm install`
+3. بدء خادم التطوير: `npm run dev`
+4. إجراء التغييرات
+5. الاختبار: `npm test`
+6. الحفظ: `git commit -m "feat: description"`
+7. الدفع: `git push`
 
-### Testing Locally
+### الاختبار المحلي
 ```bash
-# Run all tests
+# تشغيل جميع الاختبارات
 npm test
 
 # Run specific test

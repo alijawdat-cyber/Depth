@@ -1,22 +1,22 @@
-# 📱 Mobile Apps Overview
+# 📱 نظرة عامة على تطبيقات الهاتف المحمول
 
-## Platform Mobile Strategy
+## استراتيجية المنصة للهاتف المحمول
 
-### Applications Architecture
-The Depth platform includes two native mobile applications:
-- **Creator App** - For photographers, videographers, and content creators
-- **Client App** - For businesses and individuals requesting services
+### بنية التطبيقات
+تتضمن منصة Depth تطبيقين أصليين للهاتف المحمول:
+- **تطبيق المبدعين** - للمصورين ومصوري الفيديو ومنشئي المحتوى
+- **تطبيق العملاء** - للشركات والأفراد الذين يطلبون الخدمات
 
-### Technology Stack
-- **Framework**: React Native with Expo
-- **State Management**: Redux Toolkit + RTK Query
-- **Navigation**: React Navigation v6
-- **UI Components**: Native Base / Tamagui
-- **Authentication**: Firebase Auth
-- **Push Notifications**: Firebase Cloud Messaging (FCM)
-- **File Upload**: Expo ImagePicker + Cloudflare R2
-- **Maps**: React Native Maps (Google Maps)
-- **Camera**: Expo Camera
+### المجموعة التقنية
+- **الإطار**: React Native مع Expo
+- **إدارة الحالة**: Redux Toolkit + RTK Query
+- **التنقل**: React Navigation v6
+- **مكونات UI**: Native Base / Tamagui
+- **المصادقة**: Firebase Auth
+- **الإشعارات الفورية**: Firebase Cloud Messaging (FCM)
+- **رفع الملفات**: Expo ImagePicker + Cloudflare R2
+- **الخرائط**: React Native Maps (Google Maps)
+- **الكاميرا**: Expo Camera
 
 ## Creator App Features
 

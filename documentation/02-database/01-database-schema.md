@@ -1,11 +1,11 @@
-# 📊 Database Schema & Models
+# 📊 مخطط قاعدة البيانات والنماذج
 
-## Overview
-This document describes the complete database schema for the Depth platform using Firestore.
+## نظرة عامة
+تصف هذه الوثيقة مخطط قاعدة البيانات الكامل لمنصة Depth باستخدام Firestore.
 
-## Collections Structure
+## هيكل المجموعات
 
-### Users Collection
+### مجموعة المستخدمين
 ```javascript
 // Collection: users
 {
@@ -17,7 +17,7 @@ This document describes the complete database schema for the Depth platform usin
   role: 'creator' | 'client' | 'admin' | 'salariedEmployee',
   status: 'active' | 'inactive' | 'suspended',
   
-  // Profile Info
+  // معلومات الملف الشخصي
   profile: {
     firstName: string,
     lastName: string,
@@ -27,35 +27,35 @@ This document describes the complete database schema for the Depth platform usin
     languages: string[],
     bio: string,
     
-    // Location
+    // الموقع الجغرافي
     location: {
       country: string,
       city: string,
-      zone: string,              // Location zone for pricing
+      zone: string,              // المنطقة الجغرافية للتسعير
       coordinates: geopoint
     }
   },
   
-  // Timestamps
+  // التواريخ
   createdAt: timestamp,
   updatedAt: timestamp,
   lastLoginAt: timestamp
 }
 ```
 
-### Creators Collection
+### مجموعة المبدعين
 ```javascript
 // Collection: creators
 {
-  userId: string,                 // Reference to users collection
-  creatorId: string,             // Auto-generated creator ID
+  userId: string,                 // مرجع لمجموعة المستخدمين
+  creatorId: string,             // معرف المبدع المولد تلقائياً
   
-  // Onboarding Status
+  // حالة التأهيل
   onboardingStatus: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected',
-  onboardingStep: number,        // Current step (1-5)
+  onboardingStep: number,        // الخطوة الحالية (1-5)
   approvalStatus: 'pending' | 'approved' | 'rejected',
   
-  // Professional Info
+  // المعلومات المهنية
   professionalInfo: {
     experienceLevel: 'beginner' | 'intermediate' | 'professional' | 'expert',
     yearsOfExperience: number,
@@ -67,7 +67,7 @@ This document describes the complete database schema for the Depth platform usin
       other: string[]
     },
     
-    // Certifications
+    // الشهادات والمؤهلات
     certifications: [{
       name: string,
       issuedBy: string,
@@ -77,7 +77,7 @@ This document describes the complete database schema for the Depth platform usin
     }]
   },
   
-  // Categories & Subcategories
+  // الفئات والفئات الفرعية
   categories: [{
     categoryId: string,
     categoryName: string,
@@ -141,15 +141,15 @@ This document describes the complete database schema for the Depth platform usin
 }
 ```
 
-### Projects Collection
+### مجموعة المشاريع
 ```javascript
 // Collection: projects
 {
-  projectId: string,             // Auto-generated
-  clientId: string,              // Reference to users
-  creatorId: string,             // Reference to creators (when assigned)
+  projectId: string,             // مولد تلقائياً
+  clientId: string,              // مرجع للمستخدمين
+  creatorId: string,             // مرجع للمبدعين (عند التعيين)
   
-  // Basic Info
+  // المعلومات الأساسية
   title: string,
   description: string,
   category: {
@@ -243,7 +243,7 @@ This document describes the complete database schema for the Depth platform usin
 }
 ```
 
-### Categories Collection
+### مجموعة الفئات
 ```javascript
 // Collection: categories  
 {
@@ -255,18 +255,18 @@ This document describes the complete database schema for the Depth platform usin
   order: number,
   isActive: boolean,
   
-  // Metadata
+  // البيانات الوصفية
   createdAt: timestamp,
   updatedAt: timestamp
 }
 ```
 
-### Subcategories Collection
+### مجموعة الفئات الفرعية
 ```javascript
 // Collection: subcategories
 {
   subcategoryId: string,
-  categoryId: string,           // Parent category
+  categoryId: string,           // الفئة الرئيسية
   name: string,
   nameAr: string,
   description: string,

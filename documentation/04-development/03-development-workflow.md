@@ -1,11 +1,11 @@
-# 🔄 Development Workflow
+# 🔄 سير عمل التطوير
 
-## Overview
-This document outlines the development workflow and best practices for the Depth platform.
+## نظرة عامة
+تحدد هذه الوثيقة سير عمل التطوير وأفضل الممارسات لمنصة Depth.
 
-## Git Workflow
+## سير عمل Git
 
-### Branch Strategy
+### استراتيجية الفروع
 ```
 main
 ├── develop
@@ -14,20 +14,20 @@ main
 └── release/version-number
 ```
 
-### Commit Convention
+### اتفاقية الـ Commit
 ```bash
-# Format: type(scope): description
+# التنسيق: type(scope): description
 
-feat(api): add creator authentication endpoint
-fix(database): resolve connection timeout issue
-docs(readme): update installation instructions
-style(ui): improve button hover states
-refactor(pricing): optimize calculation algorithm
-test(auth): add unit tests for login flow
-chore(deps): upgrade dependencies
+feat(api): إضافة endpoint مصادقة المبدعين
+fix(database): حل مشكلة انتهاء مهلة الاتصال
+docs(readme): تحديث تعليمات التثبيت
+style(ui): تحسين حالات hover للأزرار
+refactor(pricing): تحسين خوارزمية الحساب
+test(auth): إضافة اختبارات الوحدة لتدفق تسجيل الدخول
+chore(deps): ترقية التبعيات
 ```
 
-### Development Flow
+### تدفق التطوير
 1. **Pull latest changes**: `git pull origin develop`
 2. **Create feature branch**: `git checkout -b feature/your-feature`
 3. **Make changes**: Code your feature

@@ -1,16 +1,16 @@
-# 🔐 Environment Variables
+# 🔐 متغيرات البيئة
 
-## Overview
-This document outlines all environment variables required for the Depth platform.
+## نظرة عامة
+تحدد هذه الوثيقة جميع متغيرات البيئة المطلوبة لمنصة Depth.
 
-## Environment Files
-- `.env.local` - Local development
-- `.env.staging` - Staging environment  
-- `.env.production` - Production environment
+## ملفات البيئة
+- `.env.local` - التطوير المحلي
+- `.env.staging` - بيئة الاختبار  
+- `.env.production` - بيئة الإنتاج
 
-## Required Variables
+## المتغيرات المطلوبة
 
-### Firebase Configuration
+### إعدادات Firebase
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -21,7 +21,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef123456
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-ABCDEF1234
 ```
 
-### Cloudflare R2 Storage
+### تخزين Cloudflare R2
 ```env
 CLOUDFLARE_ACCOUNT_ID=your_account_id
 CLOUDFLARE_R2_ACCESS_KEY_ID=your_access_key

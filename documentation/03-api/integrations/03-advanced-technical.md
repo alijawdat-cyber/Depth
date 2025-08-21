@@ -1013,10 +1013,10 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
 
 ## 🔗 الملفات ذات الصلة
 
-- [نظرة عامة](./00-overview.md)
-- [لوحة الأدمن](./08-admin-api.md)
-- [التكاملات الخارجية](./10-integrations-api.md)
-- [الأمان والحوكمة](./11-governance-api.md)
-- [رموز الأخطاء](./12-error-codes.md)
+- [نظرة عامة على المشروع](../../00-overview/00-introduction.md)
+- [لوحة الإدارة](../admin/01-admin-panel.md)
+- [التكاملات الخارجية](./01-external-services.md)
+- [الأمان والحوكمة](../admin/02-governance.md)
+- [معالجة الأخطاء](../core/04-error-handling.md)
 - [قاموس البيانات](../02-database/00-data-dictionary.md)
 
