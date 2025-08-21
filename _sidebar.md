@@ -1,33 +1,134 @@
-<!-- _sidebar.md -->
+<!-- ===== DEPTH PLATFORM - SIDEBAR NAVIGATION ===== -->
 
-<div class="sidebar-header">
-  <h1 style="color: #3498db; text-align: center; margin-bottom: 30px; font-size: 1.5em;">
-    📚 منصة العمق
-  </h1>
-  <div style="text-align: center; margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-    <span style="color: #27ae60; font-weight: bold;">v2.0</span>
-    <span style="margin: 0 10px;">|</span>
-    <span style="font-size: 0.9em;">التوثيق الشامل</span>
+<div class="depth-sidebar-header">
+  <div class="depth-logo">
+    <img src="logo-wordmark.svg" alt="Depth Platform" style="height: 45px; filter: brightness(0) invert(1);">
+  </div>
+  <div class="depth-version">
+    <span class="version-badge">v2.0.0</span>
+    <span class="docs-label">التوثيق الشامل</span>
   </div>
 </div>
 
 ---
 
-## 🚀 البداية السريعة
+## 🏠 الرئيسية والبداية
 
-* [📖 الصفحة الرئيسية](README.md)
-* [📖 المقدمة](documentation/00-overview/00-introduction.md)
-* [🎯 المتطلبات](documentation/01-requirements/00-requirements-v2.0.md)
-* [⚡ البدء السريع](documentation/04-development/00-getting-started.md)
-* [🔧 الإعداد المحلي](documentation/04-development/01-local-setup.md)
-* [📝 قائمة المهام](documentation/TODO.md)
+* [🏠 الصفحة الرئيسية](/)
+* [📖 مقدمة المنصة](documentation/00-overview/00-introduction)
+* [🎯 المتطلبات والأهداف](documentation/01-requirements/00-requirements-v2.0)
+* [⚡ البدء السريع](documentation/04-development/00-getting-started)
+* [🔧 الإعداد المحلي](documentation/04-development/01-local-setup)
 
 ---
 
-## 🏗️ البنية والتطوير
+## 🚀 التطوير والبناء
 
-### 💻 التطوير
-* [🌟 نظرة عامة](documentation/04-development/00-getting-started.md)
+### 💻 دليل المطور
+* [🌟 البدء في التطوير](documentation/04-development/00-getting-started)
+* [�️ الإعداد المحلي](documentation/04-development/01-local-setup)
+* [🔐 متغيرات البيئة](documentation/04-development/02-environment-variables)
+* [⚙️ سير العمل](documentation/04-development/03-development-workflow)
+* [🧪 استراتيجية الاختبار](documentation/04-development/04-testing-strategy)
+
+### � قاعدة البيانات
+* [📚 قاموس البيانات](documentation/02-database/00-data-dictionary)
+* [🏗️ مخطط قاعدة البيانات](documentation/02-database/01-database-schema)
+* [🔍 الفهارس والاستعلامات](documentation/02-database/02-indexes-and-queries)
+
+---
+
+## � واجهات البرمجة (API)
+
+### 🔌 API الأساسي
+* [📡 نظرة عامة على API](documentation/03-api/core/00-overview)
+* [🔐 المصادقة والتوثيق](documentation/03-api/core/01-authentication)
+* [👤 إدارة المستخدمين](documentation/03-api/core/02-users)
+* [📝 إدارة المشاريع](documentation/03-api/core/03-projects)
+
+### 🎨 API المبدعين
+* [👨‍🎨 ملفات المبدعين](documentation/03-api/features/01-creator-profiles)
+* [🎯 المهارات والتخصصات](documentation/03-api/features/02-skills-specializations)
+* [⏰ إدارة التوفر](documentation/03-api/features/03-availability)
+
+### 👑 API الإدارة
+* [🔧 لوحة التحكم](documentation/03-api/admin/01-dashboard)
+* [📊 التقارير والإحصائيات](documentation/03-api/admin/02-analytics)
+* [⚙️ إعدادات النظام](documentation/03-api/admin/03-system-settings)
+
+---
+
+## 🎨 الواجهة الأمامية
+
+### 💎 التصميم والـ UI/UX
+* [🎭 نظرة عامة](documentation/06-frontend/00-frontend-overview)
+* [🎨 نظام التصميم](documentation/06-frontend/01-design-system)
+* [📱 الاستجابة والموبايل](documentation/06-frontend/02-responsive-design)
+* [🌍 دعم اللغات المتعددة](documentation/06-frontend/03-i18n-support)
+
+---
+
+## � التطبيق المحمول
+
+* [📱 نظرة عامة](documentation/05-mobile/00-mobile-overview)
+
+---
+
+## 🔒 الأمان والحماية
+
+### 🛡️ دليل الأمان
+* [🔐 نظرة عامة](documentation/07-security/00-security-overview)
+* [⚠️ نموذج التهديدات](documentation/07-security/01-threat-model)
+* [🔑 إدارة المفاتيح](documentation/07-security/02-key-management)
+
+---
+
+## 🚀 العمليات والنشر
+
+### ⚙️ الإنتاج والتشغيل
+* [� نظرة عامة](documentation/08-operations/00-operations-overview)
+* [🚀 النشر والتوزيع](documentation/08-operations/01-deployment)
+* [🆘 الاستجابة للحوادث](documentation/08-operations/02-incident-response)
+
+---
+
+## 📚 المراجع والموارد
+
+### 📖 مراجع تقنية
+* [🔗 الموارد والروابط](documentation/99-reference/00-resources)
+* [📝 قاموس المصطلحات](documentation/99-reference/01-glossary)
+* [📊 معايير التعداد](documentation/99-reference/02-enums-standard)
+* [🏷️ تسميات الروابط](documentation/99-reference/03-link-alias-mapping)
+* [📋 اصطلاحات التسمية](documentation/99-reference/04-naming-conventions)
+* [👥 مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
+
+---
+
+## 📋 التوثيق التقني
+
+* [📄 ملف رئيسي شامل](documentation/MASTER-DOCUMENT-V2.0)
+* [📝 سجل التغييرات](documentation/CHANGELOG)
+* [📋 قائمة المهام](documentation/TODO)
+* [🔒 إقفال الإصدار](documentation/VERSION-LOCK-V2.0)
+
+---
+
+<div class="sidebar-footer">
+  <div class="footer-links">
+    <a href="https://github.com/alijawdat-cyber/Depth" target="_blank" class="footer-link">
+      ⚡ GitHub
+    </a>
+    <span class="separator">•</span>
+    <a href="documentation/99-reference/01-glossary" class="footer-link">
+      📚 المصطلحات
+    </a>
+  </div>
+  
+  <div class="footer-info">
+    <p class="copyright">© 2025 Depth Platform</p>
+    <p class="tagline">صُنع بـ ❤️ في العراق 🇮🇶</p>
+  </div>
+</div>
 * [🔧 الإعداد المحلي](documentation/04-development/01-local-setup.md)
 * [🌍 متغيرات البيئة](documentation/04-development/02-environment-variables.md)
 * [🔄 سير العمل](documentation/04-development/03-development-workflow.md)

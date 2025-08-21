@@ -34,65 +34,102 @@
   <!-- Custom Depth Theme - MUST BE AFTER DOCSIFY -->
   <link rel="stylesheet" href="custom-theme.css">
   
-  <!-- Additional RTL Fixes -->
+  <!-- Additional RTL Fixes and Enhanced Styling -->
   <style>
-    /* Quick RTL fixes and loading animation */
-    .app-nav {
-      position: fixed;
-      top: 25px;
-      left: 80px;
-      right: auto;
-      margin: 0;
-      z-index: 10;
+    /* Enhanced Navigation Styling */
+    .nav-icon {
+      font-size: 16px;
+      margin-left: 6px;
+      transition: transform 0.2s ease;
     }
     
-    .app-nav a {
-      color: var(--text-primary, #ffffff);
-      font-size: 15px;
+    .nav-text {
+      font-size: 13px;
       font-weight: 600;
-      margin: 0 12px;
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 10px;
-      transition: 0.3s;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.1);
     }
     
-    .app-nav a:hover {
-      background: #8E5BFF;
-      color: #0B0F14;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(142, 91, 255, 0.4);
+    .app-nav a:hover .nav-icon {
+      transform: scale(1.2);
     }
     
-    /* GitHub corner */
-    .github-corner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: auto;
-      z-index: 1000;
+    /* Mobile Navigation Adjustments */
+    @media (max-width: 480px) {
+      .nav-text {
+        display: none;
+      }
+      
+      .nav-icon {
+        margin-left: 0;
+        font-size: 18px;
+      }
+      
+      .app-nav a {
+        min-width: 40px;
+        padding: 8px 6px;
+      }
     }
     
-    .github-corner svg {
-      fill: #8E5BFF;
-      color: #0B0F14;
-      transition: 0.3s;
+    /* Loading States */
+    .loading-spinner {
+      border: 3px solid rgba(108, 43, 255, 0.1);
+      border-top: 3px solid #6C2BFF;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
     }
     
-    .github-corner:hover svg {
-      fill: #B79AFF;
+    /* Enhanced GitHub corner */
+    .github-corner:hover .octo-arm { 
+      animation: octocat-wave 560ms ease-in-out 
     }
     
-    /* Loading animation */
+    @keyframes octocat-wave { 
+      0%, 100% { transform: rotate(0) } 
+      20%, 60% { transform: rotate(-25deg) } 
+      40%, 80% { transform: rotate(10deg) } 
+    }
+    
+    @media (max-width: 500px) { 
+      .github-corner:hover .octo-arm { animation: none } 
+      .github-corner .octo-arm { animation: octocat-wave 560ms ease-in-out } 
+    }
+    
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Enhanced focus states */
+    *:focus-visible {
+      outline: 2px solid var(--accent-color, #8E5BFF);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    
+    /* Better text selection */
+    ::selection {
+      background: rgba(142, 91, 255, 0.3);
+      color: inherit;
+    }
+    
+    /* Ensure proper theme loading */
+    body {
+      background: #0B0F14;
+      color: #ffffff;
+      font-family: 'Dubai', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Loading animation improvement */
     #app:empty::before {
       content: '';
       display: block;
       width: 60px;
       height: 60px;
-      margin: 100px auto;
-      border: 5px solid rgba(255,255,255,0.1);
+      margin: 100px auto 20px;
+      border: 4px solid rgba(255,255,255,0.1);
       border-top-color: #6C2BFF;
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -102,22 +139,32 @@
       content: 'جاري تحميل التوثيق...';
       display: block;
       text-align: center;
-      margin-top: 20px;
       color: #C9D3DD;
       font-family: 'Dubai', sans-serif;
       font-weight: 600;
       font-size: 16px;
+      animation: pulse 2s ease-in-out infinite;
     }
     
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
     
-    /* Ensure proper theme loading */
-    body {
-      background: #0B0F14;
-      color: #ffffff;
-      font-family: 'Dubai', -apple-system, BlinkMacSystemFont, sans-serif;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    /* Sidebar mobile enhancements */
+    @media (max-width: 768px) {
+      .sidebar {
+        backdrop-filter: blur(25px);
+        background: linear-gradient(180deg, rgba(26, 35, 44, 0.95) 0%, rgba(11, 15, 20, 0.98) 100%);
+      }
+      
+      .sidebar-toggle {
+        box-shadow: 0 4px 12px rgba(108, 43, 255, 0.3);
+      }
     }
   </style>
 </head>
@@ -133,11 +180,26 @@
   
   <!-- Navigation -->
   <nav class="app-nav">
-    <a href="#/" title="الصفحة الرئيسية">🏠 الرئيسية</a>
-    <a href="#/documentation/03-api/core/00-overview" title="توثيق API">📡 API</a>
-    <a href="#/documentation/04-development/00-getting-started" title="دليل التطوير">💻 التطوير</a>
-    <a href="#/documentation/06-frontend/00-frontend-overview" title="الواجهة الأمامية">🎨 Frontend</a>
-    <a href="https://github.com/alijawdat-cyber/Depth" target="_blank" title="مستودع GitHub">⚡ GitHub</a>
+    <a href="#/" title="الصفحة الرئيسية">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-text">الرئيسية</span>
+    </a>
+    <a href="#/documentation/03-api/core/00-overview" title="توثيق API">
+      <span class="nav-icon">📡</span>
+      <span class="nav-text">API</span>
+    </a>
+    <a href="#/documentation/04-development/00-getting-started" title="دليل التطوير">
+      <span class="nav-icon">💻</span>
+      <span class="nav-text">التطوير</span>
+    </a>
+    <a href="#/documentation/06-frontend/00-frontend-overview" title="الواجهة الأمامية">
+      <span class="nav-icon">🎨</span>
+      <span class="nav-text">Frontend</span>
+    </a>
+    <a href="https://github.com/alijawdat-cyber/Depth" target="_blank" title="مستودع GitHub">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-text">GitHub</span>
+    </a>
   </nav>
   
   <!-- App Container -->
@@ -161,7 +223,7 @@
   <script>
     window.$docsify = {
       // Basic Configuration
-      name: '<img src="logo-wordmark.svg" alt="Depth Platform" style="height: 45px; vertical-align: middle; filter: brightness(0) invert(1);"> <span style="color: #8E5BFF; font-weight: 700;">Depth Platform</span>',
+      name: '<img src="logo-wordmark.svg" alt="Depth Platform" style="height: 45px; vertical-align: middle; filter: brightness(0) invert(1);"> <span style="color: #8E5BFF; font-weight: 700; margin-right: 10px;">منصة Depth</span>',
       repo: 'https://github.com/alijawdat-cyber/Depth',
       
       // Files and Structure
@@ -170,12 +232,13 @@
       loadNavbar: false,
       coverpage: false,
       
-      // Enhanced Features
+      // Enhanced Features for better UX
       autoHeader: true,
       maxLevel: 4,
       subMaxLevel: 3,
       mergeNavbar: true,
       relativePath: true,
+      notFoundPage: true,
       
       // Search configuration with Arabic support
       search: {
@@ -191,23 +254,17 @@
       auto2top: true,
       executeScript: true,
       
-      // Theme Configuration
-      themeable: {
-        readyTransition: true,
-        responsiveTables: true
-      },
-      
-      // Copy code functionality
+      // Copy code functionality with Arabic
       copyCode: {
-        buttonText: '📋 نسخ الكود',
-        errorText: '❌ خطأ في النسخ',
-        successText: '✅ تم النسخ بنجاح!'
+        buttonText: '📋 نسخ',
+        errorText: '❌ خطأ',
+        successText: '✅ تم النسخ!'
       },
       
-      // Pagination
+      // Pagination with Arabic
       pagination: {
-        previousText: '⬅️ الصفحة السابقة',
-        nextText: 'الصفحة التالية ➡️',
+        previousText: '⬅️ السابق',
+        nextText: 'التالي ➡️',
         crossChapter: true,
         crossChapterText: true,
       },
@@ -219,39 +276,6 @@
         theme: 'material',
         tabComments: true,
         tabHeadings: true
-      },
-      
-      // Count plugin (word count)
-      count: {
-        countable: true,
-        fontsize: '0.9em',
-        color: '#6A7D8F',
-        language: 'arabic'
-      },
-      
-      // Flexible alerts
-      'flexible-alerts': {
-        style: 'flat',
-        note: {
-          label: 'ملاحظة',
-          icon: 'fas fa-info-circle',
-          className: 'note'
-        },
-        tip: {
-          label: 'نصيحة',
-          icon: 'fas fa-lightbulb',
-          className: 'tip'
-        },
-        warning: {
-          label: 'تحذير',
-          icon: 'fas fa-exclamation-triangle',
-          className: 'warn'
-        },
-        danger: {
-          label: 'خطر',
-          icon: 'fas fa-ban',
-          className: 'danger'
-        }
       }
     }
   </script>
