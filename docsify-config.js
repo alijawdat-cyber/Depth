@@ -864,54 +864,59 @@ window.DepthDocs.features = {
     const toggleHandler = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('Mobile menu toggled'); // للـ debugging
       
       const body = document.body;
-      const sidebar = document.querySelector('.sidebar');
+      const isOpen = body.classList.contains('sidebar-open');
       
-      if (body.classList.contains('sidebar-open')) {
+      if (isOpen) {
         body.classList.remove('sidebar-open');
+        console.log('Sidebar closed');
       } else {
         body.classList.add('sidebar-open');
+        console.log('Sidebar opened');
       }
+      
+      // إضافة تأخير قصير لضمان تطبيق التحولات
+      setTimeout(() => {
+        // إزالة أي scrolling issues
+        if (body.classList.contains('sidebar-open')) {
+          body.style.overflowX = 'hidden';
+        } else {
+          body.style.overflowX = 'auto';
+        }
+      }, 50);
     };
     
     // إضافة click وtouch handlers
     newBtn.addEventListener('click', toggleHandler, { passive: false });
-    newBtn.addEventListener('touchstart', toggleHandler, { passive: false });
+    newBtn.addEventListener('touchend', toggleHandler, { passive: false });
     
-    console.log('Mobile menu setup completed'); // للـ debugging
+    console.log('Mobile menu setup completed');
     
-    // إغلاق عند النقر على رابط (موبايل)
+    // إعداد إغلاق السايدبار عند النقر على رابط (موبايل فقط)
+    this.setupSidebarAutoClose();
+  },
+
+  // وظيفة جديدة لإغلاق السايدبار تلقائياً
+  setupSidebarAutoClose: function() {
+    // إغلاق عند النقر على رابط في السايدبار (موبايل)
     const linkClickHandler = (e) => {
       if (e.target.matches('.sidebar a') && window.innerWidth < 768) {
         setTimeout(() => {
           document.body.classList.remove('sidebar-open');
-        }, 300);
+          document.body.style.overflowX = 'auto';
+        }, 200);
       }
     };
     
     document.addEventListener('click', linkClickHandler);
     
-    // إغلاق عند النقر خارج السايدبار
-    const outsideClickHandler = (e) => {
-      if (document.body.classList.contains('sidebar-open') &&
-          !e.target.closest('.sidebar') &&
-          !e.target.closest('#menuToggle')) {
-        document.body.classList.remove('sidebar-open');
-      }
-    };
-    
-    document.addEventListener('click', outsideClickHandler);
-    
-    // حفظ دوال التنظيف
+    // حفظ دالة التنظيف
     window.DepthDocs.eventCleanupFunctions.push(() => {
-      btn.removeEventListener('click', toggleHandler);
       document.removeEventListener('click', linkClickHandler);
-      document.removeEventListener('click', outsideClickHandler);
     });
   },
-  
+
   setupFeedbackWidget: function() {
     if (!window.DepthDocs.config.enableFeedback) return;
     

@@ -257,18 +257,49 @@ li {
 /* ===============================================
    5. SIDEBAR
 =============================================== */
+/* تحسين تخطيط الصفحة العام */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* منع التمرير الأفقي */
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar الأساسي - نظام موحد */
 .sidebar {
   position: fixed;
   top: 0;
   right: 0;
-  width: var(--sidebar-width);
+  width: 300px;
   height: 100vh;
-  background: var(--sidebar-bg);
-  border-left: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-color);
+  z-index: var(--z-sidebar);
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: var(--z-sidebar);
-  transition: transform var(--transition-base);
+  transition: transform 0.3s ease;
+}
+
+/* Desktop - السايدبار دائماً مرئي */
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0); /* دائماً مرئي */
+  }
+  
+  .content {
+    margin-right: 300px; /* مساحة للسايدبار */
+    transition: margin-right 0.3s ease;
+    min-height: 100vh;
+  }
+  
+  /* إخفاء زر البرجر في الأحجام الكبيرة */
+  .mobile-menu {
+    display: none;
+  }
 }
 
 .sidebar-header {
@@ -1147,31 +1178,35 @@ blockquote p {
   }
 }
 
-/* Mobile - إصلاح مشكلة السايدبار */
+/* Mobile - نظام السايدبار الموحد (يدفع المحتوى) */
 @media (max-width: 767px) {
   .sidebar {
-    transform: translateX(100%);
-    width: 100%;
-    max-width: 300px;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1001 !important; /* أعلى من الـ overlay */
+    transform: translateX(100%); /* مخفي خارج الشاشة */
   }
   
   body.sidebar-open .sidebar {
-    transform: translateX(0);
+    transform: translateX(0); /* يظهر في موقعه الطبيعي */
   }
   
-  /* إصلاح الـ overlay */
+  body.sidebar-open .content {
+    transform: translateX(-300px); /* دفع المحتوى لليسار بدلاً من margin */
+  }
+  
+  .content {
+    transform: translateX(0); /* موقع طبيعي عندما مغلق */
+    transition: transform 0.3s ease;
+    width: 100vw; /* عرض الشاشة كاملاً */
+    box-sizing: border-box;
+  }
+  
+  /* إزالة الـ overlay المعتم تماماً */
   body.sidebar-open::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000 !important; /* أقل من السايدبار */
-    cursor: pointer; /* للإشارة أنه قابل للنقر */
+    display: none;
+  }
+  
+  /* ضمان أن الصفحة لا تمتد أفقياً */
+  body.sidebar-open {
+    overflow-x: hidden;
   }
   
   .content {
