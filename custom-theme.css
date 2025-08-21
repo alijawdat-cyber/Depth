@@ -284,10 +284,18 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* Desktop - إظهار أيقونة البرجر في جميع الأحجام */
+/* Desktop - السايدبار قابلة للإغلاق في جميع الأحجام */
 @media (min-width: 768px) {
   .sidebar {
-    transform: translateX(0); /* دائماً مرئي */
+    transform: translateX(0); /* افتراضياً مرئي */
+  }
+  
+  body.sidebar-open .sidebar {
+    transform: translateX(0); /* يبقى مرئي */
+  }
+  
+  body:not(.sidebar-open) .sidebar {
+    transform: translateX(100%); /* مخفي عند الإغلاق */
   }
   
   .content {
@@ -296,10 +304,8 @@ body {
     min-height: 100vh;
   }
   
-  /* إظهار أيقونة البرجر في الشاشات الكبيرة أيضاً */
-  .burger-menu {
-    display: flex;
-    right: 320px; /* بجانب السايدبار */
+  body:not(.sidebar-open) .content {
+    margin-right: 0; /* بدون مارجين عند إغلاق السايدبار */
   }
 }
 
@@ -313,13 +319,84 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  position: relative;
 }
 
+.sidebar-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  min-height: 30px;
+}
+
+/* العنوان وسط الرأس */
+.sidebar-title {
+  color: white;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.sidebar-burger-menu {
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 3px;
+  padding: 5px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-burger-menu:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.sidebar-burger-menu .burger-line {
+  width: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1px;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-burger-menu:hover .burger-line {
+  background: white;
+}
+
+/* Animation للأيقونة في السايدبار عند فتح/إغلاق */
+body.sidebar-open .sidebar-burger-menu .burger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+body.sidebar-open .sidebar-burger-menu .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+body.sidebar-open .sidebar-burger-menu .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* أزرار التحكم في السايدبار */
 .sidebar-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: var(--space-xs);
+  position: relative;
 }
 
 .sidebar-theme-toggle {
@@ -341,6 +418,7 @@ body {
   transform: scale(1.05);
 }
 
+/* إصلاح اللوجو ليكون في منتصف الرأس */
 .sidebar-logo {
   width: 50px;
   height: 50px;
@@ -349,7 +427,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-sm);
+  margin: var(--space-sm) auto;
   backdrop-filter: blur(10px);
 }
 
@@ -357,13 +435,6 @@ body {
   width: 30px;
   height: 30px;
   fill: white;
-}
-
-.sidebar-title {
-  color: white;
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  margin-bottom: var(--space-sm);
 }
 
 .sidebar-version {
@@ -687,16 +758,15 @@ h4:hover .heading-anchor {
    8. UI COMPONENTS
 =============================================== */
 
-/* Burger Menu Button - 3 خطوط بسيطة */
+/* Burger Menu Button - 3 خطوط بسيطة بدون خلفية */
 .burger-menu {
   position: fixed;
   top: 20px;
   right: 20px; /* سيتم تعديلها ديناميكياً */
-  width: 40px;
-  height: 40px;
-  background: var(--interactive-primary);
+  width: 30px;
+  height: 30px;
+  background: transparent; /* إزالة الخلفية */
   border: none;
-  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -704,14 +774,14 @@ h4:hover .heading-anchor {
   cursor: pointer;
   z-index: calc(var(--z-sidebar) + 1); /* أعلى من السايدبار */
   transition: all var(--transition-fast);
-  gap: 4px;
-  box-shadow: var(--shadow-lg);
+  gap: 3px;
+  padding: 5px;
 }
 
 .burger-line {
-  width: 18px;
+  width: 20px;
   height: 2px;
-  background: white;
+  background: var(--text-primary); /* لون النص العادي */
   border-radius: 1px;
   transition: all var(--transition-fast);
 }
@@ -729,9 +799,8 @@ body.sidebar-open .burger-line:nth-child(3) {
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
-.burger-menu:hover {
-  background: var(--interactive-primary-hover);
-  transform: scale(1.05);
+.burger-menu:hover .burger-line {
+  background: var(--interactive-primary); /* تغيير اللون عند الـ hover */
 }
 
 /* Back to Top Button */

@@ -365,13 +365,20 @@ window.DepthDocs.sidebar = {
     const header = document.createElement('div');
     header.className = 'sidebar-header';
     header.innerHTML = `
+      <div class="sidebar-top-row">
+        <button class="sidebar-burger-menu" id="sidebarBurgerToggle" type="button" aria-label="إغلاق/فتح القائمة">
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+        </button>
+        <h2 class="sidebar-title">Depth Documentation</h2>
+      </div>
       <div class="sidebar-logo">
         <svg viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" fill="white"/>
           <circle cx="12" cy="12" r="3" fill="var(--depth-purple-500)"/>
         </svg>
       </div>
-      <div class="sidebar-title">Depth Documentation</div>
       <div class="sidebar-controls">
         <div class="sidebar-version">
           <span class="version-badge">v${window.DepthDocs.version}</span>
@@ -393,6 +400,40 @@ window.DepthDocs.sidebar = {
     
     // إعداد أيقونة تبديل الوضع في السايدبار
     this.setupSidebarThemeToggle();
+    
+    // إعداد أيقونة البرجر في السايدبار
+    this.setupSidebarBurgerToggle();
+  },
+
+  // وظيفة جديدة لإعداد أيقونة البرجر في السايدبار
+  setupSidebarBurgerToggle: function() {
+    const btn = document.getElementById('sidebarBurgerToggle');
+    if (!btn) return;
+    
+    const toggleHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const body = document.body;
+      const isOpen = body.classList.contains('sidebar-open');
+      
+      if (isOpen) {
+        body.classList.remove('sidebar-open');
+        console.log('Sidebar closed from header');
+      } else {
+        body.classList.add('sidebar-open');
+        console.log('Sidebar opened from header');
+      }
+    };
+    
+    btn.addEventListener('click', toggleHandler);
+    btn.addEventListener('touchend', toggleHandler, { passive: false });
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      btn.removeEventListener('click', toggleHandler);
+      btn.removeEventListener('touchend', toggleHandler);
+    });
   },
 
   // وظيفة جديدة لإعداد أيقونة تبديل الوضع في السايدبار
