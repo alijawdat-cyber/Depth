@@ -89,6 +89,15 @@
       box-shadow: none !important;
     }
 
+    /* Force sidebar visibility after Docsify loads */
+    .sidebar-toggle {
+      display: none !important;
+    }
+    
+    .app-name {
+      display: none !important;
+    }
+
     .sidebar-nav {
       padding: 0 20px;
     }
@@ -368,7 +377,8 @@
       maxLevel: 4,
       subMaxLevel: 3,
       auto2top: true,
-      relativePath: true,
+      relativePath: false,
+      basePath: '/',
       
       // Search
       search: {
@@ -382,10 +392,28 @@
       // Plugins
       plugins: [
         function(hook) {
+          hook.ready(function() {
+            console.log('Docsify ready');
+            // Force show sidebar
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+              sidebar.style.display = 'block';
+              sidebar.style.visibility = 'visible';
+            }
+          });
+          
           hook.doneEach(function() {
+            console.log('Page loaded');
             // Close mobile sidebar when navigating
             if (window.innerWidth <= 768) {
               closeMobileSidebar();
+            }
+            
+            // Ensure sidebar is visible
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+              sidebar.style.display = 'block';
+              sidebar.style.visibility = 'visible';
             }
           });
         }
@@ -398,5 +426,35 @@
   <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+
+  <!-- Fix for loading issues -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ensure elements are properly loaded
+      setTimeout(function() {
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const header = document.querySelector('.app-header');
+        
+        if (sidebar) {
+          sidebar.style.display = 'block';
+          sidebar.style.visibility = 'visible';
+          console.log('Sidebar found and shown');
+        }
+        
+        if (content) {
+          content.style.display = 'block';
+          content.style.visibility = 'visible';
+          console.log('Content found and shown');
+        }
+        
+        if (header) {
+          header.style.display = 'flex';
+          header.style.visibility = 'visible';
+          console.log('Header found and shown');
+        }
+      }, 1000);
+    });
+  </script>
 </body>
 </html>
