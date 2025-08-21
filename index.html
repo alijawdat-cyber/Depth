@@ -6,150 +6,552 @@
   <title>Depth Docs</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <link rel="stylesheet" href="custom-theme.css" />
   <style>
-    :root { --sidebar-w: 280px; }
-    *{box-sizing:border-box}
-    body{margin:0;background:#fff;color:#222;font:400 15px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,'Noto Kufi Arabic',sans-serif}
+    /* استخدام متغيرات Depth من custom-theme.css */
+    :root {
+      --sidebar-w: 280px;
+      --icon-size: 20px;
+    }
 
-    /* Sidebar */
-    .sidebar{position:fixed!important;top:0;right:0;width:var(--sidebar-w);height:100vh;background:#fff!important;border-left:1px solid #e6e6e6!important;padding:16px 0!important;overflow:auto}
-  /* إخفاء عناصر Docsify الافتراضية التي تسبب مشاكل على الهاتف */
-  .sidebar-toggle,.app-name,.sidebar-mask,.mask{display:none!important}
-    .sidebar:before{content:'Documentation';display:block;padding:6px 18px 14px;font-weight:600;font-size:18px;color:#111}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    /* Search */
-    .search input{width:calc(100% - 28px)!important;margin:0 14px 14px;padding:8px 10px;border:1px solid #e6e6e6!important;border-radius:6px;background:#fafafa;font-size:13px}
+    body {
+      font-family: 'Dubai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      direction: rtl;
+    }
 
-    /* Navigation */
-    .sidebar-nav{padding:0 8px}
-    .sidebar-nav ul{list-style:none;padding:0;margin:0}
-    .sidebar-nav li{margin:0}
-  .sidebar-nav a{display:block;text-decoration:none;color:#444;padding:10px 10px;border-radius:6px;font-size:14px}
-    .sidebar-nav a:hover{background:#f4f4f4;color:#111}
+    /* === SIDEBAR MODERN DESIGN === */
+    .sidebar {
+      position: fixed !important;
+      top: 0;
+      right: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--sidebar-bg) !important;
+      border-left: 1px solid var(--border-primary) !important;
+      border-right: none !important;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: all var(--transition-base);
+      z-index: 100;
+    }
 
-    /* Collapsible sections */
-  .sidebar-nav>ul>li>a.section{font-weight:600;color:#222;padding:12px 34px 12px 10px;position:relative;font-size:15px}
-  .sidebar-nav>ul>li>.section-label{display:block;color:#222;padding:12px 34px 12px 10px;font-weight:600;border-radius:6px;font-size:15px;cursor:pointer}
-  /* زر صغير للتبديل فقط، حتى يبقى النقر على العنوان للتنقل */
-  .section-toggle{position:absolute; left:8px; top:50%; transform:translateY(-50%); width:20px; height:20px; border:1px solid #e1e1e1; border-radius:6px; background:#fff; color:#777; font-size:14px; line-height:18px; padding:0; cursor:pointer}
-  .sidebar-nav>ul>li.open>.section-toggle{color:#333}
-    .sidebar-nav>ul>li>ul{display:none;padding:6px 0 10px;margin:0;border-top:1px solid #f0f0f0}
-    .sidebar-nav>ul>li.open>ul{display:block}
-    .sidebar-nav>ul>li>ul a{font-weight:400;color:#555;padding:8px 12px;border-radius:4px}
-    .sidebar-nav>ul>li>ul a.active{background:#eef5ff;color:#1e5bb8}
+    /* إخفاء عناصر Docsify الافتراضية */
+    .sidebar-toggle,
+    .app-name,
+    .sidebar-mask,
+    .mask {
+      display: none !important;
+    }
 
-    /* Content */
-    .content{padding:24px 24px 48px 24px;margin-right:var(--sidebar-w);min-height:100vh}
-    .markdown-section{max-width:980px}
-    .markdown-section h1{font-size:26px;margin:0 0 18px}
-    .markdown-section h2{font-size:20px;margin:24px 0 12px}
+    /* === HEADER WITH LOGO === */
+    .sidebar-header {
+      padding: 24px 20px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--depth-purple-500), var(--depth-purple-600));
+      border-bottom: 1px solid var(--border-primary);
+      margin-bottom: 16px;
+    }
 
-    /* زر بسيط لفتح/إغلاق السايدبار على الهاتف (يدفع الصفحة بلا أنيميشن) */
-    .mobile-menu{display:none;position:fixed;top:10px;right:10px;z-index:2000;border:1px solid #e2e2e2;background:#fff;color:#222;border-radius:8px;padding:8px 10px;font-size:13px}
+    .sidebar-logo {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      backdrop-filter: blur(10px);
+    }
 
-    /* سلوك الجوال */
-    @media (max-width: 980px){
-      .content{margin-right:0}
-      .sidebar{right:-280px}
-      body.sidebar-open .sidebar{right:0}
-      body.sidebar-open .content{margin-right:var(--sidebar-w)}
-      .mobile-menu{display:block}
+    .sidebar-logo svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+    }
+
+    .sidebar-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-version {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .version-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    /* === SEARCH BOX === */
+    .search {
+      padding: 0 16px 16px;
+    }
+
+    .search input {
+      width: 100% !important;
+      padding: 10px 12px !important;
+      border: 1px solid var(--border-primary) !important;
+      border-radius: 10px !important;
+      background: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+      font-size: 14px !important;
+      transition: all var(--transition-fast) !important;
+    }
+
+    .search input:focus {
+      border-color: var(--interactive-primary) !important;
+      box-shadow: 0 0 0 3px rgba(108, 43, 255, 0.1) !important;
+      outline: none !important;
+    }
+
+    .search input::placeholder {
+      color: var(--text-muted) !important;
+    }
+
+    /* === NAVIGATION ITEMS === */
+    .sidebar-nav {
+      padding: 0 8px 20px;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin: 2px 0;
+    }
+
+    /* القسم الرئيسي */
+    .sidebar-nav > ul > li {
+      margin: 4px 0;
+    }
+
+    /* العناصر الرئيسية مع أيقونات */
+    .sidebar-nav a,
+    .section-label {
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--sidebar-text);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all var(--transition-fast);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .sidebar-nav a:hover,
+    .section-label:hover {
+      background: var(--sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    /* العناصر النشطة */
+    .sidebar-nav a.active,
+    .sidebar-nav li.active > a {
+      background: var(--sidebar-active);
+      color: var(--interactive-primary);
+      font-weight: 600;
+    }
+
+    /* الأيقونات */
+    .nav-icon {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      margin-left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 0;
+    }
+
+    /* السهم للأقسام القابلة للطي */
+    .section-arrow {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      transition: transform var(--transition-fast);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+    }
+
+    .sidebar-nav li.open .section-arrow {
+      transform: translateY(-50%) rotate(-90deg);
+    }
+
+    /* البادجات للعناصر */
+    .nav-badge {
+      margin-right: auto;
+      background: var(--interactive-primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .nav-badge.add {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    /* القوائم الفرعية */
+    .sidebar-nav > ul > li > ul {
+      display: none;
+      padding: 4px 0 8px;
+      margin: 0;
+    }
+
+    .sidebar-nav > ul > li.open > ul {
+      display: block;
+    }
+
+    .sidebar-nav > ul > li > ul a {
+      padding: 10px 14px 10px 46px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+
+    .sidebar-nav > ul > li > ul a:hover {
+      background: var(--sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav > ul > li > ul a.active {
+      background: var(--sidebar-active);
+      color: var(--interactive-primary);
+      font-weight: 500;
+    }
+
+    /* === CONTENT AREA === */
+    .content {
+      padding: 32px;
+      margin-right: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--bg-primary);
+    }
+
+    .markdown-section {
+      max-width: 980px;
+      color: var(--text-primary);
+    }
+
+    /* === MOBILE MENU BUTTON === */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 200;
+      background: var(--interactive-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: all var(--transition-fast);
+    }
+
+    .mobile-menu:hover {
+      background: var(--interactive-primary-hover);
+      transform: scale(1.05);
+    }
+
+    /* === DARK MODE SUPPORT === */
+    body.dark .sidebar {
+      background: var(--sidebar-bg);
+    }
+
+    body.dark .search input {
+      background: var(--bg-tertiary) !important;
+      border-color: var(--border-primary) !important;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 980px) {
+      .content {
+        margin-right: 0;
+        padding: 24px 16px;
+      }
+
+      .sidebar {
+        right: -280px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      body.sidebar-open .sidebar {
+        right: 0;
+      }
+
+      body.sidebar-open .content {
+        margin-right: 0;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .mobile-menu {
+        display: block;
+      }
+    }
+
+    /* === SCROLLBAR === */
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--interactive-primary);
+      border-radius: 3px;
+      opacity: 0.5;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      opacity: 1;
+    }
+
+    /* === TRANSITIONS === */
+    * {
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
   </style>
 </head>
 <body>
   <div id="app"></div>
-  <button id="menuToggle" class="mobile-menu" type="button">القائمة</button>
+  <button id="menuToggle" class="mobile-menu" type="button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-left: 6px; vertical-align: middle;">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    القائمة
+  </button>
+
   <script>
-    window.$docsify={
-      name:'Depth',
-      homepage:'main.md',
-      loadSidebar:true,
-      subMaxLevel:2,
-      auto2top:true,
-      search:{paths:'auto',placeholder:'ابحث…',noData:'لا نتائج'},
-      plugins:[function(hook){
-        hook.doneEach(function(){
-          const root=document.querySelector('.sidebar-nav > ul');
-          if(!root) return;
-          // نظّف الأزرار واللّيبيلات القديمة قبل إعادة البناء بعد كل تنقل
-          root.querySelectorAll('.section-toggle').forEach(b=>b.remove());
-          // لا نحذف section-label إن كان نص الرابط نفسه، لكن نتجنب التكرار
+    // أيقونات SVG للقائمة
+    const icons = {
+      home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
+      requirements: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+      database: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+      api: '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>',
+      features: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>',
+      admin: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+      integrations: '<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+      development: '<svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
+      mobile: '<svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+      security: '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      operations: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 12h6m6 6l4.24 4.24"/></svg>',
+      reference: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+      arrow: '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'
+    };
 
-          root.querySelectorAll(':scope > li').forEach(li=>{
-            const sub = Array.from(li.children).find(el=>el.tagName==='UL');
-            if(!sub) return; // لا زر إن لم تكن هناك قائمة فرعية
-
-            let link = li.querySelector(':scope > a');
-            let label = li.querySelector(':scope > .section-label');
-
-            // إذا لم يوجد رابط رئيسي، أنشئ label من النص الموجود
-            if(!link && !label){
-              // اجمع النص من أول عقدة ليست UL
-              let titleText = '';
-              Array.from(li.childNodes).forEach(n=>{
-                if(n.nodeType===3){ titleText += n.textContent.trim(); n.textContent=''; }
-                else if(n.nodeType===1 && n.tagName!=='UL' && n.tagName!=='A'){
-                  titleText += (n.textContent||'').trim();
-                  n.remove();
-                }
-              });
-              label = document.createElement('span');
-              label.className='section-label';
-              label.textContent = titleText || 'قسم';
-              li.insertBefore(label, sub);
+    // تكوين Docsify
+    window.$docsify = {
+      name: 'Depth',
+      homepage: 'main.md',
+      loadSidebar: true,
+      subMaxLevel: 2,
+      auto2top: true,
+      search: {
+        paths: 'auto',
+        placeholder: 'البحث...',
+        noData: 'لا توجد نتائج'
+      },
+      plugins: [
+        function(hook) {
+          // إضافة Header مخصص للسايدبار
+          hook.mounted(function() {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar && !sidebar.querySelector('.sidebar-header')) {
+              const header = document.createElement('div');
+              header.className = 'sidebar-header';
+              header.innerHTML = `
+                <div class="sidebar-logo">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="white"/>
+                    <circle cx="12" cy="12" r="3" fill="var(--depth-purple-500)"/>
+                  </svg>
+                </div>
+                <div class="sidebar-title">Depth Documentation</div>
+                <div class="sidebar-version">
+                  <span class="version-badge">v2.0</span>
+                  <span class="version-badge">RTL</span>
+                </div>
+              `;
+              sidebar.insertBefore(header, sidebar.firstChild);
             }
-
-            // أضف زر التبديل
-            const btn=document.createElement('button');
-            btn.className='section-toggle';
-            btn.type='button';
-            btn.textContent = li.classList.contains('open') ? '−' : '+';
-            btn.addEventListener('click',function(e){
-              e.stopPropagation();
-              li.classList.toggle('open');
-              btn.textContent = li.classList.contains('open') ? '−' : '+';
-            });
-            li.insertBefore(btn, li.firstChild);
-
-            // إن وجد label (بدون رابط)، اجعله يفتح/يغلق
-            if(label){
-              label.addEventListener('click', function(){
-                li.classList.toggle('open');
-                btn.textContent = li.classList.contains('open') ? '−' : '+';
-              });
-            }
-
-            // إن وجد رابط، اتركه للتنقل فقط
-            if(link){ link.classList.add('section'); }
-
-            // الوضع الافتراضي مغلق
-            li.classList.remove('open');
           });
-          const active=root.querySelector('a.active');
-          if(active){
-            let p=active.parentElement;
-            while(p&&p!==root){ if(p.tagName==='LI') p.classList.add('open'); p=p.parentElement; }
-          }
 
-          // زر الجوال لفتح/إغلاق السايدبار (يدفع الصفحة بلا أنيميشن)
-          const btn=document.getElementById('menuToggle');
-          if(btn){
-            btn.onclick=function(){ document.body.classList.toggle('sidebar-open'); };
-          }
+          // تحسين عناصر القائمة بعد كل تحميل
+          hook.doneEach(function() {
+            const root = document.querySelector('.sidebar-nav > ul');
+            if (!root) return;
 
-          // على الجوال: عند الضغط على عنصر ورقي (بدون أطفال)، أغلق السايدبار لدفع الصفحة
-          if (window.matchMedia('(max-width: 980px)').matches) {
-            root.querySelectorAll('li').forEach(li=>{
-              const hasChildren = Array.from(li.children).some(el=>el.tagName==='UL');
-              const link = li.querySelector(':scope > a');
-              if(link && !hasChildren){
-                link.addEventListener('click', ()=>{ document.body.classList.remove('sidebar-open'); }, { once:true });
+            // تنظيف العناصر القديمة
+            root.querySelectorAll('.nav-icon, .section-arrow, .nav-badge').forEach(el => el.remove());
+
+            // معالجة كل عنصر في القائمة
+            root.querySelectorAll(':scope > li').forEach((li, index) => {
+              const sub = Array.from(li.children).find(el => el.tagName === 'UL');
+              let link = li.querySelector(':scope > a');
+              let label = li.querySelector(':scope > .section-label');
+
+              // تحديد الأيقونة المناسبة
+              let iconName = 'home';
+              const text = (link?.textContent || label?.textContent || '').trim();
+              
+              if (text.includes('الرئيسية')) iconName = 'home';
+              else if (text.includes('البداية') || text.includes('المتطلبات')) iconName = 'requirements';
+              else if (text.includes('قاعدة البيانات')) iconName = 'database';
+              else if (text.includes('الأساسيات')) iconName = 'api';
+              else if (text.includes('المميزات')) iconName = 'features';
+              else if (text.includes('الإدارة')) iconName = 'admin';
+              else if (text.includes('التكاملات')) iconName = 'integrations';
+              else if (text.includes('التطوير')) iconName = 'development';
+              else if (text.includes('الجوال')) iconName = 'mobile';
+              else if (text.includes('الواجهات')) iconName = 'mobile';
+              else if (text.includes('الأمان')) iconName = 'security';
+              else if (text.includes('العمليات')) iconName = 'operations';
+              else if (text.includes('المراجع')) iconName = 'reference';
+
+              // إذا لم يكن هناك رابط أو label، أنشئ label
+              if (!link && !label && sub) {
+                let titleText = '';
+                Array.from(li.childNodes).forEach(n => {
+                  if (n.nodeType === 3) {
+                    titleText += n.textContent.trim();
+                    n.textContent = '';
+                  } else if (n.nodeType === 1 && n.tagName !== 'UL' && n.tagName !== 'A') {
+                    titleText += (n.textContent || '').trim();
+                    n.remove();
+                  }
+                });
+                
+                label = document.createElement('span');
+                label.className = 'section-label';
+                label.innerHTML = `
+                  <span class="nav-icon">${icons[iconName]}</span>
+                  <span>${titleText || 'قسم'}</span>
+                `;
+                li.insertBefore(label, sub);
+              }
+
+              // إضافة الأيقونة للرابط إن وجد
+              if (link && !link.querySelector('.nav-icon')) {
+                const linkText = link.textContent;
+                link.innerHTML = `
+                  <span class="nav-icon">${icons[iconName]}</span>
+                  <span>${linkText}</span>
+                `;
+              }
+
+              // إضافة سهم للأقسام القابلة للطي
+              if (sub) {
+                const arrow = document.createElement('span');
+                arrow.className = 'section-arrow';
+                arrow.innerHTML = icons.arrow;
+                
+                if (label) {
+                  label.appendChild(arrow);
+                  label.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    li.classList.toggle('open');
+                  });
+                } else if (link) {
+                  link.appendChild(arrow);
+                  link.addEventListener('click', function(e) {
+                    if (e.target.closest('.section-arrow')) {
+                      e.preventDefault();
+                      li.classList.toggle('open');
+                    }
+                  });
+                }
+              }
+
+              // إضافة badges للعناصر (مثال)
+              if (text.includes('المشاريع') && link) {
+                const badge = document.createElement('span');
+                badge.className = 'nav-badge';
+                badge.textContent = '8';
+                link.appendChild(badge);
+              } else if (text.includes('التسعير') && link) {
+                const badge = document.createElement('span');
+                badge.className = 'nav-badge add';
+                badge.textContent = '+3';
+                link.appendChild(badge);
               }
             });
-          }
-        });
-      }]
+
+            // فتح القسم النشط تلقائياً
+            const active = root.querySelector('a.active');
+            if (active) {
+              let p = active.parentElement;
+              while (p && p !== root) {
+                if (p.tagName === 'LI') p.classList.add('open');
+                p = p.parentElement;
+              }
+            }
+
+            // معالجة زر القائمة على الموبايل
+            const btn = document.getElementById('menuToggle');
+            if (btn) {
+              btn.onclick = function() {
+                document.body.classList.toggle('sidebar-open');
+              };
+            }
+
+            // إغلاق القائمة عند النقر على رابط في الموبايل
+            if (window.matchMedia('(max-width: 980px)').matches) {
+              root.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                  setTimeout(() => {
+                    document.body.classList.remove('sidebar-open');
+                  }, 300);
+                });
+              });
+            }
+          });
+        }
+      ]
     };
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
