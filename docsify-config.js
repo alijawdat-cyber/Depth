@@ -794,13 +794,34 @@ window.DepthDocs.features = {
   
   setupMobileMenu: function() {
     const btn = document.getElementById('menuToggle');
-    if (!btn) return;
+    if (!btn) {
+      // إعادة محاولة بعد قليل إذا لم يُعثر على العنصر
+      setTimeout(() => this.setupMobileMenu(), 100);
+      return;
+    }
     
-    const toggleHandler = () => {
+    // التأكد من أن الزر مرئي وقابل للنقر
+    btn.style.pointerEvents = 'auto';
+    btn.style.visibility = 'visible';
+    
+    const toggleHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Mobile menu clicked'); // للـ debugging
       document.body.classList.toggle('sidebar-open');
     };
     
+    // إزالة أي event listeners قديمة
+    btn.removeEventListener('click', toggleHandler);
     btn.addEventListener('click', toggleHandler);
+    
+    // إضافة handler للـ touch events أيضاً (للموبايل)
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      toggleHandler(e);
+    });
+    
+    console.log('Mobile menu setup completed'); // للـ debugging
     
     // إغلاق عند النقر على رابط (موبايل)
     const linkClickHandler = (e) => {
@@ -943,6 +964,10 @@ window.DepthDocs.init = {
       setTimeout(() => {
         window.DepthDocs.ui.hideLoading();
         this.showWelcomeMessage();
+        // إعادة إعداد mobile menu بعد إخفاء loading screen
+        setTimeout(() => {
+          window.DepthDocs.features.setupMobileMenu();
+        }, 100);
       }, 500);
     });
   },

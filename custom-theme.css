@@ -231,7 +231,7 @@ li {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 100; /* خفض من 9999 إلى 100 لتجنب حجب mobile menu */
   transition: opacity var(--transition-base);
 }
 
@@ -631,7 +631,7 @@ h4:hover .heading-anchor {
   position: fixed;
   top: var(--space-md);
   right: var(--space-md);
-  z-index: var(--z-modal);
+  z-index: var(--z-modal); /* 300 - أعلى من loading screen الجديد */
   background: var(--interactive-primary);
   color: white;
   border: none;
@@ -684,23 +684,51 @@ h4:hover .heading-anchor {
 }
 
 /* Theme Toggle */
+/* Theme Toggle Button */
 .theme-toggle {
   position: fixed;
   top: var(--space-md);
-  left: var(--space-md);
+  right: var(--space-md);
   width: 44px;
   height: 44px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border-primary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-fast);
   z-index: var(--z-dropdown);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+/* GitHub Corner Override - نقل إلى اليسار */
+.github-corner {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  transform: scaleX(-1) !important; /* عكس الأيقونة لتناسب اليسار */
+  z-index: var(--z-dropdown) !important;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out !important;
+}
+
+@keyframes octocat-wave {
+  0%, 100% { transform: rotate(0) }
+  20%, 60% { transform: rotate(-25deg) }
+  40%, 80% { transform: rotate(10deg) }
+}
+
+/* Debug: إضافة outline للـ mobile menu للتأكد من موقعه */
+@media (max-width: 767px) {
+  .mobile-menu {
+    outline: 2px solid red; /* مؤقت للـ debugging */
+  }
 }
 
 .theme-toggle:hover {
@@ -1118,12 +1146,15 @@ blockquote p {
   
   .mobile-menu {
     display: flex;
+    pointer-events: auto !important; /* التأكد من إمكانية النقر */
+    visibility: visible !important;
+    z-index: var(--z-modal) !important; /* أعلى من loading screen */
   }
   
   .theme-toggle {
     top: var(--space-md);
-    left: auto;
-    right: 80px;
+    right: var(--space-md);
+    left: auto; /* تأكيد البقاء في اليمين في الموبايل */
   }
   
   .markdown-section {
