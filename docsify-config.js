@@ -356,6 +356,7 @@ window.DepthDocs.sidebar = {
     this.enhanceNavItems();
     this.restoreState();
     this.setupSearch();
+    this.setupRouteListener();
   },
   
   addHeader: function(sidebar) {
@@ -483,9 +484,21 @@ window.DepthDocs.sidebar = {
   },
   
   openActiveSection: function(navRoot) {
-    const activeLink = navRoot.querySelector('a.active');
+    // محاولة العثور على الرابط النشط بعدة طرق
+    let activeLink = navRoot.querySelector('a.active');
+    
+    // إذا لم يتم العثور على active link، ابحث بناءً على URL
+    if (!activeLink) {
+      activeLink = this.findActiveLinkByUrl(navRoot);
+    }
+    
     if (!activeLink) return;
     
+    // إضافة active class يدوياً للتأكد
+    navRoot.querySelectorAll('a.active').forEach(link => link.classList.remove('active'));
+    activeLink.classList.add('active');
+    
+    // فتح جميع الأقسام الأب
     let parent = activeLink.parentElement;
     while (parent && parent !== navRoot) {
       if (parent.tagName === 'LI') {
@@ -493,6 +506,45 @@ window.DepthDocs.sidebar = {
       }
       parent = parent.parentElement;
     }
+  },
+
+  // وظيفة جديدة للعثور على الرابط النشط بناءً على URL
+  findActiveLinkByUrl: function(navRoot) {
+    const currentPath = this.getCurrentPath();
+    if (!currentPath) return null;
+    
+    // البحث عن رابط يطابق المسار الحالي تماماً
+    let exactMatch = navRoot.querySelector(`a[href="${currentPath}"]`);
+    if (exactMatch) return exactMatch;
+    
+    // البحث عن رابط يطابق المسار بدون البادئة #/
+    const pathWithoutHash = currentPath.replace(/^#?\/?/, '');
+    exactMatch = navRoot.querySelector(`a[href="${pathWithoutHash}"]`);
+    if (exactMatch) return exactMatch;
+    
+    // البحث عن رابط يحتوي على جزء من المسار
+    const links = Array.from(navRoot.querySelectorAll('a[href]'));
+    return links.find(link => {
+      const linkPath = link.getAttribute('href').replace(/^#?\/?/, '');
+      return linkPath && pathWithoutHash.includes(linkPath);
+    }) || null;
+  },
+
+  // وظيفة للحصول على المسار الحالي
+  getCurrentPath: function() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#/')) {
+      return hash.substring(2);
+    }
+    return hash || window.location.pathname;
+  },
+
+  // وظيفة لتحديث active state عند تغيير الصفحة
+  updateActiveState: function() {
+    const navRoot = document.querySelector('.sidebar-nav > ul');
+    if (!navRoot) return;
+    
+    this.openActiveSection(navRoot);
   },
   
   saveState: function(navRoot) {
@@ -555,6 +607,38 @@ window.DepthDocs.sidebar = {
     
     localStorage.setItem('recentSearches', JSON.stringify(uniqueSearches));
     window.DepthDocs.recentSearches = uniqueSearches;
+  },
+
+  // إعداد مراقبة تغيير الصفحات
+  setupRouteListener: function() {
+    // مراقبة تغيير hash
+    const hashChangeHandler = () => {
+      setTimeout(() => {
+        this.updateActiveState();
+      }, 100); // تأخير قصير للتأكد من أن docsify انتهى من التحديث
+    };
+    
+    window.addEventListener('hashchange', hashChangeHandler);
+    
+    // مراقبة popstate للتنقل بالأزرار
+    const popStateHandler = () => {
+      setTimeout(() => {
+        this.updateActiveState();
+      }, 100);
+    };
+    
+    window.addEventListener('popstate', popStateHandler);
+    
+    // حفظ دوال التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      window.removeEventListener('hashchange', hashChangeHandler);
+      window.removeEventListener('popstate', popStateHandler);
+    });
+    
+    // تحديث فوري للحالة الحالية
+    setTimeout(() => {
+      this.updateActiveState();
+    }, 200);
   }
 };
 
@@ -964,6 +1048,11 @@ window.DepthDocs.docsifyPlugin = function(hook, vm) {
     
     // تحسينات السايدبار
     window.DepthDocs.sidebar.enhance();
+    
+    // تحديث إضافي للـ active state بعد قليل
+    setTimeout(() => {
+      window.DepthDocs.sidebar.updateActiveState();
+    }, 150);
     
     // الميزات التفاعلية
     window.DepthDocs.features.setupFeedbackWidget();
