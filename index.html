@@ -13,7 +13,8 @@
 
     /* Sidebar */
     .sidebar{position:fixed!important;top:0;right:0;width:var(--sidebar-w);height:100vh;background:#fff!important;border-left:1px solid #e6e6e6!important;padding:16px 0!important;overflow:auto}
-    .sidebar-toggle,.app-name{display:none!important}
+  /* إخفاء عناصر Docsify الافتراضية التي تسبب مشاكل على الهاتف */
+  .sidebar-toggle,.app-name,.sidebar-mask,.mask{display:none!important}
     .sidebar:before{content:'Documentation';display:block;padding:6px 18px 14px;font-weight:600;font-size:18px;color:#111}
 
     /* Search */
@@ -27,7 +28,10 @@
     .sidebar-nav a:hover{background:#f4f4f4;color:#111}
 
     /* Collapsible sections */
-    .sidebar-nav>ul>li>a.section{font-weight:600;color:#222;padding:12px 10px}
+  .sidebar-nav>ul>li>a.section{font-weight:600;color:#222;padding:12px 34px 12px 10px;position:relative}
+  /* زر صغير للتبديل فقط، حتى يبقى النقر على العنوان للتنقل */
+  .section-toggle{position:absolute; left:8px; top:50%; transform:translateY(-50%); width:20px; height:20px; border:1px solid #e1e1e1; border-radius:6px; background:#fff; color:#777; font-size:14px; line-height:18px; padding:0; cursor:pointer}
+  .sidebar-nav>ul>li.open>.section-toggle{color:#333}
     .sidebar-nav>ul>li>ul{display:none;padding:6px 0 10px;margin:0;border-top:1px solid #f0f0f0}
     .sidebar-nav>ul>li.open>ul{display:block}
     .sidebar-nav>ul>li>ul a{font-weight:400;color:#555;padding:8px 12px;border-radius:4px}
@@ -38,10 +42,23 @@
     .markdown-section{max-width:980px}
     .markdown-section h1{font-size:26px;margin:0 0 18px}
     .markdown-section h2{font-size:20px;margin:24px 0 12px}
+
+    /* زر بسيط لفتح/إغلاق السايدبار على الهاتف (يدفع الصفحة بلا أنيميشن) */
+    .mobile-menu{display:none;position:fixed;top:10px;right:10px;z-index:2000;border:1px solid #e2e2e2;background:#fff;color:#222;border-radius:8px;padding:8px 10px;font-size:13px}
+
+    /* سلوك الجوال */
+    @media (max-width: 980px){
+      .content{margin-right:0}
+      .sidebar{right:-280px}
+      body.sidebar-open .sidebar{right:0}
+      body.sidebar-open .content{margin-right:var(--sidebar-w)}
+      .mobile-menu{display:block}
+    }
   </style>
 </head>
 <body>
   <div id="app"></div>
+  <button id="menuToggle" class="mobile-menu" type="button">القائمة</button>
   <script>
     window.$docsify={
       name:'Depth',
@@ -54,12 +71,27 @@
         hook.doneEach(function(){
           const root=document.querySelector('.sidebar-nav > ul');
           if(!root) return;
+          // نظّف الأزرار القديمة قبل إعادة البناء بعد كل تنقل
+          root.querySelectorAll('.section-toggle').forEach(b=>b.remove());
+
           root.querySelectorAll(':scope > li').forEach(li=>{
             const a=li.querySelector(':scope > a');
-            const sub=li.querySelector(':scope > ul');
+            const sub=Array.from(li.children).find(el=>el.tagName==='UL');
             if(a&&sub){
               a.classList.add('section');
-              a.onclick=(e)=>{e.preventDefault();li.classList.toggle('open');};
+              // أنشئ زر التبديل الصغير
+              const btn=document.createElement('button');
+              btn.className='section-toggle';
+              btn.type='button';
+              btn.textContent = li.classList.contains('open') ? '−' : '+';
+              btn.addEventListener('click',function(e){
+                e.stopPropagation();
+                li.classList.toggle('open');
+                btn.textContent = li.classList.contains('open') ? '−' : '+';
+              });
+              // أدخل الزر قبل أول عنصر داخل li ليكون أخًا للرابط
+              li.insertBefore(btn, li.firstChild);
+              // أبقِ الرابط يعمل للتنقل الطبيعي
               li.classList.remove('open');
             }
           });
@@ -67,6 +99,23 @@
           if(active){
             let p=active.parentElement;
             while(p&&p!==root){ if(p.tagName==='LI') p.classList.add('open'); p=p.parentElement; }
+          }
+
+          // زر الجوال لفتح/إغلاق السايدبار (يدفع الصفحة بلا أنيميشن)
+          const btn=document.getElementById('menuToggle');
+          if(btn){
+            btn.onclick=function(){ document.body.classList.toggle('sidebar-open'); };
+          }
+
+          // على الجوال: عند الضغط على عنصر ورقي (بدون أطفال)، أغلق السايدبار لدفع الصفحة
+          if (window.matchMedia('(max-width: 980px)').matches) {
+            root.querySelectorAll('li').forEach(li=>{
+              const hasChildren = Array.from(li.children).some(el=>el.tagName==='UL');
+              const link = li.querySelector(':scope > a');
+              if(link && !hasChildren){
+                link.addEventListener('click', ()=>{ document.body.classList.remove('sidebar-open'); }, { once:true });
+              }
+            });
           }
         });
       }]
