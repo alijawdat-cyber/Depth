@@ -1,0 +1,23 @@
+{
+  "name": "depth-documentation",
+  "version": "2.0.0",
+  "description": "Depth Platform Documentation",
+  "scripts": {
+    "serve": "docsify serve .",
+    "start": "docsify serve .",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "documentation",
+    "docsify",
+    "depth-platform",
+    "api-docs",
+    "rtl-arabic"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alijawdat-cyber/Depth.git"
+  },
+  "homepage": "https://alijawdat-cyber.github.io/Depth/"
+}

@@ -15,9 +15,6 @@
   <meta property="og:title" content="Depth Platform - التوثيق الشامل">
   <meta property="og:description" content="منصة العمق - نظام إدارة المشاريع الإبداعية المتطور">
   
-  <!-- Favicon -->
-  <link rel="icon" href="./depth-site/public/icons/favicon.ico">
-  
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,44 +22,29 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Docsify Theme -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   
   <!-- Custom Theme -->
   <link rel="stylesheet" href="./custom-theme.css">
   
-  <!-- Additional Configuration -->
-  <script src="./docsify-config.js"></script>
-  
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#2c3e50">
+  <meta name="theme-color" content="#3498db">
   
   <style>
-    /* Critical CSS for immediate loading */
+    /* Basic RTL and Theme Support */
     :root {
       --primary-color: #3498db;
       --secondary-color: #2c3e50;
-      --accent-color: #e74c3c;
-      --success-color: #27ae60;
-      --warning-color: #f39c12;
-      --background: #ffffff;
       --text-color: #2c3e50;
-      --border-color: #ecf0f1;
-      --sidebar-bg: #34495e;
-      --code-bg: #f8f9fa;
+      --background: #ffffff;
     }
     
     [data-theme="dark"] {
       --primary-color: #5dade2;
       --secondary-color: #ecf0f1;
-      --accent-color: #ec7063;
-      --success-color: #58d68d;
-      --warning-color: #f7dc6f;
-      --background: #1a1a1a;
       --text-color: #ecf0f1;
-      --border-color: #34495e;
-      --sidebar-bg: #2c3e50;
-      --code-bg: #2c3e50;
+      --background: #1a1a1a;
     }
     
     body {
@@ -71,101 +53,51 @@
       color: var(--text-color);
       transition: all 0.3s ease;
     }
-    
-    /* Loading Animation */
-    .loading-container {
-      position: fixed;
-      top: 0;
-      left: 0;
+
+    /* RTL Support */
+    [dir="rtl"] .sidebar {
       right: 0;
-      bottom: 0;
-      background: var(--background);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.5s ease;
+      left: auto;
+      text-align: right;
     }
     
-    .loading-spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid var(--border-color);
-      border-top: 4px solid var(--primary-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    [dir="rtl"] .content {
+      margin-right: 300px;
+      margin-left: 0;
     }
     
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    [dir="rtl"] .markdown-section {
+      direction: rtl;
+      text-align: right;
     }
     
-    .loading-text {
-      margin-top: 20px;
-      font-size: 18px;
-      color: var(--text-color);
-      font-weight: 500;
+    /* Keep code LTR */
+    pre, code {
+      direction: ltr !important;
+      text-align: left !important;
+    }
+    
+    /* Mobile responsive */
+    @media screen and (max-width: 768px) {
+      [dir="rtl"] .content {
+        margin-right: 0;
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- Loading Screen -->
-  <div id="loading" class="loading-container">
-    <div>
-      <div class="loading-spinner"></div>
-      <div class="loading-text">جاري تحميل التوثيق...</div>
-    </div>
-  </div>
-
-  <!-- Theme Toggle Button -->
-  <div id="theme-toggle" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
-    <button onclick="toggleTheme()" style="
-      background: var(--primary-color);
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s ease;
-    " title="تبديل الوضع المظلم/المضيء">
-      <i class="fas fa-moon" id="theme-icon"></i>
-    </button>
-  </div>
-
-  <!-- Language Toggle -->
-  <div id="language-toggle" style="position: fixed; top: 80px; left: 20px; z-index: 1000;">
-    <button onclick="toggleLanguage()" style="
-      background: var(--accent-color);
-      border: none;
-      border-radius: 25px;
-      padding: 8px 16px;
-      color: white;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s ease;
-      font-family: 'Noto Sans Arabic', sans-serif;
-    " title="تبديل اللغة">
-      <i class="fas fa-language"></i>
-      <span id="lang-text">EN</span>
-    </button>
-  </div>
 
   <!-- Main Content -->
   <div id="app">
-    <div style="text-align: center; padding: 100px 20px; color: var(--text-color);">
-      <h1 style="font-size: 3em; margin-bottom: 20px; color: var(--primary-color);">
+    <div style="text-align: center; padding: 50px 20px; color: #2c3e50;">
+      <h1 style="font-size: 2.5em; margin-bottom: 20px; color: #3498db;">
         📚 منصة العمق - التوثيق الشامل
       </h1>
-      <p style="font-size: 1.2em; margin-bottom: 30px;">
+      <p style="font-size: 1.1em; margin-bottom: 20px;">
         نظام إدارة المشاريع الإبداعية المتطور
       </p>
-      <div class="loading-spinner" style="margin: 0 auto;"></div>
+      <div style="margin-top: 30px;">جاري التحميل...</div>
     </div>
   </div>
 
@@ -179,227 +111,59 @@
       
       if (isDark) {
         body.removeAttribute('data-theme');
-        icon.className = 'fas fa-moon';
+        if (icon) icon.className = 'fas fa-moon';
         localStorage.setItem('theme', 'light');
       } else {
         body.setAttribute('data-theme', 'dark');
-        icon.className = 'fas fa-sun';
+        if (icon) icon.className = 'fas fa-sun';
         localStorage.setItem('theme', 'dark');
       }
     }
 
     // Language Toggle
     function toggleLanguage() {
-      const langText = document.getElementById('lang-text');
       const html = document.documentElement;
       const isArabic = html.getAttribute('lang') === 'ar';
       
       if (isArabic) {
         html.setAttribute('lang', 'en');
         html.setAttribute('dir', 'ltr');
-        langText.textContent = 'AR';
         localStorage.setItem('language', 'en');
       } else {
         html.setAttribute('lang', 'ar');
         html.setAttribute('dir', 'rtl');
-        langText.textContent = 'EN';
         localStorage.setItem('language', 'ar');
       }
     }
 
-    // Initialize Theme and Language
+    // Initialize Settings
     (function initializeSettings() {
       const savedTheme = localStorage.getItem('theme');
       const savedLang = localStorage.getItem('language') || 'ar';
       
       if (savedTheme === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
-        document.getElementById('theme-icon').className = 'fas fa-sun';
       }
       
       if (savedLang === 'en') {
         document.documentElement.setAttribute('lang', 'en');
         document.documentElement.setAttribute('dir', 'ltr');
-        document.getElementById('lang-text').textContent = 'AR';
       }
     })();
-
-    // Docsify Configuration
-    window.$docsify = {
-      name: 'منصة العمق - Depth Platform',
-      repo: 'https://github.com/alijawdat-cyber/Depth',
-      homepage: 'documentation/README.md',
-      basePath: '.',
-      
-      // RTL Support
-      rtl: true,
-      
-      // Theme
-      themeColor: '#3498db',
-      
-      // Logo
-      logo: './depth-site/public/icons/logo.svg',
-      
-      // Loading
-      loadSidebar: true,
-      loadNavbar: true,
-      mergeNavbar: true,
-      subMaxLevel: 3,
-      maxLevel: 4,
-      
-      // Auto header
-      autoHeader: true,
-      
-      // Search
-      search: {
-        placeholder: {
-          '/': '🔍 ابحث في التوثيق...',
-          '/en/': '🔍 Search documentation...'
-        },
-        noData: {
-          '/': '❌ لا توجد نتائج!',
-          '/en/': '❌ No Results!'
-        },
-        depth: 6,
-        maxAge: 86400000,
-        namespace: 'depth-docs',
-        hideOtherSidebarContent: false,
-        pathNamespaces: ['/en']
-      },
-      
-      // Plugins
-      plugins: [
-        // Custom Plugin for RTL support
-        function(hook, vm) {
-          hook.init(function() {
-            // Hide loading screen after initialization
-            setTimeout(() => {
-              const loading = document.getElementById('loading');
-              if (loading) {
-                loading.style.opacity = '0';
-                setTimeout(() => loading.style.display = 'none', 500);
-              }
-            }, 1000);
-          });
-          
-          hook.beforeEach(function(content) {
-            // Add RTL support for Arabic content
-            if (document.documentElement.getAttribute('lang') === 'ar') {
-              return `<div class="rtl-content">${content}</div>`;
-            }
-            return content;
-          });
-          
-          hook.doneEach(function() {
-            // Add copy code functionality
-            document.querySelectorAll('pre[data-lang]').forEach(function(pre) {
-              const button = document.createElement('button');
-              button.className = 'copy-code-button';
-              button.innerHTML = '<i class="fas fa-copy"></i>';
-              button.onclick = function() {
-                const code = pre.querySelector('code').textContent;
-                navigator.clipboard.writeText(code);
-                button.innerHTML = '<i class="fas fa-check"></i>';
-                setTimeout(() => {
-                  button.innerHTML = '<i class="fas fa-copy"></i>';
-                }, 2000);
-              };
-              pre.appendChild(button);
-            });
-            
-            // Add scroll to top button
-            const scrollBtn = document.getElementById('scroll-to-top') || 
-              document.createElement('button');
-            scrollBtn.id = 'scroll-to-top';
-            scrollBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-            scrollBtn.className = 'scroll-to-top-btn';
-            scrollBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
-            
-            if (!document.getElementById('scroll-to-top')) {
-              document.body.appendChild(scrollBtn);
-            }
-            
-            // Show/hide scroll button
-            window.onscroll = function() {
-              scrollBtn.style.display = 
-                document.documentElement.scrollTop > 300 ? 'block' : 'none';
-            };
-          });
-        },
-        
-        // Progress Bar Plugin
-        function(hook, vm) {
-          hook.beforeEach(function(content) {
-            document.body.style.setProperty('--progress', '0%');
-            return content;
-          });
-          
-          hook.doneEach(function() {
-            // Update progress based on scroll
-            window.addEventListener('scroll', function() {
-              const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-              const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-              const scrolled = (winScroll / height) * 100;
-              document.body.style.setProperty('--progress', scrolled + '%');
-            });
-          });
-        }
-      ],
-      
-      // Pagination
-      pagination: {
-        previousText: 'السابق',
-        nextText: 'التالي',
-        crossChapter: true,
-        crossChapterText: true,
-      },
-      
-      // Copy Code
-      copyCode: {
-        buttonText: {
-          '/': 'نسخ الكود',
-          '/en/': 'Copy Code'
-        },
-        errorText: {
-          '/': 'خطأ',
-          '/en/': 'Error'
-        },
-        successText: {
-          '/': 'تم النسخ',
-          '/en/': 'Copied'
-        }
-      },
-      
-      // Tabs
-      tabs: {
-        persist: true,
-        sync: true,
-        theme: 'material',
-        tabComments: true,
-        tabHeadings: true
-      }
-    };
   </script>
 
   <!-- Docsify Core -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   
   <!-- Plugins -->
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
   
   <!-- Syntax Highlighting -->
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-css.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-sql.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
 </body>
 </html>

@@ -1,13 +1,13 @@
 <!-- _sidebar.md -->
 
 <div class="sidebar-header">
-  <h1 style="color: var(--primary-color); text-align: center; margin-bottom: 30px; font-size: 1.5em;">
+  <h1 style="color: #3498db; text-align: center; margin-bottom: 30px; font-size: 1.5em;">
     📚 منصة العمق
   </h1>
-  <div style="text-align: center; margin-bottom: 20px; padding: 10px; background: var(--code-bg); border-radius: 8px;">
-    <span style="color: var(--success-color); font-weight: bold;">v2.0</span>
-    <span style="margin: 0 10px; color: var(--text-color);">|</span>
-    <span style="color: var(--text-color); font-size: 0.9em;">التوثيق الشامل</span>
+  <div style="text-align: center; margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+    <span style="color: #27ae60; font-weight: bold;">v2.0</span>
+    <span style="margin: 0 10px;">|</span>
+    <span style="font-size: 0.9em;">التوثيق الشامل</span>
   </div>
 </div>
 
@@ -15,6 +15,7 @@
 
 ## 🚀 البداية السريعة
 
+* [📖 الصفحة الرئيسية](README.md)
 * [📖 المقدمة](documentation/00-overview/00-introduction.md)
 * [🎯 المتطلبات](documentation/01-requirements/00-requirements-v2.0.md)
 * [⚡ البدء السريع](documentation/04-development/00-getting-started.md)
@@ -112,105 +113,11 @@
 
 ---
 
-<div class="sidebar-footer" style="margin-top: 40px; padding: 20px; background: var(--code-bg); border-radius: 8px; text-align: center;">
-  <div style="margin-bottom: 15px;">
-    <a href="https://github.com/alijawdat-cyber/Depth" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">
-      <i class="fab fa-github"></i> GitHub Repository
-    </a>
-  </div>
-  <div style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">
-    آخر تحديث: 21 أغسطس، 2025<br>
-    الإصدار: v2.0
-  </div>
-  <div style="margin-top: 10px; font-size: 0.7em; color: var(--text-color); opacity: 0.5;">
-    مدعوم بـ Docsify ❤️
-  </div>
+<div class="sidebar-footer" style="margin-top: 40px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center; font-size: 0.8em;">
+  <a href="https://github.com/alijawdat-cyber/Depth" target="_blank" style="color: #3498db; text-decoration: none;">
+    <i class="fab fa-github"></i> GitHub Repository
+  </a>
+  <br><br>
+  آخر تحديث: 21 أغسطس، 2025<br>
+  الإصدار: v2.0
 </div>
-
-<style>
-.sidebar-header h1 {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: none;
-}
-
-.sidebar nav ul li a {
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.sidebar nav ul li a:hover {
-  background: var(--primary-color);
-  color: white !important;
-  transform: translateX(-5px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.sidebar nav ul li a::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.sidebar nav ul li a:hover::before {
-  left: 100%;
-}
-
-/* Section Headers */
-.sidebar nav > ul > li > p {
-  font-weight: 600;
-  color: var(--primary-color) !important;
-  margin-top: 25px !important;
-  margin-bottom: 10px !important;
-  font-size: 1.1em;
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 5px;
-}
-
-/* Subsection styling */
-.sidebar nav ul ul {
-  margin-left: 10px;
-  border-left: 2px solid var(--border-color);
-  padding-left: 15px;
-}
-
-.sidebar nav ul ul li a {
-  font-size: 0.9em;
-  padding: 5px 10px;
-  color: var(--text-color);
-  opacity: 0.8;
-}
-
-.sidebar nav ul ul li a:hover {
-  opacity: 1;
-}
-
-/* Active link styling */
-.sidebar nav ul li.active > a {
-  background: var(--primary-color) !important;
-  color: white !important;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .sidebar-header h1 {
-    font-size: 1.3em;
-  }
-  
-  .sidebar-footer {
-    margin-top: 20px;
-    padding: 15px;
-  }
-}
-</style>
