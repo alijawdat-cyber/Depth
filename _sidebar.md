@@ -1,4 +1,11 @@
-* [🏠 الرئيسية](/)
+* [🏠 الرئي* ⚡ الأساسيات
+   * [💾 التخزين](documentation/03-api/features/05-storage)
+  * [🔔 الإشعارات](documentation/03-api/features/06-notifications)
+  * [💬 المراسلة](documentation/03-api/features/07-messaging)
+  * [👷 الموظفون](documentation/03-api/features/08-salaried-employees)🔐 المصادقة](documentation/03-api/core/01-authentication)
+  * [⏱️ تحديد المعدل](documentation/03-api/core/02-rate-limiting)
+  * [🔌 WebSockets](documentation/03-api/core/03-websockets)
+  * [❌ معالجة الأخطاء](documentation/03-api/core/04-error-handling)/)
 
 * 📊 البداية
   * [📖 نظرة عامة](documentation/00-overview/00-introduction)
@@ -10,31 +17,30 @@
   * [🔍 الفهارس والاستعلامات](documentation/02-database/02-indexes-and-queries)
 
 * ⚡ الأساسيات
-  * [👥 المستخدمون](documentation/03-api/core/01-users)
-  * [📁 المشاريع](documentation/03-api/core/02-projects)
-  * [⭐ المراجعات](documentation/03-api/core/03-reviews)
-  * [🔔 الإشعارات](documentation/03-api/core/04-notifications)
+  * [� المصادقة](documentation/03-api/core/01-authentication)
+  * [⏱️ تحديد المعدل](documentation/03-api/core/02-rate-limiting)
+  * [🔌 WebSockets](documentation/03-api/core/03-websockets)
+  * [❌ معالجة الأخطاء](documentation/03-api/core/04-error-handling)
 
 * 🎯 المميزات
   * [✨ المبدعون](documentation/03-api/features/01-creators)
   * [👤 العملاء](documentation/03-api/features/02-clients)
-  * [🤝 التطابق](documentation/03-api/features/03-matching)
+  * [📁 المشاريع](documentation/03-api/features/03-projects)
   * [💰 التسعير](documentation/03-api/features/04-pricing)
-  * [💬 الاتصالات](documentation/03-api/features/05-communications)
-  * [📄 المحتوى](documentation/03-api/features/06-content)
-  * [💳 الاشتراكات](documentation/03-api/features/07-subscriptions)
+  * [� التخزين](documentation/03-api/features/05-storage)
+  * [🔔 الإشعارات](documentation/03-api/features/06-notifications)
+  * [� المراسلة](documentation/03-api/features/07-messaging)
+  * [� الموظفون](documentation/03-api/features/08-salaried-employees)
 
 * ⚙️ الإدارة
   * [🎛️ لوحة المدير](documentation/03-api/admin/01-admin-panel)
-  * [📈 التحليلات](documentation/03-api/admin/02-analytics)
-  * [🗃️ إدارة المحتوى](documentation/03-api/admin/03-content-management)
-  * [👨‍💼 إدارة المستخدمين](documentation/03-api/admin/04-user-management)
+  * [⚖️ الحوكمة](documentation/03-api/admin/02-governance)
+  * [🌱 إدارة البيانات](documentation/03-api/admin/03-seeds-management)
 
 * 🔗 التكاملات
-  * [💳 الدفع](documentation/03-api/integrations/01-payment)
-  * [☁️ التخزين السحابي](documentation/03-api/integrations/02-cloud-storage)
-  * [📢 الإشعارات](documentation/03-api/integrations/03-notifications)
-  * [📱 الشبكات الاجتماعية](documentation/03-api/integrations/04-social-media)
+  * [🌐 الخدمات الخارجية](documentation/03-api/integrations/01-external-services)
+  * [🪝 Webhooks](documentation/03-api/integrations/02-webhooks)
+  * [⚙️ التقنيات المتقدمة](documentation/03-api/integrations/03-advanced-technical)
 
 * 👨‍💻 التطوير
   * [🚀 دليل المطورين](documentation/04-development/00-getting-started)
@@ -64,8 +70,3 @@
   * [🔗 ربط الروابط](documentation/99-reference/03-link-alias-mapping)
   * [📝 قواعد التسمية](documentation/99-reference/04-naming-conventions)
   * [👥 مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
-- [المصطلحات](documentation/99-reference/01-glossary)
-- [المعايير](documentation/99-reference/02-enums-standard)
-- [ربط الروابط](documentation/99-reference/03-link-alias-mapping)
-- [قواعد التسمية](documentation/99-reference/04-naming-conventions)
-- [مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
