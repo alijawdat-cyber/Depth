@@ -496,8 +496,8 @@ const iraqCarriers = {
 
 ## 🔗 الملفات ذات الصلة
 
-- [نظرة عامة](./00-overview.md)
-- [نظام المبدعين](./02-creators-api.md)
-- [نظام العملاء](./03-clients-api.md)
-- [نظام الإشعارات](./07-notifications-api.md)
-- [رموز الأخطاء](./12-error-codes.md)
+- [نظرة عامة](../../00-overview/00-introduction.md)
+- [نظام المبدعين](../features/01-creators.md)
+- [نظام العملاء](../features/02-clients.md)
+- [نظام الإشعارات](../features/06-notifications.md)
+- [رموز الأخطاء](./04-error-handling.md)
