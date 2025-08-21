@@ -52,9 +52,10 @@ const roles = {
     permissions: ["profile:write", "projects:create", "projects:read"],
     access: ["client/*", "projects/owned/*"]
   },
-  employee: {
+  salariedEmployee: {
     permissions: ["profile:read", "projects:read", "tasks:write"],
-    access: ["employee/*", "projects/assigned/*"]
+    access: ["salariedEmployee/*", "projects/assigned/*"],
+    description: "موظف براتب ثابت - لا يرى الأسعار"
   }
 };
 ```

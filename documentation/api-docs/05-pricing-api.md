@@ -191,13 +191,281 @@
           "description": "خدمات التصوير الاحترافي لجميع الأغراض",
           "subcategories": [
             {
-              "id": "product",
-              "name": "تصوير المنتجات",
-              "basePrice": 450000,
+              "id": "flatlay",
+              "name": "فلات لاي",
+              "basePrice": 10000,
               "currency": "IQD",
               "unit": "per_session",
+              "duration": "2-3 ساعات",
+              "includes": ["5-10 صور معالجة", "ملفات JPG + RAW"]
+            },
+            {
+              "id": "before_after",
+              "name": "قبل/بعد",
+              "basePrice": 15000,
+              "currency": "IQD",
+              "unit": "per_session", 
+              "duration": "2-4 ساعات",
+              "includes": ["صور قبل وبعد", "تحرير احترافي"]
+            },
+            {
+              "id": "portrait",
+              "name": "بورتريه",
+              "basePrice": 12000,
+              "currency": "IQD",
+              "unit": "per_session",
+              "duration": "1-2 ساعة",
+              "includes": ["5-15 صور معالجة", "تحرير احترافي"]
+            },
+            {
+              "id": "on_model",
+              "name": "على موديل",
+              "basePrice": 20000,
+              "currency": "IQD", 
+              "unit": "per_session",
               "duration": "3-5 ساعات",
-              "includes": [
+              "includes": ["10-20 صور معالجة", "تنسيق مع الموديل"]
+            },
+            {
+              "id": "on_mannequin", 
+              "name": "على مانيكان",
+              "basePrice": 15000,
+              "currency": "IQD",
+              "unit": "per_session",
+              "duration": "2-3 ساعات",
+              "includes": ["8-15 صور معالجة", "إعداد المانيكان"]
+            },
+            {
+              "id": "food_photography",
+              "name": "تصوير طعام", 
+              "basePrice": 10000,
+              "currency": "IQD",
+              "unit": "per_session",
+              "duration": "2-4 ساعات",
+              "includes": ["صور أطباق متعددة", "تنسيق إبداعي"]
+            },
+            {
+              "id": "product_photography",
+              "name": "تصوير منتجات",
+              "basePrice": 8000,
+              "currency": "IQD",
+              "unit": "per_session", 
+              "duration": "1-2 ساعة",
+              "includes": ["صور بخلفية بيضاء", "زوايا متعددة"]
+            },
+            {
+              "id": "360_photography",
+              "name": "تصوير 360 درجة",
+              "basePrice": 25000,
+              "currency": "IQD",
+              "unit": "per_product",
+              "duration": "2-3 ساعات",
+              "includes": ["360° تفاعلي", "تحرير متخصص"]
+            },
+            {
+              "id": "interior_photography",
+              "name": "تصوير داخلي",
+              "basePrice": 30000,
+              "currency": "IQD",
+              "unit": "per_space",
+              "duration": "3-5 ساعات",
+              "includes": ["صور معمارية", "إضاءة احترافية"]
+            },
+            {
+              "id": "event_photography",
+              "name": "تصوير فعاليات",
+              "basePrice": 50000,
+              "currency": "IQD",
+              "unit": "per_hour",
+              "duration": "حسب الحدث",
+              "includes": ["تغطية شاملة", "تسليم سريع"]
+            }
+          ]
+        },
+        {
+          "id": "video",
+          "name": "التصوير المرئي",
+          "description": "إنتاج وتصوير المحتوى المرئي",
+          "subcategories": [
+            {
+              "id": "reels_30s",
+              "name": "ريلز 30 ثانية",
+              "basePrice": 35000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "2-4 ساعات إنتاج",
+              "includes": ["مونتاج احترافي", "موسيقى", "تأثيرات"]
+            },
+            {
+              "id": "video_1min",
+              "name": "فيديو دقيقة",
+              "basePrice": 75000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "4-6 ساعات إنتاج",
+              "includes": ["سيناريو", "تصوير", "مونتاج كامل"]
+            },
+            {
+              "id": "video_3min", 
+              "name": "فيديو 3 دقائق",
+              "basePrice": 150000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "1-2 يوم إنتاج",
+              "includes": ["إنتاج متكامل", "عدة مواقع", "فريق عمل"]
+            },
+            {
+              "id": "corporate_video",
+              "name": "فيديو تعريفي", 
+              "basePrice": 250000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "3-5 أيام إنتاج",
+              "includes": ["سيناريو احترافي", "ممثلين", "إنتاج كامل"]
+            },
+            {
+              "id": "event_coverage",
+              "name": "تغطية فعالية",
+              "basePrice": 100000,
+              "currency": "IQD", 
+              "unit": "per_hour",
+              "duration": "حسب الحدث",
+              "includes": ["كاميرات متعددة", "مونتاج سريع", "هايلايت"]
+            }
+          ]
+        },
+        {
+          "id": "design",
+          "name": "التصميم الجرافيكي",
+          "description": "تصميم الهويات البصرية والمطبوعات",
+          "subcategories": [
+            {
+              "id": "logo_design",
+              "name": "تصميم شعار",
+              "basePrice": 50000,
+              "currency": "IQD",
+              "unit": "per_logo",
+              "duration": "3-5 أيام",
+              "includes": ["مفاهيم متعددة", "مراجعات", "ملفات متنوعة"]
+            },
+            {
+              "id": "brand_identity",
+              "name": "هوية بصرية",
+              "basePrice": 200000,
+              "currency": "IQD",
+              "unit": "per_package",
+              "duration": "1-2 أسبوع",
+              "includes": ["شعار", "ألوان", "خطوط", "تطبيقات"]
+            },
+            {
+              "id": "social_media_post",
+              "name": "منشور سوشيال ميديا",
+              "basePrice": 5000,
+              "currency": "IQD",
+              "unit": "per_post",
+              "duration": "1-2 ساعة",
+              "includes": ["تصميم مخصص", "نص إبداعي (اختياري)"]
+            },
+            {
+              "id": "brochure_design",
+              "name": "تصميم بروشور",
+              "basePrice": 30000,
+              "currency": "IQD",
+              "unit": "per_brochure",
+              "duration": "2-3 أيام",
+              "includes": ["تصميم ثنائي الطية", "ملفات طباعة"]
+            },
+            {
+              "id": "menu_design",
+              "name": "تصميم منيو",
+              "basePrice": 40000,
+              "currency": "IQD",
+              "unit": "per_menu",
+              "duration": "3-5 أيام", 
+              "includes": ["تصميم كامل", "صور الأطباق", "أسعار"]
+            },
+            {
+              "id": "poster_design",
+              "name": "تصميم بوستر",
+              "basePrice": 20000,
+              "currency": "IQD",
+              "unit": "per_poster",
+              "duration": "1-2 يوم",
+              "includes": ["تصميم إبداعي", "ملفات عالية الدقة"]
+            },
+            {
+              "id": "business_card",
+              "name": "بطاقة عمل",
+              "basePrice": 15000,
+              "currency": "IQD",
+              "unit": "per_design",
+              "duration": "1-2 يوم",
+              "includes": ["وجهين", "ملفات طباعة"]
+            },
+            {
+              "id": "packaging_design",
+              "name": "تصميم تغليف",
+              "basePrice": 60000,
+              "currency": "IQD",
+              "unit": "per_package",
+              "duration": "5-7 أيام",
+              "includes": ["تصميم 3D", "قوالب طباعة"]
+            }
+          ]
+        },
+        {
+          "id": "editing", 
+          "name": "المونتاج والمعالجة",
+          "description": "مونتاج وتحرير المحتوى المرئي",
+          "subcategories": [
+            {
+              "id": "basic_edit",
+              "name": "مونتاج أساسي",
+              "basePrice": 20000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "1-2 يوم",
+              "includes": ["قص وربط", "تصحيح ألوان بسيط"]
+            },
+            {
+              "id": "advanced_edit", 
+              "name": "مونتاج متقدم",
+              "basePrice": 40000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "2-3 أيام",
+              "includes": ["مؤثرات", "انتقالات", "تصحيح صوت"]
+            },
+            {
+              "id": "color_grading",
+              "name": "تصحيح ألوان",
+              "basePrice": 15000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "1 يوم",
+              "includes": ["تدرج لوني احترافي", "مطابقة ألوان"]
+            },
+            {
+              "id": "effects_addition",
+              "name": "إضافة مؤثرات",
+              "basePrice": 25000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "1-2 يوم",
+              "includes": ["مؤثرات بصرية", "تحسينات صوتية"]
+            },
+            {
+              "id": "motion_graphics",
+              "name": "موشن جرافيك",
+              "basePrice": 50000,
+              "currency": "IQD",
+              "unit": "per_video",
+              "duration": "3-5 أيام",
+              "includes": ["رسوم متحركة", "نصوص ديناميكية", "انفوجرافيك"]
+            }
+          ]
+        }
+      ],
                 "تصوير احترافي",
                 "معالجة أساسية",
                 "10-15 صورة نهائية",
@@ -336,6 +604,65 @@
       }
     }
   }
+}
+```
+
+### `PUT /admin/pricing/base-prices`
+تحديث الأسعار الأساسية (أدمن فقط).
+
+**المصادقة:** Admin only
+
+**الطلب:**
+```json
+{
+  "updates": [
+    {
+      "subcategoryId": "flatlay",
+      "newBasePrice": 12000,
+      "reason": "تحديث أسعار السوق"
+    },
+    {
+      "subcategoryId": "food_photography",
+      "newBasePrice": 11000,
+      "reason": "زيادة تكاليف المعدات"
+    }
+  ],
+  "effectiveDate": "2025-09-01",
+  "notifyCreators": true
+}
+```
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "priceUpdate": {
+      "totalUpdated": 2,
+      "successful": 2,
+      "failed": 0,
+      "effectiveDate": "2025-09-01T00:00:00.000Z",
+      "updates": [
+        {
+          "subcategoryId": "flatlay",
+          "previousPrice": 10000,
+          "newPrice": 12000,
+          "percentageChange": 20.0,
+          "status": "success"
+        },
+        {
+          "subcategoryId": "food_photography", 
+          "previousPrice": 10000,
+          "newPrice": 11000,
+          "percentageChange": 10.0,
+          "status": "success"
+        }
+      ],
+      "affectedCreators": 28,
+      "notificationsSent": true
+    }
+  },
+  "message": "تم تحديث الأسعار الأساسية بنجاح"
 }
 ```
 
