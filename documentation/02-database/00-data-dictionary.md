@@ -158,46 +158,22 @@
 
 ## 4. معادلات التسعير النهائية المحسومة
 
-### البنية الهرمية للتسعير
-```
-السعر الأساسي (BasePrice) → سعر المبدع المحسوب → السعر النهائي للعميل
-```
+المعادلات كاملة (المقفلة في 2.0) مُدارة مركزياً في: `99-reference/02-enums-standard.md` وقسم التسعير المختصر في: `MASTER-DOCUMENT-V2.0.md`.
 
-### حساب سعر المبدع الأساسي (عند التسجيل):
-> يُحسب مرة واحدة لكل فئة فرعية يختارها المبدع ويُحفظ في CreatorSubcategoryPricing
-
-```javascript
+### ملخص مختصر (للسياق فقط)
+```
 BaseCreatorPrice = BasePrice × OwnershipFactor × ProcessingMod × ExperienceMod × EquipmentMod
-
-// حيث:
-// BasePrice: من جدول Subcategories  
-// OwnershipFactor: 0.9 إذا بدون معدات، 1.0 إذا يملك معدات
-// ProcessingMod: حسب اختيار المبدع للفئة الفرعية (من ProcessingModifiers)
-// ExperienceMod: من بروفايل المبدع (من ExperienceModifiers)
-// EquipmentMod: من بروفايل المبدع (من EquipmentModifiers)
-```
-
-### حساب سعر المبدع النهائي (عند إنشاء المشروع):
-> يُحسب لكل مشروع باستخدام السعر الأساسي المحفوظ
-
-```javascript
 CreatorPrice = BaseCreatorPrice × RushMod + LocationAddition
-
-// حيث:
-// BaseCreatorPrice: المحسوب مسبقاً من CreatorSubcategoryPricing
-// RushMod: 1.0 أو 1.2 حسب المشروع (من RushModifiers)
-<!-- LocationMod تم حذفه: الاعتماد فقط على LocationAddition -->
-// LocationAddition: 0، 25000، 50000، أو 100000 حسب الموقع (من LocationAdditions)
+ClientPrice = CreatorPrice + (CreatorPrice × AgencyMarginPercent) | أو + AgencyMarginFixed
 ```
+أي تعديل رقمي أو منطق حسابي يتطلب فتح إصدار 2.1 وفق `VERSION-LOCK-V2.0.md`.
 
-### حساب سعر العميل النهائي:
-```javascript
-// طريقة النسبة المئوية
-ClientPrice = CreatorPrice + (CreatorPrice × AgencyMarginPercent)
+### سياق البيانات
+- BasePrice مصدره بذور التسعير (Seeds)
+- معاملات الخبرة/المعالجة/المعدات/الاستعجال من الجداول التعدادية المعتمدة
+- LocationAddition ثابتة حسب الموقع (لا معاملات نسبية)
 
-// أو طريقة المبلغ الثابت  
-ClientPrice = CreatorPrice + AgencyMarginFixed
-```
+> (تم تقليل النسخ المكرر؛ المرجعية الحقيقية في الملف القياسي لتفادي الانجراف.)
 
 ### أمثلة توضيحية محسومة
 

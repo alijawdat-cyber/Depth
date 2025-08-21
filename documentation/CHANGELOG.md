@@ -1,58 +1,83 @@
-# 📝 Changelog - Depth Platform Documentation
+# 📝 سجل التغييرات - توثيق منصة Depth
 
-All notable changes to the Depth platform documentation will be documented in this file.
+جميع التغييرات المهمة على توثيق منصة Depth ستُسجل في هذا الملف.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+التنسيق مبني على [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)،
+وهذا المشروع يتبع [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.0.1] - 2025-08-21
+
+### ✨ مُضاف
+- `08-operations/01-deployment.md` - دليل النشر القياسي
+- `08-operations/02-incident-response.md` - خطة استجابة الحوادث
+- `07-security/02-key-management.md` - سياسة إدارة المفاتيح
+- `03-api/integrations/02-webhooks.md` - مواصفات أولية للويب هوكس
+- `99-reference/05-roles-matrix.md` - مصفوفة الأدوار والصلاحيات الرسمية
+- `02-database/02-indexes-and-queries.md` - إستراتيجية الفهارس والاستعلامات
+- `07-security/01-threat-model.md` - نموذج تهديد مبدئي
+- `04-development/04-testing-strategy.md` - إستراتيجية الاختبارات
+
+### 🔄 مُعدّل
+- تقليل التكرار بنقل معادلات التسعير المرجعية إلى الملف القياسي والاكتفاء بملخص في قاموس البيانات.
+- تحديث بصمة السلامة (Integrity Hash) واستثناء ملف القفل من مجموعة الحساب.
+- تحديث روابط Legacy في: `01-creators.md`, `04-pricing.md`, `03-seeds-management.md`.
+
+### 🔐 سلامة البيانات
+- Hash جديد: موجود في `VERSION-LOCK-V2.0.md`.
+
+### 📌 ملاحظات
+- لا تغييرات وظيفية جوهرية؛ إضافات تشغيل/أمن ومرجع (مسموح ضمن 2.0).
+
+---
 
 ## [2.0.0] - 2025-08-21
 
-### 🎉 Major Restructure
-- **BREAKING**: Complete documentation restructure from flat structure to hierarchical organization
-- **NEW**: Organized content into 9 main categories across multiple subdirectories
-- **IMPROVED**: Enhanced navigation and discoverability of content
+### 🎉 إعادة هيكلة كاملة
+- **تغيير جذري**: إعادة هيكلة كاملة للتوثيق من هيكل مسطح إلى تنظيم هرمي
+- **جديد**: تنظيم المحتوى في 9 فئات رئيسية عبر مجلدات متعددة
+- **محسّن**: تحسين التنقل وسهولة اكتشاف المحتوى
 
-### ✨ Added
-- `README.md` - Comprehensive documentation overview with quick navigation
-- `TODO.md` - Detailed development roadmap with 6 Sprints and 42-day plan (589 lines)
-- `CHANGELOG.md` - This changelog file for tracking documentation changes
+### ✨ مُضاف
+- `README.md` - نظرة شاملة على التوثيق مع تنقل سريع
+- `TODO.md` - خارطة طريق تطوير مفصلة مع 6 مراحل وخطة 42 يوم (589 سطر)
+- `CHANGELOG.md` - ملف سجل التغييرات هذا لتتبع تغييرات التوثيق
 
-#### 📁 New Documentation Sections
-- **00-overview/** - Platform introduction and architecture overview
-- **01-requirements/** - Comprehensive requirements and specifications  
-- **02-database/** - Complete database schema and data models
-- **03-api/** - Reorganized API documentation into logical categories
-- **04-development/** - Developer setup guides and workflows
-- **05-mobile/** - Mobile app development documentation
-- **07-security/** - Security architecture and compliance
+#### 📁 أقسام التوثيق الجديدة
+- **00-overview/** - مقدمة المنصة ونظرة عامة على المعمارية
+- **01-requirements/** - متطلبات ومواصفات شاملة
+- **02-database/** - مخطط قاعدة البيانات ونماذج البيانات الكاملة
+- **03-api/** - إعادة تنظيم توثيق API في فئات منطقية
+- **04-development/** - أدلة إعداد المطورين وسير العمل
+- **05-mobile/** - توثيق تطوير تطبيقات الجوال
+- **07-security/** - معمارية الأمان والامتثال
 
-### 🆕 New Critical Files
-- `04-development/00-getting-started.md` - Quick start guide for developers
-- `04-development/01-local-setup.md` - Detailed local development setup
-- `04-development/02-environment-variables.md` - Complete environment configuration
-- `04-development/03-development-workflow.md` - Development workflow guide
-- `02-database/01-database-schema.md` - Comprehensive database schema
-- `05-mobile/00-mobile-overview.md` - Mobile app strategy and architecture
-- `07-security/00-security-overview.md` - Security framework and standards
+### 🆕 ملفات جديدة مهمة
+- `04-development/00-getting-started.md` - دليل البدء السريع للمطورين
+- `04-development/01-local-setup.md` - إعداد التطوير المحلي المفصل
+- `04-development/02-environment-variables.md` - إعداد متغيرات البيئة الكامل
+- `04-development/03-development-workflow.md` - دليل سير عمل التطوير
+- `02-database/01-database-schema.md` - مخطط قاعدة البيانات الشامل
+- `05-mobile/00-mobile-overview.md` - استراتيجية ومعمارية تطبيقات الجوال
+- `07-security/00-security-overview.md` - إطار عمل ومعايير الأمان
 
-### 🔄 Changed
-- **RELOCATED**: API documentation moved from flat `api-docs/` to categorized structure:
+### 🔄 مُعدّل
+- **نُقل**: تم نقل توثيق API من هيكل مسطح `api-docs/` إلى هيكل مصنف:
   - Core APIs → `03-api/core/`
   - Feature APIs → `03-api/features/` 
   - Admin APIs → `03-api/admin/`
   - Integration APIs → `03-api/integrations/`
-- **RENAMED**: Removed `-api` suffix from most API documentation files
-- **MERGED**: Combined `00-overview.md` and `00-index.md` into single introduction
-- **MOVED**: `requirements-v2.0.md` → `01-requirements/00-requirements-v2.0.md`
-- **MOVED**: `data-dictionary-and-domain-model.md` → `02-database/00-data-dictionary.md`
+- **أُعيد تسمية**: إزالة لاحقة `-api` من معظم ملفات توثيق API
+- **دُمج**: دمج `00-overview.md` و `00-index.md` في مقدمة واحدة
+- **نُقل**: `requirements-v2.0.md` → `01-requirements/00-requirements-v2.0.md`
+- **نُقل**: `data-dictionary-and-domain-model.md` → `02-database/00-data-dictionary.md`
 
-### ⚠️ Known Issues
-- **3 empty directories**: `06-frontend/`, `08-operations/`, `99-reference/` (to be populated or removed)
-- **2 API files merged**: `00-overview.md` + `00-index.md` combined into `00-introduction.md`
+### ⚠️ مشاكل معروفة
+- **3 مجلدات فارغة**: `06-frontend/`, `08-operations/`, `99-reference/` (سيتم ملؤها أو إزالتها)
+- **دُمج ملفان API**: `00-overview.md` + `00-index.md` دُمجا في `00-introduction.md`
 
-### 📋 File Mapping (Complete)
+### 📋 خريطة نقل الملفات (مكتملة)
 ```
-OLD LOCATION                           → NEW LOCATION
+الموقع القديم                        → الموقع الجديد
 ────────────────────────────────────────────────────────────────────────
 requirements-v2.0.md                  → 01-requirements/00-requirements-v2.0.md
 data-dictionary-and-domain-model.md   → 02-database/00-data-dictionary.md
@@ -75,63 +100,63 @@ api-docs/10-integrations-api.md       → 03-api/integrations/01-external-servic
 api-docs/13-advanced-technical.md     → 03-api/integrations/03-advanced-technical.md
 ```
 
-### 🔧 Technical Improvements
-- **VALIDATION**: All file moves verified and links updated
-- **INDEXING**: Improved search and navigation with hierarchical structure
-- **CONSISTENCY**: Standardized naming conventions across all files
-- **ORGANIZATION**: Moved from flat structure to categorized directories
+### 🔧 تحسينات تقنية
+- **التحقق**: تم التحقق من جميع عمليات نقل الملفات وتحديث الروابط
+- **الفهرسة**: تحسين البحث والتنقل مع الهيكل الهرمي
+- **التماسك**: توحيد معايير التسمية عبر جميع الملفات
+- **التنظيم**: الانتقال من هيكل مسطح إلى مجلدات مصنفة
 
-### 📊 Statistics (Accurate)
-- **API Files**: Restructured 17 original files into 15 organized files
-- **Total Files**: Increased from 19 to 28 files (47% increase)
-- **Directories**: Created 9 active directories (3 empty directories removed)
-- **Organization**: All content properly categorized and accessible
+### 📊 إحصائيات (دقيقة)
+- **ملفات API**: إعادة هيكلة 17 ملف أصلي إلى 15 ملف منظم
+- **إجمالي الملفات**: زيادة من 19 إلى 28 ملف (زيادة 47%)
+- **المجلدات**: إنشاء 9 مجلدات نشطة (إزالة 3 مجلدات فارغة)
+- **التنظيم**: جميع المحتويات مصنفة بشكل صحيح ويمكن الوصول إليها
 
-### 🎯 Impact
-- **Developers**: Faster onboarding with clear setup guides
-- **Project Managers**: Complete roadmap visibility with comprehensive TODO.md
-- **API Consumers**: Intuitive API documentation structure with logical categorization
-- **New Contributors**: Clear documentation hierarchy for easy navigation
+### 🎯 التأثير
+- **المطورون**: إعداد أسرع مع أدلة إعداد واضحة
+- **مدراء المشاريع**: رؤية كاملة لخارطة الطريق مع TODO.md شامل
+- **مستهلكو API**: هيكل توثيق API بديهي مع تصنيف منطقي
+- **المساهمون الجدد**: تسلسل هرمي واضح للتوثيق لسهولة التنقل
 
 ## [1.2.0] - 2025-08-20
 
-### Added
-- `api-docs/14-seeds-management-api.md` - Seeds management API documentation
-- `api-docs/02b-salaried-employees-api.md` - Salaried employees API endpoints
+### مُضاف
+- `api-docs/14-seeds-management-api.md` - توثيق API لإدارة البذور
+- `api-docs/02b-salaried-employees-api.md` - نقاط نهاية API للموظفين براتب
 
-### Changed
-- Updated API endpoint documentation with enhanced examples
-- Improved Arabic language support in API responses
+### مُعدّل
+- تحديث توثيق نقاط النهاية API مع أمثلة محسنة
+- تحسين دعم اللغة العربية في استجابات API
 
 ## [1.1.0] - 2025-08-15
 
-### Added
-- Complete API documentation for all major endpoints
-- Comprehensive data dictionary and domain models
-- Enhanced error handling documentation
+### مُضاف
+- توثيق API كامل لجميع النقاط الرئيسية
+- قاموس بيانات شامل ونماذج مجال
+- توثيق معالجة أخطاء محسن
 
-### Changed
-- Standardized API response formats
-- Updated authentication flow documentation
+### مُعدّل
+- توحيد تنسيقات استجابة API
+- تحديث توثيق تدفق المصادقة
 
 ## [1.0.0] - 2025-08-01
 
-### Added
-- Initial documentation structure
-- Basic API documentation
-- Project requirements specification
-- Data dictionary and domain model
+### مُضاف
+- هيكل التوثيق الأولي
+- توثيق API أساسي
+- مواصفات متطلبات المشروع
+- قاموس البيانات ونموذج المجال
 
-### Technical Debt Resolved
-- ✅ **Duplicate File Names**: Resolved 00-overview.md and 00-index.md conflict
-- ✅ **Missing Development Docs**: Added complete developer setup guides
-- ✅ **Flat Structure**: Implemented hierarchical organization
-- ✅ **Missing TODO**: Created comprehensive development roadmap
-- ✅ **Broken References**: Fixed all internal documentation links
+### الديون التقنية المُحلة
+- ✅ **أسماء ملفات مكررة**: حُل تعارض 00-overview.md و 00-index.md
+- ✅ **توثيق التطوير المفقود**: أُضيفت أدلة إعداد مطور كاملة
+- ✅ **الهيكل المسطح**: تم تنفيذ تنظيم هرمي
+- ✅ **TODO المفقود**: أُنشئت خارطة طريق تطوير شاملة
+- ✅ **المراجع المكسورة**: أُصلحت جميع روابط التوثيق الداخلية
 
 ---
 
-## Future Releases
+## الإصدارات المستقبلية
 
 ### [2.1.0] - Planned for 2025-09-01
 - [ ] Complete API reference with Postman collection

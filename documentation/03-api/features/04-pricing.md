@@ -7,7 +7,7 @@
 - ✅ **هامش الوكالة**: موحد في النطاق 10%-50%
 - ✅ **معاملات الموقع**: تم استبدالها بإضافات ثابتة
 - ✅ **معادلات التسعير**: متطابقة مع requirements
-- 🔗 **التكامل**: مع [`02-creators-api.md`](02-creators-api.md) و [`02b-salaried-employees-api.md`](02b-salaried-employees-api.md)
+- 🔗 **التكامل**: مع [`01-creators.md`](./01-creators.md) و [`08-salaried-employees.md`](./08-salaried-employees.md)
 
 ---
 
