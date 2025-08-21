@@ -284,7 +284,7 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* Desktop - السايدبار دائماً مرئي */
+/* Desktop - إظهار أيقونة البرجر في جميع الأحجام */
 @media (min-width: 768px) {
   .sidebar {
     transform: translateX(0); /* دائماً مرئي */
@@ -296,9 +296,10 @@ body {
     min-height: 100vh;
   }
   
-  /* إخفاء زر البرجر في الأحجام الكبيرة */
-  .mobile-menu {
-    display: none;
+  /* إظهار أيقونة البرجر في الشاشات الكبيرة أيضاً */
+  .burger-menu {
+    display: flex;
+    right: 320px; /* بجانب السايدبار */
   }
 }
 
@@ -686,28 +687,49 @@ h4:hover .heading-anchor {
    8. UI COMPONENTS
 =============================================== */
 
-/* Mobile Menu Button */
-.mobile-menu {
-  display: none;
+/* Burger Menu Button - 3 خطوط بسيطة */
+.burger-menu {
   position: fixed;
-  top: var(--space-md);
-  right: var(--space-md);
-  z-index: var(--z-modal); /* 300 - أعلى من loading screen الجديد */
+  top: 20px;
+  right: 20px; /* سيتم تعديلها ديناميكياً */
+  width: 40px;
+  height: 40px;
   background: var(--interactive-primary);
-  color: white;
   border: none;
   border-radius: var(--radius-md);
-  padding: 10px 16px;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  justify-content: center;
+  cursor: pointer;
+  z-index: calc(var(--z-sidebar) + 1); /* أعلى من السايدبار */
+  transition: all var(--transition-fast);
+  gap: 4px;
+  box-shadow: var(--shadow-lg);
 }
 
-.mobile-menu:hover {
+.burger-line {
+  width: 18px;
+  height: 2px;
+  background: white;
+  border-radius: 1px;
+  transition: all var(--transition-fast);
+}
+
+/* Animation عند فتح السايدبار */
+body.sidebar-open .burger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+body.sidebar-open .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+body.sidebar-open .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.burger-menu:hover {
   background: var(--interactive-primary-hover);
   transform: scale(1.05);
 }
@@ -1214,11 +1236,8 @@ blockquote p {
     padding: var(--space-lg) var(--space-md);
   }
   
-  .mobile-menu {
+  .burger-menu {
     display: flex;
-    pointer-events: auto !important; /* التأكد من إمكانية النقر */
-    visibility: visible !important;
-    z-index: var(--z-modal) !important; /* أعلى من loading screen */
   }
   
   .theme-toggle {

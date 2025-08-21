@@ -852,6 +852,9 @@ window.DepthDocs.features = {
       return;
     }
     
+    // تحديث موقع الأيقونة ديناميكياً
+    this.updateBurgerPosition();
+    
     // التأكد من أن الزر مرئي وقابل للنقر
     btn.style.pointerEvents = 'auto';
     btn.style.visibility = 'visible';
@@ -876,25 +879,85 @@ window.DepthDocs.features = {
         console.log('Sidebar opened');
       }
       
-      // إضافة تأخير قصير لضمان تطبيق التحولات
+      // تحديث موقع الأيقونة بعد التبديل
       setTimeout(() => {
-        // إزالة أي scrolling issues
-        if (body.classList.contains('sidebar-open')) {
-          body.style.overflowX = 'hidden';
-        } else {
-          body.style.overflowX = 'auto';
-        }
-      }, 50);
+        this.updateBurgerPosition();
+      }, 100);
     };
     
     // إضافة click وtouch handlers
     newBtn.addEventListener('click', toggleHandler, { passive: false });
     newBtn.addEventListener('touchend', toggleHandler, { passive: false });
     
-    console.log('Mobile menu setup completed');
+    // إعداد إغلاق عند النقر في أي مكان
+    this.setupClickOutside();
     
-    // إعداد إغلاق السايدبار عند النقر على رابط (موبايل فقط)
+    // إعداد إغلاق السايدبار عند النقر على رابط 
     this.setupSidebarAutoClose();
+    
+    // إعداد مراقبة تغيير حجم الشاشة لتحديث موقع الأيقونة
+    window.addEventListener('resize', () => {
+      this.updateBurgerPosition();
+    });
+    
+    console.log('Mobile menu setup completed');
+  },
+
+  // وظيفة جديدة لتحديد موقع أيقونة البرجر
+  updateBurgerPosition: function() {
+    const btn = document.getElementById('menuToggle');
+    if (!btn) return;
+    
+    const isOpen = document.body.classList.contains('sidebar-open');
+    const sidebarWidth = 300; // عرض السايدبار
+    const isDesktop = window.innerWidth >= 768;
+    
+    if (isDesktop) {
+      // في الشاشات الكبيرة
+      if (isOpen) {
+        // السايدبار مفتوح - الأيقونة بجانب السايدبار
+        btn.style.right = (sidebarWidth + 20) + 'px';
+      } else {
+        // السايدبار مغلق - الأيقونة في الموقع الافتراضي للشاشات الكبيرة
+        btn.style.right = '320px'; // بجانب مكان السايدبار المغلق
+      }
+    } else {
+      // في الموبايل
+      if (isOpen) {
+        // السايدبار مفتوح - الأيقونة عند حافة السايدبار
+        btn.style.right = (sidebarWidth + 10) + 'px';
+      } else {
+        // السايدبار مغلق - الأيقونة في الزاوية
+        btn.style.right = '20px';
+      }
+    }
+  },
+
+  // وظيفة جديدة للإغلاق عند النقر خارج السايدبار
+  setupClickOutside: function() {
+    const outsideClickHandler = (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const btn = document.getElementById('menuToggle');
+      const isOpen = document.body.classList.contains('sidebar-open');
+      
+      if (isOpen && 
+          !e.target.closest('.sidebar') && 
+          !e.target.closest('#menuToggle')) {
+        
+        document.body.classList.remove('sidebar-open');
+        setTimeout(() => {
+          this.updateBurgerPosition();
+        }, 100);
+        console.log('Sidebar closed by outside click');
+      }
+    };
+    
+    document.addEventListener('click', outsideClickHandler);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      document.removeEventListener('click', outsideClickHandler);
+    });
   },
 
   // وظيفة جديدة لإغلاق السايدبار تلقائياً
