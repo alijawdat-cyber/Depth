@@ -65,7 +65,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3>اختصارات لوحة المفاتيح</h3>
-        <button class="modal-close" onclick="toggleShortcuts()">&times;</button>
+        <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="shortcut-item">
@@ -93,10 +93,9 @@
   </div>
 
   <!-- Scripts -->
+  <script src="docsify-config.js"></script>
   <script>
-    // ============================================
-    // Configuration
-    // ============================================
+    // Docsify Configuration - استخدام الإعدادات من docsify-config.js
     window.$docsify = {
       name: 'Depth',
       repo: 'https://github.com/depth-platform/docs',
@@ -137,182 +136,10 @@
         '/': '404.md'
       },
       
-      // Plugins
+      // استخدام البرنامج المساعد من docsify-config.js
       plugins: [
-        // Main Enhancement Plugin
-        function(hook, vm) {
-          // ========================================
-          // Initialize
-          // ========================================
-          hook.init(function() {
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-            
-            // Load saved sidebar state
-            const sidebarState = localStorage.getItem('sidebarState');
-            if (sidebarState) {
-              try {
-                window.sidebarOpenSections = JSON.parse(sidebarState);
-              } catch(e) {
-                window.sidebarOpenSections = [];
-              }
-            }
-          });
-          
-          // ========================================
-          // Before Each Page Render
-          // ========================================
-          hook.beforeEach(function(content) {
-            // Add breadcrumbs placeholder
-            const breadcrumbs = '<div id="breadcrumbs" class="breadcrumbs"></div>';
-            
-            // Add reading time
-            const wordCount = content.split(/\s+/).length;
-            const readingTime = Math.ceil(wordCount / 200);
-            const readingTimeHtml = `
-              <div class="reading-meta">
-                <span class="reading-time">⏱️ ${readingTime} دقائق قراءة</span>
-                <span class="word-count">📝 ${wordCount} كلمة</span>
-              </div>
-            `;
-            
-            return breadcrumbs + readingTimeHtml + content;
-          });
-          
-          // ========================================
-          // After Each Page Render
-          // ========================================
-          hook.doneEach(function() {
-            // Hide loading screen
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen) {
-              loadingScreen.style.opacity = '0';
-              setTimeout(() => {
-                loadingScreen.style.display = 'none';
-              }, 300);
-            }
-            
-            // Update breadcrumbs
-            if (window.DepthDocs && window.DepthDocs.navigation) {
-              window.DepthDocs.navigation.updateBreadcrumbs();
-            }
-            
-            // Setup floating TOC
-            if (window.DepthDocs && window.DepthDocs.navigation) {
-              window.DepthDocs.navigation.setupFloatingTOC();
-            }
-            
-            // Enhance headings with anchors
-            if (window.DepthDocs && window.DepthDocs.navigation) {
-              window.DepthDocs.navigation.enhanceHeadings();
-            }
-            
-            // Setup sidebar enhancements
-            if (window.DepthDocs && window.DepthDocs.sidebar) {
-              window.DepthDocs.sidebar.enhance();
-            }
-            
-            // Update reading progress
-            if (window.DepthDocs && window.DepthDocs.navigation) {
-              window.DepthDocs.navigation.updateReadingProgress();
-            }
-            
-            // Setup feedback widget
-            if (window.DepthDocs && window.DepthDocs.features) {
-              window.DepthDocs.features.setupFeedbackWidget();
-            }
-          });
-          
-          // ========================================
-          // Mounted
-          // ========================================
-          hook.mounted(function() {
-            // Setup keyboard shortcuts
-            setupKeyboardShortcuts();
-            
-            // Setup back to top button
-            setupBackToTop();
-            
-            // Setup theme toggle
-            setupThemeToggle();
-            
-            // Setup mobile menu
-            setupMobileMenu();
-          });
-          
-          // ========================================
-          // Ready
-          // ========================================
-          hook.ready(function() {
-            // Show welcome message for first-time visitors
-            if (!localStorage.getItem('welcomed')) {
-              showToast('مرحباً بك في توثيق Depth! استخدم / للبحث السريع', 'info', 5000);
-              localStorage.setItem('welcomed', 'true');
-            }
-          });
-        }
+        window.DepthDocs.docsifyPlugin
       ]
-    };
-    
-    // ============================================
-    // Helper Functions
-    // ============================================
-    
-    // Update Theme Icon
-    function updateThemeIcon(theme) {
-      const btn = document.getElementById('themeToggle');
-      if (!btn) return;
-      
-      const sunIcon = btn.querySelector('.sun-icon');
-      const moonIcon = btn.querySelector('.moon-icon');
-      
-      if (theme === 'dark') {
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      } else {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-      }
-    }
-    
-    // Setup Mobile Menu
-    function setupMobileMenu() {
-      const btn = document.getElementById('menuToggle');
-      if (!btn) return;
-      
-      btn.addEventListener('click', () => {
-        document.body.classList.toggle('sidebar-open');
-      });
-      
-      // Close on link click
-      document.addEventListener('click', (e) => {
-        if (e.target.matches('.sidebar a') && window.innerWidth < 768) {
-          setTimeout(() => {
-            document.body.classList.remove('sidebar-open');
-          }, 300);
-        }
-      });
-    }
-    
-    // Global functions for external access
-    window.toggleTheme = function() {
-      if (window.DepthDocs && window.DepthDocs.features) {
-        window.DepthDocs.features.toggleTheme();
-      }
-    };
-    
-    window.toggleShortcuts = function() {
-      if (window.DepthDocs && window.DepthDocs.features) {
-        window.DepthDocs.features.toggleShortcutsModal();
-      }
-    };
-    
-    window.showToast = function(message, type, duration) {
-      if (window.DepthDocs && window.DepthDocs.ui) {
-        window.DepthDocs.ui.showToast(message, type, duration);
-      }
     };
   </script>
   

@@ -1,6 +1,6 @@
 /* ===============================================
-   DEPTH DOCUMENTATION - THEME SYSTEM v2.0
-   Optimized & Organized Version
+   DEPTH DOCUMENTATION - UNIFIED THEME v2.0
+   نسخة موحدة ومحسنة
    =============================================== */
 
 /* ===============================================
@@ -80,6 +80,7 @@
   /* === Z-INDEX SCALE === */
   --z-dropdown: 100;
   --z-sidebar: 200;
+  --z-overlay: 190; /* أقل من السايدبار */
   --z-modal: 300;
   --z-tooltip: 400;
   --z-toast: 500;
@@ -323,11 +324,13 @@ li {
 /* Search Box */
 .search {
   padding: 0 var(--space-md) var(--space-md);
+  position: relative;
 }
 
 .search input {
   width: 100%;
   padding: 10px 12px;
+  padding-left: 36px;
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
@@ -340,6 +343,23 @@ li {
   border-color: var(--interactive-primary);
   box-shadow: 0 0 0 3px rgba(108, 43, 255, 0.1);
   outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.search-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: currentColor;
 }
 
 /* Navigation */
@@ -443,31 +463,6 @@ li {
   color: var(--text-tertiary);
 }
 
-/* Version Selector */
-.version-selector {
-  padding: 0 var(--space-md) var(--space-md);
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.version-selector select {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-}
-
-.changelog-link {
-  color: var(--interactive-primary);
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-}
-
 /* Hide Docsify defaults */
 .sidebar-toggle,
 .app-name {
@@ -536,6 +531,68 @@ li {
   font-size: var(--font-size-sm);
 }
 
+/* Floating TOC */
+.floating-toc {
+  position: fixed;
+  left: 20px;
+  top: 100px;
+  width: 200px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+}
+
+.floating-toc:hover {
+  opacity: 1;
+}
+
+.toc-title {
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-list li {
+  margin: 4px 0;
+}
+
+.toc-list li.h3 {
+  padding-right: var(--space-md);
+}
+
+.toc-list a {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+  display: block;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.toc-list a:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.toc-list a.active {
+  background: var(--interactive-secondary);
+  color: var(--interactive-primary);
+  font-weight: 600;
+}
+
 /* Hide TOC on smaller screens */
 @media (max-width: 1280px) {
   .floating-toc {
@@ -585,7 +642,6 @@ h4:hover .heading-anchor {
   cursor: pointer;
   box-shadow: var(--shadow-lg);
   transition: all var(--transition-fast);
-  display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
@@ -774,7 +830,7 @@ h4:hover .heading-anchor {
    10. MODALS
 =============================================== */
 .modal {
-  display: flex;
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -1014,7 +1070,7 @@ blockquote p {
 }
 
 /* ===============================================
-   15. RESPONSIVE DESIGN
+   15. RESPONSIVE DESIGN - مع إصلاح مشكلة الموبايل
 =============================================== */
 
 /* Tablet */
@@ -1026,40 +1082,23 @@ blockquote p {
   .content {
     margin-right: 240px;
   }
-  
-  .sidebar.collapsed {
-    width: 60px;
-  }
-  
-  .sidebar.collapsed .sidebar-header,
-  .sidebar.collapsed .search,
-  .sidebar.collapsed .version-selector,
-  .sidebar.collapsed .sidebar-nav span {
-    display: none;
-  }
-  
-  .sidebar.collapsed .nav-icon {
-    margin: 0;
-  }
-  
-  .content.expanded {
-    margin-right: 60px;
-  }
 }
 
-/* Mobile */
+/* Mobile - إصلاح مشكلة السايدبار */
 @media (max-width: 767px) {
   .sidebar {
     transform: translateX(100%);
     width: 100%;
     max-width: 300px;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001 !important; /* أعلى من الـ overlay */
   }
   
   body.sidebar-open .sidebar {
     transform: translateX(0);
   }
   
+  /* إصلاح الـ overlay */
   body.sidebar-open::after {
     content: '';
     position: fixed;
@@ -1068,7 +1107,8 @@ blockquote p {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: calc(var(--z-sidebar) - 1);
+    z-index: 1000 !important; /* أقل من السايدبار */
+    cursor: pointer; /* للإشارة أنه قابل للنقر */
   }
   
   .content {
@@ -1187,20 +1227,6 @@ blockquote p {
 .invisible { visibility: hidden; }
 
 /* ===============================================
-   18. MOBILE SIDEBAR FIX
-=============================================== */
-@media (max-width: 767px) {
-  .sidebar {
-    z-index: 1001 !important;
-  }
-  
-  body.sidebar-open::after {
-    z-index: 1000 !important;
-    pointer-events: auto !important;
-  }
-}
-
-/* ===============================================
    18. ANIMATIONS
 =============================================== */
 @keyframes fadeIn {
@@ -1218,4 +1244,4 @@ blockquote p {
   to { transform: translateX(0); }
 }
 
-/* End of Theme System v2.0 */
+/* End of Unified Theme v2.0 */

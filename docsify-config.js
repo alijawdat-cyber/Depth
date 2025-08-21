@@ -1,6 +1,6 @@
 /**
- * Depth Documentation - Enhanced Configuration v2.0
- * This file contains all JavaScript enhancements for the documentation
+ * Depth Documentation - Unified Configuration v2.0
+ * ملف موحد لجميع التحسينات والوظائف
  */
 
 // ============================================
@@ -13,6 +13,7 @@ window.DepthDocs = {
   sidebarState: JSON.parse(localStorage.getItem('sidebarState') || '[]'),
   recentSearches: JSON.parse(localStorage.getItem('recentSearches') || '[]'),
   scrollPositions: {},
+  eventCleanupFunctions: [], // لتنظيف Event Listeners
   
   // Configuration options
   config: {
@@ -27,7 +28,7 @@ window.DepthDocs = {
 };
 
 // ============================================
-// Icon Library
+// Icon Library - مكتبة واحدة موحدة
 // ============================================
 window.DepthDocs.icons = {
   home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>',
@@ -54,9 +55,6 @@ window.DepthDocs.icons = {
 // Utility Functions
 // ============================================
 window.DepthDocs.utils = {
-  /**
-   * Debounce function to limit execution rate
-   */
   debounce: function(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -69,9 +67,6 @@ window.DepthDocs.utils = {
     };
   },
   
-  /**
-   * Throttle function to limit execution frequency
-   */
   throttle: function(func, limit) {
     let inThrottle;
     return function(...args) {
@@ -83,16 +78,10 @@ window.DepthDocs.utils = {
     };
   },
   
-  /**
-   * Get icon by name
-   */
   getIcon: function(name) {
     return window.DepthDocs.icons[name] || window.DepthDocs.icons.home;
   },
   
-  /**
-   * Determine icon based on text content
-   */
   getIconByText: function(text) {
     const t = text.toLowerCase();
     if (t.includes('الرئيسية') || t.includes('home')) return 'home';
@@ -111,20 +100,24 @@ window.DepthDocs.utils = {
     return 'home';
   },
   
-  /**
-   * Calculate reading time
-   */
   calculateReadingTime: function(text) {
     const words = text.split(/\s+/).length;
     const minutes = Math.ceil(words / window.DepthDocs.config.readingWordsPerMinute);
     return { words, minutes };
   },
   
-  /**
-   * Copy to clipboard
-   */
   copyToClipboard: function(text) {
     return navigator.clipboard.writeText(text);
+  },
+  
+  cleanupEventListeners: function() {
+    // تنظيف جميع Event Listeners المسجلة
+    window.DepthDocs.eventCleanupFunctions.forEach(cleanup => {
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
+    });
+    window.DepthDocs.eventCleanupFunctions = [];
   }
 };
 
@@ -132,9 +125,6 @@ window.DepthDocs.utils = {
 // UI Components
 // ============================================
 window.DepthDocs.ui = {
-  /**
-   * Show toast notification
-   */
   showToast: function(message, type = 'info', duration = 3000) {
     const container = document.getElementById('toastContainer') || this.createToastContainer();
     
@@ -144,21 +134,16 @@ window.DepthDocs.ui = {
     
     container.appendChild(toast);
     
-    // Trigger animation
     requestAnimationFrame(() => {
       toast.classList.add('show');
     });
     
-    // Auto dismiss
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
     }, duration);
   },
   
-  /**
-   * Create toast container if not exists
-   */
   createToastContainer: function() {
     const container = document.createElement('div');
     container.id = 'toastContainer';
@@ -167,23 +152,15 @@ window.DepthDocs.ui = {
     return container;
   },
   
-  /**
-   * Toggle modal
-   */
   toggleModal: function(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
       const isVisible = modal.style.display !== 'none';
       modal.style.display = isVisible ? 'none' : 'flex';
-      
-      // Add/remove body scroll lock
       document.body.style.overflow = isVisible ? '' : 'hidden';
     }
   },
   
-  /**
-   * Create loading indicator
-   */
   showLoading: function(message = 'جاري التحميل...') {
     const existing = document.getElementById('loading-screen');
     if (existing) return;
@@ -200,9 +177,6 @@ window.DepthDocs.ui = {
     document.body.appendChild(loader);
   },
   
-  /**
-   * Hide loading indicator
-   */
   hideLoading: function() {
     const loader = document.getElementById('loading-screen');
     if (loader) {
@@ -216,9 +190,6 @@ window.DepthDocs.ui = {
 // Navigation Enhancement Functions
 // ============================================
 window.DepthDocs.navigation = {
-  /**
-   * Update breadcrumbs based on current path
-   */
   updateBreadcrumbs: function() {
     const breadcrumbsEl = document.getElementById('breadcrumbs');
     if (!breadcrumbsEl) return;
@@ -243,11 +214,12 @@ window.DepthDocs.navigation = {
     breadcrumbsEl.innerHTML = html;
   },
   
-  /**
-   * Setup floating table of contents
-   */
   setupFloatingTOC: function() {
     if (!window.DepthDocs.config.enableFloatingTOC) return;
+    
+    // تنظيف TOC السابق
+    const existingTOC = document.getElementById('floating-toc');
+    if (existingTOC) existingTOC.remove();
     
     const content = document.querySelector('.markdown-section');
     if (!content) return;
@@ -255,11 +227,7 @@ window.DepthDocs.navigation = {
     const headings = content.querySelectorAll('h2, h3');
     if (headings.length < window.DepthDocs.config.tocMinHeadings) return;
     
-    // Remove existing TOC
-    const existingTOC = document.getElementById('floating-toc');
-    if (existingTOC) existingTOC.remove();
-    
-    // Create new TOC
+    // إنشاء TOC جديد
     const toc = document.createElement('div');
     toc.id = 'floating-toc';
     toc.className = 'floating-toc';
@@ -272,7 +240,6 @@ window.DepthDocs.navigation = {
     const tocList = document.createElement('ul');
     tocList.className = 'toc-list';
     
-    // Build TOC items
     headings.forEach((heading, index) => {
       const id = heading.id || `heading-${index}`;
       heading.id = id;
@@ -298,14 +265,7 @@ window.DepthDocs.navigation = {
     toc.appendChild(tocList);
     content.appendChild(toc);
     
-    // Highlight active section on scroll
-    this.setupTOCHighlight(headings, tocList);
-  },
-  
-  /**
-   * Setup TOC active highlighting
-   */
-  setupTOCHighlight: function(headings, tocList) {
+    // Highlight active section with cleanup
     const updateActiveLink = window.DepthDocs.utils.throttle(() => {
       const scrollPos = window.scrollY + 100;
       
@@ -320,13 +280,17 @@ window.DepthDocs.navigation = {
       });
     }, 100);
     
-    window.addEventListener('scroll', updateActiveLink, { passive: true });
-    updateActiveLink(); // Initial call
+    const scrollHandler = () => updateActiveLink();
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      window.removeEventListener('scroll', scrollHandler);
+    });
+    
+    updateActiveLink();
   },
   
-  /**
-   * Enhance headings with anchor links
-   */
   enhanceHeadings: function() {
     const headings = document.querySelectorAll('.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4');
     
@@ -355,9 +319,6 @@ window.DepthDocs.navigation = {
     });
   },
   
-  /**
-   * Setup reading progress bar
-   */
   updateReadingProgress: function() {
     if (!window.DepthDocs.config.enableReadingProgress) return;
     
@@ -371,8 +332,15 @@ window.DepthDocs.navigation = {
       progressBar.style.width = progress + '%';
     }, 50);
     
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress(); // Initial call
+    const scrollHandler = () => updateProgress();
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      window.removeEventListener('scroll', scrollHandler);
+    });
+    
+    updateProgress();
   }
 };
 
@@ -380,9 +348,6 @@ window.DepthDocs.navigation = {
 // Sidebar Enhancement Functions
 // ============================================
 window.DepthDocs.sidebar = {
-  /**
-   * Initialize sidebar enhancements
-   */
   enhance: function() {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
@@ -393,9 +358,6 @@ window.DepthDocs.sidebar = {
     this.setupSearch();
   },
   
-  /**
-   * Add custom sidebar header
-   */
   addHeader: function(sidebar) {
     if (sidebar.querySelector('.sidebar-header')) return;
     
@@ -418,66 +380,50 @@ window.DepthDocs.sidebar = {
     sidebar.insertBefore(header, sidebar.firstChild);
   },
   
-  /**
-   * Enhance navigation items with icons and interactivity
-   */
   enhanceNavItems: function() {
     const navRoot = document.querySelector('.sidebar-nav > ul');
     if (!navRoot) return;
     
-    // Clean up previous enhancements
+    // تنظيف التحسينات السابقة
     navRoot.querySelectorAll('.nav-icon, .section-arrow, .nav-badge').forEach(el => el.remove());
     
-    // Process each navigation item
+    // معالجة كل عنصر
     navRoot.querySelectorAll(':scope > li').forEach((li, index) => {
       this.processNavItem(li, navRoot, index);
     });
     
-    // Auto-open active section
+    // فتح القسم النشط تلقائياً
     this.openActiveSection(navRoot);
   },
   
-  /**
-   * Process individual navigation item
-   */
   processNavItem: function(li, navRoot, index) {
     const hasSubmenu = li.querySelector('ul');
     let link = li.querySelector(':scope > a');
     let sectionLabel = li.querySelector(':scope > .section-label');
     
-    // Get text content
     const text = (link?.textContent || sectionLabel?.textContent || '').trim();
-    
-    // Determine appropriate icon
     const iconName = window.DepthDocs.utils.getIconByText(text);
     const icon = window.DepthDocs.utils.getIcon(iconName);
     
-    // Create section label if needed
+    // إنشاء تسمية القسم إذا لزم الأمر
     if (!link && !sectionLabel && hasSubmenu) {
       sectionLabel = this.createSectionLabel(li, icon, text);
     }
     
-    // Add icon to link
+    // إضافة أيقونة للرابط
     if (link && !link.querySelector('.nav-icon')) {
       this.addIconToLink(link, icon);
     }
     
-    // Add collapse functionality for sections
+    // إضافة سهم الطي للأقسام
     if (hasSubmenu) {
       this.addCollapseArrow(li, sectionLabel || link, navRoot);
     }
-    
-    // Add badges if applicable
-    this.addBadges(link, text);
   },
   
-  /**
-   * Create section label for collapsible sections
-   */
   createSectionLabel: function(li, icon, defaultText) {
     let titleText = '';
     
-    // Extract text from li
     Array.from(li.childNodes).forEach(node => {
       if (node.nodeType === 3) {
         titleText += node.textContent.trim();
@@ -501,9 +447,6 @@ window.DepthDocs.sidebar = {
     return label;
   },
   
-  /**
-   * Add icon to navigation link
-   */
   addIconToLink: function(link, icon) {
     const linkText = link.textContent;
     link.innerHTML = `
@@ -512,9 +455,6 @@ window.DepthDocs.sidebar = {
     `;
   },
   
-  /**
-   * Add collapse arrow and functionality
-   */
   addCollapseArrow: function(li, clickTarget, navRoot) {
     const arrow = document.createElement('span');
     arrow.className = 'section-arrow';
@@ -523,7 +463,7 @@ window.DepthDocs.sidebar = {
     clickTarget.appendChild(arrow);
     clickTarget.style.cursor = 'pointer';
     
-    clickTarget.addEventListener('click', (e) => {
+    const clickHandler = (e) => {
       const isArrowClick = e.target.closest('.section-arrow');
       const isLink = clickTarget.tagName === 'A';
       
@@ -532,36 +472,16 @@ window.DepthDocs.sidebar = {
         li.classList.toggle('open');
         this.saveState(navRoot);
       }
+    };
+    
+    clickTarget.addEventListener('click', clickHandler);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      clickTarget.removeEventListener('click', clickHandler);
     });
   },
   
-  /**
-   * Add badges to special items
-   */
-  addBadges: function(link, text) {
-    if (!link) return;
-    
-    // Example badges - customize based on your needs
-    if (text.includes('المشاريع')) {
-      this.addBadge(link, '8', 'nav-badge');
-    } else if (text.includes('التسعير')) {
-      this.addBadge(link, '+3', 'nav-badge add');
-    }
-  },
-  
-  /**
-   * Add badge element to link
-   */
-  addBadge: function(link, text, className) {
-    const badge = document.createElement('span');
-    badge.className = className;
-    badge.textContent = text;
-    link.appendChild(badge);
-  },
-  
-  /**
-   * Open active section in sidebar
-   */
   openActiveSection: function(navRoot) {
     const activeLink = navRoot.querySelector('a.active');
     if (!activeLink) return;
@@ -575,9 +495,6 @@ window.DepthDocs.sidebar = {
     }
   },
   
-  /**
-   * Save sidebar state to localStorage
-   */
   saveState: function(navRoot) {
     const openSections = Array.from(navRoot.querySelectorAll('li.open')).map(el => {
       return Array.from(navRoot.querySelectorAll('li')).indexOf(el);
@@ -587,9 +504,6 @@ window.DepthDocs.sidebar = {
     window.DepthDocs.sidebarState = openSections;
   },
   
-  /**
-   * Restore sidebar state from localStorage
-   */
   restoreState: function() {
     const navRoot = document.querySelector('.sidebar-nav > ul');
     if (!navRoot) return;
@@ -605,14 +519,11 @@ window.DepthDocs.sidebar = {
     });
   },
   
-  /**
-   * Setup search functionality
-   */
   setupSearch: function() {
     const searchInput = document.querySelector('.search input');
     if (!searchInput) return;
     
-    // Add search icon
+    // إضافة أيقونة البحث
     const searchBox = searchInput.parentElement;
     if (!searchBox.querySelector('.search-icon')) {
       const icon = document.createElement('span');
@@ -621,22 +532,24 @@ window.DepthDocs.sidebar = {
       searchBox.appendChild(icon);
     }
     
-    // Track search queries
-    searchInput.addEventListener('input', window.DepthDocs.utils.debounce((e) => {
+    // تتبع استعلامات البحث
+    const inputHandler = window.DepthDocs.utils.debounce((e) => {
       const query = e.target.value.trim();
       if (query.length > 2) {
         this.saveSearchQuery(query);
       }
-    }, 500));
+    }, 500);
+    
+    searchInput.addEventListener('input', inputHandler);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      searchInput.removeEventListener('input', inputHandler);
+    });
   },
   
-  /**
-   * Save search query to recent searches
-   */
   saveSearchQuery: function(query) {
     const searches = window.DepthDocs.recentSearches;
-    
-    // Add to beginning and remove duplicates
     searches.unshift(query);
     const uniqueSearches = [...new Set(searches)].slice(0, 5);
     
@@ -649,33 +562,29 @@ window.DepthDocs.sidebar = {
 // Interactive Features
 // ============================================
 window.DepthDocs.features = {
-  /**
-   * Setup keyboard shortcuts
-   */
   setupKeyboardShortcuts: function() {
     if (!window.DepthDocs.config.enableKeyboardShortcuts) return;
     
     let lastKey = '';
     
-    document.addEventListener('keydown', (e) => {
-      // Skip if typing in input/textarea
+    const keyHandler = (e) => {
       const activeElement = document.activeElement;
       const isTyping = activeElement.tagName === 'INPUT' || 
                       activeElement.tagName === 'TEXTAREA';
       
-      // Search: / or Ctrl+K
+      // البحث: / أو Ctrl+K
       if (!isTyping && (e.key === '/' || (e.ctrlKey && e.key === 'k'))) {
         e.preventDefault();
         this.focusSearch();
       }
       
-      // Go home: G then H
+      // الصفحة الرئيسية: G ثم H
       if (lastKey === 'g' && e.key === 'h') {
         e.preventDefault();
         window.location.hash = '/';
       }
       
-      // Navigate with arrows
+      // التنقل بالأسهم
       if (e.key === 'ArrowLeft' && !isTyping) {
         this.navigateNext();
       }
@@ -683,30 +592,34 @@ window.DepthDocs.features = {
         this.navigatePrev();
       }
       
-      // Toggle theme: T
+      // تبديل الثيم: T
       if (e.key === 't' && !isTyping && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         this.toggleTheme();
       }
       
-      // Show shortcuts: ?
+      // عرض الاختصارات: ?
       if (e.key === '?' && !isTyping) {
         e.preventDefault();
         this.toggleShortcutsModal();
       }
       
-      // ESC to close modals
+      // ESC لإغلاق النوافذ
       if (e.key === 'Escape') {
         this.closeModals();
       }
       
       lastKey = e.key.toLowerCase();
+    };
+    
+    document.addEventListener('keydown', keyHandler);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      document.removeEventListener('keydown', keyHandler);
     });
   },
   
-  /**
-   * Focus search input
-   */
   focusSearch: function() {
     const searchInput = document.querySelector('.search input');
     if (searchInput) {
@@ -715,25 +628,16 @@ window.DepthDocs.features = {
     }
   },
   
-  /**
-   * Navigate to next page
-   */
   navigateNext: function() {
     const nextBtn = document.querySelector('.pagination-item-next a');
     if (nextBtn) nextBtn.click();
   },
   
-  /**
-   * Navigate to previous page
-   */
   navigatePrev: function() {
     const prevBtn = document.querySelector('.pagination-item-prev a');
     if (prevBtn) prevBtn.click();
   },
   
-  /**
-   * Toggle theme between light and dark
-   */
   toggleTheme: function() {
     const currentTheme = window.DepthDocs.theme;
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -750,9 +654,6 @@ window.DepthDocs.features = {
     );
   },
   
-  /**
-   * Update theme toggle icon
-   */
   updateThemeIcon: function(theme) {
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
@@ -769,16 +670,10 @@ window.DepthDocs.features = {
     }
   },
   
-  /**
-   * Toggle shortcuts modal
-   */
   toggleShortcutsModal: function() {
     window.DepthDocs.ui.toggleModal('shortcutsModal');
   },
   
-  /**
-   * Close all modals
-   */
   closeModals: function() {
     document.querySelectorAll('.modal').forEach(modal => {
       modal.style.display = 'none';
@@ -786,61 +681,73 @@ window.DepthDocs.features = {
     document.body.style.overflow = '';
   },
   
-  /**
-   * Setup back to top button
-   */
   setupBackToTop: function() {
     const btn = document.getElementById('backToTop');
     if (!btn) return;
     
-    // Show/hide based on scroll
-    window.addEventListener('scroll', window.DepthDocs.utils.throttle(() => {
+    const scrollHandler = window.DepthDocs.utils.throttle(() => {
       const shouldShow = window.pageYOffset > 500;
       btn.classList.toggle('visible', shouldShow);
-    }, 200), { passive: true });
+    }, 200);
     
-    // Scroll to top on click
-    btn.addEventListener('click', () => {
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    const clickHandler = () => {
       window.scrollTo({ 
         top: 0, 
         behavior: window.DepthDocs.config.enableSmoothScroll ? 'smooth' : 'auto'
       });
+    };
+    
+    btn.addEventListener('click', clickHandler);
+    
+    // حفظ دوال التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      window.removeEventListener('scroll', scrollHandler);
+      btn.removeEventListener('click', clickHandler);
     });
   },
   
-  /**
-   * Setup mobile menu toggle
-   */
   setupMobileMenu: function() {
     const btn = document.getElementById('menuToggle');
     if (!btn) return;
     
-    btn.addEventListener('click', () => {
+    const toggleHandler = () => {
       document.body.classList.toggle('sidebar-open');
-    });
+    };
     
-    // Close on link click (mobile)
-    document.addEventListener('click', (e) => {
+    btn.addEventListener('click', toggleHandler);
+    
+    // إغلاق عند النقر على رابط (موبايل)
+    const linkClickHandler = (e) => {
       if (e.target.matches('.sidebar a') && window.innerWidth < 768) {
         setTimeout(() => {
           document.body.classList.remove('sidebar-open');
         }, 300);
       }
-    });
+    };
     
-    // Close on outside click
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', linkClickHandler);
+    
+    // إغلاق عند النقر خارج السايدبار
+    const outsideClickHandler = (e) => {
       if (document.body.classList.contains('sidebar-open') &&
           !e.target.closest('.sidebar') &&
           !e.target.closest('#menuToggle')) {
         document.body.classList.remove('sidebar-open');
       }
+    };
+    
+    document.addEventListener('click', outsideClickHandler);
+    
+    // حفظ دوال التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      btn.removeEventListener('click', toggleHandler);
+      document.removeEventListener('click', linkClickHandler);
+      document.removeEventListener('click', outsideClickHandler);
     });
   },
   
-  /**
-   * Setup feedback widget
-   */
   setupFeedbackWidget: function() {
     if (!window.DepthDocs.config.enableFeedback) return;
     
@@ -864,25 +771,27 @@ window.DepthDocs.features = {
     
     content.appendChild(widget);
     
-    // Add event listeners
+    // إضافة معالجات الأحداث
     widget.querySelectorAll('.feedback-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      const clickHandler = () => {
         this.submitFeedback(btn.dataset.value === 'positive');
+      };
+      
+      btn.addEventListener('click', clickHandler);
+      
+      // حفظ دالة التنظيف
+      window.DepthDocs.eventCleanupFunctions.push(() => {
+        btn.removeEventListener('click', clickHandler);
       });
     });
   },
   
-  /**
-   * Submit feedback
-   */
   submitFeedback: function(isPositive) {
     const widget = document.getElementById('feedback-widget');
     if (!widget) return;
     
-    // Update UI
     widget.innerHTML = '<div class="feedback-thanks">شكراً لك على رأيك! 💜</div>';
     
-    // Log feedback (in production, send to backend)
     const feedback = {
       page: window.location.hash,
       positive: isPositive,
@@ -891,7 +800,7 @@ window.DepthDocs.features = {
     
     console.log('Feedback submitted:', feedback);
     
-    // Optional: Send to analytics
+    // إرسال للتحليلات إن وجدت
     if (window.gtag) {
       window.gtag('event', 'feedback', {
         event_category: 'engagement',
@@ -906,9 +815,6 @@ window.DepthDocs.features = {
 // Scroll Position Management
 // ============================================
 window.DepthDocs.scroll = {
-  /**
-   * Save current scroll position
-   */
   savePosition: function() {
     const key = `scrollPos_${window.location.hash}`;
     const position = window.pageYOffset;
@@ -917,9 +823,6 @@ window.DepthDocs.scroll = {
     window.DepthDocs.scrollPositions[window.location.hash] = position;
   },
   
-  /**
-   * Restore scroll position
-   */
   restorePosition: function() {
     const key = `scrollPos_${window.location.hash}`;
     const position = sessionStorage.getItem(key) || 
@@ -937,24 +840,21 @@ window.DepthDocs.scroll = {
 // Initialization
 // ============================================
 window.DepthDocs.init = {
-  /**
-   * Initialize all features
-   */
   start: function() {
-    // Set initial theme
+    // تعيين الثيم الأولي
     document.body.setAttribute('data-theme', window.DepthDocs.theme);
     
-    // Show loading
+    // عرض شاشة التحميل
     window.DepthDocs.ui.showLoading();
     
-    // Setup event listeners when DOM is ready
+    // إعداد معالجات الأحداث عند جاهزية DOM
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.setupFeatures());
     } else {
       this.setupFeatures();
     }
     
-    // Hide loading when Docsify is ready
+    // إخفاء التحميل عند جاهزية Docsify
     window.addEventListener('load', () => {
       setTimeout(() => {
         window.DepthDocs.ui.hideLoading();
@@ -963,41 +863,56 @@ window.DepthDocs.init = {
     });
   },
   
-  /**
-   * Setup all features
-   */
   setupFeatures: function() {
-    // Core features
+    // الميزات الأساسية
     window.DepthDocs.features.setupKeyboardShortcuts();
     window.DepthDocs.features.setupBackToTop();
     window.DepthDocs.features.setupMobileMenu();
     
-    // Theme toggle
+    // زر تبديل الثيم
     const themeBtn = document.getElementById('themeToggle');
     if (themeBtn) {
-      themeBtn.addEventListener('click', () => {
+      const clickHandler = () => {
         window.DepthDocs.features.toggleTheme();
-      });
+      };
+      
+      themeBtn.addEventListener('click', clickHandler);
       window.DepthDocs.features.updateThemeIcon(window.DepthDocs.theme);
+      
+      // حفظ دالة التنظيف
+      window.DepthDocs.eventCleanupFunctions.push(() => {
+        themeBtn.removeEventListener('click', clickHandler);
+      });
     }
     
-    // Shortcuts modal close button
+    // زر إغلاق النافذة المنبثقة
     const modalClose = document.querySelector('.modal-close');
     if (modalClose) {
-      modalClose.addEventListener('click', () => {
+      const clickHandler = () => {
         window.DepthDocs.features.closeModals();
+      };
+      
+      modalClose.addEventListener('click', clickHandler);
+      
+      // حفظ دالة التنظيف
+      window.DepthDocs.eventCleanupFunctions.push(() => {
+        modalClose.removeEventListener('click', clickHandler);
       });
     }
     
-    // Save scroll position before unload
-    window.addEventListener('beforeunload', () => {
+    // حفظ موضع التمرير قبل التفريغ
+    const beforeUnloadHandler = () => {
       window.DepthDocs.scroll.savePosition();
+    };
+    
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     });
   },
   
-  /**
-   * Show welcome message for first-time visitors
-   */
   showWelcomeMessage: function() {
     if (!localStorage.getItem('welcomed')) {
       window.DepthDocs.ui.showToast(
@@ -1019,12 +934,12 @@ window.DepthDocs.docsifyPlugin = function(hook, vm) {
     console.log('🚀 Depth Documentation v' + window.DepthDocs.version);
   });
   
-  // Before each page render
+  // قبل عرض كل صفحة
   hook.beforeEach(function(content) {
-    // Add breadcrumbs placeholder
+    // إضافة placeholder للـ breadcrumbs
     const breadcrumbs = '<div id="breadcrumbs" class="breadcrumbs"></div>';
     
-    // Calculate reading time
+    // حساب وقت القراءة
     const { words, minutes } = window.DepthDocs.utils.calculateReadingTime(content);
     const readingMeta = `
       <div class="reading-meta">
@@ -1036,30 +951,34 @@ window.DepthDocs.docsifyPlugin = function(hook, vm) {
     return breadcrumbs + readingMeta + content;
   });
   
-  // After each page render
+  // بعد عرض كل صفحة
   hook.doneEach(function() {
-    // Navigation enhancements
+    // تنظيف Event Listeners القديمة
+    window.DepthDocs.utils.cleanupEventListeners();
+    
+    // تحسينات التنقل
     window.DepthDocs.navigation.updateBreadcrumbs();
     window.DepthDocs.navigation.setupFloatingTOC();
     window.DepthDocs.navigation.enhanceHeadings();
     window.DepthDocs.navigation.updateReadingProgress();
     
-    // Sidebar enhancements
+    // تحسينات السايدبار
     window.DepthDocs.sidebar.enhance();
     
-    // Interactive features
+    // الميزات التفاعلية
     window.DepthDocs.features.setupFeedbackWidget();
     
-    // Restore scroll position
+    // استعادة موضع التمرير
     window.DepthDocs.scroll.restorePosition();
   });
   
-  // When mounted
+  // عند التركيب
   hook.mounted(function() {
-    console.log('📄 Page mounted successfully');
+    // لا نحتاج لمحدد الإصدار
+    console.log('✅ Documentation mounted successfully!');
   });
   
-  // When ready
+  // عند الجاهزية
   hook.ready(function() {
     console.log('✅ Documentation ready!');
   });
@@ -1070,9 +989,8 @@ window.DepthDocs.docsifyPlugin = function(hook, vm) {
 // ============================================
 window.DepthDocs.init.start();
 
-// Export for global access
+// تصدير للوصول العام
 window.toggleTheme = () => window.DepthDocs.features.toggleTheme();
 window.toggleShortcuts = () => window.DepthDocs.features.toggleShortcutsModal();
 window.submitFeedback = (isPositive) => window.DepthDocs.features.submitFeedback(isPositive);
-window.changeVersion = (version) => window.DepthDocs.versions.changeVersion(version);
 window.showToast = (message, type, duration) => window.DepthDocs.ui.showToast(message, type, duration);
