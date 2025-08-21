@@ -217,7 +217,36 @@ window.DepthDocs.navigation = {
   setupFloatingTOC: function() {
     if (!window.DepthDocs.config.enableFloatingTOC) return;
     
-    // تنظيف TOC السابق
+    // استخدام النظام الموحد الجديد
+    if (typeof window.UnifiedTOC !== 'undefined') {
+      // تنظيف أي TOC سابق
+      if (window.currentTOC) {
+        window.currentTOC.destroy();
+      }
+      
+      // إنشاء TOC موحد جديد
+      const unifiedToc = new window.UnifiedTOC({
+        tocSelector: '.js-toc',
+        contentSelector: '.markdown-section',
+        headingSelector: 'h1, h2, h3, h4',
+        scrollSmoothOffset: -20,
+        throttleTimeout: 100
+      });
+      
+      unifiedToc.init();
+      window.currentTOC = unifiedToc;
+      
+      console.log('✅ Using Unified TOC System (Tocbot)');
+      return;
+    }
+    
+    // Fallback للنظام القديم (في حالة عدم تحميل Tocbot)
+    console.warn('⚠️ Unified TOC not available, using fallback');
+    this.setupLegacyTOC();
+  },
+  
+  setupLegacyTOC: function() {
+    // النظام القديم كـ fallback
     const existingTOC = document.getElementById('floating-toc');
     if (existingTOC) existingTOC.remove();
     
@@ -227,68 +256,43 @@ window.DepthDocs.navigation = {
     const headings = content.querySelectorAll('h2, h3');
     if (headings.length < window.DepthDocs.config.tocMinHeadings) return;
     
-    // إنشاء TOC جديد
+    // إنشاء TOC مبسط
     const toc = document.createElement('div');
     toc.id = 'floating-toc';
-    toc.className = 'floating-toc';
+    toc.className = 'floating-toc legacy-toc';
+    toc.innerHTML = `
+      <div class="toc-title">في هذه الصفحة</div>
+      <div class="toc-content">
+        <ul class="toc-list">
+          ${Array.from(headings).map((heading, index) => {
+            const id = heading.id || `heading-${index}`;
+            heading.id = id;
+            const level = heading.tagName.toLowerCase();
+            const text = heading.textContent.replace('#', '').trim();
+            return `<li class="toc-list-item ${level}">
+              <a href="#${id}" class="toc-link">${text}</a>
+            </li>`;
+          }).join('')}
+        </ul>
+      </div>
+    `;
     
-    const tocTitle = document.createElement('div');
-    tocTitle.className = 'toc-title';
-    tocTitle.textContent = 'في هذه الصفحة';
-    toc.appendChild(tocTitle);
-    
-    const tocList = document.createElement('ul');
-    tocList.className = 'toc-list';
-    
-    headings.forEach((heading, index) => {
-      const id = heading.id || `heading-${index}`;
-      heading.id = id;
-      
-      const li = document.createElement('li');
-      li.className = heading.tagName.toLowerCase();
-      
-      const a = document.createElement('a');
-      a.href = `#${id}`;
-      a.textContent = heading.textContent.replace('#', '').trim();
-      a.onclick = (e) => {
-        e.preventDefault();
-        heading.scrollIntoView({ 
-          behavior: window.DepthDocs.config.enableSmoothScroll ? 'smooth' : 'auto',
-          block: 'start' 
-        });
-      };
-      
-      li.appendChild(a);
-      tocList.appendChild(li);
-    });
-    
-    toc.appendChild(tocList);
     content.appendChild(toc);
     
-    // Highlight active section with cleanup
-    const updateActiveLink = window.DepthDocs.utils.throttle(() => {
-      const scrollPos = window.scrollY + 100;
-      
-      headings.forEach((heading, index) => {
-        const link = tocList.children[index]?.querySelector('a');
-        if (!link) return;
-        
-        const isActive = heading.offsetTop <= scrollPos && 
-                        (!headings[index + 1] || headings[index + 1].offsetTop > scrollPos);
-        
-        link.classList.toggle('active', isActive);
-      });
-    }, 100);
-    
-    const scrollHandler = () => updateActiveLink();
-    window.addEventListener('scroll', scrollHandler, { passive: true });
-    
-    // حفظ دالة التنظيف
-    window.DepthDocs.eventCleanupFunctions.push(() => {
-      window.removeEventListener('scroll', scrollHandler);
+    // إعداد التمرير
+    toc.addEventListener('click', (e) => {
+      if (e.target.classList.contains('toc-link')) {
+        e.preventDefault();
+        const targetId = e.target.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start' 
+          });
+        }
+      }
     });
-    
-    updateActiveLink();
   },
   
   enhanceHeadings: function() {

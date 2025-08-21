@@ -19,5 +19,8 @@
     "type": "git",
     "url": "https://github.com/alijawdat-cyber/Depth.git"
   },
-  "homepage": "https://alijawdat-cyber.github.io/Depth/"
+  "homepage": "https://alijawdat-cyber.github.io/Depth/",
+  "dependencies": {
+    "tocbot": "^4.36.4"
+  }
 }

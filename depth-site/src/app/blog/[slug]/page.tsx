@@ -4,6 +4,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { blogPosts, getPostBySlug, getRecentPosts, type BlogPost } from "@/data/blog";
 import type { Metadata } from 'next';
+import UnifiedTOC from '@/components/ui/UnifiedTOC';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -45,43 +46,6 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       description: post.excerpt,
     },
   };
-}
-
-function TableOfContents({ content }: { content: string }) {
-  // Extract headings from markdown content
-  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-  const headings = [];
-  let match;
-  
-  while ((match = headingRegex.exec(content)) !== null) {
-    const level = match[1].length;
-    const text = match[2];
-    const id = text.toLowerCase().replace(/[^\u0600-\u06FF\w\s]/g, '').replace(/\s+/g, '-');
-    headings.push({ level, text, id });
-  }
-
-  if (headings.length === 0) return null;
-
-  return (
-    <div className="bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius-lg)] p-6 mb-8">
-      <h3 className="font-bold text-[var(--text)] mb-4">محتويات المقال</h3>
-      <nav className="space-y-2">
-        {headings.map((heading, index) => (
-          <a
-            key={index}
-            href={`#${heading.id}`}
-            className={`block text-sm hover:text-[var(--primary)] transition-colors ${
-              heading.level === 1 ? 'font-medium text-[var(--text)]' :
-              heading.level === 2 ? 'pr-4 text-[var(--slate-600)]' :
-              'pr-8 text-[var(--slate-500)]'
-            }`}
-          >
-            {heading.text}
-          </a>
-        ))}
-      </nav>
-    </div>
-  );
 }
 
 function MarkdownRenderer({ content }: { content: string }) {
@@ -264,8 +228,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8">
-                {/* Table of Contents */}
-                <TableOfContents content={post.content} />
+                {/* Table of Contents - النظام الموحد */}
+                <UnifiedTOC content={post.content} />
 
                 {/* Newsletter/Contact Card */}
                 <div className="bg-[var(--card)] border border-[var(--elev)] rounded-[var(--radius-lg)] p-6">
