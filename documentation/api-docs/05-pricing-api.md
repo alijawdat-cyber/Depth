@@ -25,22 +25,22 @@
 {
   "creatorExperienceLevels": {
     "beginner": {
-      "agencyFeeRange": "10-15%",
+  "agencyFeeRange": "10-50%",
       "description": "مبدعون جدد (أقل من 10 مشاريع)",
       "incentive": "هامش منخفض لتشجيع البدء"
     },
     "intermediate": {
-      "agencyFeeRange": "15-25%",
+  "agencyFeeRange": "10-50%",
       "description": "مبدعون متوسطون (10-50 مشروع)",
       "factors": ["جودة العمل", "تقييم العملاء", "الالتزام بالمواعيد"]
     },
     "expert": {
-      "agencyFeeRange": "25-35%",
+  "agencyFeeRange": "10-50%",
       "description": "خبراء معتمدون (50+ مشروع)",
       "benefits": ["أولوية في المشاريع", "دعم تسويقي"]
     },
     "premium": {
-      "agencyFeeRange": "35-50%",
+  "agencyFeeRange": "10-50%",
       "description": "مبدعون مميزون وشركاء استراتيجيون",
       "criteria": ["تقييم 4.8+", "معدل إكمال 95%+", "عملاء VIP"]
     }
@@ -82,22 +82,22 @@
   "projectValueTiers": {
     "micro": {
       "range": "0-500,000 IQD",
-      "agencyFeeRange": "10-20%",
+  "agencyFeeRange": "10-50%",
       "rationale": "مشاريع صغيرة، هامش منخفض لتعزيز الحجم"
     },
     "small": {
       "range": "500,000-1,500,000 IQD", 
-      "agencyFeeRange": "15-25%",
+  "agencyFeeRange": "10-50%",
       "rationale": "المجال الأساسي للعمل"
     },
     "medium": {
       "range": "1,500,000-5,000,000 IQD",
-      "agencyFeeRange": "20-35%",
+  "agencyFeeRange": "10-50%",
       "rationale": "مشاريع متوسطة تتطلب إدارة أكثر"
     },
     "large": {
       "range": "5,000,000+ IQD",
-      "agencyFeeRange": "30-50%",
+  "agencyFeeRange": "10-50%",
       "rationale": "مشاريع كبيرة بدعم شامل ومخاطر أعلى"
     }
   }
@@ -1024,7 +1024,7 @@
           "projects": 7,
           "commission": 2542400, // 77.5% للمبدع (متوسط)
           "agencyFee": 737600, // 22.5% متوسط هامش الوكالة المتغير
-          "agencyFeeRange": "15-35%",
+          "agencyFeeRange": "10-50%",
           "averageAgencyRate": "22.5%"
         },
         {
@@ -1034,7 +1034,7 @@
           "projects": 6,
           "commission": 2205000, // 75% للمبدع
           "agencyFee": 735000, // 25% متوسط هامش الوكالة
-          "agencyFeeRange": "20-30%",
+          "agencyFeeRange": "10-50%",
           "averageAgencyRate": "25%"
         }
       ],

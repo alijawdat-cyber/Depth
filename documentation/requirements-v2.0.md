@@ -166,6 +166,7 @@ CreatorPrice = 0 (محسوب ضمن الراتب)
 ClientPrice = CreatorPrice + AgencyMargin
 أو
 ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
+\n> **ملاحظة:** نطاق هامش الوكالة الرسمي هو **10% إلى 50%** حسب سياسة التسعير. يجب الالتزام بهذا النطاق في جميع العمليات.
 ```
 
 ### جداول المعاملات النهائية (Modifiers):
@@ -207,6 +208,7 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
 | أطراف بغداد | outskirts | +25,000 IQD |
 | محافظات مجاورة | nearby | +50,000 IQD |
 | محافظات بعيدة | far | +100,000 IQD |
+<!-- تم حذف معاملات الموقع النسبية (locationMod) والاعتماد فقط على الإضافات الثابتة -->
 
 #### 6. معامل ملكية المعدات (Ownership Factor):
 | الحالة | المعامل | الوصف |

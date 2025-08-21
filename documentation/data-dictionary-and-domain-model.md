@@ -140,11 +140,11 @@
 | ownershipFactor   | float        | نعم   | معامل ملكية المعدات        | 1.0            | 0.9 أو 1.0   |
 | processingMod     | float        | نعم   | معامل المعالجة             | 1.3            | من ProcessingModifiers |
 | rushMod           | float        | نعم   | معامل الاستعجال            | 1.0            | من RushModifiers |
-| locationMod       | float        | نعم   | معامل الموقع (للتوافق)     | 1.0            | دائماً 1.0    |
 | locationAddition  | int          | نعم   | إضافة الموقع الثابتة       | 0              | من LocationAdditions |
+<!-- تم حذف معاملات الموقع النسبية (locationMod) والاعتماد فقط على الإضافات الثابتة -->
 | creatorPrice      | int          | نعم   | سعر المبدع النهائي         | 15730          | محسوب تلقائياً |
 | agencyMargin      | int          | لا    | هامش الوكالة (مبلغ ثابت)   | 4719           | اختياري      |
-| agencyMarginPercent| float       | لا    | هامش الوكالة (نسبة مئوية)  | 0.30           | اختياري      |
+| agencyMarginPercent| float       | لا    | هامش الوكالة (نسبة مئوية)  | 0.30           | النطاق الرسمي 10% إلى 50% |
 | clientPrice       | int          | نعم   | السعر النهائي للعميل       | 20449          | محسوب تلقائياً |
 | isRush            | boolean      | نعم   | مشروع مستعجل               | false          |              |
 | location          | enum         | نعم   | موقع التنفيذ               | studio         | studio/client/outskirts/nearby/far |
@@ -181,12 +181,12 @@ BaseCreatorPrice = BasePrice × OwnershipFactor × ProcessingMod × ExperienceMo
 > يُحسب لكل مشروع باستخدام السعر الأساسي المحفوظ
 
 ```javascript
-CreatorPrice = BaseCreatorPrice × RushMod × LocationMod + LocationAddition
+CreatorPrice = BaseCreatorPrice × RushMod + LocationAddition
 
 // حيث:
 // BaseCreatorPrice: المحسوب مسبقاً من CreatorSubcategoryPricing
 // RushMod: 1.0 أو 1.2 حسب المشروع (من RushModifiers)
-// LocationMod: 1.0 دائماً (للتوافق)
+<!-- LocationMod تم حذفه: الاعتماد فقط على LocationAddition -->
 // LocationAddition: 0، 25000، 50000، أو 100000 حسب الموقع (من LocationAdditions)
 ```
 
@@ -1316,7 +1316,7 @@ ClientPrice = 118,876 + (118,876 × 30%) = 154,538 IQD
 
 ✅ **المعادلات المحسومة:**
 - معادلة السعر الأساسي: `BasePrice × OwnershipFactor × ProcessingMod × ExperienceMod × EquipmentMod`
-- معادلة السعر النهائي: `BaseCreatorPrice × RushMod × LocationMod + LocationAddition`
+- معادلة السعر النهائي: `BaseCreatorPrice × RushMod + LocationAddition`
 - معادلة العميل: `CreatorPrice + AgencyMargin` أو `CreatorPrice × (1 + AgencyMarginPercent)`
 
 ✅ **المعاملات المحسومة:**
@@ -1351,7 +1351,7 @@ ClientPrice = 118,876 + (118,876 × 30%) = 154,538 IQD
 
 **المرحلة 2 - إنشاء المشروع:**
 - اختيار معاملات متغيرة: استعجال، موقع
-- حساب CreatorPrice = BaseCreatorPrice × RushMod × LocationMod + LocationAddition
+- حساب CreatorPrice = BaseCreatorPrice × RushMod + LocationAddition
 - تحديد هامش الوكالة وحساب ClientPrice
 
 **المرحلة 3 - العرض:**
@@ -1374,7 +1374,7 @@ ClientPrice = 118,876 + (118,876 × 30%) = 154,538 IQD
 ### 12.2 التحسينات المُحسومة
 🔧 **جداول المعاملات المنفصلة:** ProcessingModifiers, ExperienceModifiers, EquipmentModifiers, RushModifiers, LocationAdditions
 🔧 **آلية الحساب المتدرج:** BaseCreatorPrice محفوظ، CreatorPrice محسوب لكل مشروع
-🔧 **معاملات الموقع المحسومة:** LocationMod = 1.0 دائماً، LocationAddition للإضافات الثابتة
+🔧 **معاملات الموقع المحسومة:** LocationAddition فقط للإضافات الثابتة
 🔧 **هامش الوكالة المرن:** نسبة مئوية أو مبلغ ثابت حسب اختيار الأدمن
 
 ### 12.3 حالة التطابق النهائية
