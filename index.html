@@ -24,7 +24,8 @@
     .sidebar {
       position: fixed !important;
       top: 0;
-      right: 0;
+      right: 0 !important;
+      left: auto !important; /* cancel theme's left positioning */
       width: var(--sidebar-width);
       height: 100vh;
       background: var(--sidebar-bg, #f9fafb) !important;
@@ -32,6 +33,7 @@
       border-right: none !important;
       overflow-y: auto;
       z-index: 100;
+      transform: none !important; /* ensure visible by default */
     }
 
     /* Hide default elements */
@@ -92,7 +94,8 @@
 
     /* === CONTENT === */
     .content {
-      margin-right: var(--sidebar-width);
+      margin-right: var(--sidebar-width) !important; /* override theme default */
+      margin-left: 0 !important;
       padding: 32px;
       min-height: 100vh;
       background: var(--bg-primary, #ffffff);
@@ -121,22 +124,31 @@
 
     @media (max-width: 768px) {
       .content {
-        margin-right: 0;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
         padding: 24px 16px;
       }
 
       .sidebar {
-        right: -280px;
+        right: -280px !important;
+        left: auto !important;
         transition: right 0.3s ease;
+        transform: none !important;
       }
 
       body.sidebar-open .sidebar {
-        right: 0;
+        right: 0 !important;
       }
 
       .mobile-menu {
         display: block;
       }
+    }
+
+    /* Ensure desktop always shows sidebar */
+    @media (min-width: 769px) {
+      .sidebar { right: 0 !important; transform: none !important; }
+      .content { margin-right: var(--sidebar-width) !important; margin-left: 0 !important; }
     }
 
     /* === ENHANCED NAVIGATION === */
@@ -380,12 +392,29 @@
       ]
     };
 
-    // Mobile menu
+    // Mobile menu + ensure sidebar injection doesn't hide content
     document.addEventListener('DOMContentLoaded', () => {
       const menuBtn = document.getElementById('menuToggle');
       if (menuBtn) {
         menuBtn.onclick = () => document.body.classList.toggle('sidebar-open');
       }
+
+      // Safety: If Docsify theme applied left-positioned sidebar, fix to right
+      const fixSidebarPosition = () => {
+        const sb = document.querySelector('.sidebar');
+        if (sb) {
+          sb.style.left = 'auto';
+          sb.style.right = '0px';
+          sb.style.transform = 'none';
+        }
+        const content = document.querySelector('.content');
+        if (content) {
+          content.style.marginRight = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '280px';
+          content.style.marginLeft = '0px';
+        }
+      };
+      setTimeout(fixSidebarPosition, 300);
+      window.addEventListener('resize', fixSidebarPosition);
     });
   </script>
 
