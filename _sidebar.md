@@ -1,130 +1,71 @@
-<!-- Depth Platform - Clean Sidebar Navigation -->
+* [🏠 الرئيسية](/)
 
-* [الرئيسية](/)
+* 📊 البداية
+  * [📖 نظرة عامة](documentation/00-overview/00-introduction)
+  * [📋 المتطلبات](documentation/01-requirements/00-requirements-v2.0)
 
-## دليل البداية
+* 🗄️ قاعدة البيانات
+  * [📚 قاموس البيانات](documentation/02-database/00-data-dictionary)
+  * [🗂️ مخطط قاعدة البيانات](documentation/02-database/01-database-schema)
+  * [🔍 الفهارس والاستعلامات](documentation/02-database/02-indexes-and-queries)
 
-* [نظرة عامة](documentation/00-overview/00-introduction)
-* [متطلبات النظام](documentation/01-requirements/00-requirements-v2.0)
+* ⚡ الأساسيات
+  * [👥 المستخدمون](documentation/03-api/core/01-users)
+  * [📁 المشاريع](documentation/03-api/core/02-projects)
+  * [⭐ المراجعات](documentation/03-api/core/03-reviews)
+  * [🔔 الإشعارات](documentation/03-api/core/04-notifications)
 
-## للمطورين
+* 🎯 المميزات
+  * [✨ المبدعون](documentation/03-api/features/01-creators)
+  * [👤 العملاء](documentation/03-api/features/02-clients)
+  * [🤝 التطابق](documentation/03-api/features/03-matching)
+  * [💰 التسعير](documentation/03-api/features/04-pricing)
+  * [💬 الاتصالات](documentation/03-api/features/05-communications)
+  * [📄 المحتوى](documentation/03-api/features/06-content)
+  * [💳 الاشتراكات](documentation/03-api/features/07-subscriptions)
 
-* **البدء السريع**
-  * [التثبيت والإعداد](documentation/04-development/00-getting-started)
-  * [البيئة المحلية](documentation/04-development/01-local-setup)
-  * [متغيرات البيئة](documentation/04-development/02-environment-variables)
-  * [سير العمل](documentation/04-development/03-development-workflow)
-  * [الاختبارات](documentation/04-development/04-testing-strategy)
+* ⚙️ الإدارة
+  * [🎛️ لوحة المدير](documentation/03-api/admin/01-admin-panel)
+  * [📈 التحليلات](documentation/03-api/admin/02-analytics)
+  * [🗃️ إدارة المحتوى](documentation/03-api/admin/03-content-management)
+  * [👨‍💼 إدارة المستخدمين](documentation/03-api/admin/04-user-management)
 
-* **قاعدة البيانات**
-  * [قاموس البيانات](documentation/02-database/00-data-dictionary)
-  * [مخطط القاعدة](documentation/02-database/01-database-schema)
-  * [الفهارس والاستعلامات](documentation/02-database/02-indexes-and-queries)
+* 🔗 التكاملات
+  * [💳 الدفع](documentation/03-api/integrations/01-payment)
+  * [☁️ التخزين السحابي](documentation/03-api/integrations/02-cloud-storage)
+  * [📢 الإشعارات](documentation/03-api/integrations/03-notifications)
+  * [📱 الشبكات الاجتماعية](documentation/03-api/integrations/04-social-media)
 
-## واجهات البرمجة
+* 👨‍💻 التطوير
+  * [🚀 دليل المطورين](documentation/04-development/00-getting-started)
+  * [🛠️ الإعداد المحلي](documentation/04-development/01-local-setup)
+  * [🔧 متغيرات البيئة](documentation/04-development/02-environment-variables)
+  * [⚡ سير العمل](documentation/04-development/03-development-workflow)
+  * [🧪 استراتيجية الاختبار](documentation/04-development/04-testing-strategy)
 
-* **الأساسيات**
-  * [المصادقة والأمان](documentation/03-api/core/01-authentication)
-  * [تحديد المعدل](documentation/03-api/core/02-rate-limiting)
-  * [WebSockets](documentation/03-api/core/03-websockets)
-  * [معالجة الأخطاء](documentation/03-api/core/04-error-handling)
+* 📱 الواجهات
+  * [📲 الجوال](documentation/05-mobile/00-mobile-overview)
+  * [💻 الويب](documentation/06-frontend/00-frontend-overview)
 
-* **إدارة المستخدمين**
-  * [المبدعين](documentation/03-api/features/01-creators)
-  * [العملاء](documentation/03-api/features/02-clients)
-  * [الموظفين](documentation/03-api/features/08-salaried-employees)
+* 🛡️ الأمان
+  * [🔐 نظرة عامة](documentation/07-security/00-security-overview)
+  * [⚠️ نموذج التهديدات](documentation/07-security/01-threat-model)
+  * [🔑 إدارة المفاتيح](documentation/07-security/02-key-management)
 
-* **إدارة المشاريع**
-  * [المشاريع](documentation/03-api/features/03-projects)
-  * [التسعير](documentation/03-api/features/04-pricing)
-  * [التخزين](documentation/03-api/features/05-storage)
+* 🚀 العمليات
+  * [⚙️ نظرة عامة](documentation/08-operations/00-operations-overview)
+  * [🚢 النشر](documentation/08-operations/01-deployment)
+  * [🚨 الاستجابة للحوادث](documentation/08-operations/02-incident-response)
 
-* **التواصل**
-  * [الإشعارات](documentation/03-api/features/06-notifications)
-  * [الرسائل](documentation/03-api/features/07-messaging)
-
-* **لوحة الإدارة**
-  * [لوحة التحكم](documentation/03-api/admin/01-admin-panel)
-  * [الحوكمة والأذونات](documentation/03-api/admin/02-governance)
-  * [إدارة البيانات الأساسية](documentation/03-api/admin/03-seeds-management)
-
-* **التكاملات**
-  * [الخدمات الخارجية](documentation/03-api/integrations/01-external-services)
-  * [الـ Webhooks](documentation/03-api/integrations/02-webhooks)
-  * [التقنيات المتقدمة](documentation/03-api/integrations/03-advanced-technical)
-
-## الواجهات الأمامية
-
-* [الواجهة الويب](documentation/06-frontend/00-frontend-overview)
-* [تطبيقات الموبايل](documentation/05-mobile/00-mobile-overview)
-
-## الأمان والحماية
-
-* [نظرة عامة على الأمان](documentation/07-security/00-security-overview)
-* [نموذج التهديدات](documentation/07-security/01-threat-model)
-* [إدارة المفاتيح](documentation/07-security/02-key-management)
-
-## العمليات والنشر
-
-* [نظرة عامة](documentation/08-operations/00-operations-overview)
-* [النشر والتحديث](documentation/08-operations/01-deployment)
-* [الاستجابة للحوادث](documentation/08-operations/02-incident-response)
-
-## المراجع والموارد
-
-* [الموارد والأدوات](documentation/99-reference/00-resources)
-* [المسرد](documentation/99-reference/01-glossary)
-* [معايير التسمية](documentation/99-reference/04-naming-conventions)
-* [مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
-* [خريطة الروابط](documentation/99-reference/03-link-alias-mapping)
-* [معايير التعداد](documentation/99-reference/02-enums-standard)
-  * [👨‍💼 لوحة التحكم](documentation/03-api/admin/01-admin-panel)
-  * [🛡 الحوكمة والأذونات](documentation/03-api/admin/02-governance)
-  * [🌱 إدارة البيانات الأساسية](documentation/03-api/admin/03-seeds-management)
-
-* **التكاملات**
-  * [🔗 الخدمات الخارجية](documentation/03-api/integrations/01-external-services)
-  * [🪝 الـ Webhooks](documentation/03-api/integrations/02-webhooks)
-  * [⚙️ التقنيات المتقدمة](documentation/03-api/integrations/03-advanced-technical)
-
----
-
-## 🎨 الواجهات الأمامية
-
-* [💻 الواجهة الويب](documentation/06-frontend/00-frontend-overview)
-* [📱 تطبيقات الموبايل](documentation/05-mobile/00-mobile-overview)
-
----
-
-## 🔐 الأمان والحماية
-
-* [🛡 نظرة عامة على الأمان](documentation/07-security/00-security-overview)
-* [⚠️ نموذج التهديدات](documentation/07-security/01-threat-model)
-* [🔑 إدارة المفاتيح](documentation/07-security/02-key-management)
-
----
-
-## 🚀 العمليات والنشر
-
-* [⚙️ نظرة عامة](documentation/08-operations/00-operations-overview)
-* [🚀 النشر والتحديث](documentation/08-operations/01-deployment)
-* [🚨 الاستجابة للحوادث](documentation/08-operations/02-incident-response)
-
----
-
-## 📖 المراجع والموارد
-
-* [📚 الموارد والأدوات](documentation/99-reference/00-resources)
-* [📝 المسرد](documentation/99-reference/01-glossary)
-* [🏷 معايير التسمية](documentation/99-reference/04-naming-conventions)
-* [👥 مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
-
----
-
-<details>
-<summary>🔧 موارد إضافية</summary>
-
-* [🔗 خريطة الروابط](documentation/99-reference/03-link-alias-mapping)
-* [📊 معايير التعداد](documentation/99-reference/02-enums-standard)
-
-</details>
+* 📚 المراجع
+  * [🔧 الموارد](documentation/99-reference/00-resources)
+  * [📖 المصطلحات](documentation/99-reference/01-glossary)
+  * [📏 المعايير](documentation/99-reference/02-enums-standard)
+  * [🔗 ربط الروابط](documentation/99-reference/03-link-alias-mapping)
+  * [📝 قواعد التسمية](documentation/99-reference/04-naming-conventions)
+  * [👥 مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
+- [المصطلحات](documentation/99-reference/01-glossary)
+- [المعايير](documentation/99-reference/02-enums-standard)
+- [ربط الروابط](documentation/99-reference/03-link-alias-mapping)
+- [قواعد التسمية](documentation/99-reference/04-naming-conventions)
+- [مصفوفة الأدوار](documentation/99-reference/05-roles-matrix)
