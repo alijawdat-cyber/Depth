@@ -5,7 +5,7 @@
 
 ## المحتويات
 - [إنشاء مشروع جديد](#إنشاء-مشروع-جديد)
-- [تعيين المبدعين](#تعيين-المبدعين)
+- [تعيين المبدعين والموظفين](#تعيين-المبدعين-والموظفين)
 - [متابعة التقدم](#متابعة-التقدم)
 - [تسليم المشاريع](#تسليم-المشاريع)
 - [النتائج والتقييم](#النتائج-والتقييم)
@@ -120,25 +120,27 @@
 
 ---
 
-## تعيين المبدعين
+## تعيين المبدعين والموظفين
 
-### `GET /projects/{projectId}/available-creators`
-البحث عن مبدعين متاحين للمشروع.
+### `GET /projects/{projectId}/available-team`
+البحث عن أعضاء الفريق المتاحين للمشروع (مبدعين + موظفين براتب ثابت).
 
 **معاملات الاستعلام:**
-- `category`: نوع الخدمة المطلوبة
+- `category`: نوع الخدمة المطلوبة  
 - `location`: الموقع الجغرافي
 - `startDate`: تاريخ بداية المشروع
 - `budget`: الميزانية المتاحة
+- `teamType`: freelance|salaried|both (افتراضي: both)
 
 **الاستجابة الناجحة (200):**
 ```json
 {
   "success": true,
   "data": {
-    "availableCreators": [
+    "availableFreelanceCreators": [
       {
         "id": "c_789ghi",
+        "type": "freelance_creator",
         "name": "فاطمة الزهراء",
         "specialization": "Food Photography",
         "rating": 4.9,
@@ -169,10 +171,35 @@
             "clientType": "restaurant"
           }
         ],
-        "matchScore": 95, // مدى ملاءمة المبدع للمشروع
+        "matchScore": 95,
         "responseTime": "عادة خلال 2-4 ساعات",
         "reliability": "excellent"
-      },
+      }
+    ],
+    "availableSalariedEmployees": [
+      {
+        "id": "se_123abc",
+        "type": "salaried_employee", 
+        "name": "سارة علي الحسن",
+        "department": "photography",
+        "jobTitle": "مصورة أولى",
+        "specialization": "Product & Food Photography",
+        "availability": {
+          "status": "available",
+          "workingHours": "09:00-17:00",
+          "currentLoad": "30%" // نسبة الأعمال الحالية
+        },
+        "equipment": "agency_equipment", // يستخدم معدات الوكالة
+        "experience": "5 سنوات خبرة",
+        "matchScore": 88,
+        "cost": "no_additional_cost", // لا توجد تكلفة إضافية (ضمن الراتب)
+        "strengths": ["سرعة التنفيذ", "خبرة بالمنتجات الغذائية", "متاحة فوراً"]
+      }
+    ],
+    "recommendation": {
+      "suggested": "se_123abc",
+      "reason": "متاحة فوراً وبدون تكلفة إضافية، مع خبرة ممتازة في تصوير الطعام"
+    },
       {
         "id": "c_456def",
         "name": "أحمد محمد الربيعي",
@@ -202,7 +229,7 @@
 ```
 
 ### `POST /projects/{projectId}/assign-creator`
-تعيين مبدع محدد للمشروع.
+تعيين مبدع فريلانسر للمشروع.
 
 **الطلب:**
 ```json
@@ -221,6 +248,74 @@
     "objectives": ["تصوير احترافي عالي الجودة", "إبراز جاذبية الأطباق"],
     "styleGuide": "طبيعي ومشرق مع ألوان زاهية",
     "referenceImages": ["ref1.jpg", "ref2.jpg"],
+    "specialRequests": ["استخدام خلفية بيضاء نظيفة"]
+  }
+}
+```
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "assignment": {
+      "id": "asgn_123abc",
+      "projectId": "p_123abc",
+      "creatorId": "c_789ghi",
+      "status": "pending_acceptance",
+      "contractGenerated": true,
+      "contractUrl": "https://contracts.depth-agency.com/c_789ghi_p_123abc.pdf"
+    }
+  },
+  "message": "تم تعيين المبدع بنجاح! سيتم إرسال العقد للتوقيع."
+}
+```
+
+### `POST /projects/{projectId}/assign-employee`
+تعيين موظف براتب ثابت للمشروع.
+
+**المصادقة:** Admin only
+
+**الطلب:**
+```json
+{
+  "employeeId": "se_123abc",
+  "taskAssignment": {
+    "startDate": "2025-08-28T09:00:00.000Z", 
+    "targetCompletionDate": "2025-09-01T17:00:00.000Z",
+    "priority": "normal", // low | normal | high | urgent
+    "estimatedHours": 8,
+    "workLocation": "studio" // studio | client_location | remote
+  },
+  "projectBrief": {
+    "objectives": ["تصوير احترافي عالي الجودة", "إبراز جاذبية الأطباق"],
+    "styleGuide": "طبيعي ومشرق مع ألوان زاهية", 
+    "referenceImages": ["ref1.jpg", "ref2.jpg"],
+    "specialInstructions": ["استخدام معدات الاستوديو", "التنسيق مع فريق التصميم"]
+  }
+}
+```
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "taskAssignment": {
+      "id": "task_123abc",
+      "projectId": "p_123abc", 
+      "employeeId": "se_123abc",
+      "status": "assigned",
+      "priority": "normal",
+      "cost": 0, // لا توجد تكلفة إضافية - ضمن الراتب
+      "timeline": {
+        "assignedAt": "2025-08-26T14:30:00.000Z",
+        "targetCompletion": "2025-09-01T17:00:00.000Z"
+      }
+    }
+  },
+  "message": "تم تعيين الموظف للمهمة بنجاح! سيتم إشعاره فوراً."
+}
     "restrictions": ["لا يُسمح بالتصوير في أوقات الذروة"]
   },
   "notes": "يرجى التنسيق مع مدير المطعم قبل الوصول"
