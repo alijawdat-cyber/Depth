@@ -903,53 +903,6 @@ window.DepthDocs.features = {
 };
 
 // ============================================
-// Version Management
-// ============================================
-window.DepthDocs.versions = {
-  /**
-   * Add version selector to sidebar
-   */
-  addVersionSelector: function() {
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar || document.getElementById('version-selector')) return;
-    
-    const selector = document.createElement('div');
-    selector.id = 'version-selector';
-    selector.className = 'version-selector';
-    selector.innerHTML = `
-      <select id="versionSelect">
-        <option value="v2.0" selected>v2.0 (الحالي)</option>
-        <option value="v1.9">v1.9</option>
-        <option value="v1.8">v1.8</option>
-      </select>
-      <a href="#/changelog" class="changelog-link">سجل التغييرات</a>
-    `;
-    
-    // Insert after search box
-    const searchBox = sidebar.querySelector('.search');
-    if (searchBox) {
-      searchBox.parentNode.insertBefore(selector, searchBox.nextSibling);
-    }
-    
-    // Add change event
-    document.getElementById('versionSelect').addEventListener('change', (e) => {
-      this.changeVersion(e.target.value);
-    });
-  },
-  
-  /**
-   * Change documentation version
-   */
-  changeVersion: function(version) {
-    window.DepthDocs.ui.showToast(`جاري التبديل إلى الإصدار ${version}...`, 'info');
-    
-    // In production, redirect to version-specific URL
-    // For now, just log
-    console.log('Switching to version:', version);
-  }
-};
-
-// ============================================
 // Scroll Position Management
 // ============================================
 window.DepthDocs.scroll = {
@@ -1103,8 +1056,7 @@ window.DepthDocs.docsifyPlugin = function(hook, vm) {
   
   // When mounted
   hook.mounted(function() {
-    // Add version selector
-    window.DepthDocs.versions.addVersionSelector();
+    console.log('📄 Page mounted successfully');
   });
   
   // When ready

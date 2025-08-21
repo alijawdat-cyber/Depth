@@ -536,68 +536,6 @@ li {
   font-size: var(--font-size-sm);
 }
 
-/* Floating TOC */
-.floating-toc {
-  position: fixed;
-  left: 20px;
-  top: 100px;
-  width: 200px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-  padding: var(--space-md);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-primary);
-  opacity: 0.9;
-  transition: opacity var(--transition-fast);
-}
-
-.floating-toc:hover {
-  opacity: 1;
-}
-
-.toc-title {
-  font-weight: 600;
-  margin-bottom: var(--space-sm);
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-}
-
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.toc-list li {
-  margin: 4px 0;
-}
-
-.toc-list li.h3 {
-  padding-right: var(--space-md);
-}
-
-.toc-list a {
-  color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
-  display: block;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
-}
-
-.toc-list a:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-
-.toc-list a.active {
-  background: var(--interactive-secondary);
-  color: var(--interactive-primary);
-  font-weight: 600;
-}
-
 /* Hide TOC on smaller screens */
 @media (max-width: 1280px) {
   .floating-toc {
@@ -1247,6 +1185,20 @@ blockquote p {
 
 .hidden { display: none; }
 .invisible { visibility: hidden; }
+
+/* ===============================================
+   18. MOBILE SIDEBAR FIX
+=============================================== */
+@media (max-width: 767px) {
+  .sidebar {
+    z-index: 1001 !important;
+  }
+  
+  body.sidebar-open::after {
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+  }
+}
 
 /* ===============================================
    18. ANIMATIONS
