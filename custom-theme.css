@@ -277,6 +277,36 @@ li {
   background: linear-gradient(135deg, var(--depth-purple-500), var(--depth-purple-600));
   border-bottom: 1px solid var(--border-primary);
   margin-bottom: var(--space-md);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sidebar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+}
+
+.sidebar-theme-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  color: white;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 
 .sidebar-logo {
@@ -724,12 +754,17 @@ h4:hover .heading-anchor {
   40%, 80% { transform: rotate(10deg) }
 }
 
-/* Debug: إضافة outline للـ mobile menu للتأكد من موقعه */
+/* تصغير GitHub corner في الموبايل */
 @media (max-width: 767px) {
-  .mobile-menu {
-    outline: 2px solid red; /* مؤقت للـ debugging */
+  .github-corner {
+    transform: scaleX(-1) scale(0.5) !important; /* تصغير بنسبة النصف */
+    top: 5px !important;
+    left: 5px !important;
   }
 }
+
+/* Debug: إضافة outline للـ mobile menu للتأكد من موقعه */
+/* تم إزالة debug outline بعد التأكد من الموقع */
 
 .theme-toggle:hover {
   background: var(--interactive-secondary);
@@ -1152,9 +1187,7 @@ blockquote p {
   }
   
   .theme-toggle {
-    top: var(--space-md);
-    right: var(--space-md);
-    left: auto; /* تأكيد البقاء في اليمين في الموبايل */
+    display: none; /* إخفاء الأيقونة الخارجية في الموبايل لأنها موجودة في السايدبار */
   }
   
   .markdown-section {

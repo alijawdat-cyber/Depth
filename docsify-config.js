@@ -372,13 +372,47 @@ window.DepthDocs.sidebar = {
         </svg>
       </div>
       <div class="sidebar-title">Depth Documentation</div>
-      <div class="sidebar-version">
-        <span class="version-badge">v${window.DepthDocs.version}</span>
-        <span class="version-badge">RTL</span>
+      <div class="sidebar-controls">
+        <div class="sidebar-version">
+          <span class="version-badge">v${window.DepthDocs.version}</span>
+          <span class="version-badge">RTL</span>
+        </div>
+        <button class="sidebar-theme-toggle" id="sidebarThemeToggle" aria-label="تبديل الوضع">
+          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 1v2m0 18v2m9-11h-2M5 12H3m16.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" style="display: none;">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     `;
     
     sidebar.insertBefore(header, sidebar.firstChild);
+    
+    // إعداد أيقونة تبديل الوضع في السايدبار
+    this.setupSidebarThemeToggle();
+  },
+
+  // وظيفة جديدة لإعداد أيقونة تبديل الوضع في السايدبار
+  setupSidebarThemeToggle: function() {
+    const btn = document.getElementById('sidebarThemeToggle');
+    if (!btn) return;
+    
+    const clickHandler = () => {
+      window.DepthDocs.features.toggleTheme();
+    };
+    
+    btn.addEventListener('click', clickHandler);
+    
+    // تحديث الأيقونة حسب الوضع الحالي
+    window.DepthDocs.features.updateThemeIcon(window.DepthDocs.theme, btn);
+    
+    // حفظ دالة التنظيف
+    window.DepthDocs.eventCleanupFunctions.push(() => {
+      btn.removeEventListener('click', clickHandler);
+    });
   },
   
   enhanceNavItems: function() {
@@ -738,19 +772,37 @@ window.DepthDocs.features = {
     );
   },
   
-  updateThemeIcon: function(theme) {
+  updateThemeIcon: function(theme, customBtn = null) {
+    // تحديث الأيقونة في الأعلى
     const btn = document.getElementById('themeToggle');
-    if (!btn) return;
+    if (btn) {
+      const sunIcon = btn.querySelector('.sun-icon');
+      const moonIcon = btn.querySelector('.moon-icon');
+      
+      if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    }
     
-    const sunIcon = btn.querySelector('.sun-icon');
-    const moonIcon = btn.querySelector('.moon-icon');
-    
-    if (theme === 'dark') {
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
-    } else {
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
+    // تحديث الأيقونة في السايدبار
+    const sidebarBtn = customBtn || document.getElementById('sidebarThemeToggle');
+    if (sidebarBtn) {
+      const sunIcon = sidebarBtn.querySelector('.sun-icon');
+      const moonIcon = sidebarBtn.querySelector('.moon-icon');
+      
+      if (sunIcon && moonIcon) {
+        if (theme === 'dark') {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        } else {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        }
+      }
     }
   },
   
@@ -803,23 +855,30 @@ window.DepthDocs.features = {
     // التأكد من أن الزر مرئي وقابل للنقر
     btn.style.pointerEvents = 'auto';
     btn.style.visibility = 'visible';
+    btn.style.display = 'flex';
+    
+    // إزالة أي event listeners قديمة
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
     
     const toggleHandler = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('Mobile menu clicked'); // للـ debugging
-      document.body.classList.toggle('sidebar-open');
+      console.log('Mobile menu toggled'); // للـ debugging
+      
+      const body = document.body;
+      const sidebar = document.querySelector('.sidebar');
+      
+      if (body.classList.contains('sidebar-open')) {
+        body.classList.remove('sidebar-open');
+      } else {
+        body.classList.add('sidebar-open');
+      }
     };
     
-    // إزالة أي event listeners قديمة
-    btn.removeEventListener('click', toggleHandler);
-    btn.addEventListener('click', toggleHandler);
-    
-    // إضافة handler للـ touch events أيضاً (للموبايل)
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      toggleHandler(e);
-    });
+    // إضافة click وtouch handlers
+    newBtn.addEventListener('click', toggleHandler, { passive: false });
+    newBtn.addEventListener('touchstart', toggleHandler, { passive: false });
     
     console.log('Mobile menu setup completed'); // للـ debugging
     
