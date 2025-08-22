@@ -336,6 +336,9 @@ class DepthDocs {
                     const tocEl = document.getElementById('floating-toc');
                     if (tocEl) tocEl.style.display = 'none';
                 }
+                // Footer navigation and code copy
+                UIComponents.injectPrevNextAndRelated(path);
+                UIComponents.enhanceCodeBlocks(docContent);
                 // Inject page icon into H1 and render Lucide
                 UIComponents.injectPageTitleIcon(path);
                 if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -380,6 +383,9 @@ class DepthDocs {
                 const tocEl = document.getElementById('floating-toc');
                 if (tocEl) tocEl.style.display = 'none';
             }
+            // Footer navigation and code copy
+            UIComponents.injectPrevNextAndRelated(path);
+            UIComponents.enhanceCodeBlocks(docContent);
             // Inject page icon into H1 and render Lucide
             UIComponents.injectPageTitleIcon(path);
             if (window.lucide && typeof window.lucide.createIcons === 'function') {

@@ -760,6 +760,135 @@ class UIComponents {
         };
         root.querySelectorAll('h1, h2, h3, h4').forEach(cleanNode);
     }
+
+    // =============== Footer navigation (Prev/Next + Related) ===============
+    static injectPrevNextAndRelated(currentPath) {
+        try {
+            const host = document.getElementById('doc-content');
+            if (!host || currentPath === '/') return;
+
+            // locate current item in sidebarData
+            let secIndex = -1, itemIndex = -1;
+            for (let s = 0; s < (window.sidebarData || []).length; s++) {
+                const items = (window.sidebarData[s].items || []);
+                const idx = items.findIndex(it => it.path === currentPath);
+                if (idx !== -1) { secIndex = s; itemIndex = idx; break; }
+            }
+            if (secIndex === -1) return; // not found
+
+            const sections = window.sidebarData;
+            const curSection = sections[secIndex];
+            const curItems = curSection.items || [];
+
+            const prev = (() => {
+                if (itemIndex > 0) return { sec: secIndex, idx: itemIndex - 1 };
+                // previous section last item
+                for (let s = secIndex - 1; s >= 0; s--) {
+                    const itms = sections[s].items || [];
+                    if (itms.length) return { sec: s, idx: itms.length - 1 };
+                }
+                return null;
+            })();
+
+            const next = (() => {
+                if (itemIndex < curItems.length - 1) return { sec: secIndex, idx: itemIndex + 1 };
+                // next section first item
+                for (let s = secIndex + 1; s < sections.length; s++) {
+                    const itms = sections[s].items || [];
+                    if (itms.length) return { sec: s, idx: 0 };
+                }
+                return null;
+            })();
+
+            const related = (curItems.filter((_, i) => i !== itemIndex).slice(0, 3));
+
+            const wrap = document.createElement('div');
+            wrap.className = 'doc-footer';
+
+            const nav = document.createElement('div');
+            nav.className = 'doc-footer-nav';
+            if (prev) {
+                const p = sections[prev.sec].items[prev.idx];
+                const a = document.createElement('a');
+                a.className = 'doc-nav-link prev';
+                a.href = `#${p.path}`;
+                a.innerHTML = `<span class="dir">السابق</span><span class="title">${p.name}</span>`;
+                a.onclick = (e) => { e.preventDefault(); window.app.navigate(p.path); };
+                nav.appendChild(a);
+            } else {
+                const span = document.createElement('span');
+                span.className = 'doc-nav-spacer';
+                nav.appendChild(span);
+            }
+            if (next) {
+                const n = sections[next.sec].items[next.idx];
+                const a = document.createElement('a');
+                a.className = 'doc-nav-link next';
+                a.href = `#${n.path}`;
+                a.innerHTML = `<span class="dir">التالي</span><span class="title">${n.name}</span>`;
+                a.onclick = (e) => { e.preventDefault(); window.app.navigate(n.path); };
+                nav.appendChild(a);
+            }
+
+            wrap.appendChild(nav);
+
+            if (related && related.length) {
+                const rel = document.createElement('div');
+                rel.className = 'doc-related';
+                const label = document.createElement('div');
+                label.className = 'doc-related-label';
+                label.textContent = 'روابط ذات صلة';
+                rel.appendChild(label);
+                const list = document.createElement('div');
+                list.className = 'doc-related-links';
+                related.forEach(r => {
+                    const a = document.createElement('a');
+                    a.href = `#${r.path}`;
+                    a.textContent = r.name;
+                    a.onclick = (e) => { e.preventDefault(); window.app.navigate(r.path); };
+                    list.appendChild(a);
+                });
+                rel.appendChild(list);
+                wrap.appendChild(rel);
+            }
+
+            host.appendChild(wrap);
+        } catch (_) { /* noop */ }
+    }
+
+    // =============== Enhance code blocks with Copy button ===============
+    static enhanceCodeBlocks(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const blocks = root.querySelectorAll('pre > code');
+        blocks.forEach(code => {
+            const pre = code.parentElement;
+            if (!pre || pre.querySelector('.code-copy-btn')) return;
+            // button
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'code-copy-btn';
+            btn.setAttribute('aria-label', 'نسخ');
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', 'copy');
+            btn.appendChild(icon);
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await navigator.clipboard.writeText(code.innerText);
+                    btn.classList.add('copied');
+                    btn.innerHTML = '<i data-lucide="check"></i>';
+                    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                    setTimeout(() => {
+                        btn.classList.remove('copied');
+                        btn.innerHTML = '<i data-lucide="copy"></i>';
+                        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                    }, 1200);
+                } catch (_) { /* ignore */ }
+            });
+            pre.appendChild(btn);
+        });
+    }
 }
 
 // Export for use

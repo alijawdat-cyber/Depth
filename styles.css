@@ -500,6 +500,7 @@ body {
     overflow-x: auto;
     font-size: 14px;
     line-height: 1.4;
+    position: relative; /* for copy button */
 }
 
 .doc-content code {
@@ -515,6 +516,26 @@ body {
     padding: 0;
     font-size: inherit;
 }
+
+/* Small corner copy button */
+.code-copy-btn { position: absolute; top: 8px; left: 8px; /* RTL: left */ height: 26px; width: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border); background: color-mix(in oklab, var(--bg) 92%, transparent); color: var(--text-secondary); cursor: pointer; opacity: .85; transition: opacity .15s ease, transform .12s ease, background-color .2s ease; }
+.code-copy-btn:hover { opacity: 1; background: var(--bg); transform: translateY(-1px); }
+.code-copy-btn i[data-lucide] { width: 16px; height: 16px; color: currentColor; }
+.code-copy-btn.copied { color: var(--primary); border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); }
+
+/* Footer navigation and related links */
+.doc-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+.doc-footer-nav { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.doc-nav-link { display: inline-flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); background: var(--bg); transition: box-shadow .2s ease, transform .12s ease, border-color .2s ease; }
+.doc-nav-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.06); border-color: color-mix(in oklab, var(--primary) 35%, var(--border)); }
+.doc-nav-link .dir { font-size: 12px; color: var(--text-secondary); }
+.doc-nav-link .title { font-size: 14px; font-weight: 600; color: var(--text); }
+.doc-nav-spacer { flex: 1 1 auto; }
+.doc-related { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.doc-related-label { font-weight: 600; color: var(--text); }
+.doc-related-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.doc-related-links a { display: inline-flex; padding: 6px 10px; border-radius: 999px; border: 1px dashed var(--border); text-decoration: none; color: var(--text); font-size: 13px; }
+.doc-related-links a:hover { border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); }
 
 .doc-content a {
     color: var(--primary);
