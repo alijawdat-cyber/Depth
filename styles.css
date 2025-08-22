@@ -528,10 +528,12 @@ body {
 /* Footer navigation and related links */
 .doc-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); display: block; }
 .doc-footer-nav { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.doc-nav-link { display: inline-flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); background: var(--bg); transition: box-shadow .2s ease, transform .12s ease, border-color .2s ease; }
+.doc-nav-link { display: inline-flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--border); border-bottom-color: var(--border) !important; border-radius: 10px; text-decoration: none; color: var(--text); background: var(--bg); background-clip: padding-box; transition: box-shadow .2s ease, transform .12s ease, border-color .2s ease; }
+.doc-nav-link:focus-visible { outline: 2px solid color-mix(in oklab, var(--primary) 50%, transparent); outline-offset: 2px; }
 .doc-nav-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.06); border-color: color-mix(in oklab, var(--primary) 35%, var(--border)); }
 .doc-nav-link .dir { font-size: 12px; color: var(--text-secondary); }
 .doc-nav-link .title { font-size: 14px; font-weight: 600; color: var(--text); }
+.doc-nav-link *, .doc-nav-link { text-decoration: none !important; background-image: none !important; }
 .doc-nav-spacer { flex: 1 1 auto; }
 .doc-related { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .doc-related-label { font-weight: 600; color: var(--text); }
@@ -555,7 +557,7 @@ body {
 /* Ensure cards/buttons inside doc-content keep intended colors and NO underline */
 .doc-content .btn,
 .doc-content .doc-nav-link,
-.doc-content .doc-related-links a { background-image: none !important; border-bottom: 0 !important; }
+.doc-content .doc-related-links a { background-image: none !important; }
 .doc-content .doc-nav-link:hover,
 .doc-content .doc-related-links a:hover { background-image: none !important; }
 .doc-content .btn-ghost { color: var(--text); }
