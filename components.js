@@ -495,13 +495,15 @@ class UIComponents {
 
     // =============== Mobile TOC (phones) ===============
     static setupMobileTOC(h2Headings) {
-        const isPhone = window.innerWidth < 768;
-        const chip = document.getElementById('mobile-heading-chip');
-        const mobileToc = document.getElementById('mobile-toc');
+    const isPhone = window.innerWidth < 768;
+    const chip = document.getElementById('mobile-heading-chip');
+    const mobileToc = document.getElementById('mobile-toc');
+    const thumb = document.querySelector('.mobile-v-thumb');
+    const track = document.querySelector('.mobile-v-track');
         if (!chip) return;
 
-        // Hide legacy rail/panel
-        if (mobileToc) mobileToc.classList.add('hidden');
+    // Show minimal rail on phones
+    if (mobileToc) mobileToc.classList.remove('hidden');
 
         if (!isPhone || h2Headings.length === 0) {
             chip.classList.remove('is-visible');
@@ -532,15 +534,32 @@ class UIComponents {
             hideTimer = setTimeout(() => chip.classList.remove('is-visible'), 900);
         };
 
-        // Initial state
-        setChip(currentIndex());
+    // Initial state
+    setChip(currentIndex());
 
         // Scroll sync
         let ticking = false;
+        const syncVisual = () => {
+            // Move thumb and chip along track proportionally to scroll position
+            const docH = Math.max(0, document.body.scrollHeight - window.innerHeight);
+            const progress = docH ? Math.min(1, Math.max(0, window.scrollY / docH)) : 0;
+            const tr = track?.getBoundingClientRect();
+            if (tr && thumb) {
+                const range = tr.height - 18;
+                const y = progress * range;
+                thumb.style.transform = `translateY(${y}px)`;
+                // Chip follows thumb
+                const chipY = tr.top + y + 9; // center
+                chip.style.top = `${chipY}px`;
+                chip.style.transform = `translateY(-50%)`;
+            }
+        };
+
         const onScroll = () => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     setChip(currentIndex());
+                    syncVisual();
                     showChip();
                     ticking = false;
                 });
@@ -551,34 +570,41 @@ class UIComponents {
         UIComponents._mobileChipScroll = onScroll;
         window.addEventListener('scroll', onScroll, { passive: true });
 
-        // Tap/drag to scrub: vertical drag moves page scroll proportionally
+        // Drag to scrub: works from chip, thumb, or track
         let dragging = false;
-        let startY = 0;
-        let startScroll = 0;
-        const onDown = (e) => {
+        const onStart = (e) => {
             dragging = true;
-            startY = (e.touches ? e.touches[0].clientY : e.clientY);
-            startScroll = window.scrollY;
             chip.classList.add('is-visible');
             e.preventDefault();
+            handle(e);
         };
-        const onMove = (e) => {
+        const handle = (e) => {
             if (!dragging) return;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY);
-            const dy = y - startY;
-            // Scroll a bit faster than finger
-            window.scrollTo({ top: startScroll + dy * 2, behavior: 'auto' });
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const tr = track?.getBoundingClientRect();
+            if (!tr) return;
+            const y = Math.min(tr.bottom - 9, Math.max(tr.top + 9, clientY));
+            const ratio = (y - (tr.top + 9)) / (tr.height - 18);
+            const docH = Math.max(0, document.body.scrollHeight - window.innerHeight);
+            const target = ratio * docH;
+            window.scrollTo({ top: target, behavior: 'auto' });
+            syncVisual();
         };
-        const onUp = () => {
-            dragging = false;
-            showChip();
-        };
-        chip.addEventListener('touchstart', onDown, { passive: false });
-        chip.addEventListener('mousedown', onDown);
-        window.addEventListener('touchmove', onMove, { passive: true });
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('touchend', onUp, { passive: true });
-        window.addEventListener('mouseup', onUp);
+        const onEnd = () => { dragging = false; showChip(); };
+        // Bind events
+        chip.addEventListener('touchstart', onStart, { passive: false });
+        chip.addEventListener('mousedown', onStart);
+        thumb?.addEventListener('touchstart', onStart, { passive: false });
+        thumb?.addEventListener('mousedown', onStart);
+        track?.addEventListener('touchstart', onStart, { passive: false });
+        track?.addEventListener('mousedown', onStart);
+        window.addEventListener('touchmove', handle, { passive: false });
+        window.addEventListener('mousemove', handle);
+        window.addEventListener('touchend', onEnd, { passive: true });
+        window.addEventListener('mouseup', onEnd);
+
+        // Sync visuals once at init
+        syncVisual();
 
         // Click navigates to the current heading (center it)
         chip.onclick = () => {

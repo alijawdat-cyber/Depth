@@ -793,12 +793,17 @@ body {
         display: none;
     }
 
-    /* Mobile TOC: compact left chip (LTR side) */
-    .mobile-toc { display: none; }
+    /* Mobile TOC: minimal left rail + single chip */
+    .mobile-toc { display: block; position: fixed; top: calc(var(--header-height) + 8px); bottom: 12px; left: 10px; width: 24px; z-index: 1200; pointer-events: none; }
     .mobile-toc.hidden { display: none !important; }
-    
-    /* Floating chip shows current H2 only; appears while scrolling */
-    #mobile-heading-chip { position: fixed; left: 8px; top: 50%; transform: translateY(-50%); z-index: 1300; pointer-events: auto; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; font-size: 12px; line-height: 1.2; max-width: 70vw; text-align: left; box-shadow: 0 8px 22px rgba(0,0,0,.16); opacity: 0; transition: opacity .25s ease, transform .15s ease; }
+    .mobile-v-rail { position: absolute; inset: 0; }
+    .mobile-v-track { position: absolute; left: 10px; top: 0; bottom: 0; width: 3px; border-radius: 3px; background: linear-gradient(180deg, color-mix(in oklab, var(--border) 90%, transparent), color-mix(in oklab, var(--border) 70%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 40%, transparent); }
+    .mobile-v-thumb { position: absolute; left: 3px; width: 18px; height: 18px; border-radius: 9px; background: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,.25); transform: translateY(0); touch-action: none; pointer-events: auto; }
+    /* Hide unused elements from legacy panel */
+    .mobile-v-markers, .mobile-toc-panel { display: none !important; }
+
+    /* Floating chip shows current H2 only; follows the thumb; appears while scrolling */
+    #mobile-heading-chip { position: fixed; left: 36px; top: 50%; transform: translateY(-50%); z-index: 1300; pointer-events: auto; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; font-size: 12px; line-height: 1.2; max-width: 72vw; text-align: left; box-shadow: 0 8px 22px rgba(0,0,0,.16); opacity: 0; transition: opacity .25s ease, transform .12s ease; }
     #mobile-heading-chip.is-visible { opacity: 1; }
     #mobile-heading-chip:active { transform: translateY(-50%) scale(0.98); }
 }
