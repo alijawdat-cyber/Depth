@@ -501,6 +501,19 @@ class UIComponents {
     const thumb = document.querySelector('.mobile-v-thumb');
     const track = document.querySelector('.mobile-v-track');
     const markersHost = document.getElementById('mobile-toc-markers');
+    // container for small labels next to the rail
+    let labelsHost = document.getElementById('mobile-toc-labels');
+    if (!labelsHost) {
+        labelsHost = document.createElement('div');
+        labelsHost.id = 'mobile-toc-labels';
+        labelsHost.style.position = 'absolute';
+        labelsHost.style.left = '0';
+        labelsHost.style.top = '0';
+        labelsHost.style.bottom = '0';
+        labelsHost.style.width = '100%';
+        labelsHost.style.pointerEvents = 'none';
+        mobileToc?.querySelector('.mobile-v-rail')?.appendChild(labelsHost);
+    }
         if (!chip) return;
 
     // Show minimal rail on phones
@@ -542,16 +555,23 @@ class UIComponents {
         const ensureMarkers = () => {
             if (!markersHost) return;
             markersHost.innerHTML = '';
+            labelsHost && (labelsHost.innerHTML = '');
             for (let i = 0; i < h2Headings.length; i++) {
                 const m = document.createElement('div');
                 m.className = 'mobile-v-marker';
                 m.dataset.index = String(i);
                 markersHost.appendChild(m);
+                // create label node (hidden unless dragging)
+                const label = document.createElement('div');
+                label.className = 'mobile-v-label';
+                label.dataset.index = String(i);
+                label.textContent = (h2Headings[i].textContent || '').trim();
+                labelsHost && labelsHost.appendChild(label);
             }
         };
 
         // Position markers according to heading positions
-        const positionMarkers = () => {
+    const positionMarkers = () => {
             if (!markersHost || !track) return;
             const tr = track.getBoundingClientRect();
             const docH = Math.max(0, document.body.scrollHeight - window.innerHeight);
@@ -563,6 +583,9 @@ class UIComponents {
                 const y = 9 + ratio * range; // center of thumb path
                 const el = markers[i];
                 if (el) el.style.top = `${y}px`;
+        // position label vertically aligned with marker
+        const label = labelsHost?.querySelector(`.mobile-v-label[data-index="${i}"]`);
+        if (label) label.style.top = `${y}px`;
             });
         };
 
@@ -587,6 +610,10 @@ class UIComponents {
                 const idx = currentIndex();
                 markersHost.querySelectorAll('.mobile-v-marker').forEach((m, i) => {
                     m.classList.toggle('is-current', i === idx);
+                });
+                // emphasize the current label
+                labelsHost?.querySelectorAll('.mobile-v-label').forEach((l, i) => {
+                    l.classList.toggle('is-current', i === idx);
                 });
             }
         };

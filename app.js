@@ -55,7 +55,12 @@ class DepthDocs {
         }
         if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
         if (mainContent) mainContent.classList.add('sidebar-closed');
-    if (mainContent) mainContent.classList.remove('pushed');
+        // If user changed zoom or breakpoint, make sure any mobile push styles are fully reset
+        if (mainContent) {
+            mainContent.classList.remove('pushed');
+            // Clear any leftover inline transform set while opening the mobile sidebar
+            mainContent.style.transform = '';
+        }
         
         this.updateBurgerButton();
     }
@@ -132,6 +137,12 @@ class DepthDocs {
                 const oldLargeDesktop = this.isLargeDesktop;
                 
                 this.checkScreenSize();
+                // Always clear any stale transform caused by previous mobile push after zooming
+                const mc = document.querySelector('.main-content');
+                if (mc) {
+                    mc.classList.remove('pushed');
+                    mc.style.transform = '';
+                }
                 
                 // Re-initialize if screen category changed
                 if (oldDesktop !== this.isDesktop || oldLargeDesktop !== this.isLargeDesktop) {
@@ -254,6 +265,12 @@ class DepthDocs {
     handleRoute() {
         const hash = window.location.hash.slice(1) || '/';
         this.currentPath = hash;
+        // Reset any mobile push transform that might persist across pages after zoom
+        const mc = document.querySelector('.main-content');
+        if (mc) {
+            mc.classList.remove('pushed');
+            mc.style.transform = '';
+        }
         
         // Update breadcrumbs
         UIComponents.updateBreadcrumbs(hash);

@@ -805,6 +805,10 @@ body {
     .mobile-v-markers { position: absolute; left: 6px; top: 0; bottom: 0; width: 16px; pointer-events: none; }
     .mobile-v-marker { position: absolute; left: 0; width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, var(--text) 50%, transparent); opacity: .45; transform: translate(0, -50%); box-shadow: 0 0 0 1px color-mix(in oklab, var(--border) 60%, transparent); }
     .mobile-v-marker.is-current { width: 10px; height: 10px; opacity: .65; background: color-mix(in oklab, var(--primary) 80%, transparent); box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 50%, transparent); }
+    /* Labels for each H2 next to the rail (visible while dragging) */
+    .mobile-v-label { position: absolute; left: 28px; transform: translateY(-50%); display: none; pointer-events: none; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 4px 6px; font-size: 11px; line-height: 1.1; opacity: .5; max-width: 64vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 6px 14px rgba(0,0,0,.08); }
+    .mobile-toc.dragging .mobile-v-label { display: block; }
+    .mobile-v-label.is-current { opacity: .9; font-weight: 600; }
     .mobile-toc-panel { display: none !important; }
 
     /* Floating chip shows current H2 only; follows the thumb; appears while scrolling */
