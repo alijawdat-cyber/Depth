@@ -640,12 +640,14 @@ body {
     }
 
     .content-wrapper {
-        /* Reserve a pad on the right equal to sidebar width so the floating TOC area stays visible */
-        padding-right: calc(14px + var(--sidebar-width));
+        /* Default: no extra reserve so content isn't squeezed */
+        padding-right: 14px;
         max-width: 1320px;
         margin: 0 auto;
         grid-template-columns: minmax(0, 1fr) 300px;
     }
+    /* When sidebar is open (class removed by JS), reserve space so floating TOC stays visible */
+    .content-wrapper:not(.sidebar-closed) { padding-right: calc(14px + var(--sidebar-width)); }
 }
 
 /* Desktop (1024px - 1399px) */
@@ -661,6 +663,7 @@ body {
     }
     
     .content-wrapper { grid-template-columns: 1fr 260px; padding: 24px 14px; }
+    .content-wrapper:not(.sidebar-closed) { padding-right: calc(14px + 220px); }
     
     .content-wrapper.sidebar-closed {
         margin-right: 0;
