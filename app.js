@@ -46,6 +46,7 @@ class DepthDocs {
         }
         if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
         if (mainContent) mainContent.classList.add('sidebar-closed');
+    if (mainContent) mainContent.classList.remove('pushed');
         
         this.updateBurgerButton();
     }
@@ -126,10 +127,11 @@ class DepthDocs {
                 if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
                 if (mainContent) mainContent.classList.remove('sidebar-closed');
             } else {
-                // Mobile/Tablet: show overlay
-                overlay.classList.add('active');
-                sidebar.style.width = '280px';
-                document.body.style.overflow = 'hidden';
+                // Mobile/Tablet: push content (no overlay)
+                overlay.classList.remove('active');
+                sidebar.style.width = '';
+                if (mainContent) mainContent.classList.add('pushed');
+                document.body.style.overflow = '';
             }
         } else {
             // Closing sidebar
@@ -157,6 +159,9 @@ class DepthDocs {
             sidebar.classList.add('sidebar-closed');
             if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
             if (mainContent) mainContent.classList.add('sidebar-closed');
+        } else {
+            // Mobile/Tablet: remove push translation
+            if (mainContent) mainContent.classList.remove('pushed');
         }
         
         this.updateBurgerButton();

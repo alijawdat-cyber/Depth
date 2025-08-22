@@ -337,7 +337,7 @@ body {
     flex: 1;
     margin-top: var(--header-height);
     min-height: calc(100vh - var(--header-height));
-    transition: margin-right 0.3s ease;
+    transition: margin-right 0.3s ease, transform 0.3s ease;
     width: 100%;
 }
 
@@ -578,6 +578,7 @@ body {
 
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
+    :root { --sidebar-width: 300px; }
     .sidebar {
         width: 300px;
         transform: translateX(100%);
@@ -630,11 +631,8 @@ body {
         box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     }
     
-    /* When sidebar is open, disable interactions with the main content */
-    .sidebar.active ~ .main-content {
-        margin-right: 0;
-        pointer-events: none;
-    }
+    /* Push layout on mobile when sidebar is open */
+    .main-content.pushed { transform: translateX(calc(-1 * var(--sidebar-width))); }
     
     .sidebar-close {
         display: block;
@@ -675,6 +673,10 @@ body {
     .doc-content h2 { font-size: clamp(20px, 5vw, 24px); }
     .doc-content pre { font-size: 12px; overflow-x: auto; }
     .doc-content table { display: block; overflow-x: auto; }
+    .doc-content img, .doc-content video, .doc-content svg { max-width: 100%; height: auto; }
+    .doc-content h1, .doc-content h2, .doc-content h3, .doc-content h4 { overflow-wrap: anywhere; }
+    .doc-content code { word-break: break-word; }
+    .doc-content pre { white-space: pre-wrap; word-break: break-word; }
     
     /* تحسين السايد بار على الموبايل */
     .sidebar-nav {
