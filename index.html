@@ -76,14 +76,15 @@
     <!-- Main Content -->
     <main id="main-content" class="main-content">
         <div class="content-wrapper">
-            <!-- Mobile TOC (phones only) -->
+            <!-- Mobile TOC (phones only) - vertical left rail -->
             <nav id="mobile-toc" class="mobile-toc" aria-label="فهرس الصفحة (الهاتف)">
-                <div class="mobile-toc-inner">
-                    <div id="mobile-toc-list" class="mobile-toc-list" role="tablist" aria-label="عناوين الصفحة"></div>
-                    <div class="mobile-toc-progress" aria-hidden="false">
-                        <div class="mobile-toc-track"></div>
-                        <div class="mobile-toc-thumb" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="التنقل عبر العناوين"></div>
-                    </div>
+                <div class="mobile-v-rail">
+                    <div class="mobile-v-track"></div>
+                    <div class="mobile-v-thumb" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="التنقل عبر العناوين"></div>
+                    <div id="mobile-toc-markers" class="mobile-v-markers" aria-hidden="false"></div>
+                </div>
+                <div class="mobile-toc-panel" aria-hidden="true">
+                    <div id="mobile-toc-list" class="mobile-v-list" role="tablist" aria-label="عناوين الصفحة"></div>
                 </div>
             </nav>
             <article id="doc-content" class="doc-content">

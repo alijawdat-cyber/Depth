@@ -496,10 +496,10 @@ class UIComponents {
     static setupMobileTOC(h2Headings) {
         const mobileToc = document.getElementById('mobile-toc');
         const list = document.getElementById('mobile-toc-list');
-        const thumb = document.querySelector('.mobile-toc-thumb');
-        const track = document.querySelector('.mobile-toc-track');
+        const markersWrap = document.getElementById('mobile-toc-markers');
+        const thumb = document.querySelector('.mobile-v-thumb');
+        const track = document.querySelector('.mobile-v-track');
 
-        // Hide on desktop/tablet or when no headings
         const isPhone = window.innerWidth < 768;
         if (!mobileToc) return;
         if (!isPhone || h2Headings.length === 0) {
@@ -508,51 +508,68 @@ class UIComponents {
         }
         mobileToc.classList.remove('hidden');
 
-        // Build chips
+        // Build vertical list in panel
         list.innerHTML = '';
         const items = h2Headings.map((h, idx) => {
-            const a = document.createElement('button');
-            a.type = 'button';
-            a.className = 'mobile-toc-chip';
-            a.textContent = h.textContent.trim();
-            a.dataset.target = h.id;
-            a.addEventListener('click', () => {
-                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-            list.appendChild(a);
-            return { el: a, heading: h, idx };
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mobile-v-item';
+            btn.textContent = h.textContent.trim();
+            btn.addEventListener('click', () => h.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            list.appendChild(btn);
+            return { el: btn, heading: h, idx };
         });
 
-        // Sync active chip and thumb with scroll
-        const sync = () => {
-            if (!track || !thumb) return;
-            const scrollTop = window.scrollY;
-            const docHeight = document.body.scrollHeight - window.innerHeight;
-            const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
-            const trackRect = track.getBoundingClientRect();
-            const minX = 4; const maxX = trackRect.width - 4 - 14; // paddings and thumb width
-            const x = minX + progress * (maxX - minX);
-            thumb.style.transform = `translateX(${x}px)`;
+        // Build markers on the rail (all H2)
+        markersWrap.innerHTML = '';
+        const docHeight = document.body.scrollHeight - window.innerHeight;
+        const markerAt = (heading) => {
+            const rect = heading.getBoundingClientRect();
+            const yAbs = window.scrollY + rect.top; // document Y for heading top
+            const ratio = docHeight > 0 ? Math.min(1, Math.max(0, yAbs / (document.body.scrollHeight - window.innerHeight))) : 0;
+            return ratio;
+        };
+        const markers = items.map((it) => {
+            const m = document.createElement('div');
+            m.className = 'mobile-v-marker';
+            markersWrap.appendChild(m);
+            return { el: m, item: it };
+        });
 
-            // Find nearest heading in view and set active
+        const positionMarkers = () => {
+            const railRect = track.getBoundingClientRect();
+            const minY = railRect.top;
+            const maxY = railRect.bottom;
+            markers.forEach(({ el, item }) => {
+                const r = markerAt(item.heading);
+                const y = minY + r * (maxY - minY);
+                el.style.top = `${y - railRect.top}px`; // relative to rail
+            });
+        };
+
+        // Sync active state and thumb with scroll
+        const sync = () => {
+            const scrollTop = window.scrollY;
+            const docH = document.body.scrollHeight - window.innerHeight;
+            const progress = docH > 0 ? Math.min(1, Math.max(0, scrollTop / docH)) : 0;
+            const tr = track.getBoundingClientRect();
+            const y = progress * (tr.height - 16); // 16 = thumb size
+            thumb.style.transform = `translateY(${y}px)`;
+
+            // Determine active heading in viewport
             let activeIdx = 0;
             for (let i = 0; i < items.length; i++) {
                 const rect = items[i].heading.getBoundingClientRect();
-                if (rect.top <= 120) activeIdx = i; else break;
+                if (rect.top <= 100) activeIdx = i; else break;
             }
             items.forEach((it, i) => it.el.classList.toggle('active', i === activeIdx));
-            // Auto-scroll chips list to keep active centered
-            const activeEl = items[activeIdx]?.el;
-            if (activeEl) {
-                const listRect = list.getBoundingClientRect();
-                const elRect = activeEl.getBoundingClientRect();
-                const target = (elRect.left + elRect.right) / 2 - (listRect.left + listRect.right) / 2;
-                list.scrollBy({ left: target, behavior: 'smooth' });
-            }
+            markers.forEach(({ el }, i) => el.classList.toggle('active', i === activeIdx));
         };
+
+        positionMarkers();
         sync();
 
-        // Throttled scroll listener
+        // Update on scroll/resize
         let ticking = false;
         const onScroll = () => {
             if (!ticking) {
@@ -560,29 +577,29 @@ class UIComponents {
                 ticking = true;
             }
         };
+        const onResize = () => {
+            positionMarkers();
+            sync();
+        };
         window.removeEventListener('scroll', UIComponents._mobileTocScroll);
         UIComponents._mobileTocScroll = onScroll;
         window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onResize);
 
-        // Drag to scrub
+        // Drag to scrub vertically
         let dragging = false;
         const onPointerDown = (e) => {
-            dragging = true;
-            thumb.setPointerCapture?.(e.pointerId);
-            e.preventDefault();
+            dragging = true; thumb.setPointerCapture?.(e.pointerId); e.preventDefault();
         };
         const onPointerMove = (e) => {
             if (!dragging) return;
             const tr = track.getBoundingClientRect();
-            const px = Math.min(tr.right - 4 - 14, Math.max(tr.left + 4, e.clientX)) - (tr.left + 4);
-            const ratio = Math.min(1, Math.max(0, px / (tr.width - 8 - 14)));
+            const py = Math.min(tr.bottom - 8, Math.max(tr.top + 8, e.clientY)) - (tr.top + 8);
+            const ratio = Math.min(1, Math.max(0, py / (tr.height - 16)));
             const y = ratio * (document.body.scrollHeight - window.innerHeight);
             window.scrollTo({ top: y, behavior: 'auto' });
         };
-        const onPointerUp = (e) => {
-            dragging = false;
-            try { thumb.releasePointerCapture?.(e.pointerId); } catch (_) {}
-        };
+        const onPointerUp = (e) => { dragging = false; try { thumb.releasePointerCapture?.(e.pointerId); } catch (_) {} };
         thumb?.addEventListener('pointerdown', onPointerDown);
         window.addEventListener('pointermove', onPointerMove, { passive: true });
         window.addEventListener('pointerup', onPointerUp, { passive: true });

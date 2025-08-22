@@ -790,17 +790,19 @@ body {
         display: none;
     }
 
-    /* Mobile TOC: fixed bottom timeline */
-    .mobile-toc { display: block; position: fixed; right: 12px; left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 1200; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+    /* Mobile TOC: vertical left rail */
+    .mobile-toc { display: block; position: fixed; top: calc(var(--header-height) + 10px); bottom: 12px; left: 8px; z-index: 1200; display: grid; grid-template-columns: 28px 1fr; gap: 8px; pointer-events: none; }
     .mobile-toc.hidden { display: none !important; }
-    .mobile-toc-inner { padding: 8px 10px; display: grid; grid-template-rows: auto auto; gap: 6px; }
-    .mobile-toc-list { display: grid; grid-auto-flow: column; gap: 8px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    .mobile-toc-list::-webkit-scrollbar { display: none; }
-    .mobile-toc-chip { white-space: nowrap; max-width: 180px; text-overflow: ellipsis; overflow: hidden; padding: 6px 10px; font-size: 12px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 999px; color: var(--text-secondary); }
-    .mobile-toc-chip.active { background: var(--primary); border-color: transparent; color: #fff; }
-    .mobile-toc-progress { position: relative; height: 18px; }
-    .mobile-toc-track { position: absolute; inset-inline: 4px; top: 8px; height: 2px; background: var(--border); border-radius: 2px; }
-    .mobile-toc-thumb { position: absolute; top: 1px; inset-inline-start: 4px; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; transform: translateX(0); touch-action: none; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+    .mobile-v-rail { position: relative; width: 28px; height: 100%; pointer-events: auto; }
+    .mobile-v-track { position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--border); border-radius: 2px; }
+    .mobile-v-thumb { position: absolute; left: 6px; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.25); touch-action: none; transform: translateY(0); }
+    .mobile-v-markers { position: absolute; left: 9px; top: 0; bottom: 0; width: 8px; pointer-events: none; }
+    .mobile-v-marker { position: absolute; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--border); transform: translateY(-50%); }
+    .mobile-v-marker.active { background: var(--primary); }
+    .mobile-toc-panel { pointer-events: auto; align-self: start; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; max-height: calc(100vh - var(--header-height) - 24px); overflow: auto; padding: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+    .mobile-v-list { display: flex; flex-direction: column; gap: 4px; min-width: 180px; max-width: 70vw; }
+    .mobile-v-item { text-align: right; padding: 8px 10px; font-size: 13px; color: var(--text-secondary); border-radius: 8px; border: 1px solid var(--border); background: var(--bg-secondary); }
+    .mobile-v-item.active { color: #fff; background: var(--primary); border-color: transparent; }
 }
 
 /* Micro-mobile (<= 360px) */
