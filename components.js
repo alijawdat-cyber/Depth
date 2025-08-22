@@ -5,8 +5,20 @@ class UIComponents {
         const a = document.createElement('a');
         a.href = `#${item.path}`;
         const iconKey = UIComponents.getItemIconKey(item, sectionId);
-        a.className = `nav-item icon-${iconKey} ${isActive ? 'active' : ''}`;
-        a.textContent = item.name;
+        const lucideName = UIComponents.getLucideFromKey(iconKey);
+        a.className = `nav-item ${isActive ? 'active' : ''}`;
+
+        // icon
+        const icon = document.createElement('i');
+        icon.className = 'nav-icon';
+        icon.setAttribute('data-lucide', lucideName);
+        a.appendChild(icon);
+
+        // text
+        const text = document.createElement('span');
+        text.className = 'nav-text';
+        text.textContent = item.name;
+        a.appendChild(text);
         a.onclick = (e) => {
             e.preventDefault();
             window.app.navigate(item.path);
@@ -20,9 +32,17 @@ class UIComponents {
     div.className = 'nav-section';
     if (section.id) div.setAttribute('data-id', section.id);
         
-        const title = document.createElement('div');
-        title.className = 'nav-section-title';
-        title.textContent = section.title;
+    const title = document.createElement('div');
+    title.className = 'nav-section-title';
+    // icon
+    const sectionIcon = document.createElement('i');
+    sectionIcon.className = 'nav-icon';
+    sectionIcon.setAttribute('data-lucide', UIComponents.getSectionLucide(section.id));
+    title.appendChild(sectionIcon);
+    // text
+    const sectionText = document.createElement('span');
+    sectionText.textContent = section.title;
+    title.appendChild(sectionText);
         title.onclick = () => {
             title.classList.toggle('collapsed');
             items.classList.toggle('collapsed');
@@ -112,6 +132,79 @@ class UIComponents {
             case 'reference': return 'book';
             default: return 'dot';
         }
+    }
+
+    // Map internal keys to Lucide icon names
+    static getLucideFromKey(key) {
+        const map = {
+            overview: 'list',
+            requirements: 'file-check-2',
+            dictionary: 'book',
+            schema: 'sitemap',
+            indexes: 'list-filter',
+            database: 'database',
+            auth: 'shield',
+            'rate-limit': 'gauge',
+            websocket: 'network',
+            error: 'triangle-alert',
+            creator: 'pen-tool',
+            clients: 'users',
+            projects: 'folder-kanban',
+            pricing: 'receipt',
+            storage: 'hard-drive',
+            notifications: 'bell',
+            messaging: 'message-square',
+            employees: 'user-cog',
+            dashboard: 'layout-dashboard',
+            governance: 'landmark',
+            seeds: 'sprout',
+            plug: 'plug',
+            webhook: 'webhook',
+            flask: 'flask-conical',
+            rocket: 'rocket',
+            laptop: 'laptop',
+            key: 'key',
+            flow: 'workflow',
+            test: 'beaker',
+            phone: 'smartphone',
+            monitor: 'monitor',
+            shield: 'shield',
+            target: 'target',
+            cogs: 'cog',
+            'cloud-upload': 'cloud-upload',
+            alert: 'triangle-alert',
+            book: 'book',
+            'book-open': 'book-open',
+            braces: 'braces',
+            link: 'link',
+            text: 'type',
+            grid: 'grid-2x2',
+            cog: 'cog',
+            sparkles: 'sparkles',
+            'shield-check': 'shield-check',
+            code: 'code-2',
+            devices: 'monitor-smartphone',
+            dot: 'dot'
+        };
+        return map[key] || 'dot';
+    }
+
+    static getSectionLucide(id = '') {
+        const map = {
+            home: 'home',
+            'getting-started': 'rocket',
+            database: 'database',
+            core: 'layers-3',
+            features: 'sparkles',
+            admin: 'shield-check',
+            integrations: 'plug',
+            development: 'code-2',
+            interfaces: 'monitor-smartphone',
+            security: 'shield',
+            operations: 'settings-2',
+            reference: 'book'
+        };
+        return map[id] || 'dot';
     }
 
     // Generate breadcrumb

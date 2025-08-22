@@ -225,6 +225,11 @@ class DepthDocs {
         sidebarData.forEach(section => {
             nav.appendChild(UIComponents.createNavSection(section));
         });
+
+        // Enhance icons via Lucide
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
     }
 
     // Handle routing
