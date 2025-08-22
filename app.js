@@ -240,7 +240,7 @@ class DepthDocs {
             
             // If not found, try to load .md file
             const filePath = path.substring(1);
-            const mdPath = `${filePath}.md`;
+            const mdPath = `./${filePath}.md`;
             
             console.log('Loading file:', mdPath);
             
