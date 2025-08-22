@@ -639,6 +639,25 @@ class UIComponents {
             h1.insertBefore(wrap, h1.firstChild);
         } catch (_) { /* noop */ }
     }
+
+    // Remove emoji icons from headings (H1-H4) across documentation pages
+    static sanitizeHeadings(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const reLeadingEmoji = /^\s*(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?)*)+/u;
+        const cleanNode = (el) => {
+            // find first non-empty text node child
+            for (let n of el.childNodes) {
+                if (n.nodeType === Node.TEXT_NODE) {
+                    const orig = n.nodeValue || '';
+                    const cleaned = orig.replace(reLeadingEmoji, '').replace(/^\s+/, '');
+                    if (cleaned !== orig) n.nodeValue = cleaned;
+                    break;
+                }
+            }
+        };
+        root.querySelectorAll('h1, h2, h3, h4').forEach(cleanNode);
+    }
 }
 
 // Export for use

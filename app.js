@@ -297,6 +297,8 @@ class DepthDocs {
                 const content = pageContent[path];
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
+                // Strip old emoji icons from headings
+                UIComponents.sanitizeHeadings(docContent);
                 UIComponents.generateTOC(docContent);
                 // Inject page icon into H1 and render Lucide
                 UIComponents.injectPageTitleIcon(path);
@@ -335,6 +337,8 @@ class DepthDocs {
             
             const docContent = document.getElementById('doc-content');
             docContent.innerHTML = cleanHtml;
+            // Strip old emoji icons from headings
+            UIComponents.sanitizeHeadings(docContent);
             
             UIComponents.generateTOC(docContent);
             // Inject page icon into H1 and render Lucide
