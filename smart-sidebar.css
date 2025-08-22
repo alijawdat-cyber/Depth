@@ -1,0 +1,217 @@
+/* ===============================================
+   SMART SIDEBAR - تحسينات تجربة المستخدم
+   =============================================== */
+
+/* Smart Badges للأقسام */
+.nav-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+.nav-badge.popular {
+  background: var(--success);
+  color: white;
+}
+
+.nav-badge.admin {
+  background: var(--error);
+  color: white;
+}
+
+.nav-badge.ref {
+  background: var(--neutral-400);
+  color: white;
+}
+
+/* Quick Access Panel */
+.sidebar-quick-access {
+  background: var(--depth-purple-50);
+  border: 1px solid var(--depth-purple-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin: var(--space-md) var(--space-sm);
+}
+
+.sidebar-quick-access h4 {
+  font-size: var(--font-size-sm);
+  color: var(--depth-purple-700);
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+}
+
+.quick-link {
+  display: block;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--depth-purple-600);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  transition: all var(--transition-fast);
+}
+
+.quick-link:hover {
+  background: var(--depth-purple-100);
+  color: var(--depth-purple-800);
+}
+
+/* Smart Search Enhancement */
+.sidebar-search {
+  position: relative;
+  margin: var(--space-sm);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: var(--space-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.suggestion-item:hover {
+  background: var(--neutral-50);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Recent Pages Panel */
+.sidebar-recent {
+  margin: var(--space-md) var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.recent-page {
+  display: flex;
+  align-items: center;
+  padding: var(--space-xs);
+  color: var(--neutral-600);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+}
+
+.recent-page:hover {
+  color: var(--depth-purple-600);
+}
+
+.recent-icon {
+  width: 12px;
+  height: 12px;
+  margin-left: var(--space-xs);
+  opacity: 0.5;
+}
+
+/* Adaptive Sidebar Width */
+@media (min-width: 1440px) {
+  .sidebar {
+    width: 320px; /* أوسع للشاشات الكبيرة */
+  }
+  
+  .content {
+    margin-right: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 280px; /* أصغر للأجهزة اللوحية */
+  }
+}
+
+/* Progress Indicators */
+.section-progress {
+  font-size: 10px;
+  color: var(--success);
+  margin-right: auto;
+}
+
+.section-label {
+  position: relative;
+}
+
+.section-label::after {
+  content: attr(data-count);
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--neutral-400);
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Collapsible Animation Enhancement */
+.sidebar-nav > ul > li > ul {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-nav > ul > li.open > ul {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* Smart Default States */
+.sidebar-nav > ul > li:nth-child(1),
+.sidebar-nav > ul > li:nth-child(2) {
+  /* الأقسام الأولى مفتوحة افتراضياً */
+}
+
+.sidebar-nav > ul > li:nth-child(1) > ul,
+.sidebar-nav > ul > li:nth-child(2) > ul {
+  display: block;
+  max-height: none;
+  opacity: 1;
+}
+
+/* Loading States */
+.sidebar-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--neutral-500);
+}
+
+.sidebar-loading::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neutral-200);
+  border-top: 2px solid var(--depth-purple-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: var(--space-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

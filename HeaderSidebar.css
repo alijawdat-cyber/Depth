@@ -1,0 +1,444 @@
+/* HeaderSidebar.css - مكوّن الهيدر والسايدبار المدموج */
+
+/* ===============================================
+   متغيرات CSS الأساسية
+   =============================================== */
+:root {
+  --header-height: 64px;
+  --sidebar-width: 280px;
+  --z-header: 1000;
+  --z-sidebar: 1001;
+  --z-overlay: 999;
+
+  /* الألوان - الوضع الفاتح */
+  --bg-header-light: rgba(255, 255, 255, 0.95);
+  --bg-sidebar-light: #ffffff;
+  --text-primary-light: #1f2937;
+  --text-secondary-light: #6b7280;
+  --border-light: #e5e7eb;
+  --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  /* الألوان - الوضع الداكن */
+  --bg-header-dark: rgba(17, 24, 39, 0.95);
+  --bg-sidebar-dark: #111827;
+  --text-primary-dark: #f9fafb;
+  --text-secondary-dark: #9ca3af;
+  --border-dark: #374151;
+  --shadow-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+
+  /* افتراضي للوضع الفاتح */
+  --bg-header: var(--bg-header-light);
+  --bg-sidebar: var(--bg-sidebar-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --border-color: var(--border-light);
+  --shadow-color: var(--shadow-light);
+}
+
+/* الوضع الداكن */
+[data-theme="dark"] {
+  --bg-header: var(--bg-header-dark);
+  --bg-sidebar: var(--bg-sidebar-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+  --border-color: var(--border-dark);
+  --shadow-color: var(--shadow-dark);
+}
+
+/* ===============================================
+   الهيدر (Header)
+   =============================================== */
+.header-sidebar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--bg-header);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: var(--z-header);
+  transition: all 0.3s ease;
+}
+
+.header-sidebar-header.header-scrolled {
+  box-shadow: var(--shadow-color);
+  backdrop-filter: blur(12px);
+}
+
+.header-content {
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  direction: rtl; /* RTL للعربية */
+}
+
+/* ===============================================
+   أيقونة القائمة (Hamburger) - اليمين
+   =============================================== */
+.hamburger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  order: 3; /* RTL: يمين */
+}
+
+.hamburger-btn:hover {
+  background: var(--border-color);
+}
+
+.hamburger-btn:focus {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* ===============================================
+   فتات الخبز (Breadcrumbs) - الوسط
+   =============================================== */
+.breadcrumbs-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  order: 2; /* RTL: وسط */
+}
+
+.breadcrumbs-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+  direction: ltr; /* الإنجليزية من اليسار إلى اليمين */
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.breadcrumb-link:hover {
+  color: var(--text-primary);
+  background: var(--border-color);
+}
+
+.breadcrumb-separator {
+  color: var(--text-secondary);
+  font-size: 14px;
+  user-select: none;
+}
+
+.breadcrumb-current {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px;
+  text-transform: capitalize;
+}
+
+/* ===============================================
+   رابط GitHub - اليسار
+   =============================================== */
+.github-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  order: 1; /* RTL: يسار */
+}
+
+.github-link:hover {
+  background: var(--border-color);
+}
+
+.github-link:focus {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* ===============================================
+   السايدبار (Sidebar)
+   =============================================== */
+.header-sidebar-nav {
+  position: fixed;
+  top: var(--header-height);
+  right: 0; /* RTL: من اليمين */
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border-color); /* RTL: حدود يسار */
+  z-index: var(--z-sidebar);
+  transform: translateX(100%); /* مخفي افتراضياً */
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  direction: rtl; /* RTL للمحتوى العربي */
+}
+
+.header-sidebar-nav.sidebar-open {
+  transform: translateX(0); /* ظاهر */
+}
+
+/* Overlay للموبايل */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+  display: none;
+}
+
+/* ===============================================
+   محتوى السايدبار
+   =============================================== */
+.sidebar-content {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sidebar-close-btn {
+  display: none; /* مخفي في الديسكتوب */
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* ===============================================
+   التنقل داخل السايدبار
+   =============================================== */
+.sidebar-nav {
+  flex: 1;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-bottom: 2px;
+}
+
+.nav-link {
+  display: block;
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+.nav-link-active {
+  background: var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nav-submenu {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+
+.nav-item-level-1 .nav-link {
+  padding-right: 32px;
+  font-size: 13px;
+}
+
+.nav-item-level-2 .nav-link {
+  padding-right: 48px;
+  font-size: 12px;
+}
+
+/* ===============================================
+   مساحة للهيدر الثابت
+   =============================================== */
+.header-spacer {
+  height: var(--header-height);
+  width: 100%;
+}
+
+/* ===============================================
+   Responsive - الموبايل
+   =============================================== */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 12px;
+  }
+
+  .breadcrumbs-nav {
+    padding: 0 12px;
+  }
+
+  .breadcrumbs-list {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .breadcrumbs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .breadcrumb-link,
+  .breadcrumb-current {
+    white-space: nowrap;
+  }
+
+  /* السايدبار في الموبايل */
+  .header-sidebar-nav {
+    width: 320px;
+    max-width: 85vw;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  .sidebar-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-sidebar);
+    z-index: 10;
+  }
+}
+
+/* ===============================================
+   Responsive - الأجهزة اللوحية
+   =============================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .header-sidebar-nav {
+    width: 260px;
+  }
+
+  .breadcrumbs-nav {
+    padding: 0 16px;
+  }
+}
+
+/* ===============================================
+   Responsive - الشاشات الكبيرة
+   =============================================== */
+@media (min-width: 1200px) {
+  .header-content {
+    padding: 0 24px;
+  }
+
+  .breadcrumbs-nav {
+    padding: 0 32px;
+  }
+}
+
+/* ===============================================
+   تحسينات الوصولية
+   =============================================== */
+@media (prefers-reduced-motion: reduce) {
+  .header-sidebar-header,
+  .header-sidebar-nav,
+  .hamburger-btn,
+  .breadcrumb-link,
+  .nav-link {
+    transition: none;
+  }
+}
+
+/* Focus styles محسنة */
+.hamburger-btn:focus-visible,
+.github-link:focus-visible,
+.breadcrumb-link:focus-visible,
+.nav-link:focus-visible,
+.sidebar-close-btn:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .header-sidebar-header {
+    border-bottom: 2px solid var(--text-primary);
+  }
+  
+  .header-sidebar-nav {
+    border-left: 2px solid var(--text-primary);
+  }
+  
+  .nav-link-active {
+    outline: 2px solid var(--text-primary);
+  }
+}

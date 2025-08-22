@@ -361,6 +361,98 @@ window.DepthDocs.sidebar = {
     this.restoreState();
     this.setupSearch();
     this.setupRouteListener();
+    this.initializeHeaderSidebar();
+  },
+
+  // إعداد HeaderSidebar الجديد
+  initializeHeaderSidebar: function() {
+    // التحقق من وجود المكوّن
+    if (document.getElementById('depth-header-sidebar')) {
+      console.log('HeaderSidebar already initialized');
+      return;
+    }
+
+    // إنشاء الهيكل الأساسي للNavigation من السايدبار الموجود
+    const navigation = this.extractNavigationFromSidebar();
+    
+    // إنشاء container للمكوّن
+    const container = document.createElement('div');
+    container.id = 'depth-header-sidebar';
+    document.body.insertBefore(container, document.body.firstChild);
+    
+    // تحديث CSS Variables للتكامل
+    this.updateCSSVariables();
+    
+    console.log('✅ HeaderSidebar component ready for initialization');
+    console.log('Navigation items extracted:', navigation.length);
+  },
+
+  // استخراج التنقل من السايدبار الموجود
+  extractNavigationFromSidebar: function() {
+    const sidebarNav = document.querySelector('.sidebar-nav ul');
+    if (!sidebarNav) return [];
+
+    const navigation = [];
+    const items = sidebarNav.querySelectorAll(':scope > li');
+    
+    items.forEach((item, index) => {
+      const link = item.querySelector(':scope > a');
+      const submenu = item.querySelector(':scope > ul');
+      
+      let label = '';
+      let href = '#/';
+      
+      if (link) {
+        label = link.textContent.trim();
+        href = link.getAttribute('href') || '#/';
+      } else {
+        // استخراج النص من العقدة المباشرة
+        const textNodes = Array.from(item.childNodes)
+          .filter(node => node.nodeType === 3)
+          .map(node => node.textContent.trim())
+          .filter(text => text.length > 0);
+        label = textNodes[0] || `Section ${index + 1}`;
+      }
+
+      const navItem = {
+        id: `nav-${index}`,
+        label: label,
+        href: href,
+        children: []
+      };
+
+      // استخراج الأقسام الفرعية
+      if (submenu) {
+        const subItems = submenu.querySelectorAll('li');
+        subItems.forEach((subItem, subIndex) => {
+          const subLink = subItem.querySelector('a');
+          if (subLink) {
+            navItem.children.push({
+              id: `nav-${index}-${subIndex}`,
+              label: subLink.textContent.trim(),
+              href: subLink.getAttribute('href') || '#/',
+              children: []
+            });
+          }
+        });
+      }
+
+      navigation.push(navItem);
+    });
+
+    return navigation;
+  },
+
+  // تحديث CSS Variables للتكامل مع النظام الموجود
+  updateCSSVariables: function() {
+    const root = document.documentElement;
+    
+    // ربط المتغيرات الجديدة بالموجودة
+    root.style.setProperty('--bg-header', 'var(--sidebar-bg, var(--bg-sidebar-light))');
+    root.style.setProperty('--bg-sidebar', 'var(--sidebar-bg, var(--bg-sidebar-light))');
+    root.style.setProperty('--text-primary', 'var(--sidebar-text, var(--text-primary-light))');
+    root.style.setProperty('--text-secondary', 'var(--text-muted, var(--text-secondary-light))');
+    root.style.setProperty('--border-color', 'var(--border, var(--border-light))');
   },
   
   addHeader: function(sidebar) {
