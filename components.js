@@ -200,7 +200,7 @@ class UIComponents {
         document.getElementById('floating-toc').style.display = 'block';
         toc.innerHTML = '';
         
-        headings.forEach((heading, index) => {
+    headings.forEach((heading, index) => {
             const id = `heading-${index}`;
             heading.id = id;
             
@@ -224,7 +224,7 @@ class UIComponents {
         });
         
         // Highlight active heading on scroll
-        this.observeHeadings(headings);
+    this.observeHeadings(headings);
     }
 
     // Observe headings for active state
@@ -234,6 +234,14 @@ class UIComponents {
             threshold: 0
         };
         
+        const toc = document.getElementById('toc-list');
+        const scrollIntoViewCentered = (el) => {
+            if (!toc || !el) return;
+            const elTop = el.offsetTop;
+            const target = elTop - (toc.clientHeight / 2) + (el.clientHeight / 2);
+            toc.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+        };
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -244,6 +252,8 @@ class UIComponents {
                         link.classList.remove('active');
                         if (link.getAttribute('href') === `#${id}`) {
                             link.classList.add('active');
+                            // اجعل عنصر TOC الحالي في المنتصف أثناء التمرير
+                            scrollIntoViewCentered(link);
                         }
                     });
                 }

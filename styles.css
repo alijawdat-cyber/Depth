@@ -483,6 +483,7 @@ body {
     padding: 20px;
     max-height: calc(100vh - var(--header-height) - 40px);
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .floating-toc h3 {
@@ -494,6 +495,8 @@ body {
 
 .toc-list {
     list-style: none;
+    overflow-y: auto;
+    max-height: calc(100vh - var(--header-height) - 120px);
 }
 
 .toc-item {
