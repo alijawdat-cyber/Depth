@@ -154,6 +154,12 @@ body {
     transition: color 0.2s;
 }
 
+.breadcrumbs span {
+    color: var(--text);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
 .breadcrumbs a:hover {
     color: var(--primary);
 }
@@ -610,7 +616,8 @@ body {
 /* Mobile (max-width: 767px) */
 @media (max-width: 767px) {
     .header-container {
-    padding: 0 calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left));
+        padding: 0 calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left));
+        gap: 12px;
     }
     
     .logo svg {
@@ -618,7 +625,15 @@ body {
     }
     
     .breadcrumbs {
-        display: none;
+        display: flex;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .breadcrumbs a,
+    .breadcrumbs span {
+        font-size: 12px;
     }
     
     .sidebar {
