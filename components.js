@@ -444,10 +444,10 @@ class UIComponents {
         });
 
         // Highlight active heading on scroll
-    this.observeHeadings(headings);
-    // Build mobile TOC from h2s only for concise chips
-    const h2s = Array.from(headings).filter(h => h.tagName.toLowerCase() === 'h2');
-    UIComponents.setupMobileTOC(h2s);
+        this.observeHeadings(headings);
+        // Build mobile TOC from h2s only for concise chips
+        const h2s = Array.from(headings).filter(h => h.tagName.toLowerCase() === 'h2');
+        UIComponents.setupMobileTOC(h2s);
     }
 
     // Observe headings for active state
