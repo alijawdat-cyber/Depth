@@ -114,6 +114,13 @@ body {
     gap: 10px;
     font-weight: 600;
     font-size: 18px;
+    flex-shrink: 0;
+}
+
+.logo svg {
+    height: 24px;
+    width: auto;
+    transition: all 0.3s ease;
 }
 
 /* Breadcrumbs */
@@ -501,6 +508,10 @@ body {
 @media (max-width: 768px) {
     .header-container {
         padding: 0 16px;
+    }
+    
+    .logo svg {
+        height: 20px;
     }
     
     .breadcrumbs {
