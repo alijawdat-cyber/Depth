@@ -262,7 +262,7 @@ body {
 }
 
 .sidebar-nav {
-    padding: 20px;
+    padding: 20px 16px 24px 16px;
 }
 
 .sidebar-overlay {
@@ -283,22 +283,59 @@ body {
     visibility: visible;
 }
 
+
+    /* نقطة خفيفة قبل عناصر الصفحات لتعزيز الهرمية */
+    .nav-item::before {
+        content: '•';
+        position: absolute;
+        right: 8px; /* RTL */
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    /* فواصل بين الأقسام لتهوية أفضل */
+    .nav-section + .nav-section {
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+    }
+
+    /* تحسين الوصول */
+    .nav-item:focus-visible,
+    .nav-section-title:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
 /* Navigation Items */
 .nav-section {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    padding: 12px 12px 8px 12px;
+}
+
+.nav-section + .nav-section {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
 }
 
 .nav-section-title {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
+    gap: 8px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text);
-    cursor: pointer;
+    padding: 8px 12px;
+    white-space: nowrap;
     border-radius: var(--radius);
-    transition: var(--transition);
+    cursor: default;
+}
+
+.nav-section-title::before {
+    content: '▦';
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
 .nav-section-title:hover {
@@ -308,16 +345,19 @@ body {
 .nav-section-title.collapsed::after {
     content: '◄';
     font-size: 12px;
+    margin-right: auto; /* keep arrow at far side in RTL */
 }
 
 .nav-section-title::after {
     content: '▼';
     font-size: 12px;
+    margin-right: auto; /* keep arrow at far side in RTL */
 }
 
 .nav-section-items {
-    margin-top: 4px;
+    margin-top: 6px;
     padding-right: 12px;
+    border-right: 1px dashed var(--border); /* RTL nesting guide */
 }
 
 .nav-section-items.collapsed {
@@ -325,8 +365,10 @@ body {
 }
 
 .nav-item {
+    position: relative;
     display: block;
     padding: 8px 12px;
+    padding-right: 22px; /* room for bullet */
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 14px;
@@ -704,19 +746,6 @@ body {
     .doc-content h1, .doc-content h2, .doc-content h3, .doc-content h4 { overflow-wrap: anywhere; }
     .doc-content code { word-break: break-word; }
     .doc-content pre { white-space: pre-wrap; word-break: break-word; }
-    
-    /* تحسين السايد بار على الموبايل */
-    .sidebar-nav {
-        padding: 16px;
-    }
-    .nav-section-title {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-    .nav-item {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
     
     .floating-toc {
         display: none;
