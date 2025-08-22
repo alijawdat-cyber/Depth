@@ -171,6 +171,12 @@ body {
     font-size: 12px;
 }
 
+.breadcrumbs a.disabled {
+    pointer-events: none;
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
 /* Theme Toggle */
 .theme-toggle {
     width: 40px;

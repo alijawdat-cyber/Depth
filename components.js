@@ -41,28 +41,68 @@ class UIComponents {
     // Generate breadcrumb
     static updateBreadcrumbs(path) {
         const breadcrumbs = document.getElementById('breadcrumbs');
-        const parts = path.split('/').filter(p => p);
-        
-        const breadcrumbItems = [];
-        
-        // ابدأ بالرئيسية
-        breadcrumbItems.push('<a href="#/">الرئيسية</a>');
-        
-        // أضف المسارات الوسطى
-        let currentPath = '';
+        if (!breadcrumbs) return;
+
+        // اجمع جميع المسارات الفعلية من شجرة السايدبار
+        const allPaths = [];
+        try {
+            sidebarData.forEach(section => {
+                (section.items || []).forEach(item => allPaths.push(item.path));
+            });
+        } catch (_) {}
+
+        // مساعد: إيجاد أول صفحة حقيقية تحت بادئة معيّنة
+        const resolveTarget = (prefix) => {
+            // 1) إن كان هناك صفحة مطابقة مباشرة في الصفحة/المحتوى
+            if (pageContent && pageContent[prefix]) return prefix;
+            // 2) اختر أول عنصر في السايدبار يبدأ بهذه البادئة
+            const found = allPaths.find(p => p.startsWith(prefix + '/'));
+            return found || null;
+        };
+
+        // بناء DOM آمن لفتات الخبز
+        breadcrumbs.innerHTML = '';
+
+        const addLink = (text, href, disabled = false) => {
+            const a = document.createElement('a');
+            a.textContent = text;
+            a.href = href || '#';
+            if (disabled) {
+                a.classList.add('disabled');
+                a.setAttribute('tabindex', '-1');
+            }
+            breadcrumbs.appendChild(a);
+        };
+
+        const addSpan = (text) => {
+            const s = document.createElement('span');
+            s.textContent = text;
+            breadcrumbs.appendChild(s);
+        };
+
+        const parts = path.split('/').filter(Boolean);
+
+        // الرئيسية
+        addLink('الرئيسية', '#/');
+
+        // المسارات الوسطى: اربطها بأولى صفحة صحيحة تحتها
+        let prefix = '';
         for (let i = 0; i < parts.length - 1; i++) {
-            currentPath += '/' + parts[i];
+            prefix += '/' + parts[i];
             const name = this.formatPathName(parts[i]);
-            breadcrumbItems.push(`<a href="#${currentPath}">${name}</a>`);
+            const target = resolveTarget(prefix);
+            if (target) {
+                addLink(name, `#${target}`);
+            } else {
+                addLink(name, '#', true);
+            }
         }
-        
-        // أضف الصفحة الحالية (غير قابلة للنقر)
+
+        // الصفحة الحالية (نص فقط)
         if (parts.length > 0) {
             const currentName = this.formatPathName(parts[parts.length - 1]);
-            breadcrumbItems.push(`<span>${currentName}</span>`);
+            addSpan(currentName);
         }
-        
-        breadcrumbs.innerHTML = breadcrumbItems.join(' ');
     }
 
     // Format path name for display
