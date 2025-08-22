@@ -49,8 +49,8 @@ body {
 }
 
 /* Page title icon next to H1 */
-.doc-content h1 .page-title-icon { width: 22px; height: 22px; color: var(--icon-color); vertical-align: middle; margin-left: 8px; }
-.doc-content h1 svg.lucide.page-title-icon { width: 22px; height: 22px; color: var(--icon-color); }
+.doc-content h1 .page-title-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; color: var(--icon-color); vertical-align: middle; margin-left: 8px; }
+.doc-content h1 .page-title-icon svg.lucide { width: 22px; height: 22px; color: var(--icon-color); }
 
 /* =============== Layout Structure =============== */
 .app-container {

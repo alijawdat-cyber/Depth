@@ -648,12 +648,14 @@ class UIComponents {
             // Avoid duplicate injection on re-renders
             if (h1.querySelector('.page-title-icon')) return;
 
+            // Use a wrapper so styles persist after Lucide replaces <i>
+            const wrap = document.createElement('span');
+            wrap.className = 'page-title-icon';
             const i = document.createElement('i');
-            i.className = 'page-title-icon';
             i.setAttribute('data-lucide', lucideName);
-
+            wrap.appendChild(i);
             // Prepend before text; in RTL this will appear at the right visually
-            h1.insertBefore(i, h1.firstChild);
+            h1.insertBefore(wrap, h1.firstChild);
         } catch (_) { /* noop */ }
     }
 }
