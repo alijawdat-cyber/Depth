@@ -124,7 +124,8 @@ body {
     gap: 8px;
     overflow-x: auto;
     scrollbar-width: none;
-    direction: ltr;
+    direction: rtl;
+    flex-direction: row-reverse;
 }
 
 .breadcrumbs::-webkit-scrollbar {
@@ -144,9 +145,10 @@ body {
 }
 
 .breadcrumbs a:not(:last-child)::after {
-    content: '/';
-    margin: 0 8px;
+    content: '◄';
+    margin: 0 6px;
     color: var(--border);
+    font-size: 12px;
 }
 
 /* Theme Toggle */
@@ -506,12 +508,30 @@ body {
     }
     
     .sidebar {
-        width: 85%;
-        max-width: 320px;
+        width: 50%;
+        max-width: 250px;
     }
     
     .sidebar-close {
         display: block;
+    }
+    
+    .sidebar-header h2 {
+        font-size: 16px;
+    }
+    
+    .nav-section-title {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    
+    .nav-item {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .sidebar-nav {
+        padding: 16px;
     }
     
     .doc-content {
