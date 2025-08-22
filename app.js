@@ -30,6 +30,11 @@ class DepthDocs {
         this.isTablet = width >= 768 && width < 1024;
         this.isMobile = width < 768;
         this.updateContentPadding();
+        // Toggle mobile TOC visibility per breakpoint
+        const mt = document.getElementById('mobile-toc');
+        if (mt) {
+            if (this.isMobile) mt.classList.remove('hidden'); else mt.classList.add('hidden');
+        }
     }
 
     // Initialize sidebar state based on screen size
@@ -121,6 +126,9 @@ class DepthDocs {
                 // Re-initialize if screen category changed
                 if (oldDesktop !== this.isDesktop || oldLargeDesktop !== this.isLargeDesktop) {
                     this.initializeSidebarState();
+                    // Re-wire mobile TOC on breakpoint change
+                    const dc = document.getElementById('doc-content');
+                    if (dc) UIComponents.generateTOC(dc);
                 }
             }, 250);
         });
@@ -249,6 +257,12 @@ class DepthDocs {
         // Close sidebar on mobile/tablet after navigation
         if (this.isMobile || this.isTablet) {
             this.closeSidebar();
+        }
+
+        // Hide mobile TOC on home route
+        const mt = document.getElementById('mobile-toc');
+        if (mt) {
+            if (hash === '/') mt.classList.add('hidden');
         }
     }
 

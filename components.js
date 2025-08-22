@@ -363,6 +363,7 @@ class UIComponents {
 
         if (headings.length === 0) {
             document.getElementById('floating-toc').style.display = 'none';
+            UIComponents.setupMobileTOC([]);
             return;
         }
 
@@ -442,7 +443,10 @@ class UIComponents {
         });
 
         // Highlight active heading on scroll
-        this.observeHeadings(headings);
+    this.observeHeadings(headings);
+    // Build mobile TOC from h2s only for concise chips
+    const h2s = Array.from(headings).filter(h => h.tagName.toLowerCase() === 'h2');
+    UIComponents.setupMobileTOC(h2s);
     }
 
     // Observe headings for active state
@@ -486,6 +490,102 @@ class UIComponents {
         }, options);
         
         headings.forEach(heading => observer.observe(heading));
+    }
+
+    // =============== Mobile TOC (phones) ===============
+    static setupMobileTOC(h2Headings) {
+        const mobileToc = document.getElementById('mobile-toc');
+        const list = document.getElementById('mobile-toc-list');
+        const thumb = document.querySelector('.mobile-toc-thumb');
+        const track = document.querySelector('.mobile-toc-track');
+
+        // Hide on desktop/tablet or when no headings
+        const isPhone = window.innerWidth < 768;
+        if (!mobileToc) return;
+        if (!isPhone || h2Headings.length === 0) {
+            mobileToc.classList.add('hidden');
+            return;
+        }
+        mobileToc.classList.remove('hidden');
+
+        // Build chips
+        list.innerHTML = '';
+        const items = h2Headings.map((h, idx) => {
+            const a = document.createElement('button');
+            a.type = 'button';
+            a.className = 'mobile-toc-chip';
+            a.textContent = h.textContent.trim();
+            a.dataset.target = h.id;
+            a.addEventListener('click', () => {
+                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            list.appendChild(a);
+            return { el: a, heading: h, idx };
+        });
+
+        // Sync active chip and thumb with scroll
+        const sync = () => {
+            if (!track || !thumb) return;
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+            const trackRect = track.getBoundingClientRect();
+            const minX = 4; const maxX = trackRect.width - 4 - 14; // paddings and thumb width
+            const x = minX + progress * (maxX - minX);
+            thumb.style.transform = `translateX(${x}px)`;
+
+            // Find nearest heading in view and set active
+            let activeIdx = 0;
+            for (let i = 0; i < items.length; i++) {
+                const rect = items[i].heading.getBoundingClientRect();
+                if (rect.top <= 120) activeIdx = i; else break;
+            }
+            items.forEach((it, i) => it.el.classList.toggle('active', i === activeIdx));
+            // Auto-scroll chips list to keep active centered
+            const activeEl = items[activeIdx]?.el;
+            if (activeEl) {
+                const listRect = list.getBoundingClientRect();
+                const elRect = activeEl.getBoundingClientRect();
+                const target = (elRect.left + elRect.right) / 2 - (listRect.left + listRect.right) / 2;
+                list.scrollBy({ left: target, behavior: 'smooth' });
+            }
+        };
+        sync();
+
+        // Throttled scroll listener
+        let ticking = false;
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => { sync(); ticking = false; });
+                ticking = true;
+            }
+        };
+        window.removeEventListener('scroll', UIComponents._mobileTocScroll);
+        UIComponents._mobileTocScroll = onScroll;
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Drag to scrub
+        let dragging = false;
+        const onPointerDown = (e) => {
+            dragging = true;
+            thumb.setPointerCapture?.(e.pointerId);
+            e.preventDefault();
+        };
+        const onPointerMove = (e) => {
+            if (!dragging) return;
+            const tr = track.getBoundingClientRect();
+            const px = Math.min(tr.right - 4 - 14, Math.max(tr.left + 4, e.clientX)) - (tr.left + 4);
+            const ratio = Math.min(1, Math.max(0, px / (tr.width - 8 - 14)));
+            const y = ratio * (document.body.scrollHeight - window.innerHeight);
+            window.scrollTo({ top: y, behavior: 'auto' });
+        };
+        const onPointerUp = (e) => {
+            dragging = false;
+            try { thumb.releasePointerCapture?.(e.pointerId); } catch (_) {}
+        };
+        thumb?.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        window.addEventListener('pointerup', onPointerUp, { passive: true });
     }
 
     // Show loading state
