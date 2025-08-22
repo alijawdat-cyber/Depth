@@ -43,23 +43,6 @@ class UIComponents {
         const breadcrumbs = document.getElementById('breadcrumbs');
         if (!breadcrumbs) return;
 
-        // اجمع جميع المسارات الفعلية من شجرة السايدبار
-        const allPaths = [];
-        try {
-            sidebarData.forEach(section => {
-                (section.items || []).forEach(item => allPaths.push(item.path));
-            });
-        } catch (_) {}
-
-        // مساعد: إيجاد أول صفحة حقيقية تحت بادئة معيّنة
-        const resolveTarget = (prefix) => {
-            // 1) إن كان هناك صفحة مطابقة مباشرة في الصفحة/المحتوى
-            if (pageContent && pageContent[prefix]) return prefix;
-            // 2) اختر أول عنصر في السايدبار يبدأ بهذه البادئة
-            const found = allPaths.find(p => p.startsWith(prefix + '/'));
-            return found || null;
-        };
-
         // بناء DOM آمن لفتات الخبز
         breadcrumbs.innerHTML = '';
 
@@ -80,29 +63,39 @@ class UIComponents {
             breadcrumbs.appendChild(s);
         };
 
-        const parts = path.split('/').filter(Boolean);
-
         // الرئيسية
         addLink('الرئيسية', '#/');
 
-        // المسارات الوسطى: اربطها بأولى صفحة صحيحة تحتها
-        let prefix = '';
-        for (let i = 0; i < parts.length - 1; i++) {
-            prefix += '/' + parts[i];
-            const name = this.formatPathName(parts[i]);
-            const target = resolveTarget(prefix);
-            if (target) {
-                addLink(name, `#${target}`);
-            } else {
-                addLink(name, '#', true);
+        // ابحث عن العنصر المطابق للمسار داخل السايدبار
+        let foundSection = null;
+        let foundItem = null;
+        try {
+            for (const section of sidebarData) {
+                const item = (section.items || []).find(it => it.path === path);
+                if (item) {
+                    foundSection = section;
+                    foundItem = item;
+                    break;
+                }
             }
+        } catch (_) {}
+
+        if (foundSection && foundItem) {
+            // أضف عنوان القسم كرابط لأول عنصر ضمن نفس القسم
+            const firstItem = (foundSection.items && foundSection.items[0]) ? foundSection.items[0] : null;
+            if (firstItem) {
+                addLink(foundSection.title, `#${firstItem.path}`);
+            } else {
+                addLink(foundSection.title, '#', true);
+            }
+            // أضف اسم الصفحة الحالية كنص ثابت
+            addSpan(foundItem.name);
+            return;
         }
 
-        // الصفحة الحالية (نص فقط)
-        if (parts.length > 0) {
-            const currentName = this.formatPathName(parts[parts.length - 1]);
-            addSpan(currentName);
-        }
+        // في حال لم نجد العنصر في السايدبار، اعرض اسم أخير جزء من المسار بشكل مبسّط
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length) addSpan(this.formatPathName(parts[parts.length - 1]));
     }
 
     // Format path name for display
