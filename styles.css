@@ -342,7 +342,7 @@ body {
 
 .doc-content {
     background: var(--bg);
-    padding: 30px;
+    padding: clamp(16px, 4vw, 30px);
     border-radius: var(--radius);
     border: 1px solid var(--border);
 }
@@ -549,6 +549,14 @@ body {
         grid-template-columns: 1fr;
     }
     
+    .content-wrapper.sidebar-closed {
+        margin-right: 0;
+    }
+    
+    .main-content.sidebar-closed {
+        margin-right: 0;
+    }
+    
     .floating-toc {
         display: none;
     }
@@ -599,14 +607,18 @@ body {
     }
     
     .sidebar {
-        width: 80%;
-        max-width: 300px;
+        width: 280px;
         transform: translateX(100%);
     }
     
     .sidebar.active {
         transform: translateX(0);
         box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar.active + .main-content {
+        margin-right: 0;
+        pointer-events: none;
     }
     
     .sidebar-close {
@@ -637,11 +649,29 @@ body {
     
     .content-wrapper {
         grid-template-columns: 1fr;
-        padding: 20px 16px;
+        padding: 20px;
     }
     
     .doc-content {
         padding: 20px;
+    }
+    
+    .doc-content h1 { font-size: clamp(24px, 6vw, 32px); }
+    .doc-content h2 { font-size: clamp(20px, 5vw, 24px); }
+    .doc-content pre { font-size: 12px; overflow-x: auto; }
+    .doc-content table { display: block; overflow-x: auto; }
+    
+    /* تحسين السايد بار على الموبايل */
+    .sidebar-nav {
+        padding: 16px;
+    }
+    .nav-section-title {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    .nav-item {
+        font-size: 12px;
+        padding: 6px 10px;
     }
     
     .floating-toc {

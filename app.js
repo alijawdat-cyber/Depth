@@ -25,6 +25,7 @@ class DepthDocs {
         this.isDesktop = width >= 1024;
         this.isTablet = width >= 768 && width < 1024;
         this.isMobile = width < 768;
+        this.updateContentPadding();
     }
 
     // Initialize sidebar state based on screen size
@@ -131,6 +132,7 @@ class DepthDocs {
             } else {
                 // Mobile/Tablet: show overlay
                 overlay.classList.add('active');
+                sidebar.style.width = '280px';
                 document.body.style.overflow = 'hidden';
             }
         } else {
@@ -151,6 +153,7 @@ class DepthDocs {
         this.sidebarOpen = false;
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
+        sidebar.style.width = '';
         document.body.style.overflow = '';
         
         if (this.isDesktop || this.isLargeDesktop) {
@@ -160,6 +163,18 @@ class DepthDocs {
         }
         
         this.updateBurgerButton();
+    }
+
+    // Update content padding based on screen size
+    updateContentPadding() {
+        const contentWrapper = document.querySelector('.content-wrapper');
+        if (contentWrapper) {
+            if (this.isMobile) {
+                contentWrapper.style.padding = '20px';
+            } else {
+                contentWrapper.style.padding = '40px 20px';
+            }
+        }
     }
 
     // Update burger button state
