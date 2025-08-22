@@ -315,8 +315,8 @@ body {
     }
 /* Navigation Items */
 .nav-section {
-    margin-bottom: 16px;
-    padding: 12px 12px 8px 12px;
+    margin-bottom: 14px;
+    padding: 10px 12px 6px 12px;
 }
 
 .nav-section + .nav-section {
@@ -368,8 +368,8 @@ body {
 }
 
 .nav-section-items {
-    margin-top: 6px;
-    padding-right: 12px;
+    margin-top: 4px;
+    padding-right: 10px;
     border-right: 1px dashed var(--border); /* RTL nesting guide */
 }
 
@@ -380,8 +380,8 @@ body {
 .nav-item {
     position: relative;
     display: block;
-    padding: 8px 12px;
-    padding-right: 22px; /* room for bullet */
+    padding: 7px 12px;
+    padding-right: 24px; /* room for bullet */
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 14px;
@@ -761,21 +761,27 @@ body {
         font-size: 16px;
     }
     
+    /* Compact section title on mobile */
     .nav-section-title {
         font-size: 13px;
         padding: 6px 10px;
-    white-space: nowrap;
+        gap: 6px;
+        white-space: nowrap;
     }
     
+    /* Fix bullet overlap and tighten item spacing */
     .nav-item {
         font-size: 12px;
-    padding: 6px 10px;
-    white-space: nowrap;
+        padding: 6px 10px;
+        padding-right: 24px; /* space for the bullet */
+        white-space: nowrap;
     }
     
-    .sidebar-nav {
-        padding: 16px;
-    }
+    /* More compact sidebar container */
+    .sidebar-nav { padding: 12px; }
+    .nav-section { margin-bottom: 10px; padding: 8px 10px 6px 10px; }
+    .nav-section + .nav-section { padding-top: 8px; }
+    .nav-section-items { margin-top: 4px; padding-right: 10px; }
     
     .main-content {
         margin-right: 0;
