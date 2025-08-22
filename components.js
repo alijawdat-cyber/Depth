@@ -495,115 +495,96 @@ class UIComponents {
 
     // =============== Mobile TOC (phones) ===============
     static setupMobileTOC(h2Headings) {
-        const mobileToc = document.getElementById('mobile-toc');
-        const list = document.getElementById('mobile-toc-list');
-        const markersWrap = document.getElementById('mobile-toc-markers');
-        const thumb = document.querySelector('.mobile-v-thumb');
-        const track = document.querySelector('.mobile-v-track');
-
         const isPhone = window.innerWidth < 768;
-        if (!mobileToc) return;
+        const chip = document.getElementById('mobile-heading-chip');
+        const mobileToc = document.getElementById('mobile-toc');
+        if (!chip) return;
+
+        // Hide legacy rail/panel
+        if (mobileToc) mobileToc.classList.add('hidden');
+
         if (!isPhone || h2Headings.length === 0) {
-            mobileToc.classList.add('hidden');
+            chip.classList.remove('is-visible');
+            chip.style.display = 'none';
             return;
         }
-        mobileToc.classList.remove('hidden');
+        chip.style.display = 'block';
 
-        // Build vertical list in panel
-        list.innerHTML = '';
-        const items = h2Headings.map((h, idx) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'mobile-v-item';
-            btn.textContent = h.textContent.trim();
-            btn.addEventListener('click', () => h.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-            list.appendChild(btn);
-            return { el: btn, heading: h, idx };
-        });
-
-        // Build markers on the rail (all H2)
-        markersWrap.innerHTML = '';
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const markerAt = (heading) => {
-            const rect = heading.getBoundingClientRect();
-            const yAbs = window.scrollY + rect.top; // document Y for heading top
-            const ratio = docHeight > 0 ? Math.min(1, Math.max(0, yAbs / (document.body.scrollHeight - window.innerHeight))) : 0;
-            return ratio;
-        };
-        const markers = items.map((it) => {
-            const m = document.createElement('div');
-            m.className = 'mobile-v-marker';
-            markersWrap.appendChild(m);
-            return { el: m, item: it };
-        });
-
-        const positionMarkers = () => {
-            const railRect = track.getBoundingClientRect();
-            const minY = railRect.top;
-            const maxY = railRect.bottom;
-            markers.forEach(({ el, item }) => {
-                const r = markerAt(item.heading);
-                const y = minY + r * (maxY - minY);
-                el.style.top = `${y - railRect.top}px`; // relative to rail
-            });
-        };
-
-        // Sync active state and thumb with scroll
-        const sync = () => {
-            const scrollTop = window.scrollY;
-            const docH = document.body.scrollHeight - window.innerHeight;
-            const progress = docH > 0 ? Math.min(1, Math.max(0, scrollTop / docH)) : 0;
-            const tr = track.getBoundingClientRect();
-            const y = progress * (tr.height - 16); // 16 = thumb size
-            thumb.style.transform = `translateY(${y}px)`;
-
-            // Determine active heading in viewport
-            let activeIdx = 0;
-            for (let i = 0; i < items.length; i++) {
-                const rect = items[i].heading.getBoundingClientRect();
-                if (rect.top <= 100) activeIdx = i; else break;
+        // Helpers
+        const currentIndex = () => {
+            let idx = 0;
+            for (let i = 0; i < h2Headings.length; i++) {
+                const r = h2Headings[i].getBoundingClientRect();
+                if (r.top <= window.innerHeight * 0.25) idx = i; else break;
             }
-            items.forEach((it, i) => it.el.classList.toggle('active', i === activeIdx));
-            markers.forEach(({ el }, i) => el.classList.toggle('active', i === activeIdx));
+            return idx;
         };
 
-        positionMarkers();
-        sync();
+        const setChip = (idx) => {
+            chip.textContent = (h2Headings[idx].textContent || '').trim();
+        };
 
-        // Update on scroll/resize
+        // Show chip while scrolling, hide after idle
+        let hideTimer = null;
+        const showChip = () => {
+            chip.classList.add('is-visible');
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => chip.classList.remove('is-visible'), 900);
+        };
+
+        // Initial state
+        setChip(currentIndex());
+
+        // Scroll sync
         let ticking = false;
         const onScroll = () => {
             if (!ticking) {
-                window.requestAnimationFrame(() => { sync(); ticking = false; });
+                window.requestAnimationFrame(() => {
+                    setChip(currentIndex());
+                    showChip();
+                    ticking = false;
+                });
                 ticking = true;
             }
         };
-        const onResize = () => {
-            positionMarkers();
-            sync();
-        };
-        window.removeEventListener('scroll', UIComponents._mobileTocScroll);
-        UIComponents._mobileTocScroll = onScroll;
+        window.removeEventListener('scroll', UIComponents._mobileChipScroll);
+        UIComponents._mobileChipScroll = onScroll;
         window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onResize);
 
-        // Drag to scrub vertically
+        // Tap/drag to scrub: vertical drag moves page scroll proportionally
         let dragging = false;
-        const onPointerDown = (e) => {
-            dragging = true; thumb.setPointerCapture?.(e.pointerId); e.preventDefault();
+        let startY = 0;
+        let startScroll = 0;
+        const onDown = (e) => {
+            dragging = true;
+            startY = (e.touches ? e.touches[0].clientY : e.clientY);
+            startScroll = window.scrollY;
+            chip.classList.add('is-visible');
+            e.preventDefault();
         };
-        const onPointerMove = (e) => {
+        const onMove = (e) => {
             if (!dragging) return;
-            const tr = track.getBoundingClientRect();
-            const py = Math.min(tr.bottom - 8, Math.max(tr.top + 8, e.clientY)) - (tr.top + 8);
-            const ratio = Math.min(1, Math.max(0, py / (tr.height - 16)));
-            const y = ratio * (document.body.scrollHeight - window.innerHeight);
-            window.scrollTo({ top: y, behavior: 'auto' });
+            const y = (e.touches ? e.touches[0].clientY : e.clientY);
+            const dy = y - startY;
+            // Scroll a bit faster than finger
+            window.scrollTo({ top: startScroll + dy * 2, behavior: 'auto' });
         };
-        const onPointerUp = (e) => { dragging = false; try { thumb.releasePointerCapture?.(e.pointerId); } catch (_) {} };
-        thumb?.addEventListener('pointerdown', onPointerDown);
-        window.addEventListener('pointermove', onPointerMove, { passive: true });
-        window.addEventListener('pointerup', onPointerUp, { passive: true });
+        const onUp = () => {
+            dragging = false;
+            showChip();
+        };
+        chip.addEventListener('touchstart', onDown, { passive: false });
+        chip.addEventListener('mousedown', onDown);
+        window.addEventListener('touchmove', onMove, { passive: true });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchend', onUp, { passive: true });
+        window.addEventListener('mouseup', onUp);
+
+        // Click navigates to the current heading (center it)
+        chip.onclick = () => {
+            const idx = currentIndex();
+            h2Headings[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
     }
 
     // Show loading state

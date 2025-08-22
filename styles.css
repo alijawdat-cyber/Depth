@@ -801,19 +801,14 @@ body {
         display: none;
     }
 
-    /* Mobile TOC: vertical left rail */
-    .mobile-toc { display: block; position: fixed; top: calc(var(--header-height) + 10px); bottom: 12px; left: 8px; z-index: 1200; display: grid; grid-template-columns: 28px 1fr; gap: 8px; pointer-events: none; }
+    /* Mobile TOC: compact left chip (LTR side) */
+    .mobile-toc { display: none; }
     .mobile-toc.hidden { display: none !important; }
-    .mobile-v-rail { position: relative; width: 28px; height: 100%; pointer-events: auto; }
-    .mobile-v-track { position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--border); border-radius: 2px; }
-    .mobile-v-thumb { position: absolute; left: 6px; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.25); touch-action: none; transform: translateY(0); }
-    .mobile-v-markers { position: absolute; left: 9px; top: 0; bottom: 0; width: 8px; pointer-events: none; }
-    .mobile-v-marker { position: absolute; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--border); transform: translateY(-50%); }
-    .mobile-v-marker.active { background: var(--primary); }
-    .mobile-toc-panel { pointer-events: auto; align-self: start; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; max-height: calc(100vh - var(--header-height) - 24px); overflow: auto; padding: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-    .mobile-v-list { display: flex; flex-direction: column; gap: 4px; min-width: 180px; max-width: 70vw; }
-    .mobile-v-item { text-align: right; padding: 8px 10px; font-size: 13px; color: var(--text-secondary); border-radius: 8px; border: 1px solid var(--border); background: var(--bg-secondary); }
-    .mobile-v-item.active { color: #fff; background: var(--primary); border-color: transparent; }
+    
+    /* Floating chip shows current H2 only; appears while scrolling */
+    #mobile-heading-chip { position: fixed; left: 8px; top: 50%; transform: translateY(-50%); z-index: 1300; pointer-events: auto; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; font-size: 12px; line-height: 1.2; max-width: 70vw; text-align: left; box-shadow: 0 8px 22px rgba(0,0,0,.16); opacity: 0; transition: opacity .25s ease, transform .15s ease; }
+    #mobile-heading-chip.is-visible { opacity: 1; }
+    #mobile-heading-chip:active { transform: translateY(-50%) scale(0.98); }
 }
 
 /* Micro-mobile (<= 360px) */
