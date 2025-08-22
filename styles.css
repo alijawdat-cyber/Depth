@@ -818,7 +818,7 @@ body.is-home .doc-footer { display: none; }
     
     .content-wrapper { grid-template-columns: 1fr; padding: 16px; }
     
-    .doc-content { padding: 16px; padding-bottom: 84px; }
+    .doc-content { padding: 16px; }
     
     .doc-content h1 { font-size: clamp(24px, 6vw, 32px); }
     .doc-content h2 { font-size: clamp(20px, 5vw, 24px); }
