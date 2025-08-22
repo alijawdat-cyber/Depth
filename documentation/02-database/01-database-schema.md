@@ -1,5 +1,7 @@
 # 📊 مخطط قاعدة البيانات والنماذج
 
+> Note (v2.0 alignment): This file contains illustrative schema examples. The canonical enums, pricing equations, and currency baseline are defined in `documentation/99-reference/02-enums-standard.md` and `documentation/01-requirements/00-requirements-v2.0.md`. Some enums/currency samples here may be legacy; prefer the SSOT when implementing. A follow-up pass will align examples fully.
+
 ## نظرة عامة
 تصف هذه الوثيقة مخطط قاعدة البيانات الكامل لمنصة Depth باستخدام Firestore.
 

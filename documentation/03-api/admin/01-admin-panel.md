@@ -1,3 +1,9 @@
+# ⚙️ لوحة الأدمِن - Depth API v2.0
+
+> مصطلحات هذا المستند:
+> - واجهة برمجة التطبيقات: Application Programming Interface — API
+> - التحكم بالوصول المعتمد على الأدوار: Role-Based Access Control — RBAC
+> (انظر أيضًا: `99-reference/06-terminology-glossary-ar.md`)
 # ⚙️ لوحة الأدمن - Depth API v2.0
 
 ---

@@ -1,5 +1,13 @@
 # ⚙️ الجوانب التقنية والتكامل - Depth API v2.0
 
+> مصطلحات هذا المستند:
+> - واجهة برمجة التطبيقات: Application Programming Interface — API
+> - شبكة توصيل المحتوى: Content Delivery Network — CDN
+> - التكامل/التسليم المستمران: Continuous Integration / Continuous Delivery — CI/CD
+> (انظر أيضًا: `99-reference/06-terminology-glossary-ar.md`)
+
+> ملاحظة إصدار: النسخة الحالية في التطبيق (`depth-site/package.json`) تستخدم Next.js 15 و React 19، وتوجد SWR لإدارة الجلب؛ لا توجد Zustand/React Query حالياً.
+
 ---
 
 ## المحتويات

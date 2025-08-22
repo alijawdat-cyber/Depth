@@ -1,5 +1,11 @@
 # API Conventions (Draft)
 
+> مصطلحات هذا المستند:
+> - واجهة برمجة التطبيقات: Application Programming Interface — API
+> - رمز ويب بصيغة JSON: JSON Web Token — JWT
+> - التحكم بالوصول المعتمد على الأدوار: Role-Based Access Control — RBAC
+> (انظر أيضًا: `99-reference/06-terminology-glossary-ar.md`)
+
 Status: Draft — aligns v2.0
 
 ## Versioning & Base
