@@ -33,6 +33,7 @@ class DepthDocs {
         // Toggle mobile TOC visibility per breakpoint
         const mt = document.getElementById('mobile-toc');
         if (mt) {
+            // only show on phones; keep hidden on tablet/desktop so it doesn't affect layout
             if (this.isMobile) mt.classList.remove('hidden'); else mt.classList.add('hidden');
         }
     }
