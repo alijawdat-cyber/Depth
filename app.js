@@ -3,15 +3,55 @@ class DepthDocs {
     constructor() {
         this.currentPath = '/';
         this.sidebarOpen = false;
+        this.isDesktop = false;
+        this.isLargeDesktop = false;
         this.init();
     }
 
     init() {
+        this.checkScreenSize();
+        this.initializeSidebarState();
         this.setupEventListeners();
         this.renderSidebar();
         this.handleRoute();
         this.setupScrollEffects();
         this.loadTheme();
+    }
+
+    // Check current screen size
+    checkScreenSize() {
+        const width = window.innerWidth;
+        this.isLargeDesktop = width >= 1400;
+        this.isDesktop = width >= 1024;
+        this.isTablet = width >= 768 && width < 1024;
+        this.isMobile = width < 768;
+    }
+
+    // Initialize sidebar state based on screen size
+    initializeSidebarState() {
+        const sidebar = document.getElementById('sidebar');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const mainContent = document.querySelector('.main-content');
+        
+        if (this.isLargeDesktop) {
+            // Large desktop: sidebar open by default
+            this.sidebarOpen = true;
+            sidebar.classList.add('active');
+            if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
+            if (mainContent) mainContent.classList.remove('sidebar-closed');
+        } else if (this.isDesktop) {
+            // Desktop: sidebar closed by default
+            this.sidebarOpen = false;
+            sidebar.classList.remove('active');
+            if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
+            if (mainContent) mainContent.classList.add('sidebar-closed');
+        } else {
+            // Tablet/Mobile: sidebar hidden
+            this.sidebarOpen = false;
+            sidebar.classList.remove('active');
+        }
+        
+        this.updateBurgerButton();
     }
 
     // Setup all event listeners
@@ -48,62 +88,87 @@ class DepthDocs {
 
         // Close sidebar on escape
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.sidebarOpen) {
+            if (e.key === 'Escape' && this.sidebarOpen && !this.isDesktop) {
                 this.closeSidebar();
             }
         });
 
         // Handle window resize
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 768 && this.sidebarOpen) {
-                this.closeSidebar();
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const oldDesktop = this.isDesktop;
+                const oldLargeDesktop = this.isLargeDesktop;
+                
+                this.checkScreenSize();
+                
+                // Re-initialize if screen category changed
+                if (oldDesktop !== this.isDesktop || oldLargeDesktop !== this.isLargeDesktop) {
+                    this.initializeSidebarState();
+                }
+            }, 250);
         });
     }
 
-    // Toggle sidebar
+    // Toggle sidebar with proper handling for all screen sizes
     toggleSidebar() {
-        this.sidebarOpen = !this.sidebarOpen;
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        const burger = document.getElementById('burger-btn');
         const contentWrapper = document.querySelector('.content-wrapper');
-        const isDesktop = window.innerWidth >= 1024;
-
+        const mainContent = document.querySelector('.main-content');
+        
+        this.sidebarOpen = !this.sidebarOpen;
+        
         if (this.sidebarOpen) {
+            // Opening sidebar
             sidebar.classList.add('active');
-            burger.classList.add('active');
             
-            if (isDesktop) {
-                // للشاشات الكبيرة: لا حاجة للـ overlay أو حجب التمرير
-                contentWrapper.classList.remove('sidebar-closed');
+            if (this.isDesktop || this.isLargeDesktop) {
+                // Desktop: push content
+                if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
+                if (mainContent) mainContent.classList.remove('sidebar-closed');
             } else {
-                // للموبايل: استخدام overlay وحجب التمرير
+                // Mobile/Tablet: show overlay
                 overlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
         } else {
+            // Closing sidebar
             this.closeSidebar();
         }
+        
+        this.updateBurgerButton();
     }
 
     // Close sidebar
     closeSidebar() {
-        this.sidebarOpen = false;
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        const burger = document.getElementById('burger-btn');
         const contentWrapper = document.querySelector('.content-wrapper');
-        const isDesktop = window.innerWidth >= 1024;
+        const mainContent = document.querySelector('.main-content');
         
+        this.sidebarOpen = false;
         sidebar.classList.remove('active');
-        burger.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
         
-        if (isDesktop) {
-            contentWrapper.classList.add('sidebar-closed');
+        if (this.isDesktop || this.isLargeDesktop) {
+            // Desktop: add sidebar-closed class to stop pushing content
+            if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
+            if (mainContent) mainContent.classList.add('sidebar-closed');
+        }
+        
+        this.updateBurgerButton();
+    }
+
+    // Update burger button state
+    updateBurgerButton() {
+        const burger = document.getElementById('burger-btn');
+        if (this.sidebarOpen) {
+            burger.classList.add('active');
         } else {
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
+            burger.classList.remove('active');
         }
     }
 
@@ -131,8 +196,8 @@ class DepthDocs {
         // Load content
         this.loadContent(hash);
         
-        // Close sidebar on mobile after navigation
-        if (window.innerWidth <= 768) {
+        // Close sidebar on mobile/tablet after navigation
+        if (this.isMobile || this.isTablet) {
             this.closeSidebar();
         }
     }
@@ -143,6 +208,17 @@ class DepthDocs {
             item.classList.remove('active');
             if (item.getAttribute('href') === `#${path}`) {
                 item.classList.add('active');
+                
+                // Expand parent section if collapsed
+                const section = item.closest('.nav-section');
+                if (section) {
+                    const title = section.querySelector('.nav-section-title');
+                    const items = section.querySelector('.nav-section-items');
+                    if (title && items && items.classList.contains('collapsed')) {
+                        title.classList.remove('collapsed');
+                        items.classList.remove('collapsed');
+                    }
+                }
             }
         });
     }
@@ -152,7 +228,7 @@ class DepthDocs {
         try {
             UIComponents.showLoading();
             
-            // تحقق من وجود المحتوى في pageContent أولاً
+            // Check if content exists in pageContent first
             if (pageContent[path]) {
                 const content = pageContent[path];
                 const docContent = document.getElementById('doc-content');
@@ -162,7 +238,7 @@ class DepthDocs {
                 return;
             }
             
-            // إذا لم يكن موجوداً، حاول جلب ملف .md
+            // If not found, try to load .md file
             const filePath = path.substring(1);
             const mdPath = `${filePath}.md`;
             
@@ -238,7 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Handle initial route
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.app.handleRoute();
+        if (window.app) {
+            window.app.handleRoute();
+        }
     });
 } else {
     setTimeout(() => {
