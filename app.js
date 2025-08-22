@@ -67,6 +67,16 @@ class DepthDocs {
             this.toggleSidebar();
         });
 
+        // Logo -> navigate home reliably
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.addEventListener('click', (e) => {
+                // If it's an <a>, let hash update; else force it
+                e.preventDefault();
+                this.navigate('/');
+            });
+        }
+
         // Sidebar close button
         document.getElementById('sidebar-close').addEventListener('click', () => {
             this.closeSidebar();

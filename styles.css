@@ -138,6 +138,8 @@ body {
     width: auto;
 }
 
+.logo { cursor: pointer; }
+
 /* Breadcrumbs */
 .breadcrumbs {
     flex: 1;
@@ -658,11 +660,7 @@ body {
         transform: translateX(100%);
     }
     
-    .content-wrapper {
-        /* Reserve modest space on the right for floating area */
-        padding-right: calc(12px + 220px);
-        grid-template-columns: 1fr;
-    }
+    .content-wrapper { grid-template-columns: 1fr 260px; padding: 24px 14px; }
     
     .content-wrapper.sidebar-closed {
         margin-right: 0;
@@ -672,9 +670,7 @@ body {
         margin-right: 0;
     }
     
-    .floating-toc {
-        display: none;
-    }
+    .floating-toc { display: block; }
 }
 
 /* Tablet (768px - 1023px) */
@@ -800,7 +796,13 @@ body {
     .mobile-v-track { position: absolute; left: 10px; top: 0; bottom: 0; width: 3px; border-radius: 3px; background: linear-gradient(180deg, color-mix(in oklab, var(--border) 90%, transparent), color-mix(in oklab, var(--border) 70%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 40%, transparent); }
     .mobile-v-thumb { position: absolute; left: 3px; width: 18px; height: 18px; border-radius: 9px; background: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,.25); transform: translateY(0); touch-action: none; pointer-events: auto; }
     /* Hide unused elements from legacy panel */
-    .mobile-v-markers, .mobile-toc-panel { display: none !important; }
+    /* Hide markers by default; reveal only while dragging for minimal visual noise */
+    .mobile-v-markers { display: none; }
+    .mobile-toc.dragging .mobile-v-markers { display: block; }
+    .mobile-v-markers { position: absolute; left: 6px; top: 0; bottom: 0; width: 16px; pointer-events: none; }
+    .mobile-v-marker { position: absolute; left: 0; width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, var(--text) 50%, transparent); opacity: .45; transform: translate(0, -50%); box-shadow: 0 0 0 1px color-mix(in oklab, var(--border) 60%, transparent); }
+    .mobile-v-marker.is-current { width: 10px; height: 10px; opacity: .65; background: color-mix(in oklab, var(--primary) 80%, transparent); box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 50%, transparent); }
+    .mobile-toc-panel { display: none !important; }
 
     /* Floating chip shows current H2 only; follows the thumb; appears while scrolling */
     #mobile-heading-chip { position: fixed; left: 36px; top: 50%; transform: translateY(-50%); z-index: 1300; pointer-events: auto; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; font-size: 12px; line-height: 1.2; max-width: 72vw; text-align: left; box-shadow: 0 8px 22px rgba(0,0,0,.16); opacity: 0; transition: opacity .25s ease, transform .12s ease; }

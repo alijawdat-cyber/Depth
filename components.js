@@ -500,6 +500,7 @@ class UIComponents {
     const mobileToc = document.getElementById('mobile-toc');
     const thumb = document.querySelector('.mobile-v-thumb');
     const track = document.querySelector('.mobile-v-track');
+    const markersHost = document.getElementById('mobile-toc-markers');
         if (!chip) return;
 
     // Show minimal rail on phones
@@ -512,7 +513,7 @@ class UIComponents {
         }
         chip.style.display = 'block';
 
-        // Helpers
+    // Helpers
         const currentIndex = () => {
             let idx = 0;
             for (let i = 0; i < h2Headings.length; i++) {
@@ -537,6 +538,34 @@ class UIComponents {
     // Initial state
     setChip(currentIndex());
 
+        // Build markers (one per H2)
+        const ensureMarkers = () => {
+            if (!markersHost) return;
+            markersHost.innerHTML = '';
+            for (let i = 0; i < h2Headings.length; i++) {
+                const m = document.createElement('div');
+                m.className = 'mobile-v-marker';
+                m.dataset.index = String(i);
+                markersHost.appendChild(m);
+            }
+        };
+
+        // Position markers according to heading positions
+        const positionMarkers = () => {
+            if (!markersHost || !track) return;
+            const tr = track.getBoundingClientRect();
+            const docH = Math.max(0, document.body.scrollHeight - window.innerHeight);
+            const range = tr.height - 18; // thumb travel range
+            const markers = markersHost.querySelectorAll('.mobile-v-marker');
+            h2Headings.forEach((h, i) => {
+                const yDoc = Math.max(0, Math.min(docH, h.offsetTop));
+                const ratio = docH ? (yDoc / docH) : 0;
+                const y = 9 + ratio * range; // center of thumb path
+                const el = markers[i];
+                if (el) el.style.top = `${y}px`;
+            });
+        };
+
         // Scroll sync
         let ticking = false;
         const syncVisual = () => {
@@ -552,6 +581,13 @@ class UIComponents {
                 const chipY = tr.top + y + 9; // center
                 chip.style.top = `${chipY}px`;
                 chip.style.transform = `translateY(-50%)`;
+            }
+            // Highlight current marker
+            if (markersHost) {
+                const idx = currentIndex();
+                markersHost.querySelectorAll('.mobile-v-marker').forEach((m, i) => {
+                    m.classList.toggle('is-current', i === idx);
+                });
             }
         };
 
@@ -570,11 +606,12 @@ class UIComponents {
         UIComponents._mobileChipScroll = onScroll;
         window.addEventListener('scroll', onScroll, { passive: true });
 
-        // Drag to scrub: works from chip, thumb, or track
+        // Drag to scrub: works from chip, thumb, or track; show markers only during drag
         let dragging = false;
         const onStart = (e) => {
             dragging = true;
             chip.classList.add('is-visible');
+            mobileToc?.classList.add('dragging');
             e.preventDefault();
             handle(e);
         };
@@ -590,7 +627,7 @@ class UIComponents {
             window.scrollTo({ top: target, behavior: 'auto' });
             syncVisual();
         };
-        const onEnd = () => { dragging = false; showChip(); };
+        const onEnd = () => { dragging = false; mobileToc?.classList.remove('dragging'); showChip(); };
         // Bind events
         chip.addEventListener('touchstart', onStart, { passive: false });
         chip.addEventListener('mousedown', onStart);
@@ -603,8 +640,20 @@ class UIComponents {
         window.addEventListener('touchend', onEnd, { passive: true });
         window.addEventListener('mouseup', onEnd);
 
-        // Sync visuals once at init
+        // Init markers and sync visuals
+        ensureMarkers();
+        positionMarkers();
         syncVisual();
+
+        // Reposition markers on resize/content changes
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                positionMarkers();
+                syncVisual();
+            }, 150);
+        });
 
         // Click navigates to the current heading (center it)
         chip.onclick = () => {
