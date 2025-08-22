@@ -418,8 +418,10 @@ body {
 .home-card h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
 .home-card p { font-size: 14px; color: var(--text-secondary); margin-bottom: 10px; }
 .home-links { display: flex; flex-wrap: wrap; gap: 8px; }
-.home-links a { font-size: 13px; color: var(--primary); text-decoration: none; border-bottom: 1px dashed transparent; }
-.home-links a:hover { border-bottom-color: var(--primary); }
+.home-links a { font-size: 13px; color: var(--primary); text-decoration: none; 
+    background-image: linear-gradient(90deg, color-mix(in oklab, var(--primary) 55%, transparent), color-mix(in oklab, var(--text-secondary) 50%, transparent));
+    background-size: 100% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .2s ease, background-image .2s ease; }
+.home-links a:hover, .home-links a:focus-visible { background-image: linear-gradient(90deg, var(--primary), var(--primary)); background-size: 100% 2px; }
 
 .home-steps { text-align: center; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: var(--bg); }
 .home-steps h2 { font-size: 18px; margin-bottom: 12px; color: var(--text); }
@@ -537,19 +539,25 @@ body {
 .doc-related-links a { display: inline-flex; padding: 6px 10px; border-radius: 999px; border: 1px dashed var(--border); text-decoration: none; color: var(--text); font-size: 13px; }
 .doc-related-links a:hover { border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); }
 
-.doc-content a {
-    color: var(--primary);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
-}
+.doc-content p a,
+.doc-content li a,
+.doc-content td a,
+.doc-content dd a,
+.doc-content blockquote a { color: var(--primary); text-decoration: none; 
+    background-image: linear-gradient(90deg, color-mix(in oklab, var(--primary) 55%, transparent), color-mix(in oklab, var(--text-secondary) 50%, transparent));
+    background-size: 100% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .2s ease, background-image .2s ease; border-bottom: 1px solid transparent; }
+.doc-content p a:hover, .doc-content p a:focus-visible,
+.doc-content li a:hover, .doc-content li a:focus-visible,
+.doc-content td a:hover, .doc-content td a:focus-visible,
+.doc-content dd a:hover, .doc-content dd a:focus-visible,
+.doc-content blockquote a:hover, .doc-content blockquote a:focus-visible { background-image: linear-gradient(90deg, var(--primary), var(--primary)); background-size: 100% 2px; }
 
-.doc-content a:hover {
-    border-bottom-color: var(--primary);
-}
-
-/* Ensure buttons inside doc-content keep intended colors */
-.doc-content .btn { border-bottom: 0; }
+/* Ensure cards/buttons inside doc-content keep intended colors and NO underline */
+.doc-content .btn,
+.doc-content .doc-nav-link,
+.doc-content .doc-related-links a { background-image: none !important; border-bottom: 0 !important; }
+.doc-content .doc-nav-link:hover,
+.doc-content .doc-related-links a:hover { background-image: none !important; }
 .doc-content .btn-ghost { color: var(--text); }
 .doc-content .btn-primary { color: #fff; }
 
