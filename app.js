@@ -68,6 +68,20 @@ class DepthDocs {
             this.closeSidebar();
         });
 
+        // Close sidebar when clicking or touching outside it (mobile & desktop)
+        const outsideClose = (event) => {
+            if (!this.sidebarOpen) return;
+            const sidebar = document.getElementById('sidebar');
+            const burger = document.getElementById('burger-btn');
+            const isInsideSidebar = sidebar.contains(event.target);
+            const isBurger = burger.contains(event.target);
+            if (!isInsideSidebar && !isBurger) {
+                this.closeSidebar();
+            }
+        };
+        document.addEventListener('click', outsideClose, { capture: true });
+        document.addEventListener('pointerdown', outsideClose, { capture: true });
+
         // Theme toggle
         document.getElementById('theme-toggle').addEventListener('click', () => {
             this.toggleTheme();
