@@ -1,3 +1,9 @@
+---
+status: deprecated
+ssot: ../../../../documentation/99-reference/05-roles-matrix.md
+note: Deprecated; please use the SSOT roles matrix in documentation/99-reference/05-roles-matrix.md
+---
+
 # مصفوفة موحّدة — Roles × Modules
 
 | Module / Action | Admin | Client | Creator | Employee |

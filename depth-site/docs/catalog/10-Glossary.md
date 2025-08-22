@@ -1,3 +1,9 @@
+---
+status: deprecated
+ssot: ../../../../documentation/99-reference/01-glossary.md
+note: This glossary is deprecated; use the SSOT in documentation/99-reference/01-glossary.md
+---
+
 ## قاموس مصطلحات (عربي/إنكليزي)
 
 - Category = فئة رئيسية.
