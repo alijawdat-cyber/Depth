@@ -910,22 +910,7 @@ window.DepthDocs.features = {
   },
   
   updateThemeIcon: function(theme, customBtn = null) {
-    // تحديث الأيقونة في الأعلى
-    const btn = document.getElementById('themeToggle');
-    if (btn) {
-      const sunIcon = btn.querySelector('.sun-icon');
-      const moonIcon = btn.querySelector('.moon-icon');
-      
-      if (theme === 'dark') {
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      } else {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-      }
-    }
-    
-    // تحديث الأيقونة في السايدبار
+    // تحديث الأيقونة في السايدبار فقط
     const sidebarBtn = customBtn || document.getElementById('sidebarThemeToggle');
     if (sidebarBtn) {
       const sunIcon = sidebarBtn.querySelector('.sun-icon');
@@ -978,142 +963,6 @@ window.DepthDocs.features = {
     window.DepthDocs.eventCleanupFunctions.push(() => {
       window.removeEventListener('scroll', scrollHandler);
       btn.removeEventListener('click', clickHandler);
-    });
-  },
-  
-  setupMobileMenu: function() {
-    const btn = document.getElementById('menuToggle');
-    if (!btn) {
-      // إعادة محاولة بعد قليل إذا لم يُعثر على العنصر
-      setTimeout(() => this.setupMobileMenu(), 100);
-      return;
-    }
-    
-    // تحديث موقع الأيقونة ديناميكياً
-    this.updateBurgerPosition();
-    
-    // التأكد من أن الزر مرئي وقابل للنقر
-    btn.style.pointerEvents = 'auto';
-    btn.style.visibility = 'visible';
-    btn.style.display = 'flex';
-    
-    // إزالة أي event listeners قديمة
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
-    
-    const toggleHandler = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const body = document.body;
-      const isOpen = body.classList.contains('sidebar-open');
-      
-      if (isOpen) {
-        body.classList.remove('sidebar-open');
-        console.log('Sidebar closed');
-      } else {
-        body.classList.add('sidebar-open');
-        console.log('Sidebar opened');
-      }
-      
-      // تحديث موقع الأيقونة بعد التبديل
-      setTimeout(() => {
-        this.updateBurgerPosition();
-      }, 100);
-    };
-    
-    // إضافة click وtouch handlers
-    newBtn.addEventListener('click', toggleHandler, { passive: false });
-    newBtn.addEventListener('touchend', toggleHandler, { passive: false });
-    
-    // إعداد إغلاق عند النقر في أي مكان
-    this.setupClickOutside();
-    
-    // إعداد إغلاق السايدبار عند النقر على رابط 
-    this.setupSidebarAutoClose();
-    
-    // إعداد مراقبة تغيير حجم الشاشة لتحديث موقع الأيقونة
-    window.addEventListener('resize', () => {
-      this.updateBurgerPosition();
-    });
-    
-    console.log('Mobile menu setup completed');
-  },
-
-  // وظيفة جديدة لتحديد موقع أيقونة البرجر
-  updateBurgerPosition: function() {
-    const btn = document.getElementById('menuToggle');
-    if (!btn) return;
-    
-    const isOpen = document.body.classList.contains('sidebar-open');
-    const sidebarWidth = 300; // عرض السايدبار
-    const isDesktop = window.innerWidth >= 768;
-    
-    if (isDesktop) {
-      // في الشاشات الكبيرة
-      if (isOpen) {
-        // السايدبار مفتوح - الأيقونة بجانب السايدبار
-        btn.style.right = (sidebarWidth + 20) + 'px';
-      } else {
-        // السايدبار مغلق - الأيقونة في الموقع الافتراضي للشاشات الكبيرة
-        btn.style.right = '320px'; // بجانب مكان السايدبار المغلق
-      }
-    } else {
-      // في الموبايل
-      if (isOpen) {
-        // السايدبار مفتوح - الأيقونة عند حافة السايدبار
-        btn.style.right = (sidebarWidth + 10) + 'px';
-      } else {
-        // السايدبار مغلق - الأيقونة في الزاوية
-        btn.style.right = '20px';
-      }
-    }
-  },
-
-  // وظيفة جديدة للإغلاق عند النقر خارج السايدبار
-  setupClickOutside: function() {
-    const outsideClickHandler = (e) => {
-      const sidebar = document.querySelector('.sidebar');
-      const btn = document.getElementById('menuToggle');
-      const isOpen = document.body.classList.contains('sidebar-open');
-      
-      if (isOpen && 
-          !e.target.closest('.sidebar') && 
-          !e.target.closest('#menuToggle')) {
-        
-        document.body.classList.remove('sidebar-open');
-        setTimeout(() => {
-          this.updateBurgerPosition();
-        }, 100);
-        console.log('Sidebar closed by outside click');
-      }
-    };
-    
-    document.addEventListener('click', outsideClickHandler);
-    
-    // حفظ دالة التنظيف
-    window.DepthDocs.eventCleanupFunctions.push(() => {
-      document.removeEventListener('click', outsideClickHandler);
-    });
-  },
-
-  // وظيفة جديدة لإغلاق السايدبار تلقائياً
-  setupSidebarAutoClose: function() {
-    // إغلاق عند النقر على رابط في السايدبار (موبايل)
-    const linkClickHandler = (e) => {
-      if (e.target.matches('.sidebar a') && window.innerWidth < 768) {
-        setTimeout(() => {
-          document.body.classList.remove('sidebar-open');
-          document.body.style.overflowX = 'auto';
-        }, 200);
-      }
-    };
-    
-    document.addEventListener('click', linkClickHandler);
-    
-    // حفظ دالة التنظيف
-    window.DepthDocs.eventCleanupFunctions.push(() => {
-      document.removeEventListener('click', linkClickHandler);
     });
   },
 
@@ -1228,10 +1077,6 @@ window.DepthDocs.init = {
       setTimeout(() => {
         window.DepthDocs.ui.hideLoading();
         this.showWelcomeMessage();
-        // إعادة إعداد mobile menu بعد إخفاء loading screen
-        setTimeout(() => {
-          window.DepthDocs.features.setupMobileMenu();
-        }, 100);
       }, 500);
     });
   },
@@ -1240,24 +1085,7 @@ window.DepthDocs.init = {
     // الميزات الأساسية
     window.DepthDocs.features.setupKeyboardShortcuts();
     window.DepthDocs.features.setupBackToTop();
-    window.DepthDocs.features.setupMobileMenu();
-    
-    // زر تبديل الثيم
-    const themeBtn = document.getElementById('themeToggle');
-    if (themeBtn) {
-      const clickHandler = () => {
-        window.DepthDocs.features.toggleTheme();
-      };
-      
-      themeBtn.addEventListener('click', clickHandler);
-      window.DepthDocs.features.updateThemeIcon(window.DepthDocs.theme);
-      
-      // حفظ دالة التنظيف
-      window.DepthDocs.eventCleanupFunctions.push(() => {
-        themeBtn.removeEventListener('click', clickHandler);
-      });
-    }
-    
+
     // زر إغلاق النافذة المنبثقة
     const modalClose = document.querySelector('.modal-close');
     if (modalClose) {
