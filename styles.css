@@ -859,8 +859,7 @@ body.is-home .doc-footer { display: none; }
     #mobile-heading-chip.is-visible { opacity: 1; }
     #mobile-heading-chip:active { transform: translateY(-50%) scale(0.98); }
 
-    /* Footer cards hidden on phones per requirement */
-    .doc-footer { display: none !important; }
+    /* Footer cards are visible on phones; large floating area remains removed */
 }
 
 /* Micro-mobile (<= 360px) */
