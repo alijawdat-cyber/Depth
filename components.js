@@ -191,40 +191,89 @@ class UIComponents {
     static generateTOC(content) {
         const toc = document.getElementById('toc-list');
         const headings = content.querySelectorAll('h2, h3');
-        
+
         if (headings.length === 0) {
             document.getElementById('floating-toc').style.display = 'none';
             return;
         }
-        
+
         document.getElementById('floating-toc').style.display = 'block';
         toc.innerHTML = '';
-        
-    headings.forEach((heading, index) => {
+
+        // Build grouped structure: H2 groups with nested H3 items
+        let currentGroup = null; // { group: HTMLElement, sublist: HTMLElement }
+
+        headings.forEach((heading, index) => {
             const id = `heading-${index}`;
             heading.id = id;
-            
-            const item = document.createElement('div');
-            item.className = `toc-item ${heading.tagName.toLowerCase()}`;
-            
-            const link = document.createElement('a');
-            link.href = `#${id}`;
-            link.textContent = heading.textContent;
-            link.onclick = (e) => {
-                e.preventDefault();
-                heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Update active state
-                toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
-                link.classList.add('active');
-            };
-            
-            item.appendChild(link);
-            toc.appendChild(item);
+
+            if (heading.tagName.toLowerCase() === 'h2') {
+                // New group
+                const group = document.createElement('div');
+                group.className = 'toc-group';
+
+                const headerItem = document.createElement('div');
+                headerItem.className = 'toc-item h2';
+
+                const caret = document.createElement('button');
+                caret.className = 'toc-caret';
+                caret.type = 'button';
+                caret.setAttribute('aria-expanded', 'true');
+                caret.setAttribute('aria-label', 'طي/فتح');
+
+                const link = document.createElement('a');
+                link.href = `#${id}`;
+                link.textContent = heading.textContent;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                    link.classList.add('active');
+                };
+
+                headerItem.appendChild(caret);
+                headerItem.appendChild(link);
+                group.appendChild(headerItem);
+
+                const sublist = document.createElement('div');
+                sublist.className = 'toc-sublist';
+                group.appendChild(sublist);
+
+                // Toggle collapse for this group
+                caret.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isCollapsed = group.classList.toggle('collapsed');
+                    caret.setAttribute('aria-expanded', String(!isCollapsed));
+                });
+
+                toc.appendChild(group);
+                currentGroup = { group, sublist };
+            } else {
+                // H3 item
+                const item = document.createElement('div');
+                item.className = 'toc-item h3';
+
+                const link = document.createElement('a');
+                link.href = `#${id}`;
+                link.textContent = heading.textContent;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                    link.classList.add('active');
+                };
+
+                item.appendChild(link);
+                if (currentGroup && currentGroup.sublist) {
+                    currentGroup.sublist.appendChild(item);
+                } else {
+                    toc.appendChild(item); // fallback in case H3 appears before any H2
+                }
+            }
         });
-        
+
         // Highlight active heading on scroll
-    this.observeHeadings(headings);
+        this.observeHeadings(headings);
     }
 
     // Observe headings for active state
@@ -254,6 +303,13 @@ class UIComponents {
                             link.classList.add('active');
                             // اجعل عنصر TOC الحالي في المنتصف أثناء التمرير
                             scrollIntoViewCentered(link);
+                            // Ensure its group is expanded if collapsed
+                            const group = link.closest('.toc-group');
+                            if (group && group.classList.contains('collapsed')) {
+                                group.classList.remove('collapsed');
+                                const caret = group.querySelector('.toc-caret');
+                                if (caret) caret.setAttribute('aria-expanded', 'true');
+                            }
                         }
                     });
                 }
