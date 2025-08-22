@@ -607,7 +607,7 @@ body {
     }
     
     .sidebar {
-        width: 280px;
+        width: 280px !important;
         transform: translateX(100%);
     }
     

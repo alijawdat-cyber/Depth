@@ -34,23 +34,11 @@ class DepthDocs {
         const contentWrapper = document.querySelector('.content-wrapper');
         const mainContent = document.querySelector('.main-content');
         
-        if (this.isLargeDesktop) {
-            // Large desktop: sidebar open by default
-            this.sidebarOpen = true;
-            sidebar.classList.add('active');
-            if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
-            if (mainContent) mainContent.classList.remove('sidebar-closed');
-        } else if (this.isDesktop) {
-            // Desktop: sidebar closed by default
-            this.sidebarOpen = false;
-            sidebar.classList.remove('active');
-            if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
-            if (mainContent) mainContent.classList.add('sidebar-closed');
-        } else {
-            // Tablet/Mobile: sidebar hidden
-            this.sidebarOpen = false;
-            sidebar.classList.remove('active');
-        }
+        // All devices: sidebar closed by default
+        this.sidebarOpen = false;
+        sidebar.classList.remove('active');
+        if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
+        if (mainContent) mainContent.classList.add('sidebar-closed');
         
         this.updateBurgerButton();
     }
