@@ -570,9 +570,9 @@ body {
 }
 
 /* =============== Floating TOC =============== */
-.mobile-toc { display: none; }
-/* Stronger guard so it never takes a grid column on desktop */
-.content-wrapper > .mobile-toc { display: none !important; }
+.mobile-toc { display: none !important; }
+/* Strong guard: hidden by default on non-phone widths, and never consume layout space */
+.content-wrapper > .mobile-toc { display: none !important; position: fixed; }
 .floating-toc {
     position: sticky;
     top: calc(var(--header-height) + 16px);
@@ -831,6 +831,8 @@ body.is-home #mobile-toc { display: none !important; }
 
     /* Mobile TOC: minimal left rail + single chip */
     .mobile-toc { display: block !important; position: fixed; top: calc(var(--header-height) + 8px); bottom: 12px; left: 10px; width: 24px; z-index: 1200; pointer-events: none; }
+    /* Override desktop guard: show even when inside .content-wrapper */
+    .content-wrapper > .mobile-toc { display: block !important; }
     .mobile-toc.hidden { display: none !important; }
     .mobile-v-rail { position: absolute; inset: 0; }
     .mobile-v-track { position: absolute; left: 10px; top: 0; bottom: 0; width: 3px; border-radius: 3px; background: linear-gradient(180deg, color-mix(in oklab, var(--border) 90%, transparent), color-mix(in oklab, var(--border) 70%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 40%, transparent); }
