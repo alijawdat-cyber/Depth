@@ -553,6 +553,10 @@ body {
     scroll-behavior: smooth;
 }
 
+/* Hide TOC on homepage only */
+body.is-home #floating-toc { display: none !important; }
+body.is-home #mobile-toc { display: none !important; }
+
 .floating-toc h3 {
     font-size: 14px;
     font-weight: 600;

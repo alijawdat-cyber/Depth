@@ -274,6 +274,8 @@ class DepthDocs {
             mc.classList.remove('pushed');
             mc.style.transform = '';
         }
+    // mark home route on body
+    if (hash === '/') document.body.classList.add('is-home'); else document.body.classList.remove('is-home');
         
         // Update breadcrumbs
         UIComponents.updateBreadcrumbs(hash);
@@ -329,7 +331,10 @@ class DepthDocs {
                 docContent.innerHTML = content;
                 // Strip old emoji icons from headings
                 UIComponents.sanitizeHeadings(docContent);
-                UIComponents.generateTOC(docContent);
+                if (path !== '/') UIComponents.generateTOC(docContent); else {
+                    const tocEl = document.getElementById('floating-toc');
+                    if (tocEl) tocEl.style.display = 'none';
+                }
                 // Inject page icon into H1 and render Lucide
                 UIComponents.injectPageTitleIcon(path);
                 if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -370,7 +375,10 @@ class DepthDocs {
             // Strip old emoji icons from headings
             UIComponents.sanitizeHeadings(docContent);
             
-            UIComponents.generateTOC(docContent);
+            if (path !== '/') UIComponents.generateTOC(docContent); else {
+                const tocEl = document.getElementById('floating-toc');
+                if (tocEl) tocEl.style.display = 'none';
+            }
             // Inject page icon into H1 and render Lucide
             UIComponents.injectPageTitleIcon(path);
             if (window.lucide && typeof window.lucide.createIcons === 'function') {
