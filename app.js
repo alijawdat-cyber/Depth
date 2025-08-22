@@ -144,7 +144,14 @@ class DepthDocs {
                 // Mobile/Tablet: push content (no overlay)
                 overlay.classList.remove('active');
                 sidebar.style.width = '';
-                if (mainContent) mainContent.classList.add('pushed');
+                // احسب عرض السايدبار الفعلي لدفع المحتوى بشكل دقيق
+                requestAnimationFrame(() => {
+                    const sidebarWidth = sidebar.getBoundingClientRect().width;
+                    if (mainContent) {
+                        mainContent.classList.add('pushed');
+                        mainContent.style.transform = `translateX(-${sidebarWidth}px)`;
+                    }
+                });
                 document.body.style.overflow = '';
             }
         } else {
@@ -175,7 +182,10 @@ class DepthDocs {
             if (mainContent) mainContent.classList.add('sidebar-closed');
         } else {
             // Mobile/Tablet: remove push translation
-            if (mainContent) mainContent.classList.remove('pushed');
+            if (mainContent) {
+                mainContent.classList.remove('pushed');
+                mainContent.style.transform = '';
+            }
         }
         
         this.updateBurgerButton();

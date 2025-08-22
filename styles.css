@@ -643,7 +643,8 @@ body {
     }
     
     .sidebar {
-        width: 280px !important;
+        width: auto !important;
+        max-width: 92vw;
         transform: translateX(100%);
     }
     
@@ -666,11 +667,13 @@ body {
     .nav-section-title {
         font-size: 13px;
         padding: 6px 10px;
+    white-space: nowrap;
     }
     
     .nav-item {
         font-size: 12px;
-        padding: 6px 10px;
+    padding: 6px 10px;
+    white-space: nowrap;
     }
     
     .sidebar-nav {
