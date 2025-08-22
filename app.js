@@ -67,12 +67,21 @@ class DepthDocs {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         const burger = document.getElementById('burger-btn');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const isDesktop = window.innerWidth >= 1024;
 
         if (this.sidebarOpen) {
             sidebar.classList.add('active');
-            overlay.classList.add('active');
             burger.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            
+            if (isDesktop) {
+                // للشاشات الكبيرة: لا حاجة للـ overlay أو حجب التمرير
+                contentWrapper.classList.remove('sidebar-closed');
+            } else {
+                // للموبايل: استخدام overlay وحجب التمرير
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
         } else {
             this.closeSidebar();
         }
@@ -81,10 +90,21 @@ class DepthDocs {
     // Close sidebar
     closeSidebar() {
         this.sidebarOpen = false;
-        document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('sidebar-overlay').classList.remove('active');
-        document.getElementById('burger-btn').classList.remove('active');
-        document.body.style.overflow = '';
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const burger = document.getElementById('burger-btn');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const isDesktop = window.innerWidth >= 1024;
+        
+        sidebar.classList.remove('active');
+        burger.classList.remove('active');
+        
+        if (isDesktop) {
+            contentWrapper.classList.add('sidebar-closed');
+        } else {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 
     // Render sidebar navigation
@@ -132,50 +152,41 @@ class DepthDocs {
         try {
             UIComponents.showLoading();
             
-            // تحديد مسار الملف الصحيح
-            if (path === '/') {
-                // عرض الصفحة الرئيسية من pageContent
-                const content = pageContent['/'];
+            // تحقق من وجود المحتوى في pageContent أولاً
+            if (pageContent[path]) {
+                const content = pageContent[path];
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
                 UIComponents.generateTOC(docContent);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
             
-            // تحديد مسار الملف
-            const filePath = path.substring(1); // إزالة الـ / من البداية
+            // إذا لم يكن موجوداً، حاول جلب ملف .md
+            const filePath = path.substring(1);
             const mdPath = `${filePath}.md`;
             
             console.log('Loading file:', mdPath);
             
-            // جلب المحتوى من الملف
             const response = await fetch(mdPath);
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                throw new Error(`الصفحة غير موجودة: ${path}`);
             }
             
             const markdown = await response.text();
-            
-            // تحويل Markdown إلى HTML
             const html = marked.parse(markdown);
-            
-            // تنظيف HTML للأمان
             const cleanHtml = DOMPurify.sanitize(html);
             
-            // عرض المحتوى
             const docContent = document.getElementById('doc-content');
             docContent.innerHTML = cleanHtml;
             
-            // إنشاء جدول المحتويات
             UIComponents.generateTOC(docContent);
-            
-            // التمرير للأعلى
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
         } catch (error) {
             console.error('خطأ في تحميل المحتوى:', error);
-            UIComponents.showError(`فشل في تحميل المحتوى: ${path}`);
+            UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
         }
     }
 

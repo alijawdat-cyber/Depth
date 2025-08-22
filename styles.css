@@ -132,7 +132,6 @@ body {
     overflow-x: auto;
     scrollbar-width: none;
     direction: rtl;
-    flex-direction: row-reverse;
 }
 
 .breadcrumbs::-webkit-scrollbar {
@@ -519,8 +518,8 @@ body {
     }
     
     .sidebar {
-        width: 50%;
-        max-width: 250px;
+        width: 80%;
+        max-width: 300px;
     }
     
     .sidebar-close {
@@ -578,4 +577,48 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
+}
+
+/* ===== تحسينات السايد بار للابتوب ===== */
+@media (min-width: 1024px) {
+    .sidebar {
+        position: sticky;
+        top: var(--header-height);
+        right: 0;
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+        border-left: 1px solid var(--border);
+        z-index: 10;
+    }
+    
+    .sidebar.active {
+        right: 0;
+    }
+    
+    .main-content {
+        display: flex;
+    }
+    
+    .content-wrapper {
+        flex: 1;
+        margin-right: var(--sidebar-width);
+        transition: margin-right 0.3s ease;
+    }
+    
+    .content-wrapper.sidebar-closed {
+        margin-right: 0;
+    }
+}
+
+/* للموبايل - overlay sidebar */
+@media (max-width: 1023px) {
+    .sidebar {
+        position: fixed;
+        right: -100%;
+        z-index: 90;
+    }
+    
+    .sidebar.active {
+        right: 0;
+    }
 }

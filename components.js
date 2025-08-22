@@ -43,27 +43,24 @@ class UIComponents {
         const breadcrumbs = document.getElementById('breadcrumbs');
         const parts = path.split('/').filter(p => p);
         
-        let html = '';
-        let currentPath = '';
-        
-        // Build breadcrumbs in reverse order (RTL style)
         const breadcrumbItems = [];
         
-        // Add current page (not clickable)
+        // ابدأ بالرئيسية
+        breadcrumbItems.push('<a href="#/">الرئيسية</a>');
+        
+        // أضف المسارات الوسطى
+        let currentPath = '';
+        for (let i = 0; i < parts.length - 1; i++) {
+            currentPath += '/' + parts[i];
+            const name = this.formatPathName(parts[i]);
+            breadcrumbItems.push(`<a href="#${currentPath}">${name}</a>`);
+        }
+        
+        // أضف الصفحة الحالية (غير قابلة للنقر)
         if (parts.length > 0) {
             const currentName = this.formatPathName(parts[parts.length - 1]);
             breadcrumbItems.push(`<span>${currentName}</span>`);
         }
-        
-        // Add parent paths (clickable)
-        for (let i = parts.length - 2; i >= 0; i--) {
-            const partialPath = '/' + parts.slice(0, i + 1).join('/');
-            const name = this.formatPathName(parts[i]);
-            breadcrumbItems.push(`<a href="#${partialPath}">${name}</a>`);
-        }
-        
-        // Add home page (always last/rightmost)
-        breadcrumbItems.push('<a href="#/">الرئيسية</a>');
         
         breadcrumbs.innerHTML = breadcrumbItems.join(' ');
     }
