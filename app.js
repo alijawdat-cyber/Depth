@@ -16,6 +16,10 @@ class DepthDocs {
         this.handleRoute();
         this.setupScrollEffects();
         this.loadTheme();
+        // Initialize AOS if available
+        if (window.AOS) {
+            window.AOS.init({ once: true, duration: 600, easing: 'ease-out' });
+        }
     }
 
     // Check current screen size
@@ -275,6 +279,16 @@ class DepthDocs {
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
                 UIComponents.generateTOC(docContent);
+                // Homepage layout adjustments
+                const tocEl = document.getElementById('floating-toc');
+                const wrapper = document.querySelector('.content-wrapper');
+                if (path === '/') {
+                    if (tocEl) tocEl.style.display = 'none';
+                    if (wrapper) wrapper.classList.add('home-full');
+                } else {
+                    if (wrapper) wrapper.classList.remove('home-full');
+                }
+                if (window.AOS) setTimeout(() => window.AOS.refreshHard(), 50);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
@@ -299,6 +313,15 @@ class DepthDocs {
             docContent.innerHTML = cleanHtml;
             
             UIComponents.generateTOC(docContent);
+            const tocEl2 = document.getElementById('floating-toc');
+            const wrapper2 = document.querySelector('.content-wrapper');
+            if (path === '/') {
+                if (tocEl2) tocEl2.style.display = 'none';
+                if (wrapper2) wrapper2.classList.add('home-full');
+            } else {
+                if (wrapper2) wrapper2.classList.remove('home-full');
+            }
+            if (window.AOS) setTimeout(() => window.AOS.refreshHard(), 50);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
         } catch (error) {

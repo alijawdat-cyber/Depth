@@ -1,10 +1,11 @@
 // UI Components
 class UIComponents {
     // Generate navigation item
-    static createNavItem(item, isActive = false) {
+    static createNavItem(item, isActive = false, sectionId = '') {
         const a = document.createElement('a');
         a.href = `#${item.path}`;
-        a.className = `nav-item ${isActive ? 'active' : ''}`;
+        const iconKey = UIComponents.getItemIconKey(item, sectionId);
+        a.className = `nav-item icon-${iconKey} ${isActive ? 'active' : ''}`;
         a.textContent = item.name;
         a.onclick = (e) => {
             e.preventDefault();
@@ -15,8 +16,9 @@ class UIComponents {
 
     // Generate navigation section
     static createNavSection(section) {
-        const div = document.createElement('div');
-        div.className = 'nav-section';
+    const div = document.createElement('div');
+    div.className = 'nav-section';
+    if (section.id) div.setAttribute('data-id', section.id);
         
         const title = document.createElement('div');
         title.className = 'nav-section-title';
@@ -30,12 +32,86 @@ class UIComponents {
         items.className = 'nav-section-items';
         
         section.items.forEach(item => {
-            items.appendChild(this.createNavItem(item));
+            items.appendChild(this.createNavItem(item, false, section.id));
         });
         
         div.appendChild(title);
         div.appendChild(items);
         return div;
+    }
+
+    // Map item to icon key based on its path or name
+    static getItemIconKey(item, sectionId = '') {
+        const p = (item.path || '').toLowerCase();
+        const n = (item.name || '').toLowerCase();
+
+        const has = (s) => p.includes(s) || n.includes(s);
+
+        if (has('00-overview') || has('introduction') || has('نظرة')) return 'overview';
+        if (has('requirements') || has('المتطلبات')) return 'requirements';
+        if (has('data-dictionary') || has('قاموس')) return 'dictionary';
+        if (has('database-schema') || has('schema') || has('مخطط')) return 'schema';
+        if (has('indexes') || has('استعلام') || has('فهارس')) return 'indexes';
+        if (has('authentication') || has('auth') || has('مصاد')) return 'auth';
+        if (has('rate-limiting') || has('المعدل')) return 'rate-limit';
+        if (has('websockets')) return 'websocket';
+        if (has('error-handling') || has('أخطاء') || has('خطأ')) return 'error';
+
+        if (has('creators') || has('المبدعين')) return 'creator';
+        if (has('clients') || has('العملاء')) return 'clients';
+        if (has('projects') || has('المشاريع')) return 'projects';
+        if (has('pricing') || has('التسعير')) return 'pricing';
+        if (has('storage') || has('التخزين')) return 'storage';
+        if (has('notifications') || has('الإشعارات')) return 'notifications';
+        if (has('messaging') || has('المراسلة')) return 'messaging';
+        if (has('salaried') || has('الموظ')) return 'employees';
+
+        if (has('admin-panel') || has('لوحة')) return 'dashboard';
+        if (has('governance') || has('الحوكمة')) return 'governance';
+        if (has('seeds') || has('إدارة البيانات')) return 'seeds';
+
+        if (has('external-services')) return 'plug';
+        if (has('webhooks')) return 'webhook';
+        if (has('advanced')) return 'flask';
+
+        if (has('getting-started') || has('دليل')) return 'rocket';
+        if (has('local-setup') || has('الإعداد')) return 'laptop';
+        if (has('environment-variables') || has('متغيرات')) return 'key';
+        if (has('workflow') || has('العمل')) return 'flow';
+        if (has('testing') || has('الاختبار')) return 'test';
+
+        if (has('mobile') || has('الجوال')) return 'phone';
+        if (has('frontend') || has('الويب')) return 'monitor';
+
+        if (has('security-overview') || has('الأمان') || has('security')) return 'shield';
+        if (has('threat-model')) return 'target';
+        if (has('key-management')) return 'key';
+
+        if (has('operations-overview') || has('العمليات') || has('operations')) return 'cogs';
+        if (has('deployment')) return 'cloud-upload';
+        if (has('incident-response')) return 'alert';
+
+        if (has('resources')) return 'book';
+        if (has('glossary')) return 'book-open';
+        if (has('enums-standard') || has('المعايير')) return 'braces';
+        if (has('link-alias-mapping')) return 'link';
+        if (has('naming-conventions')) return 'text';
+        if (has('roles-matrix')) return 'grid';
+
+        // fallback by section
+        switch (sectionId) {
+            case 'database': return 'database';
+            case 'core': return 'cog';
+            case 'features': return 'sparkles';
+            case 'admin': return 'shield-check';
+            case 'integrations': return 'plug';
+            case 'development': return 'code';
+            case 'interfaces': return 'devices';
+            case 'security': return 'shield';
+            case 'operations': return 'cogs';
+            case 'reference': return 'book';
+            default: return 'dot';
+        }
     }
 
     // Generate breadcrumb

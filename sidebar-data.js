@@ -119,58 +119,92 @@ const sidebarData = [
 // Sample content for pages
 const pageContent = {
     '/': `
-        <h1>منصة Depth للتوثيق</h1>
-        <p>مرحباً بك في التوثيق الشامل لمنصة Depth - نظام إدارة المشاريع الإبداعية المتطور.</p>
-        
-        <h2>البداية السريعة</h2>
-        <p>ابدأ رحلتك مع منصة Depth من خلال:</p>
-        <ul>
-            <li>قراءة <a href="#/documentation/00-overview/00-introduction">النظرة العامة</a></li>
-            <li>مراجعة <a href="#/documentation/01-requirements/00-requirements-v2.0">المتطلبات</a></li>
-            <li>فهم <a href="#/documentation/02-database/00-data-dictionary">قاعدة البيانات</a></li>
-        </ul>
-        
-        <h2>المميزات الرئيسية</h2>
-        <p>تقدم منصة Depth مجموعة شاملة من المميزات:</p>
-        <ul>
-            <li>نظام إدارة مشاريع متكامل</li>
-            <li>واجهات برمجة قوية ومرنة</li>
-            <li>نظام مصادقة وأمان متقدم</li>
-            <li>تتبع شامل للأداء والتقدم</li>
-            <li>إشعارات ذكية متعددة القنوات</li>
-            <li>دعم كامل للمبدعين والعملاء</li>
-        </ul>
-        
-        <h3>التقنيات المستخدمة</h3>
-        <p>بُنيت المنصة باستخدام أحدث التقنيات:</p>
-        <ul>
-            <li>Next.js للواجهة الأمامية</li>
-            <li>Node.js للخادم</li>
-            <li>PostgreSQL لقاعدة البيانات</li>
-            <li>Redis للتخزين المؤقت</li>
-            <li>Docker للنشر</li>
-            <li>TypeScript للأمان والجودة</li>
-        </ul>
-        
-        <h2>الأقسام الرئيسية</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 20px 0;">
-            <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius);">
-                <h4>🏗️ قاعدة البيانات</h4>
-                <p>تعرف على هيكل البيانات والعلاقات</p>
+        <section class="home-hero" data-aos="fade-up" data-aos-duration="700">
+            <div class="home-hero-inner">
+                <h1 class="home-title">دليل Depth — وثائق منظمة لتفهم المنصة خلال دقائق</h1>
+                <p class="home-subtitle">مرجع موحد يشرح أهداف المنصة، أقسام التوثيق، ومسارات التعلم خطوة بخطوة. تصميم هادئ ومركز يساعدك على الوصول بسرعة.</p>
+                <div class="home-cta">
+                    <a class="btn btn-primary" href="#/documentation/00-overview/00-introduction">ابدأ من النظرة العامة</a>
+                    <a class="btn btn-ghost" href="#/documentation/01-requirements/00-requirements-v2.0">المتطلبات</a>
+                </div>
             </div>
-            <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius);">
-                <h4>🔌 واجهات البرمجة</h4>
-                <p>استخدم APIs القوية والمرنة</p>
+        </section>
+
+        <section class="home-grid" data-aos="fade-up" data-aos-delay="100">
+            <div class="home-card" tabindex="0">
+                <div class="icon" data-mask="grid"></div>
+                <h3>هيكلة التوثيق</h3>
+                <p>نظرة شاملة على أقسام الدليل وكيف ترتبط ببعضها لضمان رحلة تعلم واضحة.</p>
+                <div class="home-links">
+                    <a href="#/documentation/00-overview/00-introduction">النظرة العامة</a>
+                    <a href="#/documentation/99-reference/01-glossary">المصطلحات</a>
+                    <a href="#/documentation/99-reference/04-naming-conventions">قواعد التسمية</a>
+                </div>
             </div>
-            <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius);">
-                <h4>🎨 المميزات</h4>
-                <p>اكتشف جميع قدرات المنصة</p>
+
+            <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="150">
+                <div class="icon" data-mask="database"></div>
+                <h3>قلب البيانات</h3>
+                <p>تعرف على القاموس والمخطط والفهارس لتحصل على أداء واستعلامات فعالة.</p>
+                <div class="home-links">
+                    <a href="#/documentation/02-database/00-data-dictionary">قاموس البيانات</a>
+                    <a href="#/documentation/02-database/01-database-schema">مخطط قاعدة البيانات</a>
+                    <a href="#/documentation/02-database/02-indexes-and-queries">الفهارس والاستعلامات</a>
+                </div>
             </div>
-            <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius);">
-                <h4>🔒 الأمان</h4>
-                <p>تأمين تطبيقك وبياناتك</p>
+
+            <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="200">
+                <div class="icon" data-mask="api"></div>
+                <h3>واجهات البرمجة</h3>
+                <p>مصادقة، تحديد معدل، WebSockets، ومعالجة أخطاء — أساس واجهات مرنة وآمنة.</p>
+                <div class="home-links">
+                    <a href="#/documentation/03-api/core/01-authentication">المصادقة</a>
+                    <a href="#/documentation/03-api/core/02-rate-limiting">تحديد المعدل</a>
+                    <a href="#/documentation/03-api/core/03-websockets">WebSockets</a>
+                </div>
             </div>
-        </div>
+
+            <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="250">
+                <div class="icon" data-mask="features"></div>
+                <h3>قدرات المنصة</h3>
+                <p>المبدعون والعملاء والمشاريع والتسعير والتخزين والإشعارات والمراسلة.</p>
+                <div class="home-links">
+                    <a href="#/documentation/03-api/features/01-creators">المبدعون</a>
+                    <a href="#/documentation/03-api/features/03-projects">المشاريع</a>
+                    <a href="#/documentation/03-api/features/04-pricing">التسعير</a>
+                </div>
+            </div>
+
+            <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="300">
+                <div class="icon" data-mask="security"></div>
+                <h3>الأمان</h3>
+                <p>نموذج التهديدات، إدارة المفاتيح، وأفضل ممارسات الحماية.</p>
+                <div class="home-links">
+                    <a href="#/documentation/07-security/00-security-overview">نظرة عامة</a>
+                    <a href="#/documentation/07-security/01-threat-model">نموذج التهديدات</a>
+                    <a href="#/documentation/07-security/02-key-management">إدارة المفاتيح</a>
+                </div>
+            </div>
+
+            <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="350">
+                <div class="icon" data-mask="ops"></div>
+                <h3>التشغيل والنشر</h3>
+                <p>التشغيل، النشر، والاستجابة للحوادث — بوثائق عملية ومباشرة.</p>
+                <div class="home-links">
+                    <a href="#/documentation/08-operations/01-deployment">النشر</a>
+                    <a href="#/documentation/08-operations/02-incident-response">الاستجابة للحوادث</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-steps" data-aos="fade-up" data-aos-delay="150">
+            <h2>ابدأ خلال 3 خطوات</h2>
+            <ol>
+                <li><a href="#/documentation/00-overview/00-introduction">اقرأ النظرة العامة</a></li>
+                <li><a href="#/documentation/04-development/00-getting-started">أعد بيئة التطوير</a></li>
+                <li><a href="#/documentation/03-api/core/01-authentication">جرّب أول طلب API</a></li>
+            </ol>
+        </section>
     `,
     '/documentation/00-overview/00-introduction': `
         <h1>نظرة عامة على المنصة</h1>
