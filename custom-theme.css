@@ -46,7 +46,8 @@
   
   /* === SPACING SYSTEM === */
   --space-xs: 4px;
-  --space-sm: 8px;
+    --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
@@ -733,13 +734,21 @@ body.sidebar-open .sidebar-burger-menu .burger-line:nth-child(3) {
   }
 }
 
-/* Heading Anchors */
+/* Heading Anchors - أيقونة صغيرة مخفية */
 .heading-anchor {
-  margin-right: var(--space-sm);
+  margin-right: var(--space-xs);
   color: var(--text-muted);
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: all var(--transition-fast);
   font-weight: 400;
+  font-size: 0.8em;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  justify-content: center;
+  border-radius: var(--radius-sm);
 }
 
 h1:hover .heading-anchor,
@@ -751,7 +760,9 @@ h4:hover .heading-anchor {
 
 .heading-anchor:hover {
   color: var(--interactive-primary);
-  text-decoration: none;
+  background: rgba(108, 43, 255, 0.1);
+  text-decoration: none !important;
+  transform: scale(1.1);
 }
 
 /* ===============================================
@@ -1129,25 +1140,63 @@ pre code {
   border: none;
 }
 
-/* Copy Code Button */
+/* Copy Code Button - أيقونة صغيرة في الزاوية اليمنى */
 .docsify-copy-code-button {
   position: absolute;
-  top: var(--space-sm);
-  left: var(--space-sm);
-  padding: 6px 12px;
-  background: var(--interactive-primary);
-  color: white;
-  border: none;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-size: 0;
   cursor: pointer;
   transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  backdrop-filter: blur(8px);
+}
+
+.docsify-copy-code-button::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* إظهار الزر عند hover على الكود */
+pre:hover .docsify-copy-code-button {
+  opacity: 1;
 }
 
 .docsify-copy-code-button:hover {
-  background: var(--interactive-primary-hover);
-  transform: scale(1.05);
+  background: rgba(108, 43, 255, 0.2);
+  color: var(--interactive-primary);
+  border-color: var(--interactive-primary);
+  transform: scale(1.1);
+}
+
+.docsify-copy-code-button:active {
+  transform: scale(0.95);
+}
+
+/* للثيم الداكن */
+[data-theme="dark"] .docsify-copy-code-button {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .docsify-copy-code-button:hover {
+  background: rgba(108, 43, 255, 0.3);
 }
 
 /* ===============================================
@@ -1191,7 +1240,100 @@ tr:hover td {
 }
 
 /* ===============================================
-   13. ALERTS & BLOCKQUOTES
+   14. COPY BUTTONS & ACTIONS - تحسين جميع أزرار النسخ
+=============================================== */
+
+/* زر النسخ العام للصناديق */
+.copy-btn, 
+.copy-button, 
+[data-clipboard-target],
+[aria-label*="copy" i],
+[title*="copy" i] {
+  position: absolute !important;
+  top: var(--space-xs) !important;
+  right: var(--space-xs) !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-muted) !important;
+  font-size: 0 !important; /* إخفاء النص */
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0 !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 10 !important;
+}
+
+/* أيقونة النسخ */
+.copy-btn::before,
+.copy-button::before,
+[data-clipboard-target]::before,
+[aria-label*="copy" i]::before,
+[title*="copy" i]::before {
+  content: '' !important;
+  display: block !important;
+  width: 14px !important;
+  height: 14px !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* إظهار عند hover على الحاوي */
+.highlight:hover .copy-btn,
+.highlight:hover .copy-button,
+.highlight:hover [data-clipboard-target],
+pre:hover .copy-btn,
+pre:hover .copy-button,
+pre:hover [data-clipboard-target],
+code:hover .copy-btn,
+code:hover .copy-button,
+code:hover [data-clipboard-target],
+.code-block:hover .copy-btn,
+.code-block:hover .copy-button,
+.code-block:hover [data-clipboard-target],
+*:hover > [aria-label*="copy" i],
+*:hover > [title*="copy" i] {
+  opacity: 1 !important;
+}
+
+.copy-btn:hover,
+.copy-button:hover,
+[data-clipboard-target]:hover,
+[aria-label*="copy" i]:hover,
+[title*="copy" i]:hover {
+  background: rgba(108, 43, 255, 0.2) !important;
+  color: var(--interactive-primary) !important;
+  border-color: var(--interactive-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+/* حالة النجاح بعد النسخ */
+.copy-btn.success::before,
+.copy-button.success::before,
+[data-clipboard-target].success::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12' stroke='%2310b981' stroke-width='2' fill='none'/%3E%3C/svg%3E") !important;
+}
+
+/* للثيم الداكن */
+[data-theme="dark"] .copy-btn,
+[data-theme="dark"] .copy-button,
+[data-theme="dark"] [data-clipboard-target],
+[data-theme="dark"] [aria-label*="copy" i],
+[data-theme="dark"] [title*="copy" i] {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ===============================================
+   15. BLOCKQUOTES & ALERTS
 =============================================== */
 blockquote {
   background: var(--bg-secondary);
