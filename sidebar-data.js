@@ -132,7 +132,7 @@ const pageContent = {
 
         <section class="home-grid" data-aos="fade-up" data-aos-delay="100">
             <div class="home-card" tabindex="0">
-                <div class="icon" data-mask="grid"></div>
+                <div class="icon"><i class="home-icon" data-lucide="grid-2x2"></i></div>
                 <h3>هيكلة التوثيق</h3>
                 <p>نظرة شاملة على أقسام الدليل وكيف ترتبط ببعضها لضمان رحلة تعلم واضحة.</p>
                 <div class="home-links">
@@ -143,7 +143,7 @@ const pageContent = {
             </div>
 
             <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="150">
-                <div class="icon" data-mask="database"></div>
+                <div class="icon"><i class="home-icon" data-lucide="database"></i></div>
                 <h3>قلب البيانات</h3>
                 <p>تعرف على القاموس والمخطط والفهارس لتحصل على أداء واستعلامات فعالة.</p>
                 <div class="home-links">
@@ -154,7 +154,7 @@ const pageContent = {
             </div>
 
             <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="200">
-                <div class="icon" data-mask="api"></div>
+                <div class="icon"><i class="home-icon" data-lucide="code-2"></i></div>
                 <h3>واجهات البرمجة</h3>
                 <p>مصادقة، تحديد معدل، WebSockets، ومعالجة أخطاء — أساس واجهات مرنة وآمنة.</p>
                 <div class="home-links">
@@ -165,7 +165,7 @@ const pageContent = {
             </div>
 
             <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="250">
-                <div class="icon" data-mask="features"></div>
+                <div class="icon"><i class="home-icon" data-lucide="sparkles"></i></div>
                 <h3>قدرات المنصة</h3>
                 <p>المبدعون والعملاء والمشاريع والتسعير والتخزين والإشعارات والمراسلة.</p>
                 <div class="home-links">
@@ -176,7 +176,7 @@ const pageContent = {
             </div>
 
             <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="300">
-                <div class="icon" data-mask="security"></div>
+                <div class="icon"><i class="home-icon" data-lucide="shield"></i></div>
                 <h3>الأمان</h3>
                 <p>نموذج التهديدات، إدارة المفاتيح، وأفضل ممارسات الحماية.</p>
                 <div class="home-links">
@@ -187,7 +187,7 @@ const pageContent = {
             </div>
 
             <div class="home-card" tabindex="0" data-aos="fade-up" data-aos-delay="350">
-                <div class="icon" data-mask="ops"></div>
+                <div class="icon"><i class="home-icon" data-lucide="settings-2"></i></div>
                 <h3>التشغيل والنشر</h3>
                 <p>التشغيل، النشر، والاستجابة للحوادث — بوثائق عملية ومباشرة.</p>
                 <div class="home-links">

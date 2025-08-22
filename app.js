@@ -298,6 +298,9 @@ class DepthDocs {
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
                 UIComponents.generateTOC(docContent);
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons();
+                }
                 // Homepage layout adjustments
                 const tocEl = document.getElementById('floating-toc');
                 const wrapper = document.querySelector('.content-wrapper');
@@ -332,6 +335,9 @@ class DepthDocs {
             docContent.innerHTML = cleanHtml;
             
             UIComponents.generateTOC(docContent);
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
             const tocEl2 = document.getElementById('floating-toc');
             const wrapper2 = document.querySelector('.content-wrapper');
             if (path === '/') {
