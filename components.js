@@ -767,16 +767,19 @@ class UIComponents {
             const host = document.getElementById('doc-content');
             if (!host || currentPath === '/') return;
 
+            // Get sections from global (non-module) script: const does not attach to window
+            const sections = (window.sidebarData || (typeof sidebarData !== 'undefined' ? sidebarData : []));
+            if (!sections || !sections.length) return;
+
             // locate current item in sidebarData
             let secIndex = -1, itemIndex = -1;
-            for (let s = 0; s < (window.sidebarData || []).length; s++) {
-                const items = (window.sidebarData[s].items || []);
+            for (let s = 0; s < sections.length; s++) {
+                const items = (sections[s].items || []);
                 const idx = items.findIndex(it => it.path === currentPath);
                 if (idx !== -1) { secIndex = s; itemIndex = idx; break; }
             }
             if (secIndex === -1) return; // not found
 
-            const sections = window.sidebarData;
             const curSection = sections[secIndex];
             const curItems = curSection.items || [];
 
