@@ -646,8 +646,8 @@ body {
         margin: 0 auto;
         grid-template-columns: minmax(0, 1fr) 300px;
     }
-    /* When sidebar is open (class removed by JS), reserve space so floating TOC stays visible */
-    .content-wrapper:not(.sidebar-closed) { padding-right: calc(14px + var(--sidebar-width)); }
+    /* When sidebar is actually open, reserve space */
+    body.sidebar-open .content-wrapper { padding-right: calc(14px + var(--sidebar-width)); }
 }
 
 /* Desktop (1024px - 1399px) */
@@ -663,7 +663,8 @@ body {
     }
     
     .content-wrapper { grid-template-columns: 1fr 260px; padding: 24px 14px; }
-    .content-wrapper:not(.sidebar-closed) { padding-right: calc(14px + 220px); }
+    /* Reserve a bit less space on laptop widths when sidebar is open */
+    body.sidebar-open .content-wrapper { padding-right: calc(14px + 220px); }
     
     .content-wrapper.sidebar-closed {
         margin-right: 0;

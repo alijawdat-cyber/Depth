@@ -46,6 +46,7 @@ class DepthDocs {
         // All devices: sidebar closed by default
         this.sidebarOpen = false;
         sidebar.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
         // Ensure the visual state matches the breakpoint behavior
         if (this.isDesktop || this.isLargeDesktop) {
             // On desktop, hide the sidebar with a class so content doesn't get overlapped
@@ -168,6 +169,7 @@ class DepthDocs {
             // Opening sidebar
             sidebar.classList.add('active');
             sidebar.classList.remove('sidebar-closed');
+            document.body.classList.add('sidebar-open');
             
             if (this.isDesktop || this.isLargeDesktop) {
                 // Desktop: push content
@@ -205,6 +207,7 @@ class DepthDocs {
         this.sidebarOpen = false;
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
         sidebar.style.width = '';
         document.body.style.overflow = '';
         
