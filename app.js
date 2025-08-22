@@ -37,6 +37,13 @@ class DepthDocs {
         // All devices: sidebar closed by default
         this.sidebarOpen = false;
         sidebar.classList.remove('active');
+        // Ensure the visual state matches the breakpoint behavior
+        if (this.isDesktop || this.isLargeDesktop) {
+            // On desktop, hide the sidebar with a class so content doesn't get overlapped
+            sidebar.classList.add('sidebar-closed');
+        } else {
+            sidebar.classList.remove('sidebar-closed');
+        }
         if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
         if (mainContent) mainContent.classList.add('sidebar-closed');
         
@@ -112,6 +119,7 @@ class DepthDocs {
         if (this.sidebarOpen) {
             // Opening sidebar
             sidebar.classList.add('active');
+            sidebar.classList.remove('sidebar-closed');
             
             if (this.isDesktop || this.isLargeDesktop) {
                 // Desktop: push content
@@ -146,6 +154,7 @@ class DepthDocs {
         
         if (this.isDesktop || this.isLargeDesktop) {
             // Desktop: add sidebar-closed class to stop pushing content
+            sidebar.classList.add('sidebar-closed');
             if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
             if (mainContent) mainContent.classList.add('sidebar-closed');
         }

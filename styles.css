@@ -13,6 +13,11 @@
     --header-height: 64px;
     --sidebar-width: 280px;
     --transition: all 0.3s ease;
+    /* Breakpoints */
+    --bp-sm: 480px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
+    --bp-xl: 1400px;
 }
 
 [data-theme="dark"] {
@@ -66,7 +71,7 @@ body {
 
 .header-container {
     height: 100%;
-    padding: 0 20px;
+    padding: 0 calc(16px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));
     display: flex;
     align-items: center;
     gap: 20px;
@@ -215,6 +220,11 @@ body {
 
 .sidebar.active {
     transform: translateX(0);
+}
+
+/* Explicit closed state used on desktop to collapse sidebar and free content space */
+.sidebar.sidebar-closed {
+    transform: translateX(100%);
 }
 
 .sidebar-header {
@@ -525,6 +535,10 @@ body {
     .burger-btn {
         display: flex;
     }
+
+    .content-wrapper {
+        grid-template-columns: minmax(0, 1fr) 300px;
+    }
 }
 
 /* Desktop (1024px - 1399px) */
@@ -595,7 +609,7 @@ body {
 /* Mobile (max-width: 767px) */
 @media (max-width: 767px) {
     .header-container {
-        padding: 0 16px;
+    padding: 0 calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left));
     }
     
     .logo svg {
@@ -616,7 +630,8 @@ body {
         box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     }
     
-    .sidebar.active + .main-content {
+    /* When sidebar is open, disable interactions with the main content */
+    .sidebar.active ~ .main-content {
         margin-right: 0;
         pointer-events: none;
     }
@@ -677,6 +692,13 @@ body {
     .floating-toc {
         display: none;
     }
+}
+
+/* Micro-mobile (<= 360px) */
+@media (max-width: 360px) {
+    .burger-btn { width: 36px; height: 36px; }
+    .logo svg { height: 18px; }
+    .doc-content { padding: 16px; }
 }
 
 /* Utilities */
