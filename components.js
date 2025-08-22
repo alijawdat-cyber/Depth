@@ -856,6 +856,36 @@ class UIComponents {
             }
 
             host.appendChild(wrap);
+
+            // Also create mobile-only floating prev/next controls
+            try {
+                const isPhone = window.innerWidth < 768;
+                // Clean up any previous instance
+                document.getElementById('mobile-doc-nav')?.remove();
+                if (isPhone) {
+                    const mnav = document.createElement('div');
+                    mnav.id = 'mobile-doc-nav';
+                    const makeBtn = (label, path, dirIcon) => {
+                        const a = document.createElement('a');
+                        a.href = `#${path}`;
+                        a.className = 'mobile-doc-btn';
+                        a.innerHTML = `<span class="icon" data-lucide="${dirIcon}"></span><span>${label}</span>`;
+                        a.onclick = (e) => { e.preventDefault(); window.app.navigate(path); };
+                        return a;
+                    };
+                    if (prev) {
+                        const p = sections[prev.sec].items[prev.idx];
+                        mnav.appendChild(makeBtn('السابق', p.path, 'arrow-right'));
+                    }
+                    if (next) {
+                        const n = sections[next.sec].items[next.idx];
+                        mnav.appendChild(makeBtn('التالي', n.path, 'arrow-left'));
+                    }
+                    document.body.appendChild(mnav);
+                    // hydrate icons
+                    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                }
+            } catch (_) {}
         } catch (_) { /* noop */ }
     }
 

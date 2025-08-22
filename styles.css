@@ -590,6 +590,10 @@ body {
 /* Hide TOC on homepage only */
 body.is-home #floating-toc { display: none !important; }
 body.is-home #mobile-toc { display: none !important; }
+/* Hide footer nav on home as well (desktop stays fine) */
+body.is-home .doc-footer { display: none; }
+/* Mobile-only bottom nav is hidden by default on non-phone widths */
+#mobile-doc-nav { display: none; }
 
 .floating-toc h3 {
     font-size: 14px;
@@ -856,6 +860,13 @@ body.is-home #mobile-toc { display: none !important; }
     #mobile-heading-chip { position: fixed; left: 36px; top: 50%; transform: translateY(-50%); z-index: 1300; pointer-events: auto; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; font-size: 12px; line-height: 1.2; max-width: 72vw; text-align: left; box-shadow: 0 8px 22px rgba(0,0,0,.16); opacity: 0; transition: opacity .25s ease, transform .12s ease; }
     #mobile-heading-chip.is-visible { opacity: 1; }
     #mobile-heading-chip:active { transform: translateY(-50%) scale(0.98); }
+
+    /* Mobile-only floating prev/next buttons; desktop keeps the footer cards */
+    #mobile-doc-nav { position: fixed; inset-inline-start: 12px; inset-block-end: calc(12px + env(safe-area-inset-bottom)); z-index: 1300; display: flex; gap: 8px; pointer-events: none; }
+    #mobile-doc-nav .mobile-doc-btn { pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; box-shadow: 0 6px 16px rgba(0,0,0,.12); transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease; font-size: 13px; }
+    #mobile-doc-nav .mobile-doc-btn:active { transform: translateY(1px); }
+    #mobile-doc-nav .mobile-doc-btn:hover { box-shadow: 0 10px 20px rgba(0,0,0,.16); border-color: color-mix(in oklab, var(--primary) 35%, var(--border)); }
+    #mobile-doc-nav .mobile-doc-btn .icon { width: 16px; height: 16px; color: var(--icon-color); display: inline-block; }
 }
 
 /* Micro-mobile (<= 360px) */
