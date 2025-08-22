@@ -140,7 +140,8 @@ class UIComponents {
             overview: 'list',
             requirements: 'file-check-2',
             dictionary: 'book',
-            schema: 'sitemap',
+            // Use a widely available Lucide icon for schema to avoid CDN version gaps
+            schema: 'git-branch',
             indexes: 'list-filter',
             database: 'database',
             auth: 'shield',
@@ -621,6 +622,39 @@ class UIComponents {
                 <a href="#/" style="color: var(--primary);">العودة للرئيسية</a>
             </div>
         `;
+    }
+
+    // Inject page icon into the first H1 heading based on current route for visual unity
+    static injectPageTitleIcon(currentPath) {
+        try {
+            const container = document.getElementById('doc-content');
+            if (!container) return;
+            const h1 = container.querySelector('h1');
+            if (!h1) return;
+
+            // Find matching sidebar item to decide icon
+            let sectionId = '';
+            let item = null;
+            for (const section of (window.sidebarData || [])) {
+                const it = (section.items || []).find(x => x.path === currentPath);
+                if (it) { sectionId = section.id || ''; item = it; break; }
+            }
+            // If not found, fall back to path heuristics
+            if (!item) item = { path: currentPath, name: h1.textContent || '' };
+
+            const iconKey = UIComponents.getItemIconKey(item, sectionId);
+            const lucideName = UIComponents.getLucideFromKey(iconKey);
+
+            // Avoid duplicate injection on re-renders
+            if (h1.querySelector('.page-title-icon')) return;
+
+            const i = document.createElement('i');
+            i.className = 'page-title-icon';
+            i.setAttribute('data-lucide', lucideName);
+
+            // Prepend before text; in RTL this will appear at the right visually
+            h1.insertBefore(i, h1.firstChild);
+        } catch (_) { /* noop */ }
     }
 }
 

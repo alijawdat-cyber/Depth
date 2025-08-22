@@ -298,6 +298,8 @@ class DepthDocs {
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
                 UIComponents.generateTOC(docContent);
+                // Inject page icon into H1 and render Lucide
+                UIComponents.injectPageTitleIcon(path);
                 if (window.lucide && typeof window.lucide.createIcons === 'function') {
                     window.lucide.createIcons();
                 }
@@ -335,6 +337,8 @@ class DepthDocs {
             docContent.innerHTML = cleanHtml;
             
             UIComponents.generateTOC(docContent);
+            // Inject page icon into H1 and render Lucide
+            UIComponents.injectPageTitleIcon(path);
             if (window.lucide && typeof window.lucide.createIcons === 'function') {
                 window.lucide.createIcons();
             }
