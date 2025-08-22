@@ -377,7 +377,7 @@ body {
 }
 
 .content-wrapper {
-    max-width: 1400px;
+    max-width: 1280px;
     margin: 0 auto;
     padding: 24px 14px;
     display: grid;
@@ -626,13 +626,8 @@ body {
         transform: translateX(0);
     }
     
-    .main-content {
-        margin-right: var(--sidebar-width);
-    }
-    
-    .main-content.sidebar-closed {
-        margin-right: 0;
-    }
+    /* Keep content stationary; reserve space via inner padding instead */
+    .main-content { margin-right: 0; }
     
     .sidebar.sidebar-closed {
         transform: translateX(100%);
@@ -643,9 +638,10 @@ body {
     }
 
     .content-wrapper {
-        /* Fill available width (no large empty margin on ultra-wide screens) */
-        max-width: none;
-        margin: 0;
+        /* Reserve a pad on the right equal to sidebar width so the floating TOC area stays visible */
+        padding-right: calc(14px + var(--sidebar-width));
+        max-width: 1320px;
+        margin: 0 auto;
         grid-template-columns: minmax(0, 1fr) 300px;
     }
 }
@@ -656,19 +652,15 @@ body {
         transform: translateX(0);
     }
     
-    .main-content {
-        margin-right: var(--sidebar-width);
-    }
-    
-    .main-content.sidebar-closed {
-        margin-right: 0;
-    }
+    .main-content { margin-right: 0; }
     
     .sidebar.sidebar-closed {
         transform: translateX(100%);
     }
     
     .content-wrapper {
+        /* Reserve modest space on the right for floating area */
+        padding-right: calc(12px + 220px);
         grid-template-columns: 1fr;
     }
     
