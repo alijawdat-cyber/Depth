@@ -7,83 +7,111 @@
   <title>Depth Documentation v2.0</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   
-  <!-- Docsify Core -->
+  <!-- Docsify Core Theme -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
   
-  <!-- Custom Theme -->
-  <link rel="stylesheet" href="custom-theme.css" />
+  <!-- Simple Custom CSS -->
+  <style>
+    /* Arabic RTL and Font Support */
+    body {
+      font-family: 'Dubai', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      direction: rtl;
+    }
+    
+    /* Force sidebar to be visible */
+    .sidebar {
+      display: block !important;
+      transform: none !important;
+      position: fixed !important;
+      right: 0 !important;
+      top: 0 !important;
+      width: 300px !important;
+      height: 100vh !important;
+      background: #f8f9fa !important;
+      border-left: 1px solid #e9ecef !important;
+      overflow-y: auto !important;
+      z-index: 200 !important;
+    }
+    
+    /* Adjust content margin for sidebar */
+    .content {
+      margin-right: 300px !important;
+      padding: 20px !important;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(100%) !important;
+        transition: transform 0.3s ease !important;
+      }
+      .sidebar.show {
+        transform: translateX(0) !important;
+      }
+      .content {
+        margin-right: 0 !important;
+      }
+    }
+    
+    /* Simple header for sidebar */
+    .sidebar::before {
+      content: "📚 Depth Documentation";
+      display: block;
+      background: linear-gradient(135deg, #6c2bff, #4a1fc9);
+      color: white;
+      padding: 20px;
+      font-weight: bold;
+      text-align: center;
+      margin: 0;
+    }
+    
+    /* Mobile toggle button */
+    @media (max-width: 768px) {
+      .mobile-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: #6c2bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 300;
+        font-size: 18px;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+  </style>
   
   <!-- Prism Theme for Code Highlighting -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css" />
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div id="loading-screen" class="loading-screen">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">جاري تحميل التوثيق...</div>
-    </div>
-  </div>
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
 
   <!-- Main App Container -->
   <div id="app">يرجى الانتظار...</div>
 
-  <!-- Back to Top Button -->
-  <button id="backToTop" class="back-to-top" aria-label="العودة للأعلى">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-
-  <!-- Reading Progress Bar -->
-  <div id="readingProgress" class="reading-progress"></div>
-
-  <!-- Toast Container -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <!-- Keyboard Shortcuts Modal -->
-  <div id="shortcutsModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>اختصارات لوحة المفاتيح</h3>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="shortcut-item">
-          <kbd>/</kbd> أو <kbd>Ctrl</kbd> + <kbd>K</kbd>
-          <span>البحث السريع</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>G</kbd> ثم <kbd>H</kbd>
-          <span>الذهاب للصفحة الرئيسية</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>←</kbd> / <kbd>→</kbd>
-          <span>التنقل بين الصفحات</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>T</kbd>
-          <span>تبديل الوضع الليلي</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>?</kbd>
-          <span>عرض الاختصارات</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="docsify-config.js"></script>
-  
-  <!-- Tocbot Library - النظام الموحد -->
-  <script src="node_modules/tocbot/dist/tocbot.min.js"></script>
-  <script src="tocbot-unified.js"></script>
-  
   <script>
-    // Docsify Configuration - استخدام الإعدادات من docsify-config.js
+    // Simple mobile sidebar toggle
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.classList.toggle('show');
+      }
+    }
+    
+    // Simple Docsify Configuration
     window.$docsify = {
-      name: 'Depth',
+      name: 'Depth Documentation',
       repo: 'https://github.com/depth-platform/docs',
       homepage: 'main.md',
       loadSidebar: true,
@@ -97,9 +125,7 @@
         paths: 'auto',
         placeholder: 'ابحث في التوثيق...',
         noData: 'لم يتم العثور على نتائج',
-        depth: 6,
-        hideOtherSidebarContent: false,
-        namespace: 'depth-docs-v2'
+        depth: 6
       },
       
       // Copy Code Configuration
@@ -113,19 +139,8 @@
       pagination: {
         previousText: 'السابق',
         nextText: 'التالي',
-        crossChapter: true,
-        crossChapterText: true,
-      },
-      
-      // Custom 404 Page
-      notFoundPage: {
-        '/': '404.md'
-      },
-      
-      // استخدام البرنامج المساعد من docsify-config.js
-      plugins: [
-        window.DepthDocs.docsifyPlugin
-      ]
+        crossChapter: true
+      }
     };
   </script>
   
