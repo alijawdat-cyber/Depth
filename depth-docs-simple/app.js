@@ -128,21 +128,55 @@ class DepthDocs {
     }
 
     // Load page content
-    loadContent(path) {
-        UIComponents.showLoading();
-        
-        // Simulate loading delay
-        setTimeout(() => {
-            const content = pageContent[path] || pageContent['/'];
-            const docContent = document.getElementById('doc-content');
-            docContent.innerHTML = content;
+    async loadContent(path) {
+        try {
+            UIComponents.showLoading();
             
-            // Generate TOC
+            // تحديد مسار الملف الصحيح
+            if (path === '/') {
+                // عرض الصفحة الرئيسية من pageContent
+                const content = pageContent['/'];
+                const docContent = document.getElementById('doc-content');
+                docContent.innerHTML = content;
+                UIComponents.generateTOC(docContent);
+                return;
+            }
+            
+            // تحديد مسار الملف
+            const filePath = path.substring(1); // إزالة الـ / من البداية
+            const mdPath = `${filePath}.md`;
+            
+            console.log('Loading file:', mdPath);
+            
+            // جلب المحتوى من الملف
+            const response = await fetch(mdPath);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const markdown = await response.text();
+            
+            // تحويل Markdown إلى HTML
+            const html = marked.parse(markdown);
+            
+            // تنظيف HTML للأمان
+            const cleanHtml = DOMPurify.sanitize(html);
+            
+            // عرض المحتوى
+            const docContent = document.getElementById('doc-content');
+            docContent.innerHTML = cleanHtml;
+            
+            // إنشاء جدول المحتويات
             UIComponents.generateTOC(docContent);
             
-            // Scroll to top
+            // التمرير للأعلى
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 200);
+            
+        } catch (error) {
+            console.error('خطأ في تحميل المحتوى:', error);
+            UIComponents.showError(`فشل في تحميل المحتوى: ${path}`);
+        }
     }
 
     // Navigate to path
