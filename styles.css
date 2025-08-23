@@ -444,15 +444,19 @@ body {
 
 /* Responsive diagrams (Mermaid) */
 .doc-content .diagram.mermaid-diagram {
-    display: block;
+    display: flex;               /* center the SVG horizontally */
+    justify-content: center;
+    align-items: center;
     margin: 24px 0;
     overflow: hidden;
 }
 .doc-content .diagram.mermaid-diagram svg {
-    width: 100% !important;
+    display: block;
+    width: auto !important;      /* keep intrinsic width */
+    max-width: 100%;             /* but don’t exceed container */
     height: auto !important;
-    max-width: 100%;
     direction: ltr; /* Mermaid draws LTR; keep layout sane in RTL pages */
+    margin: 0 auto;              /* fallback centering */
 }
 [data-theme="dark"] .doc-content .diagram.mermaid-diagram svg {
     filter: brightness(0.95) contrast(1.05);
