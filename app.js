@@ -349,6 +349,8 @@ class DepthDocs {
                     UIComponents.sanitizeHeadings(docContent);
                     UIComponents.generateTOC(docContent);
                     UIComponents.injectPrevNextAndRelated(path);
+                    // Transform JSON code blocks into interactive viewers before copy buttons wrap <pre>
+                    UIComponents.enhanceJSONBlocks(docContent);
                     UIComponents.enhanceCodeBlocks(docContent);
                     UIComponents.enhanceTables(docContent);
                     UIComponents.addHeadingAnchors(docContent);
@@ -382,6 +384,7 @@ class DepthDocs {
                         UIComponents.sanitizeHeadings(docContent);
                         UIComponents.generateTOC(docContent);
                         UIComponents.injectPrevNextAndRelated(path);
+                        UIComponents.enhanceJSONBlocks(docContent);
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.enhanceTables(docContent);
                         UIComponents.addHeadingAnchors(docContent);
@@ -417,6 +420,7 @@ class DepthDocs {
                         UIComponents.sanitizeHeadings(docContent);
                         UIComponents.generateTOC(docContent);
                         UIComponents.injectPrevNextAndRelated(path);
+                        UIComponents.enhanceJSONBlocks(docContent);
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.enhanceTables(docContent);
                         UIComponents.addHeadingAnchors(docContent);
@@ -442,6 +446,7 @@ class DepthDocs {
                 UIComponents.sanitizeHeadings(docContent);
                 UIComponents.generateTOC(docContent);
                 UIComponents.injectPrevNextAndRelated(path);
+                UIComponents.enhanceJSONBlocks(docContent);
                 UIComponents.enhanceCodeBlocks(docContent);
                 UIComponents.enhanceTables(docContent);
                 UIComponents.addHeadingAnchors(docContent);
