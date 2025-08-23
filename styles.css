@@ -79,6 +79,14 @@
 /* Auto-direction helpers */
 .dir-ltr { direction: ltr; text-align: left; }
 
+/* Inline TOC styling and heading flash */
+.inline-toc-title { margin-top: 12px; }
+.inline-toc { margin: 8px 0 16px; padding-inline-start: 20px; }
+.inline-toc a { color: var(--primary); text-decoration: none; }
+.inline-toc a:hover { text-decoration: underline; }
+
+.heading-flash { background: color-mix(in oklab, var(--primary) 14%, transparent); transition: background 0.9s ease; }
+
 
     /* =============== JSON Viewer =============== */
     .json-viewer {

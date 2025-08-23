@@ -354,6 +354,7 @@ class DepthDocs {
                     UIComponents.enhanceCodeBlocks(docContent);
                     UIComponents.enhanceTables(docContent);
                     UIComponents.addHeadingAnchors(docContent);
+                    UIComponents.enhanceInlineTOC(docContent);
                     UIComponents.enhanceCallouts(docContent);
                     UIComponents.enhanceImagesAndLinks(docContent);
                     UIComponents.injectPageTitleIcon(path);
@@ -389,6 +390,7 @@ class DepthDocs {
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.enhanceTables(docContent);
                         UIComponents.addHeadingAnchors(docContent);
+                        UIComponents.enhanceInlineTOC(docContent);
                         UIComponents.enhanceCallouts(docContent);
                         UIComponents.enhanceImagesAndLinks(docContent);
                         UIComponents.injectPageTitleIcon(path);
@@ -426,6 +428,7 @@ class DepthDocs {
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.enhanceTables(docContent);
                         UIComponents.addHeadingAnchors(docContent);
+                        UIComponents.enhanceInlineTOC(docContent);
                         UIComponents.enhanceCallouts(docContent);
                         UIComponents.enhanceImagesAndLinks(docContent);
                         UIComponents.injectPageTitleIcon(path);
@@ -453,6 +456,7 @@ class DepthDocs {
                 UIComponents.enhanceCodeBlocks(docContent);
                 UIComponents.enhanceTables(docContent);
                 UIComponents.addHeadingAnchors(docContent);
+                UIComponents.enhanceInlineTOC(docContent);
                 UIComponents.enhanceCallouts(docContent);
                 UIComponents.enhanceImagesAndLinks(docContent);
                 UIComponents.injectPageTitleIcon(path);

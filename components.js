@@ -1161,6 +1161,65 @@ class UIComponents {
         });
     }
 
+    // =============== Inline TOC (inside markdown) -> make links scroll to real headings ===============
+    static enhanceInlineTOC(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+
+        const isTOCTitle = (t) => {
+            const s = (t || '').trim().toLowerCase();
+            return s === 'فهرس المحتويات' || s === 'المحتويات' || s === 'table of contents' || s === 'contents';
+        };
+
+        const normalize = (txt) => (txt || '')
+            .replace(/\[[^\]]*\]/g, '') // remove [..]
+            .replace(/[0-9٠-٩]+[\.|\-ـ)]?\s*/g, '') // strip leading numbers (Arabic & Latin)
+            .replace(/[:\.،,…]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
+
+        const allHeads = Array.from(root.querySelectorAll('h2, h3, h4'));
+        if (!allHeads.length) return;
+
+        // Find TOC heading and its following list
+        const titles = Array.from(root.querySelectorAll('h1, h2, h3'))
+            .filter(h => isTOCTitle(h.textContent));
+        titles.forEach(title => {
+            // mark title
+            title.classList.add('inline-toc-title');
+            // locate next UL/OL sibling
+            let el = title.nextElementSibling;
+            let list = null;
+            while (el && !(el.tagName === 'UL' || el.tagName === 'OL')) {
+                // stop if hit a heading or a table
+                if (/^H[1-6]$/.test(el.tagName) || el.tagName === 'TABLE') break;
+                el = el.nextElementSibling;
+            }
+            if (el && (el.tagName === 'UL' || el.tagName === 'OL')) list = el;
+            if (!list) return;
+
+            list.classList.add('inline-toc');
+            const links = Array.from(list.querySelectorAll('a'));
+            links.forEach(a => {
+                const label = normalize(a.textContent || '');
+                // find best match by normalized text
+                const target = allHeads.find(h => normalize(h.textContent || '') === label);
+                if (!target) return;
+
+                // store and wire smooth scroll; don't change main hash route
+                a.setAttribute('data-target', target.id);
+                a.setAttribute('href', '#');
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    target.classList.add('heading-flash');
+                    setTimeout(() => target.classList.remove('heading-flash'), 900);
+                });
+            });
+        });
+    }
+
     static enhanceCallouts(rootEl) {
         const root = rootEl || document.getElementById('doc-content');
         if (!root) return;
