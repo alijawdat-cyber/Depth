@@ -120,7 +120,9 @@
 .diagram-btn:hover { background: color-mix(in oklab, var(--primary) 8%, var(--bg)); color: var(--text-primary); }
 
 .diagram-stage { position: relative; overflow: auto; max-width: 100%; max-height: 65vh; background: color-mix(in oklab, var(--bg) 92%, #fff); }
-.diagram-content { transform-origin: 0 0; transition: transform 0.08s linear; padding: 12px; min-width: 100%; }
+.diagram-viewer .diagram-stage { cursor: grab; }
+.diagram-viewer.dragging .diagram-stage { cursor: grabbing; }
+.diagram-content { transform-origin: 0 0; transition: transform 0.08s linear; padding: 12px; min-width: 100%; will-change: transform; }
 .diagram-content svg { width: 100%; height: auto; display: block; }
 .diagram-caption { padding: 8px 10px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
 

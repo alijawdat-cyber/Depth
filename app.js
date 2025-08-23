@@ -548,12 +548,47 @@ class DepthDocs {
             if (!stage || !content || !svg) return;
 
             let scale = 1; let tx = 0; let ty = 0; let dragging = false; let lastX = 0; let lastY = 0;
+            let pinch = null; // {d, cx, cy}
             const clampScale = (s) => Math.max(0.4, Math.min(3, s));
-            const apply = () => { content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
+
+            const getVB = () => {
+                try {
+                    if (svg.viewBox && svg.viewBox.baseVal) {
+                        const vb = svg.viewBox.baseVal; return { w: vb.width || svg.getBBox().width, h: vb.height || svg.getBBox().height };
+                    }
+                    const bb = svg.getBBox(); return { w: bb.width || 1000, h: bb.height || 600 };
+                } catch (_) { return { w: 1000, h: 600 }; }
+            };
+
+            const clampTranslation = () => {
+                const stW = stage.clientWidth, stH = stage.clientHeight;
+                const { w, h } = getVB();
+                const cw = w * scale + 24; // padding
+                const ch = h * scale + 24;
+                // center if content smaller than stage
+                const minTx = Math.min(0, stW - cw);
+                const minTy = Math.min(0, stH - ch);
+                const maxTx = 0, maxTy = 0;
+                // if smaller, center
+                if (cw <= stW) tx = (stW - cw) / 2; else tx = Math.max(minTx, Math.min(maxTx, tx));
+                if (ch <= stH) ty = (stH - ch) / 2; else ty = Math.max(minTy, Math.min(maxTy, ty));
+            };
+
+            const apply = () => { clampTranslation(); content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
+
+            const fitContain = () => {
+                const stW = stage.clientWidth, stH = stage.clientHeight;
+                const { w, h } = getVB();
+                if (w > 0 && h > 0) {
+                    const s = Math.min((stW - 24) / w, (stH - 24) / h);
+                    scale = clampScale(Math.max(0.5, Math.min(2.5, s)));
+                    tx = 0; ty = 0; apply();
+                }
+            };
+
             const fitToWidth = () => {
                 try {
-                    const vb = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : null;
-                    const w = vb ? vb.width : svg.getBoundingClientRect().width;
+                    const { w } = getVB();
                     const st = stage.getBoundingClientRect();
                     if (w > 0 && st.width > 0) {
                         scale = clampScale(Math.max(0.5, Math.min(2.5, (st.width - 24) / w)));
@@ -576,21 +611,65 @@ class DepthDocs {
             btnFit && btnFit.addEventListener('click', fitToWidth);
             btnReset && btnReset.addEventListener('click', reset);
 
-            // Pan when scaled
-            const onStart = (e) => { dragging = true; lastX = e.touches ? e.touches[0].clientX : e.clientX; lastY = e.touches ? e.touches[0].clientY : e.clientY; e.preventDefault(); };
-            const onMove = (e) => { if (!dragging || scale <= 1) return; const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; tx += (x - lastX); ty += (y - lastY); lastX = x; lastY = y; apply(); };
-            const onEnd = () => { dragging = false; };
+            // Pan (grab) — allow always but clamp within stage
+            const onStart = (e) => {
+                // pinch start
+                if (e.touches && e.touches.length === 2) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const d = Math.hypot(dx, dy);
+                    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    pinch = { d, cx, cy };
+                    return;
+                }
+                dragging = true; viewer.classList.add('dragging');
+                lastX = e.touches ? e.touches[0].clientX : e.clientX; lastY = e.touches ? e.touches[0].clientY : e.clientY; e.preventDefault();
+            };
+            const onMove = (e) => {
+                // pinch zoom
+                if (e.touches && e.touches.length === 2 && pinch) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const d = Math.hypot(dx, dy) || 1;
+                    const factor = d / (pinch.d || 1);
+                    const newScale = clampScale(scale * factor);
+                    // zoom towards pinch center
+                    const rect = stage.getBoundingClientRect();
+                    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+                    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+                    const k = newScale / scale;
+                    tx = cx - k * (cx - tx);
+                    ty = cy - k * (cy - ty);
+                    scale = newScale; pinch.d = d; apply();
+                    return;
+                }
+                if (!dragging) return;
+                const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY;
+                tx += (x - lastX); ty += (y - lastY); lastX = x; lastY = y; apply();
+            };
+            const onEnd = () => { dragging = false; viewer.classList.remove('dragging'); pinch = null; };
             stage.addEventListener('mousedown', onStart); stage.addEventListener('touchstart', onStart, { passive: false });
             window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove, { passive: false });
             window.addEventListener('mouseup', onEnd); window.addEventListener('touchend', onEnd, { passive: true });
 
-            // Wheel zoom centered
-            stage.addEventListener('wheel', (e) => { e.preventDefault(); const dir = e.deltaY > 0 ? 1/1.15 : 1.15; const newScale = clampScale(scale * dir); if (newScale === scale) return; scale = newScale; apply(); }, { passive: false });
+            // Wheel zoom towards cursor
+            stage.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = stage.getBoundingClientRect();
+                const cx = e.clientX - rect.left; const cy = e.clientY - rect.top;
+                const dir = e.deltaY > 0 ? 1/1.15 : 1.15; const newScale = clampScale(scale * dir);
+                if (newScale === scale) return;
+                const k = newScale / scale; tx = cx - k * (cx - tx); ty = cy - k * (cy - ty); scale = newScale; apply();
+            }, { passive: false });
 
-            // Resize fit
-            const ro = new ResizeObserver(() => fitToWidth()); ro.observe(stage);
-            // Initial fit for wide diagrams
-            fitToWidth();
+            // Double click to zoom in; Shift + double click to reset
+            stage.addEventListener('dblclick', (e) => { e.preventDefault(); if (e.shiftKey) { reset(); } else { scale = clampScale(scale * 1.3); apply(); } });
+
+            // Resize: keep containment fit when resized significantly
+            const ro = new ResizeObserver(() => { apply(); }); ro.observe(stage);
+            // Initial fit contain for better placement
+            fitContain();
 
             // Download SVG
             btnDownload && btnDownload.addEventListener('click', () => {
