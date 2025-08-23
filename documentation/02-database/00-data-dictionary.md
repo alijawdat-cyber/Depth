@@ -109,6 +109,7 @@
 | bio           | string       | لا    | النبذة التعريفية           | مصور محترف    | ≤500 حرف     |
 | profileImage  | string       | لا    | رابط صورة الملف الشخصي     | https://...    |              |
 | portfolioImages| array       | لا    | مجموعة صور الأعمال         | [url1, url2]   | ≤10 صور      |
+> ℹ️ ملاحظة (V2.0): `portfolioImages` للعرض فقط، بدون تنظيم متقدم/ألبومات. السقف ≤10 صور، روابط ثابتة.
 | location      | object       | نعم   | الموقع الجغرافي            | {city, area}   |              |
 | specialties   | array<string>| نعم   | التخصصات                   | [photo, video] | من قائمة محددة |
 | experienceLevel| enum        | نعم   | مستوى الخبرة               | experienced    | fresh/experienced/expert |
@@ -565,6 +566,7 @@
 | isPublic      | boolean      | نعم   | ظاهر للعامة                | true           |              |
 | createdAt     | timestamp    | نعم   | تاريخ الإنشاء              | 2025-08-20     |              |
 | updatedAt     | timestamp    | نعم   | آخر تحديث                  | 2025-08-21     |              |
+> ℹ️ ملاحظة (V2.0): التقييم يُفتح فقط بعد اكتمال المشروع (status=completed). النموذج بسيط: rating 1–5 + comment اختياري، تقييم واحد لكل طرف لكل مشروع.
 
 ### 6.5 أكواد التحقق (OTPCodes)
 > نظام إدارة أكواد التحقق للهواتف
@@ -582,6 +584,7 @@
 | lastAttemptAt | timestamp    | لا    | تاريخ آخر محاولة           | 2025-08-21     |              |
 | createdAt     | timestamp    | نعم   | تاريخ الإنشاء              | 2025-08-20     |              |
 | updatedAt     | timestamp    | نعم   | آخر تحديث                  | 2025-08-21     |              |
+> ℹ️ ملاحظة (V2.0): تبريد 60 ثانية بين محاولات إدخال كود OTP؛ حد أقصى 3 محاولات، صلاحية 5 دقائق.
 
 ### 6.6 سجلات التدقيق (AuditLogs)
 > سجل شامل لجميع الإجراءات المهمة في النظام

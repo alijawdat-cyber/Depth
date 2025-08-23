@@ -91,6 +91,7 @@
   bio: string,                    // ≤500 حرف
   profileImage: string,           // URL
   portfolioImages: string[],      // ≤10 صور
+  // ℹ️ V2.0: عرض بسيط فقط بدون تنظيم متقدم؛ ≤10 روابط صور ثابتة
   
   // الموقع
   location: {

@@ -72,7 +72,7 @@ const otpVerification = {
   codeLength: 6,
   expiry: 300, // 5 دقائق
   maxAttempts: 3,
-  cooldown: 900 // 15 دقيقة
+  cooldown: 60 // 60 ثانية (V2.0)
 };
 ```
 
@@ -470,7 +470,7 @@ const phoneAuthConfig = {
     codeLength: 6,
     autoRetrievalTimeoutSeconds: 300,
     maxAttempts: 3,
-    cooldownSeconds: 900
+  cooldownSeconds: 60
   }
 };
 ```
