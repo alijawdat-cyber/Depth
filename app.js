@@ -350,6 +350,7 @@ class DepthDocs {
                     UIComponents.generateTOC(docContent);
                     UIComponents.injectPrevNextAndRelated(path);
                     UIComponents.enhanceCodeBlocks(docContent);
+                    UIComponents.enhanceTables(docContent);
                     UIComponents.injectPageTitleIcon(path);
                     // Mermaid render
                     try { await this.renderMermaid(docContent); } catch (_) {}
@@ -379,6 +380,7 @@ class DepthDocs {
                         UIComponents.generateTOC(docContent);
                         UIComponents.injectPrevNextAndRelated(path);
                         UIComponents.enhanceCodeBlocks(docContent);
+                        UIComponents.enhanceTables(docContent);
                         UIComponents.injectPageTitleIcon(path);
                         try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
@@ -410,6 +412,7 @@ class DepthDocs {
                         UIComponents.generateTOC(docContent);
                         UIComponents.injectPrevNextAndRelated(path);
                         UIComponents.enhanceCodeBlocks(docContent);
+                        UIComponents.enhanceTables(docContent);
                         UIComponents.injectPageTitleIcon(path);
                         try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
@@ -431,6 +434,7 @@ class DepthDocs {
                 UIComponents.generateTOC(docContent);
                 UIComponents.injectPrevNextAndRelated(path);
                 UIComponents.enhanceCodeBlocks(docContent);
+                UIComponents.enhanceTables(docContent);
                 UIComponents.injectPageTitleIcon(path);
                 try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();

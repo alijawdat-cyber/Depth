@@ -922,6 +922,30 @@ class UIComponents {
             pre.appendChild(btn);
         });
     }
+
+    // =============== Enhance tables: wrap, sticky head, optional sticky first column ===============
+    static enhanceTables(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const tables = Array.from(root.querySelectorAll('table'));
+        tables.forEach((table) => {
+            // Skip if already wrapped
+            if (!table.closest('.table-wrap')) {
+                const wrap = document.createElement('div');
+                wrap.className = 'table-wrap';
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            }
+            // Add sticky header support via class
+            table.classList.add('sticky-head');
+            // If table has many columns, make first column sticky for readability
+            try {
+                const firstRow = table.querySelector('tr');
+                const cols = firstRow ? (firstRow.children ? firstRow.children.length : 0) : 0;
+                if (cols >= 6) table.classList.add('sticky-col');
+            } catch (_) {}
+        });
+    }
 }
 
 // Export for use

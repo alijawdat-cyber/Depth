@@ -10,10 +10,29 @@
     box-shadow: var(--shadow);
     margin: 16px 0;
 }
+/* wrapper to handle horizontal scroll with padding */
+.doc-content .table-wrap {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 16px 0;
+}
+.doc-content .table-wrap::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: 12px;
+    pointer-events: none;
+    background: linear-gradient(to left, var(--bg) 60%, transparent);
+}
 .doc-content table thead th {
     background: var(--bg-secondary);
     color: var(--text);
     font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 .doc-content table th,
 .doc-content table td {
@@ -51,18 +70,27 @@
 }
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
-    .doc-content table {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        white-space: nowrap;
-    }
+    .doc-content .table-wrap { margin: 12px -12px; padding-inline: 12px; }
     .doc-content table th,
     .doc-content table td {
         padding: 10px 12px;
         font-size: 0.95rem;
     }
 }
+
+/* Sticky first column for wide tables */
+.doc-content table.sticky-col th:first-child,
+.doc-content table.sticky-col td:first-child {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 2;
+    background: inherit;
+    box-shadow: 2px 0 0 0 var(--border);
+}
+
+/* Compact density variant if needed */
+.doc-content table.compact th,
+.doc-content table.compact td { padding: 8px 10px; }
 /* =============== Variables =============== */
 :root {
     --primary: #6C2BFF;
