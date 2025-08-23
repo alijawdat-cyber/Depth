@@ -132,14 +132,14 @@
         border-bottom: 1px solid var(--border);
     }
     .json-title { font-weight: 600; color: var(--text-primary); }
-    .json-actions { display: flex; gap: 8px; }
+    .json-actions { display: flex; gap: 6px; }
     .json-action {
         display: inline-flex; align-items: center; justify-content: center;
-        width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
-        background: var(--bg); color: var(--text-secondary); cursor: pointer;
+        padding: 4px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;
     }
-    .json-action:hover { background: color-mix(in oklab, var(--primary) 8%, var(--bg)); color: var(--text-primary); }
-    .json-action.copied { color: var(--success, #16a34a); border-color: var(--success, #16a34a); }
+    .json-action i { width: 20px; height: 20px; }
+    .json-action:hover { color: var(--text-primary); background: transparent; }
+    .json-action.copied { color: var(--success, #16a34a); }
 
     .json-body { padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
     .json-node { position: relative; }
