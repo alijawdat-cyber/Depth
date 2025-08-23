@@ -1418,13 +1418,26 @@ class UIComponents {
         });
     }
 
-    // =============== AOS: Apply attributes responsively across content ===============
+    // =============== AOS: Apply attributes responsively across content (with iOS routing) ===============
     static applyAOSAttributes(rootEl) {
         const root = rootEl || document.getElementById('doc-content');
-        if (!root || !window.AOS) return;
+        if (!root) return;
 
         const isMobile = window.innerWidth < 768;
         const isDesktop = window.innerWidth >= 1024;
+    const ua = navigator.userAgent || '';
+    const isiPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || isiPadOS;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+        const isIOSSafari = isIOS && isSafari;
+
+        if (isIOSSafari) {
+            // Use custom iOS animation system to avoid AOS quirks
+            UIComponents.applyIOSAnimations(root);
+            return;
+        }
+
+        if (!window.AOS) return;
 
         // Clear previous AOS attributes to avoid duplication when re-rendering
         root.querySelectorAll('[data-aos]').forEach(el => {
@@ -1519,6 +1532,43 @@ class UIComponents {
 
         // Refresh AOS to pick up attributes
         try { window.AOS.refresh(); } catch (_) {}
+    }
+
+    // iOS-specific animation system using IntersectionObserver + CSS classes
+    static applyIOSAnimations(root) {
+        // Respect user reduced-motion preference
+        const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion) {
+            root.querySelectorAll('h1, h2, p, ul, ol, .table-wrap, pre').forEach(el => { el.style.visibility = ''; });
+            return;
+        }
+        const opts = { root: null, rootMargin: '0px 0px -10% 0px', threshold: [0.1, 0.5, 1.0] };
+        const animate = (el, cls, delay = 0) => {
+            el.style.visibility = 'hidden';
+            setTimeout(() => { el.classList.add(cls); el.style.visibility = 'visible'; }, delay);
+        };
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting || entry.intersectionRatio < 0.1) return;
+                const el = entry.target;
+                const a = el.dataset.iosAnimation;
+                const d = parseInt(el.dataset.iosDelay || '0', 10);
+                if (a && !el.classList.contains(a)) animate(el, a, d);
+                io.unobserve(el);
+            });
+        }, opts);
+
+    // Titles
+    root.querySelectorAll('h1').forEach(el => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = 'ios-animate-bounce'; el.dataset.iosDelay = '0'; io.observe(el); });
+    root.querySelectorAll('h2').forEach((el, i) => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = 'ios-animate-up'; el.dataset.iosDelay = String(i * 50); io.observe(el); });
+    // Paragraphs
+    root.querySelectorAll('p').forEach((el, i) => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = (i % 2 === 0 ? 'ios-animate-right' : 'ios-animate-left'); el.dataset.iosDelay = String(Math.min(i * 30, 200)); io.observe(el); });
+    // Lists
+    root.querySelectorAll('ul, ol').forEach((el, i) => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = 'ios-animate-zoom'; el.dataset.iosDelay = String(i * 40); io.observe(el); });
+    // Tables
+    root.querySelectorAll('.table-wrap').forEach((el, i) => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = 'ios-animate-flip'; el.dataset.iosDelay = String(i * 60); io.observe(el); });
+    // Code blocks
+    root.querySelectorAll('pre').forEach((el, i) => { el.style.visibility = 'hidden'; el.dataset.iosAnimation = 'ios-animate-bounce'; el.dataset.iosDelay = String(i * 50); io.observe(el); });
     }
 }
 

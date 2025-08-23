@@ -38,8 +38,12 @@ class DepthDocs {
         this.handleRoute();
         this.setupScrollEffects();
         this.loadTheme();
-        // Initialize AOS if available (responsive config)
-        if (window.AOS) {
+        // Initialize AOS if available (responsive config) and not on iOS Safari
+        const ua = navigator.userAgent || '';
+        const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+        const isIOSSafari = isIOS && isSafari;
+        if (window.AOS && !isIOSSafari) {
             const isMobile = window.innerWidth < 768;
             window.AOS.init({
                 once: true,
@@ -354,7 +358,12 @@ class DepthDocs {
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
         const wrapper = document.querySelector('.content-wrapper');
         if (wrapper) wrapper.classList.remove('home-full');
-        if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+    // Avoid AOS refresh on iOS Safari where custom animations are used
+    const ua = navigator.userAgent || '';
+    const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const isIOSSafari = isIOS && isSafari;
+    if (window.AOS && !isIOSSafari) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
         if (window.UIComponents && UIComponents.fixMobileStickyColumns) UIComponents.fixMobileStickyColumns();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
