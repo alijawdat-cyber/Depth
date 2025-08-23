@@ -1154,7 +1154,7 @@ class UIComponents {
             try {
                 const firstRow = table.querySelector('tr');
                 const cols = firstRow ? (firstRow.children ? firstRow.children.length : 0) : 0;
-                if (cols >= 6) table.classList.add('sticky-col');
+                if (isPhone || cols >= 5) table.classList.add('sticky-col');
             } catch (_) {}
 
             // Keep original table shape; scrolling handled by wrapper for phones

@@ -60,6 +60,11 @@
 .doc-content table tbody tr:hover {
     background: color-mix(in srgb, var(--primary) 6%, var(--bg));
 }
+/* Make hover/zebra apply under sticky first column without changing its bg */
+.doc-content table.sticky-col tbody tr:nth-child(even) th:first-child,
+.doc-content table.sticky-col tbody tr:nth-child(even) td:first-child { background: var(--bg); }
+.doc-content table.sticky-col tbody tr:hover th:first-child,
+.doc-content table.sticky-col tbody tr:hover td:first-child { background: var(--bg); }
 /* links and code inside table */
 .doc-content table a {
     color: var(--primary);
@@ -91,6 +96,9 @@
     .doc-content .table-wrap > table { display: table; overflow: visible; }
     .doc-content .table-wrap > table td { min-width: 60px; }
     .doc-content .table-wrap > table th { min-width: 60px; }
+    /* Ensure first column (field/الحقل) keeps a readable width and sticks smoothly */
+    .doc-content table.sticky-col th:first-child,
+    .doc-content table.sticky-col td:first-child { min-width: 110px; }
 }
 
 /* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */
