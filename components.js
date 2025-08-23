@@ -1135,11 +1135,18 @@ class UIComponents {
         }
         tables.forEach((table) => {
             // Skip if already wrapped
-            if (!table.closest('.table-wrap')) {
-                const wrap = document.createElement('div');
+            let wrap = table.closest('.table-wrap');
+            if (!wrap) {
+                wrap = document.createElement('div');
                 wrap.className = 'table-wrap';
                 table.parentNode.insertBefore(wrap, table);
                 wrap.appendChild(table);
+            }
+            // tag wraps on phones for CSS targeting (overflow-x only on phones)
+            if (isPhone) {
+                wrap.classList.add('mobile-scrollable');
+            } else {
+                wrap.classList.remove('mobile-scrollable');
             }
             // Add sticky header support via class
             table.classList.add('sticky-head');

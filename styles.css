@@ -13,8 +13,8 @@
 /* wrapper to handle horizontal scroll with padding */
 .doc-content .table-wrap {
     position: relative;
-    /* desktop/tablet: avoid horizontal scroll; mobile media query will enable it */
-    overflow-x: hidden;
+    /* desktop/tablet: no horizontal scroll; mobile media query will enable it */
+    overflow-x: visible;
     -webkit-overflow-scrolling: touch;
     margin: 16px 0;
     border: 1px solid var(--border);
@@ -73,22 +73,22 @@
 }
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
-    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; overscroll-behavior-x: contain; }
+    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto !important; -webkit-overflow-scrolling: touch; position: relative; overscroll-behavior-x: contain; max-width: calc(100vw - 32px); }
     /* subtle fade to hint scroll */
     .doc-content .table-wrap::before, .doc-content .table-wrap::after { content: ''; position: sticky; top: 0; width: 18px; height: 100%; pointer-events: none; z-index: 1; }
     .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
     .doc-content .table-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
     .doc-content .table-wrap > table th,
-    .doc-content .table-wrap > table td { padding: 12px 14px; font-size: 0.98rem; }
+    .doc-content .table-wrap > table td { padding: 8px 10px; font-size: 0.9rem; }
 
     /* Keep table wide and readable without squishing (inside wrapper only) */
-    .doc-content .table-wrap > table { width: max-content !important; min-width: 100%; }
-    /* Force horizontal growth on phone: prevent wrapping so wrapper scrolls */
+    .doc-content .table-wrap > table { width: auto; min-width: 500px; }
+    /* Allow wrapping so content can break naturally */
     .doc-content .table-wrap > table th,
-    .doc-content .table-wrap > table td { white-space: nowrap; word-break: normal; }
-    .doc-content .table-wrap > table td { min-width: 120px; }
-    .doc-content .table-wrap > table th { min-width: 130px; }
+    .doc-content .table-wrap > table td { white-space: normal; word-break: break-word; }
+    .doc-content .table-wrap > table td { min-width: 60px; }
+    .doc-content .table-wrap > table th { min-width: 60px; }
 }
 
 /* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */
@@ -309,10 +309,7 @@ body {
     display: flex;
     min-height: 100vh;
 }
-/* Prevent pinch/gesture zoom and layout jitter on touch devices */
-@media (pointer: coarse) {
-    html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
-}
+/* removed touch-action override per user request */
 
 /* =============== Header =============== */
 .header {
@@ -679,9 +676,9 @@ body {
 @media (min-width: 768px) {
     .doc-content pre { white-space: pre-wrap; word-break: break-word; }
 }
-/* Phones: allow horizontal scroll for code blocks only inside the pre container */
-@media (max-width: 767.98px) {
-    .doc-content pre { white-space: pre; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* ensure page itself never scrolls horizontally on phones */
+@media (max-width: 768px) {
+    body, .main-content, .doc-content { overflow-x: hidden; max-width: 100vw; }
 }
 
 /* ===== Homepage (/) ===== */
