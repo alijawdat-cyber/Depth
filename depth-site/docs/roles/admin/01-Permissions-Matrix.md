@@ -1,5 +1,7 @@
 # مصفوفة الصلاحيات — Admin
 
+> SSOT — مصدر الحقيقة الوحيد (Roles Matrix): انظر documentation/99-reference/05-roles-matrix.md
+
 الجدول أدناه يوضّح صلاحيات الأدمن على أهم الوحدات.
 
 - Catalog: Create/Read/Update/Delete, Publish/Freeze, Versions, Guardrails.
