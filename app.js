@@ -512,10 +512,12 @@ class DepthDocs {
                 };
                 const btnZoomOut = mkBtn('zoom-out', 'تصغير');
                 const btnZoomIn = mkBtn('zoom-in', 'تكبير');
-                const btnFit = mkBtn('scan', 'ملائمة للعرض');
+                const btnFit = mkBtn('scan', 'ملائمة للعرض (العرض)');
+                const btnFitH = mkBtn('maximize-2', 'ملائمة للعرض (الارتفاع)');
+                const btnCenter = mkBtn('crosshair', 'تمركز');
                 const btnReset = mkBtn('rotate-ccw', 'إعادة الضبط');
                 const btnDownload = mkBtn('download', 'تنزيل SVG');
-                right.append(btnZoomOut, btnZoomIn, btnFit, btnReset, btnDownload);
+                right.append(btnZoomOut, btnZoomIn, btnFit, btnFitH, btnCenter, btnReset, btnDownload);
                 bar.append(left, right);
                 viewer.appendChild(bar);
 
@@ -596,6 +598,17 @@ class DepthDocs {
                     }
                 } catch (_) { scale = 1; tx = ty = 0; apply(); }
             };
+            const fitToHeight = () => {
+                try {
+                    const { h } = getVB();
+                    const st = stage.getBoundingClientRect();
+                    if (h > 0 && st.height > 0) {
+                        scale = clampScale(Math.max(0.5, Math.min(2.5, (st.height - 24) / h)));
+                        tx = 0; ty = 0; apply();
+                    }
+                } catch (_) { scale = 1; tx = ty = 0; apply(); }
+            };
+            const centerView = () => { clampTranslation(); apply(); };
             const reset = () => { scale = 1; tx = 0; ty = 0; apply(); };
             apply();
 
@@ -604,12 +617,16 @@ class DepthDocs {
             const btnOut = viewer.querySelector('.diagram-btn i[data-lucide="zoom-out"]')?.parentElement;
             const btnFit = viewer.querySelector('.diagram-btn i[data-lucide="scan"]')?.parentElement;
             const btnReset = viewer.querySelector('.diagram-btn i[data-lucide="rotate-ccw"]')?.parentElement;
+            const btnCenter = viewer.querySelector('.diagram-btn i[data-lucide="crosshair"]')?.parentElement;
+            const btnFitH = viewer.querySelector('.diagram-btn i[data-lucide="maximize-2"]')?.parentElement;
             const btnDownload = viewer.querySelector('.diagram-btn i[data-lucide="download"]')?.parentElement;
 
             btnIn && btnIn.addEventListener('click', () => { scale = clampScale(scale * 1.2); apply(); });
             btnOut && btnOut.addEventListener('click', () => { scale = clampScale(scale / 1.2); apply(); });
             btnFit && btnFit.addEventListener('click', fitToWidth);
+            btnFitH && btnFitH.addEventListener('click', fitToHeight);
             btnReset && btnReset.addEventListener('click', reset);
+            btnCenter && btnCenter.addEventListener('click', centerView);
 
             // Pan (grab) — allow always but clamp within stage
             const onStart = (e) => {
