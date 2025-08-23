@@ -930,9 +930,22 @@ class UIComponents {
         const codeBlocks = Array.from(root.querySelectorAll('pre > code'));
 
         const isLikelyJSON = (text, lang) => {
-            if ((lang || '').toLowerCase().includes('json')) return true;
-            const t = (text || '').trim();
-            return (t.startsWith('{') && t.endsWith('}')) || (t.startsWith('[') && t.endsWith(']'));
+            const lower = (lang || '').toLowerCase();
+            if (lower.includes('json')) return true;
+
+            const trimmed = (text || '').trim();
+            const looksWrapped = (trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'));
+            if (!looksWrapped) return false;
+
+            try {
+                // quick structure hints even before parse
+                const hasQuotes = trimmed.includes('"') || trimmed.includes("'");
+                const hasColon = trimmed.includes(':');
+                const hasComma = trimmed.includes(',') || trimmed.length < 50;
+                return hasQuotes || hasColon || hasComma;
+            } catch {
+                return false;
+            }
         };
 
         const tryParse = (text) => {
@@ -1179,29 +1192,23 @@ class UIComponents {
         });
     }
 
-    // تحسين sticky columns للهاتف: fallback transform-based pinning
+    // تحسين sticky columns للهاتف: Observer to activate mobile sticky styling only when in view
     static fixMobileStickyColumns() {
         if (window.innerWidth > 768) return;
-        const wrappers = document.querySelectorAll('.table-wrap');
-        wrappers.forEach(wrapper => {
-            const table = wrapper.querySelector('table');
-            if (!table) return;
-            const firstCells = table.querySelectorAll('tr > *:first-child');
-            // Sync on scroll to emulate pinning when native sticky misbehaves
-            const onScroll = () => {
-                const scrollLeft = wrapper.scrollLeft;
-                firstCells.forEach(cell => {
-                    cell.style.transform = `translateX(${scrollLeft}px)`;
-                    cell.style.position = 'relative';
-                    cell.style.zIndex = '5';
-                    const bg = getComputedStyle(cell).backgroundColor;
-                    cell.style.background = bg && bg !== 'rgba(0, 0, 0, 0)' ? bg : 'var(--bg)';
-                });
-            };
-            wrapper.removeEventListener('scroll', wrapper._stickyEmuScroll);
-            wrapper._stickyEmuScroll = onScroll;
-            wrapper.addEventListener('scroll', onScroll, { passive: true });
-        });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const wrap = entry.target;
+                const table = wrap.querySelector('table');
+                if (!table) return;
+                if (entry.isIntersecting) {
+                    table.classList.add('mobile-sticky-active');
+                } else {
+                    table.classList.remove('mobile-sticky-active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.table-wrap').forEach(wrap => observer.observe(wrap));
     }
 
     // =============== Markdown polish: anchors, callouts, images, links ===============
@@ -1349,6 +1356,33 @@ class UIComponents {
                 }
             } catch (_) { /* ignore */ }
         });
+
+        // Lazy-load images for performance
+        try { UIComponents.lazyLoadImages(root); } catch (_) {}
+    }
+
+    // Lazy loading for images using IntersectionObserver
+    static lazyLoadImages(root) {
+        const images = root.querySelectorAll('img');
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                obs.unobserve(img);
+            });
+        }, { rootMargin: '50px' });
+
+        images.forEach(img => {
+            if (!img.complete) {
+                img.dataset.src = img.src;
+                img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E';
+            }
+            obs.observe(img);
+        });
     }
 
     // =============== Auto direction: set LTR on pure-English blocks only ===============
@@ -1401,22 +1435,42 @@ class UIComponents {
         });
 
         if (isMobile) {
-            // Simple fade-up for mobile, short durations
-            root.querySelectorAll('h1, h2, h3, h4').forEach(el => {
+            // Varied, smooth animations for mobile with light timings
+            root.querySelectorAll('h1, h2').forEach((el, i) => {
+                el.setAttribute('data-aos', 'fade-right');
+                el.setAttribute('data-aos-duration', '500');
+                el.setAttribute('data-aos-delay', `${i * 30}`);
+                el.setAttribute('data-aos-offset', '30');
+            });
+            root.querySelectorAll('h3, h4').forEach((el) => {
                 el.setAttribute('data-aos', 'fade-up');
                 el.setAttribute('data-aos-duration', '400');
             });
-            root.querySelectorAll('p, ul, ol, blockquote').forEach(el => {
+            root.querySelectorAll('p').forEach((el, i) => {
                 el.setAttribute('data-aos', 'fade-up');
-                el.setAttribute('data-aos-duration', '300');
+                el.setAttribute('data-aos-duration', '400');
+                el.setAttribute('data-aos-delay', `${Math.min(i * 20, 200)}`);
+                el.setAttribute('data-aos-anchor-placement', 'top-bottom');
+            });
+            root.querySelectorAll('ul, ol').forEach(el => {
+                el.setAttribute('data-aos', 'fade-left');
+                el.setAttribute('data-aos-duration', '450');
             });
             root.querySelectorAll('.table-wrap').forEach(el => {
-                el.setAttribute('data-aos', 'fade-up');
-                el.setAttribute('data-aos-duration', '300');
+                el.setAttribute('data-aos', 'zoom-in-up');
+                el.setAttribute('data-aos-duration', '400');
             });
-            root.querySelectorAll('pre, img, figure').forEach(el => {
-                el.setAttribute('data-aos', 'fade-up');
-                el.setAttribute('data-aos-duration', '300');
+            root.querySelectorAll('pre').forEach(el => {
+                el.setAttribute('data-aos', 'flip-left');
+                el.setAttribute('data-aos-duration', '500');
+            });
+            root.querySelectorAll('img, figure').forEach(el => {
+                el.setAttribute('data-aos', 'zoom-in-up');
+                el.setAttribute('data-aos-duration', '450');
+            });
+            root.querySelectorAll('blockquote').forEach(el => {
+                el.setAttribute('data-aos', 'fade-left');
+                el.setAttribute('data-aos-duration', '450');
             });
         } else if (isDesktop) {
             // Rich animations on desktop

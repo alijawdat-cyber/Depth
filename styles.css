@@ -103,6 +103,13 @@
 
 /* === حل مشكلة sticky column على الهاتف === */
 @media (max-width: 768px) {
+    /* Smooth scrolling hints and GPU acceleration */
+    .doc-content .table-wrap {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        will-change: scroll-position;
+    }
+
     /* Wrapper with sticky column behavior */
     .doc-content .table-wrap.has-sticky-col {
         position: relative;
@@ -121,6 +128,10 @@
         border-left: 2px solid var(--border);
         box-shadow: -2px 0 4px rgba(0,0,0,0.06);
         min-width: 80px;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+    transition: none;
     }
 
     /* Header cell above rows */
@@ -144,6 +155,21 @@
         background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
         pointer-events: none;
     }
+}
+
+/* === تحسينات AOS للهاتف === */
+@media (max-width: 768px) {
+    [data-aos] { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; }
+    [data-aos="fade-up"] { transform: translateY(15px) !important; }
+    [data-aos="fade-up"].aos-animate { transform: translateY(0) !important; }
+    [data-aos="fade-right"] { transform: translateX(-20px) !important; }
+    [data-aos="fade-right"].aos-animate { transform: translateX(0) !important; }
+    [data-aos="fade-left"] { transform: translateX(20px) !important; }
+    [data-aos="fade-left"].aos-animate { transform: translateX(0) !important; }
+    [data-aos^="zoom"] { transform: scale(0.98) !important; }
+    [data-aos^="zoom"].aos-animate { transform: scale(1) !important; }
+    [data-aos^="flip"] { transform: perspective(1000px) rotateY(-30deg) !important; }
+    [data-aos^="flip"].aos-animate { transform: perspective(1000px) rotateY(0) !important; }
 }
 
 /* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */

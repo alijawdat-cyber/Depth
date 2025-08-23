@@ -7,6 +7,9 @@ class DepthDocs {
         this.isLargeDesktop = false;
         this.isTablet = false;
         this.isMobile = false;
+    // lightweight page cache and preload tracking
+    this.pageCache = new Map();
+    this.preloadQueue = new Set();
         this.init();
     }
 
@@ -272,150 +275,127 @@ class DepthDocs {
         }
     }
 
-    // Load content by fetching markdown or using inline fallback
+    // Fetch content via multiple strategies and return sanitized HTML
+    async fetchContent(path) {
+        if (path === '/' && typeof pageContent !== 'undefined' && pageContent['/']) {
+            return pageContent['/'];
+        }
+        const filePath = path.replace(/^\//, '');
+        const version = 'v=2.5';
+        const tryUrl = async (url) => {
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res.ok) return null;
+            const markdown = await res.text();
+            const html = marked.parse(markdown);
+            return DOMPurify.sanitize(html);
+        };
+        // 1) Relative path
+        let clean = await tryUrl(`./${filePath}.md?${version}`);
+        if (clean) return clean;
+        // 2) Absolute path for GH pages
+        const base = `${window.location.origin}${window.location.pathname.replace(/index\.html?$/, '')}`;
+        clean = await tryUrl(`${base}${filePath}.md?${version}`);
+        if (clean) return clean;
+        // 3) Raw GitHub
+        const host = window.location.host;
+        const owner = host.split('.')[0] || 'alijawdat-cyber';
+        const repo = (window.location.pathname.split('/').filter(Boolean)[0]) || 'Depth';
+        clean = await tryUrl(`https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}.md?${version}`);
+        if (clean) return clean;
+        // 4) Inline stub
+        if (typeof pageContent !== 'undefined' && pageContent[path]) return pageContent[path];
+        throw new Error(`المحتوى غير متاح: ${path}`);
+    }
+
+    // Apply content HTML into the page and enhance progressively
+    async applyContent(cleanHtml, path) {
+        const docContent = document.getElementById('doc-content');
+        docContent.innerHTML = cleanHtml;
+        UIComponents.sanitizeHeadings(docContent);
+        UIComponents.generateTOC(docContent);
+        UIComponents.injectPrevNextAndRelated(path);
+        UIComponents.enhanceJSONBlocks(docContent);
+        UIComponents.enhanceCodeBlocks(docContent);
+        UIComponents.enhanceTables(docContent);
+        UIComponents.addHeadingAnchors(docContent);
+        UIComponents.enhanceInlineTOC(docContent);
+        UIComponents.enhanceCallouts(docContent);
+        UIComponents.enhanceImagesAndLinks(docContent);
+        UIComponents.injectPageTitleIcon(path);
+        UIComponents.applyAutoDirection(docContent);
+        if (window.UIComponents && UIComponents.applyAOSAttributes) UIComponents.applyAOSAttributes(docContent);
+        try { await this.renderMermaid(docContent); } catch (_) {}
+        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        const wrapper = document.querySelector('.content-wrapper');
+        if (wrapper) wrapper.classList.remove('home-full');
+        if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+        if (window.UIComponents && UIComponents.fixMobileStickyColumns) UIComponents.fixMobileStickyColumns();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Load content with cache and idle rendering
     async loadContent(path) {
         try {
             UIComponents.showLoading();
-            if (path === '/' && typeof pageContent !== 'undefined' && pageContent['/']) {
-                const docContent = document.getElementById('doc-content');
-                docContent.innerHTML = pageContent['/'];
-                UIComponents.sanitizeHeadings(docContent);
-                UIComponents.generateTOC(docContent);
-                UIComponents.injectPrevNextAndRelated(path);
-                UIComponents.enhanceJSONBlocks(docContent);
-                UIComponents.enhanceCodeBlocks(docContent);
-                UIComponents.enhanceTables(docContent);
-                UIComponents.addHeadingAnchors(docContent);
-                UIComponents.enhanceInlineTOC(docContent);
-                UIComponents.enhanceCallouts(docContent);
-                UIComponents.enhanceImagesAndLinks(docContent);
-                UIComponents.injectPageTitleIcon(path);
-                UIComponents.applyAutoDirection(docContent);
-                // Apply AOS attributes per device/type and refresh
-                if (window.UIComponents && UIComponents.applyAOSAttributes) {
-                    UIComponents.applyAOSAttributes(docContent);
-                }
-                try { await this.renderMermaid(docContent); } catch (_) {}
-                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
-                const wrapper = document.querySelector('.content-wrapper');
-                if (wrapper) wrapper.classList.remove('home-full');
-                if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
-                // Ensure sticky first column stability on phones
-                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
-                    UIComponents.fixMobileStickyColumns();
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (this.pageCache.has(path)) {
+                const cached = this.pageCache.get(path);
+                await this.applyContent(cached, path);
+                this.preloadAdjacentPages(path);
                 return;
             }
-
-            // Markdown-first loader
-            const filePath = path.replace(/^\//, '');
-            const version = 'v=2.5';
-            let rendered = false;
-
-            const attemptRender = async (url) => {
-                const res = await fetch(url, { cache: 'no-store' });
-                if (!res.ok) return false;
-                const markdown = await res.text();
-                const html = marked.parse(markdown);
-                const cleanHtml = DOMPurify.sanitize(html);
-                const docContent = document.getElementById('doc-content');
-                docContent.innerHTML = cleanHtml;
-                UIComponents.sanitizeHeadings(docContent);
-                UIComponents.generateTOC(docContent);
-                UIComponents.injectPrevNextAndRelated(path);
-                UIComponents.enhanceJSONBlocks(docContent);
-                UIComponents.enhanceCodeBlocks(docContent);
-                UIComponents.enhanceTables(docContent);
-                UIComponents.addHeadingAnchors(docContent);
-                UIComponents.enhanceInlineTOC(docContent);
-                UIComponents.enhanceCallouts(docContent);
-                UIComponents.enhanceImagesAndLinks(docContent);
-                UIComponents.injectPageTitleIcon(path);
-                UIComponents.applyAutoDirection(docContent);
-                // Apply AOS attributes per device/type and refresh
-                if (window.UIComponents && UIComponents.applyAOSAttributes) {
-                    UIComponents.applyAOSAttributes(docContent);
-                }
-                try { await this.renderMermaid(docContent); } catch (_) {}
-                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
-                const wrapper = document.querySelector('.content-wrapper');
-                if (wrapper) wrapper.classList.remove('home-full');
-                if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
-                // Ensure sticky first column stability on phones
-                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
-                    UIComponents.fixMobileStickyColumns();
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return true;
-            };
-
-            // 1) Relative path
-            try {
-                const mdPath = `./${filePath}.md?${version}`;
-                rendered = await attemptRender(mdPath);
-            } catch (_) {}
-
-            // 2) Absolute path (GitHub Pages nested routes)
-            if (!rendered) {
+            requestIdleCallback(async () => {
                 try {
-                    const base = `${window.location.origin}${window.location.pathname.replace(/index\.html?$/, '')}`;
-                    const absUrl = `${base}${filePath}.md?${version}`;
-                    rendered = await attemptRender(absUrl);
-                } catch (_) {}
-            }
-
-            // 3) Raw GitHub fallback
-            if (!rendered) {
-                try {
-                    const host = window.location.host; // e.g., username.github.io
-                    const owner = host.split('.')[0] || 'alijawdat-cyber';
-                    const repo = (window.location.pathname.split('/').filter(Boolean)[0]) || 'Depth';
-                    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}.md?${version}`;
-                    rendered = await attemptRender(rawUrl);
-                } catch (_) {}
-            }
-
-            // 4) Inline stub fallback
-            if (!rendered && typeof pageContent !== 'undefined' && pageContent[path]) {
-                const docContent = document.getElementById('doc-content');
-                docContent.innerHTML = pageContent[path];
-                UIComponents.sanitizeHeadings(docContent);
-                UIComponents.generateTOC(docContent);
-                UIComponents.injectPrevNextAndRelated(path);
-                UIComponents.enhanceJSONBlocks(docContent);
-                UIComponents.enhanceCodeBlocks(docContent);
-                UIComponents.enhanceTables(docContent);
-                UIComponents.addHeadingAnchors(docContent);
-                UIComponents.enhanceInlineTOC(docContent);
-                UIComponents.enhanceCallouts(docContent);
-                UIComponents.enhanceImagesAndLinks(docContent);
-                UIComponents.injectPageTitleIcon(path);
-                UIComponents.applyAutoDirection(docContent);
-                // Apply AOS attributes per device/type and refresh
-                if (window.UIComponents && UIComponents.applyAOSAttributes) {
-                    UIComponents.applyAOSAttributes(docContent);
+                    const cleanHtml = await this.fetchContent(path);
+                    // cap cache to 10 entries
+                    if (this.pageCache.size >= 10) {
+                        const firstKey = this.pageCache.keys().next().value;
+                        this.pageCache.delete(firstKey);
+                    }
+                    this.pageCache.set(path, cleanHtml);
+                    requestAnimationFrame(() => this.applyContent(cleanHtml, path));
+                    this.preloadAdjacentPages(path);
+                } catch (error) {
+                    console.error('خطأ في تحميل المحتوى:', error);
+                    UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
                 }
-                try { await this.renderMermaid(docContent); } catch (_) {}
-                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
-                const wrapper = document.querySelector('.content-wrapper');
-                if (wrapper) wrapper.classList.remove('home-full');
-                if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
-                // Ensure sticky first column stability on phones
-                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
-                    UIComponents.fixMobileStickyColumns();
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-
-            if (!rendered) {
-                throw new Error(`المحتوى غير متاح: ${path}`);
-            }
+            }, { timeout: 500 });
         } catch (error) {
             console.error('خطأ في تحميل المحتوى:', error);
             UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
         }
+    }
+
+    // Determine adjacent paths (prev/next) from sidebar to preload
+    getAdjacentPaths(currentPath) {
+        const sections = window.sidebarData || (typeof sidebarData !== 'undefined' ? sidebarData : []);
+        let secIndex = -1, itemIndex = -1, paths = [];
+        for (let s = 0; s < sections.length; s++) {
+            const items = sections[s].items || [];
+            const idx = items.findIndex(it => it.path === currentPath);
+            if (idx !== -1) { secIndex = s; itemIndex = idx; break; }
+        }
+        if (secIndex === -1) return paths;
+        const curSection = (window.sidebarData || [])[secIndex];
+        const curItems = (curSection && curSection.items) ? curSection.items : [];
+        if (itemIndex > 0) paths.push(curItems[itemIndex - 1].path);
+        if (itemIndex < curItems.length - 1) paths.push(curItems[itemIndex + 1].path);
+        return paths;
+    }
+
+    // Preload adjacent pages during idle time
+    preloadAdjacentPages(currentPath) {
+        const adj = this.getAdjacentPaths(currentPath);
+        adj.forEach(path => {
+            if (this.pageCache.has(path) || this.preloadQueue.has(path)) return;
+            this.preloadQueue.add(path);
+            requestIdleCallback(async () => {
+                try {
+                    const html = await this.fetchContent(path);
+                    this.pageCache.set(path, html);
+                } catch (_) {}
+                this.preloadQueue.delete(path);
+            }, { timeout: 2000 });
+        });
     }
 
     // Render Mermaid diagrams inside a simple static container (no animations/tools)
