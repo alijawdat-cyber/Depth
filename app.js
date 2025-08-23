@@ -18,9 +18,34 @@ class DepthDocs {
         this.handleRoute();
         this.setupScrollEffects();
         this.loadTheme();
-        // Initialize AOS if available
+        // Initialize AOS if available (responsive config)
         if (window.AOS) {
-            window.AOS.init({ once: true, duration: 600, easing: 'ease-out' });
+            const isMobile = window.innerWidth < 768;
+            window.AOS.init({
+                once: true,
+                duration: isMobile ? 300 : 600,
+                easing: isMobile ? 'ease-out' : 'ease-out-cubic',
+                offset: isMobile ? 50 : 120,
+                delay: 0,
+                anchorPlacement: 'top-bottom',
+                throttleDelay: 99,
+                debounceDelay: 50,
+                disable: false
+            });
+            // Post-init refresh and debounced scroll-driven refresh for stability
+            setTimeout(() => {
+                try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
+                let ticking = false;
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                }, { passive: true });
+            }, 100);
         }
         // Initialize Mermaid once
         try {
@@ -266,6 +291,10 @@ class DepthDocs {
                 UIComponents.enhanceImagesAndLinks(docContent);
                 UIComponents.injectPageTitleIcon(path);
                 UIComponents.applyAutoDirection(docContent);
+                // Apply AOS attributes per device/type and refresh
+                if (window.UIComponents && UIComponents.applyAOSAttributes) {
+                    UIComponents.applyAOSAttributes(docContent);
+                }
                 try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                 const wrapper = document.querySelector('.content-wrapper');
@@ -300,6 +329,10 @@ class DepthDocs {
                 UIComponents.enhanceImagesAndLinks(docContent);
                 UIComponents.injectPageTitleIcon(path);
                 UIComponents.applyAutoDirection(docContent);
+                // Apply AOS attributes per device/type and refresh
+                if (window.UIComponents && UIComponents.applyAOSAttributes) {
+                    UIComponents.applyAOSAttributes(docContent);
+                }
                 try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                 const wrapper = document.querySelector('.content-wrapper');
@@ -351,6 +384,10 @@ class DepthDocs {
                 UIComponents.enhanceImagesAndLinks(docContent);
                 UIComponents.injectPageTitleIcon(path);
                 UIComponents.applyAutoDirection(docContent);
+                // Apply AOS attributes per device/type and refresh
+                if (window.UIComponents && UIComponents.applyAOSAttributes) {
+                    UIComponents.applyAOSAttributes(docContent);
+                }
                 try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                 const wrapper = document.querySelector('.content-wrapper');

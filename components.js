@@ -1340,6 +1340,89 @@ class UIComponents {
             }
         });
     }
+
+    // =============== AOS: Apply attributes responsively across content ===============
+    static applyAOSAttributes(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root || !window.AOS) return;
+
+        const isMobile = window.innerWidth < 768;
+        const isDesktop = window.innerWidth >= 1024;
+
+        // Clear previous AOS attributes to avoid duplication when re-rendering
+        root.querySelectorAll('[data-aos]').forEach(el => {
+            el.removeAttribute('data-aos');
+            el.removeAttribute('data-aos-duration');
+            el.removeAttribute('data-aos-delay');
+            el.removeAttribute('data-aos-anchor-placement');
+        });
+
+        if (isMobile) {
+            // Simple fade-up for mobile, short durations
+            root.querySelectorAll('h1, h2, h3, h4').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '400');
+            });
+            root.querySelectorAll('p, ul, ol, blockquote').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '300');
+            });
+            root.querySelectorAll('.table-wrap').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '300');
+            });
+            root.querySelectorAll('pre, img, figure').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '300');
+            });
+        } else if (isDesktop) {
+            // Rich animations on desktop
+            root.querySelectorAll('h1').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '700');
+            });
+            root.querySelectorAll('h2').forEach((el, i) => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '600');
+                el.setAttribute('data-aos-delay', `${i * 50}`);
+            });
+            root.querySelectorAll('p').forEach((el, i) => {
+                el.setAttribute('data-aos', i % 2 === 0 ? 'fade-left' : 'fade-right');
+                el.setAttribute('data-aos-duration', '500');
+                el.setAttribute('data-aos-delay', `${i * 30}`);
+            });
+            root.querySelectorAll('ul, ol').forEach(el => {
+                el.setAttribute('data-aos', 'fade-left');
+                el.setAttribute('data-aos-duration', '600');
+                el.setAttribute('data-aos-anchor-placement', 'center-bottom');
+            });
+            root.querySelectorAll('.table-wrap').forEach(el => {
+                el.setAttribute('data-aos', 'zoom-in');
+                el.setAttribute('data-aos-duration', '500');
+            });
+            root.querySelectorAll('pre').forEach(el => {
+                el.setAttribute('data-aos', 'flip-up');
+                el.setAttribute('data-aos-duration', '600');
+            });
+            root.querySelectorAll('img, figure').forEach(el => {
+                el.setAttribute('data-aos', 'zoom-in-up');
+                el.setAttribute('data-aos-duration', '700');
+            });
+            root.querySelectorAll('blockquote').forEach(el => {
+                el.setAttribute('data-aos', 'fade-left');
+                el.setAttribute('data-aos-duration', '600');
+            });
+        } else {
+            // Tablet: mild fade-ups with moderate durations
+            root.querySelectorAll('h1, h2, h3, h4, p, ul, ol, blockquote, .table-wrap, pre, img, figure').forEach(el => {
+                el.setAttribute('data-aos', 'fade-up');
+                el.setAttribute('data-aos-duration', '500');
+            });
+        }
+
+        // Refresh AOS to pick up attributes
+        try { window.AOS.refresh(); } catch (_) {}
+    }
 }
 
 // Export for use

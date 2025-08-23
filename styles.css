@@ -118,6 +118,54 @@
 
 .heading-flash { background: color-mix(in oklab, var(--primary) 14%, transparent); transition: background 0.9s ease; }
 
+/* === AOS Enhancements === */
+
+/* RTL tweaks for horizontal fades */
+[dir="rtl"] [data-aos="fade-left"] {
+    transform: translateX(-100px);
+}
+[dir="rtl"] [data-aos="fade-right"] {
+    transform: translateX(100px);
+}
+
+/* Smoother easing across animations */
+[data-aos] {
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Reduced transform amplitude on phones */
+@media (max-width: 768px) {
+    [data-aos] {
+        transform: translateY(20px) !important;
+    }
+    [data-aos].aos-animate {
+        transform: translateY(0) !important;
+    }
+}
+
+/* Elegant title motion */
+h1[data-aos="fade-up"] { transform: translateY(40px); }
+h1[data-aos="fade-up"].aos-animate { transform: translateY(0); }
+h2[data-aos="fade-up"] { transform: translateY(30px); }
+h2[data-aos="fade-up"].aos-animate { transform: translateY(0); }
+
+/* Tables zoom-in effect */
+.table-wrap[data-aos="zoom-in"] { opacity: 0; transform: scale(0.95); }
+.table-wrap[data-aos="zoom-in"].aos-animate { opacity: 1; transform: scale(1); }
+
+/* Code blocks flip effect */
+pre[data-aos="flip-up"] { transform: perspective(2500px) rotateX(-100deg); }
+pre[data-aos="flip-up"].aos-animate { transform: perspective(2500px) rotateX(0); }
+
+/* Disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    [data-aos] {
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}
+
 
     /* =============== JSON Viewer =============== */
     .json-viewer {
