@@ -380,6 +380,10 @@ pre[data-aos="flip-up"].aos-animate { transform: perspective(2500px) rotateX(0);
     --shadow: 0 1px 3px rgba(0,0,0,0.1);
     --radius: 8px;
     --header-height: 64px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --header-total-height: calc(var(--header-height) + var(--safe-top));
     --sidebar-width: 280px;
     --transition: all 0.3s ease;
     /* Breakpoints */
@@ -502,7 +506,7 @@ body {
 
 .header-container {
     height: 100%;
-    padding: 0 calc(16px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));
+    padding: 0 calc(16px + var(--safe-right)) 0 calc(16px + var(--safe-left));
     display: flex;
     align-items: center;
     gap: 20px;
@@ -675,10 +679,10 @@ body {
 /* =============== Sidebar =============== */
 .sidebar {
     position: fixed;
-    top: var(--header-height);
+    top: var(--header-total-height);
     right: 0;
     width: var(--sidebar-width);
-    height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-total-height));
     background: var(--bg);
     border-left: 1px solid var(--border);
     z-index: 900;
@@ -821,8 +825,8 @@ body {
 /* =============== Main Content =============== */
 .main-content {
     flex: 1;
-    margin-top: var(--header-height);
-    min-height: calc(100vh - var(--header-height));
+    margin-top: var(--header-total-height);
+    min-height: calc(100vh - var(--header-total-height));
     transition: margin-right 0.3s ease, transform 0.3s ease;
     width: 100%;
 }
@@ -1036,12 +1040,12 @@ body {
 .content-wrapper > .mobile-toc { display: none !important; position: fixed; }
 .floating-toc {
     position: sticky;
-    top: calc(var(--header-height) + 16px);
+    top: calc(var(--header-total-height) + 16px);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 12px 10px;
-    max-height: calc(100vh - var(--header-height) - 32px);
+    max-height: calc(100vh - var(--header-total-height) - 32px);
     overflow-y: auto;
     scroll-behavior: smooth;
 }
@@ -1059,7 +1063,7 @@ body.is-home .doc-footer { display: none; }
     color: var(--text);
 }
 
-.toc-list { list-style: none; overflow-y: auto; max-height: calc(100vh - var(--header-height) - 120px); }
+.toc-list { list-style: none; overflow-y: auto; max-height: calc(100vh - var(--header-total-height) - 120px); }
 
 /* Group container for each H2 and its H3 children */
 .toc-group { margin-bottom: 10px; }
@@ -1304,11 +1308,11 @@ body.is-home .doc-footer { display: none; }
     .mobile-toc { 
         display: block !important; 
         position: fixed; 
-        top: calc(var(--header-height) + 12px); 
+        top: calc(var(--header-total-height) + 12px); 
         bottom: 20px; 
         left: 16px; /* مسافة أكبر من الحافة */
         width: 28px; /* عرض أكبر قليلاً */
-        z-index: 1100; /* z-index أقل */
+        z-index: 950; /* تحت الهيدر (1000) لتفادي تغطية الشعار/الأزرار */
         pointer-events: none; 
     }
     /* Override desktop guard: show even when inside .content-wrapper */
@@ -1389,10 +1393,7 @@ body.is-home .doc-footer { display: none; }
 
 /* دعم Safe Areas لأجهزة iOS */
 @supports (padding: max(0px)) {
-    .header {
-        padding-top: max(12px, env(safe-area-inset-top));
-    }
-    
+    /* header height already accounts for safe area via --header-total-height; avoid extra top padding */
     .sidebar {
         padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
