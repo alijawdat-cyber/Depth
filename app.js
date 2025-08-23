@@ -24,8 +24,8 @@ class DepthDocs {
         this.isLargeDesktop = false;
         this.isTablet = false;
         this.isMobile = false;
-    // lightweight page cache and preload tracking
-    this.pageCache = new Map();
+    // lightweight page cache and preload tracking (LRU 5)
+    this.pageCache = new LRUCache(5);
     this.preloadQueue = new Set();
         this.init();
     }
@@ -40,38 +40,45 @@ class DepthDocs {
         this.loadTheme();
         this.initMobileOptimizations(); // إضافة تحسينات الهاتف
         
-        // Initialize AOS if available (responsive config) and not on iOS Safari
+        // Initialize AOS with iOS/Safari awareness
         const ua = navigator.userAgent || '';
         const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
         const isIOSSafari = isIOS && isSafari;
-        if (window.AOS && !isIOSSafari) {
+        if (window.AOS) {
             const isMobile = window.innerWidth < 768;
-            window.AOS.init({
-                once: true,
-                duration: isMobile ? 300 : 600,
-                easing: isMobile ? 'ease-out' : 'ease-out-cubic',
-                offset: isMobile ? 50 : 120,
-                delay: 0,
-                anchorPlacement: 'top-bottom',
-                throttleDelay: 99,
-                debounceDelay: 50,
-                disable: false
-            });
-            // Post-init refresh and debounced scroll-driven refresh for stability
-            setTimeout(() => {
-                try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
-                let ticking = false;
-                window.addEventListener('scroll', () => {
-                    if (!ticking) {
-                        window.requestAnimationFrame(() => {
-                            try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
-                            ticking = false;
-                        });
-                        ticking = true;
-                    }
-                }, { passive: true });
-            }, 100);
+            if (isIOSSafari) {
+                window.AOS.init({ disable: true });
+                // Use custom iOS animations via components
+                try { UIComponents.applyIOSAnimations(document.getElementById('doc-content') || document.body); } catch (_) {}
+            } else {
+                window.AOS.init({
+                    once: true,
+                    duration: isMobile ? 200 : 400,
+                    easing: 'ease-out',
+                    offset: isMobile ? 50 : 120,
+                    delay: 0,
+                    anchorPlacement: 'top-bottom',
+                    throttleDelay: 80,
+                    debounceDelay: 40,
+                    disable: false
+                });
+                // Post-init refresh (throttled)
+                setTimeout(() => {
+                    try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
+                    let ticking = false;
+                    const onScroll = () => {
+                        if (!ticking) {
+                            requestAnimationFrame(() => {
+                                try { window.AOS && window.AOS.refresh && window.AOS.refresh(); } catch (_) {}
+                                ticking = false;
+                            });
+                            ticking = true;
+                        }
+                    };
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                }, 100);
+            }
         }
         // Initialize Mermaid once
         try {
@@ -374,7 +381,7 @@ class DepthDocs {
     async loadContent(path) {
         try {
             UIComponents.showLoading();
-            if (this.pageCache.has(path)) {
+            if (this.pageCache.get(path)) {
                 const cached = this.pageCache.get(path);
                 await this.applyContent(cached, path);
                 this.preloadAdjacentPages(path);
@@ -383,11 +390,6 @@ class DepthDocs {
             this.scheduleIdle(async () => {
                 try {
                     const cleanHtml = await this.fetchContent(path);
-                    // cap cache to 10 entries
-                    if (this.pageCache.size >= 10) {
-                        const firstKey = this.pageCache.keys().next().value;
-                        this.pageCache.delete(firstKey);
-                    }
                     this.pageCache.set(path, cleanHtml);
                     requestAnimationFrame(() => this.applyContent(cleanHtml, path));
                     this.preloadAdjacentPages(path);
@@ -423,12 +425,12 @@ class DepthDocs {
     preloadAdjacentPages(currentPath) {
         const adj = this.getAdjacentPaths(currentPath);
         adj.forEach(path => {
-            if (this.pageCache.has(path) || this.preloadQueue.has(path)) return;
+        if (this.pageCache.get(path) || this.preloadQueue.has(path)) return;
             this.preloadQueue.add(path);
             this.scheduleIdle(async () => {
                 try {
                     const html = await this.fetchContent(path);
-                    this.pageCache.set(path, html);
+            this.pageCache.set(path, html);
                 } catch (_) {}
                 this.preloadQueue.delete(path);
             }, 2000);
@@ -487,32 +489,69 @@ class DepthDocs {
         document.body.setAttribute('data-theme', savedTheme);
     }
 
-    // تحسين أداء التمرير على الهاتف
+    // تحسين أداء التمرير على الهاتف + passive listeners عامة
     initMobileOptimizations() {
+        const passiveSupported = (() => {
+            let passive = false;
+            try {
+                const opts = Object.defineProperty({}, 'passive', { get: () => { passive = true; } });
+                window.addEventListener('test', null, opts);
+            } catch (_) {}
+            return passive;
+        })();
+        const passiveOpt = passiveSupported ? { passive: true } : false;
+
+        // Passive listeners
+        document.addEventListener('touchstart', () => {}, passiveOpt);
+        document.addEventListener('touchmove', () => {}, passiveOpt);
+        window.addEventListener('scroll', () => {}, passiveOpt);
+        window.addEventListener('wheel', () => {}, passiveOpt);
+
         if (window.innerWidth > 768) return;
-        
-        // Passive listeners للتمرير
-        document.addEventListener('touchstart', () => {}, { passive: true });
-        document.addEventListener('touchmove', () => {}, { passive: true });
-        
+
         // تحسين التمرير للجداول
         const setupTableScroll = () => {
             document.querySelectorAll('.table-wrap').forEach(wrap => {
-                wrap.addEventListener('scroll', () => {
+                const onScroll = () => {
                     requestAnimationFrame(() => {
-                        // تحديث موضع sticky columns
+                        // تحديث موضع sticky columns (تعويض ثنائي)
                         const stickyEls = wrap.querySelectorAll('.mobile-sticky-first td:first-child, .mobile-sticky-first th:first-child');
                         stickyEls.forEach(el => {
+                            el.style.webkitTransform = `translateX(${wrap.scrollLeft}px)`;
                             el.style.transform = `translateX(${wrap.scrollLeft}px)`;
                         });
                     });
-                }, { passive: true });
+                };
+                wrap.addEventListener('scroll', onScroll, passiveOpt);
             });
         };
-        
+
         // تشغيل فوري ومع تأخير للجداول المحملة لاحقاً
         setupTableScroll();
         setTimeout(setupTableScroll, 1000);
+    }
+}
+
+// بسيط: LRU Cache للاحتفاظ بآخر N صفحات
+class LRUCache {
+    constructor(maxSize = 5) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+    get(key) {
+        if (!this.cache.has(key)) return null;
+        const val = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, val);
+        return val;
+    }
+    set(key, val) {
+        if (this.cache.has(key)) this.cache.delete(key);
+        this.cache.set(key, val);
+        if (this.cache.size > this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
     }
 }
 
@@ -535,3 +574,18 @@ if (document.readyState === 'loading') {
         }
     }, 100);
 }
+
+// Debug stats panel (اختياري) - يعمل فقط إذا كانت مكتبة Stats متاحة وهاش #debug
+try {
+    if (window.location.hash === '#debug' && typeof Stats !== 'undefined') {
+        const stats = new Stats();
+        stats.showPanel(0);
+        document.body.appendChild(stats.dom);
+        function animate() {
+            stats.begin();
+            stats.end();
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+} catch (_) {}

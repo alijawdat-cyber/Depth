@@ -463,6 +463,37 @@ class UIComponents {
         // Build mobile TOC from h2s only for concise chips
         const h2s = Array.from(headings).filter(h => h.tagName.toLowerCase() === 'h2');
         UIComponents.setupMobileTOC(h2s);
+        // Enhance floating TOC behavior for large screens
+        try { UIComponents.enhanceFloatingTOC(); } catch (_) {}
+    }
+
+    // تحسين سلوك TOC الطافي على الشاشات الكبيرة
+    static enhanceFloatingTOC() {
+        const toc = document.querySelector('.floating-toc');
+        if (!toc || window.innerWidth < 1024) return;
+
+        let lastY = window.scrollY;
+        let ticking = false;
+        const rafUpdate = () => {
+            const y = window.scrollY;
+            // حركة خفيفة لامتصاص التقطيع
+            const delta = Math.max(0, y - lastY);
+            toc.style.willChange = 'transform';
+            toc.style.transform = `translateY(${delta}px)`;
+            requestAnimationFrame(() => {
+                toc.style.transform = '';
+                toc.style.willChange = '';
+            });
+            lastY = y;
+            ticking = false;
+        };
+        const onScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(rafUpdate);
+                ticking = true;
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
     }
 
     // Observe headings for active state
@@ -637,7 +668,11 @@ class UIComponents {
             }
         };
 
+        let lastRun = 0;
         const onScroll = () => {
+            const now = performance.now();
+            if (now - lastRun < 16) return; // ~60fps throttle
+            lastRun = now;
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     setChip(currentIndex());
