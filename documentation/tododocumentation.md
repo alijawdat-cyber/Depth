@@ -4,6 +4,88 @@
 
 ---
 
+## ✅ لوحة مهام تنفيذية (Documentation Workboard)
+
+طريقة الاستخدام
+- حدّث المربعات التالية أثناء التنفيذ: [ ] ⟶ [x]
+- عند الإكمال، أضف: التاريخ + رقم الـ PR بجانب البند. مثال: [x] (2025‑08‑23, PR #123)
+- Definition of Done: (1) الملف المحدَّث يشير لـ SSOT الصحيح، (2) تعريب وفق سياسة المصطلحات، (3) الروابط داخلية سليمة، (4) بناء موقع الوثائق يمر بلا أخطاء.
+
+### P0 — عاجل خلال 48 ساعة
+
+1) الهوية البصرية والتصميم
+- [ ] تحديث `documentation/06-frontend/00-frontend-overview.md`: استبدال Tajawal → Dubai (AR) وتثبيت Inter (EN) + إزالة اللون القديم `#1e3a8a`.
+- [ ] تحديث `documentation/06-frontend/01-design-tokens.md`: قفل الألوان Primary `#6C2BFF` وAlternate `#3E5BFF` + إضافة رابط SSOT: `depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`.
+
+2) SSOT Badges وإزالة التكرارات
+- [ ] إضافة شارة "SSOT — مصدر الحقيقة الوحيد" أعلى الملفات التالية مع روابطها المرجعية:
+   - [ ] التسعير: ضع شارة وربط إلى `99-reference/02-enums-standard.md` + `03-api/features/04-pricing.md` داخل: `MASTER-DOCUMENT-V2.0.md`, `01-requirements/00-requirements-v2.0.md`.
+   - [ ] RBAC: ضع شارة وربط إلى `99-reference/05-roles-matrix.md` داخل: `03-api/admin/02-governance.md` وأي نسخ تحت `depth-site/docs/roles/*`.
+   - [ ] الأخطاء: ضع شارة وربط إلى `03-api/core/04-error-handling.md` في الصفحات ذات الصلة.
+
+3) قاعدة البيانات
+- [ ] مواءمة قيم الحالة (Status) في `02-database/01-database-schema.md` مع `99-reference/02-enums-standard.md` + إضافة لافتة: "القيم المعيارية في SSOT".
+
+4) الفهارس والبنية التنظيمية
+- [ ] تحديث `documentation/README.md` لإدراج كل ملفات `06-frontend` (بما فيها `02-design-system.md`, `03-component-library.md`, `02-performance-and-a11y.md`).
+
+5) تحقق سريع للموقع
+- [ ] التحقق من توفر أصل الشعار: `https://www.depth-agency.com/brand/logo-512.png` = 200 OK، وتوثيق ذلك في `depth-site/docs/ops/EMAIL-LIVE-QA-REPORT.md`.
+- [ ] بناء الموقع محلياً والتحقق من الروابط الأساسية لملفات القسمين 06 و08.
+
+### P1 — أسبوع 1
+
+6) Design System
+- [ ] إنشاء `documentation/06-frontend/02-design-system.md` (Skeleton: فلسفة التصميم، الشبكة، الألوان، Typography، Themes Light/Dark، حالات التفاعل).
+- [ ] إنشاء `documentation/06-frontend/03-component-library.md` (Skeleton) مع أقسام أولية ومربعات لكل مكوّن:
+   - [ ] Buttons
+   - [ ] Inputs & Textareas
+   - [ ] Selects & Combobox
+   - [ ] Modal/Drawer
+   - [ ] Tabs
+   - [ ] Table
+   - [ ] Toast/Alert
+   - [ ] Breadcrumbs
+   - [ ] Pagination
+   - [ ] Cards
+
+7) العمليات والنشر (Runbooks)
+- [ ] `08-operations/03-monitoring.md`: Sentry, Firebase Performance, Health checks, لوحات مؤشرات، إجراءات تنبيه.
+- [ ] `08-operations/04-backup-and-restore.md`: نطاق النسخ، الجداول الزمنية، اختبار الاستعادة الدوري.
+- [ ] `08-operations/05-disaster-recovery.md`: RPO/RTO، أدوار الفريق، تمارين DR، سيناريوهات الفشل.
+
+8) تعريب وتوحيد المصطلحات (دفعة 1)
+- [ ] `02-database/01-database-schema.md` — تعريب العناوين والمقدمات مع إبقاء المصطلح الإنجليزي أول مرة بين قوسين.
+- [ ] `04-development/03-development-workflow.md` — (Deployment/Code Review/Performance Monitoring).
+- [ ] `05-mobile/00-mobile-overview.md` — (Development Roadmap/Monitoring/Deployment).
+- [ ] `04-development/02-environment-variables.md` — (Twilio/Stripe/Monitoring) + إن كانت Twilio مجرد مثال: إضافة "TBD للشبكات العراقية".
+- [ ] `99-reference/00-resources.md` — (DevOps & Deployment/Monitoring & Analytics) + تحديد مكتبات الدفع/الخرائط/التقويم/PDF أو وضع Placeholders.
+
+### P2 — أسبوع 2–3
+
+9) توحيد وإقفال النسخ (Versions)
+- [ ] إنشاء `99-reference/version-matrix.md` باقتباس الإصدارات من `package.json` (أطر ومكتبات الويب والموبايل).
+- [ ] تحديث كل الإشارات القديمة للتقنيات: Next 14/Zustand/React Query → Next 15.x + React 19.x + SWR (حتى إشعار آخر) في: `03-api/integrations/03-advanced-technical.md`, `06-frontend/00-frontend-overview.md`.
+
+10) تعريب وتوحيد المصطلحات (دفعة 2)
+- [ ] مراجعة شاملة لتطبيق سياسة المصطلحات (عربي + English + التوسيع الكامل عند أول ذكر) عبر الملفات المحددة في P1 وإكمال الباقي.
+- [ ] توحيد مرجع النطاقات إلى `depth-agency.com` وإزالة النطاقات الافتراضية من `07-security/00-security-overview.md`.
+
+11) UI/UX Deliverables (وثائق مكملة)
+- [ ] إضافة خرائط تنقل (Sitemap + Navigation Maps) للمستخدمين.
+- [ ] User Flows مرقّمة لكل دور (Creator/Client/Employee/Admin) — (Mermaid أو روابط Figma).
+- [ ] Wireframes أولية لكل دور وربطها بالمكوّنات في `03-component-library.md`.
+
+12) الجودة والاتساق
+- [ ] مراجعة الأمثلة والبيانات التجريبية لتتبع `99-reference/04-naming-conventions.md`.
+- [ ] ربط الأمان والعمليات بإشارات متبادلة (Monitoring/IR/DR) لضمان تتبع end‑to‑end.
+
+ملحوظات تنظيمية
+- يظل هذا الملف هو SSOT لمهام التوثيق التنفيذية. أي قوائم مهام متفرقة تُزال وتُستبدل بروابط إلى هذه اللوحة.
+- عند الانتهاء من كل مجموعة (P0 ثم P1 ثم P2) نفّذ مراجعة روابط وبناء للموقع.
+
+---
+
 ## 🔴 **الجزء الأول: تحليل الهيكل الشجري والتنظيم**
 
 ### 📁 الهيكل الحالي للوثائق:
@@ -419,55 +501,4 @@ components/
 **التقدير الزمني** لإكمال كل النواقص: **3-4 أسابيع** من العمل المركز.
 
 
----
-
-## 🧩 مهام تحسين الوثائق (Documentation Improvements)
-
-### 1) تعريب وتوحيد الصياغة
-- [ ] تعريب العناوين والمقدمات والمقاطع الإنجليزية مع إبقاء المصطلح الإنجليزي بين قوسين عند أول ذكر: 
-   - `documentation/02-database/01-database-schema.md`
-   - `documentation/04-development/03-development-workflow.md` (Deployment/Code Review/Performance Monitoring)
-   - `documentation/05-mobile/00-mobile-overview.md` (Development Roadmap/Monitoring/Deployment)
-   - `documentation/04-development/02-environment-variables.md` (Twilio/Stripe/Monitoring)
-   - `documentation/99-reference/00-resources.md` (DevOps & Deployment/Monitoring & Analytics)
-- [ ] تطبيق سياسة المصطلحات: عربي + English + التوسيع الكامل عند أول ذكر (CSS — Cascading Style Sheets — أوراق الأنماط المتتالية …).
-- [ ] توحيد مرجع النطاقات إلى `depth-agency.com` وإزالة النطاقات الافتراضية من `documentation/07-security/00-security-overview.md`.
-- [ ] تحديث كل الإشارات القديمة للتقنيات: Next 14/Zustand/React Query → Next 15.x + React 19.x + SWR حتى اعتماد غيره (راجع: `documentation/03-api/integrations/03-advanced-technical.md`, `documentation/06-frontend/00-frontend-overview.md`).
-
-### 2) الهوية البصرية والتصميم
-- [ ] استبدال Tajawal → Dubai (AR) وتثبيت Inter (EN) في: `documentation/06-frontend/00-frontend-overview.md`.
-- [ ] إزالة اللون القديم `#1e3a8a` وتطبيق نظام الأكسنت الموحد: Primary `#6C2BFF` (Purple 2025) وAlternate `#3E5BFF` (Indigo 2025) عبر المستندات الأمامية.
-- [ ] إنشاء `documentation/06-frontend/02-design-system.md` وربطه بـ `01-design-tokens.md` وبـ SSOT الألوان: `depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`.
-- [ ] تأليف كتالوج مكونات: `documentation/06-frontend/03-component-library.md` (المكونات، Props، حالات، A11y، RTL، أمثلة كود).
-
-### 3) التسعير وRBAC وSSOT
-- [ ] إعلان واضح للـ SSOT داخل الملفات المتأثرة وإزالة المعادلات/الجداول المكررة، مع روابط إلى:
-   - التسعير: `documentation/99-reference/02-enums-standard.md` + `documentation/03-api/features/04-pricing.md`.
-   - RBAC: `documentation/99-reference/05-roles-matrix.md`.
-- [ ] أرشفة/تحويل نسخ RBAC تحت `depth-site/docs/roles/*` إلى صفحات ملخصة تشير للـ SSOT فقط.
-- [ ] إضافة ملف `documentation/99-reference/version-matrix.md` يثبت إصدارات الأطر والمكتبات من package.json.
-- [ ] إدراج مهمة مراجعة مراجع نهاية المستند: قسم "🔗 المراجع الأساسية" يحتوي مسارات تحتاج تصحيح (requirements وerror codes) — إصلاحها لربط SSOT الصحيح.
-
-### 4) قاعدة البيانات
-- [ ] مواءمة قيم الحالة (Status) في `documentation/02-database/01-database-schema.md` مع `documentation/99-reference/02-enums-standard.md`.
-- [ ] ترجمة الملاحظات الإنجليزية (مثل "Note (v2.0 alignment)") وإضافة لافتة أعلى الملف: "أمثلة إرشادية؛ القيم المعيارية في SSOT".
-
-### 5) العمليات والنشر
-- [ ] إنشاء `documentation/08-operations/03-monitoring.md` (Sentry, Firebase Performance, Health checks، قوائم تحقق).
-- [ ] إنشاء `documentation/08-operations/04-backup-and-restore.md` (سياسات/جداول/اختبار استعادة دوري).
-- [ ] إنشاء `documentation/08-operations/05-disaster-recovery.md` (RPO/RTO، تمارين DR وفق جدول زمني).
-- [ ] إضافة خطوة تحقق نشر لأصل الشعار: تأكيد توفر `https://www.depth-agency.com/brand/logo-512.png` (200 OK) — موثق في `depth-site/docs/ops/EMAIL-LIVE-QA-REPORT.md`.
-- [ ] توضيح نطاق Vercel: تستضيف تطبيق الويب (Next.js + API Routes) فقط؛ تحديث ذلك في `08-operations/00-operations-overview.md` و`04-development/03-development-workflow.md`.
-
-### 6) الفهارس والبنية التنظيمية
-- [ ] تحديث `documentation/README.md` لإظهار ملفات `06-frontend` كاملة بما فيها: `02-performance-and-a11y.md`, `02-design-system.md`, وكتالوج المكونات.
-- [ ] توحيد مهام الوثائق في هذا الملف `documentation/TODO.md` ونقل البنود التنفيذية من `documentation/tododocumentation.md` كمهمات؛ إبقاء الأخير تقريراً مؤرشَفاً.
-
-### 7) التكاملات والمكتبات
-- [ ] توضيح وضع SMS: إن كانت Twilio مجرد مثال، أضف ملاحظة "TBD للشبكات العراقية" في: `04-development/02-environment-variables.md` و`03-api/integrations/01-external-services.md`.
-- [ ] تحديد مكتبات الدفع/الخرائط/التقويم/PDF أو وضع Placeholders رسمية في: `99-reference/00-resources.md`.
-
-### 8) الجودة والاتساق
-- [ ] مراجعة أمثلة الأسماء والبيانات التجريبية لتتبع `documentation/99-reference/04-naming-conventions.md`.
-- [ ] ربط الأمان/العمليات بإشارات متبادلة حيث يلزم (Monitoring/IR/DR) لضمان تتبع واضح من التطوير إلى التشغيل.
 
