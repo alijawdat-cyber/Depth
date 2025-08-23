@@ -488,14 +488,127 @@ class DepthDocs {
             try {
                 const parentPre = codeEl.closest('pre');
                 const code = codeEl.textContent || '';
-                const container = document.createElement('div');
-                container.className = 'diagram mermaid-diagram';
                 // Render to SVG
                 const { svg } = await window.mermaid.render(`m-${Math.random().toString(36).slice(2)}`, code);
-                container.innerHTML = svg;
-                if (parentPre) parentPre.replaceWith(container); else codeEl.replaceWith(container);
+                // Try to extract optional title from first mermaid comment line: %% title: ...
+                let title = '';
+                const m = code.match(/^\s*%%\s*title\s*:\s*(.+)$/mi);
+                if (m && m[1]) title = m[1].trim();
+
+                // Build viewer
+                const viewer = document.createElement('div');
+                viewer.className = 'diagram-viewer';
+                // toolbar
+                const bar = document.createElement('div');
+                bar.className = 'diagram-toolbar';
+                const left = document.createElement('div'); left.className = 'dt-left';
+                const right = document.createElement('div'); right.className = 'dt-right';
+                const tlabel = document.createElement('div'); tlabel.className = 'dt-title'; tlabel.textContent = title || '';
+                left.appendChild(tlabel);
+                const mkBtn = (icon, label) => {
+                    const b = document.createElement('button'); b.type = 'button'; b.className = 'diagram-btn'; b.setAttribute('aria-label', label);
+                    const i = document.createElement('i'); i.setAttribute('data-lucide', icon); b.appendChild(i);
+                    return b;
+                };
+                const btnZoomOut = mkBtn('zoom-out', 'تصغير');
+                const btnZoomIn = mkBtn('zoom-in', 'تكبير');
+                const btnFit = mkBtn('scan', 'ملائمة للعرض');
+                const btnReset = mkBtn('rotate-ccw', 'إعادة الضبط');
+                const btnDownload = mkBtn('download', 'تنزيل SVG');
+                right.append(btnZoomOut, btnZoomIn, btnFit, btnReset, btnDownload);
+                bar.append(left, right);
+                viewer.appendChild(bar);
+
+                // stage
+                const stage = document.createElement('div'); stage.className = 'diagram-stage';
+                const content = document.createElement('div'); content.className = 'diagram-content mermaid-diagram';
+                content.innerHTML = svg;
+                stage.appendChild(content); viewer.appendChild(stage);
+
+                if (title) {
+                    const cap = document.createElement('div'); cap.className = 'diagram-caption'; cap.textContent = title;
+                    viewer.appendChild(cap);
+                }
+
+                // Replace original block with viewer
+                if (parentPre) parentPre.replaceWith(viewer); else codeEl.replaceWith(viewer);
+
+                // Activate controls
+                this.setupDiagramViewer(viewer);
             } catch (_) { /* skip broken diagram */ }
         }
+    }
+
+    // Setup zoom/pan/download controls for diagram viewer
+    setupDiagramViewer(viewer) {
+        try {
+            const stage = viewer.querySelector('.diagram-stage');
+            const content = viewer.querySelector('.diagram-content');
+            const svg = content?.querySelector('svg');
+            if (!stage || !content || !svg) return;
+
+            let scale = 1; let tx = 0; let ty = 0; let dragging = false; let lastX = 0; let lastY = 0;
+            const clampScale = (s) => Math.max(0.4, Math.min(3, s));
+            const apply = () => { content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
+            const fitToWidth = () => {
+                try {
+                    const vb = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : null;
+                    const w = vb ? vb.width : svg.getBoundingClientRect().width;
+                    const st = stage.getBoundingClientRect();
+                    if (w > 0 && st.width > 0) {
+                        scale = clampScale(Math.max(0.5, Math.min(2.5, (st.width - 24) / w)));
+                        tx = 0; ty = 0; apply();
+                    }
+                } catch (_) { scale = 1; tx = ty = 0; apply(); }
+            };
+            const reset = () => { scale = 1; tx = 0; ty = 0; apply(); };
+            apply();
+
+            // Controls
+            const btnIn = viewer.querySelector('.diagram-btn i[data-lucide="zoom-in"]')?.parentElement;
+            const btnOut = viewer.querySelector('.diagram-btn i[data-lucide="zoom-out"]')?.parentElement;
+            const btnFit = viewer.querySelector('.diagram-btn i[data-lucide="scan"]')?.parentElement;
+            const btnReset = viewer.querySelector('.diagram-btn i[data-lucide="rotate-ccw"]')?.parentElement;
+            const btnDownload = viewer.querySelector('.diagram-btn i[data-lucide="download"]')?.parentElement;
+
+            btnIn && btnIn.addEventListener('click', () => { scale = clampScale(scale * 1.2); apply(); });
+            btnOut && btnOut.addEventListener('click', () => { scale = clampScale(scale / 1.2); apply(); });
+            btnFit && btnFit.addEventListener('click', fitToWidth);
+            btnReset && btnReset.addEventListener('click', reset);
+
+            // Pan when scaled
+            const onStart = (e) => { dragging = true; lastX = e.touches ? e.touches[0].clientX : e.clientX; lastY = e.touches ? e.touches[0].clientY : e.clientY; e.preventDefault(); };
+            const onMove = (e) => { if (!dragging || scale <= 1) return; const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; tx += (x - lastX); ty += (y - lastY); lastX = x; lastY = y; apply(); };
+            const onEnd = () => { dragging = false; };
+            stage.addEventListener('mousedown', onStart); stage.addEventListener('touchstart', onStart, { passive: false });
+            window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('mouseup', onEnd); window.addEventListener('touchend', onEnd, { passive: true });
+
+            // Wheel zoom centered
+            stage.addEventListener('wheel', (e) => { e.preventDefault(); const dir = e.deltaY > 0 ? 1/1.15 : 1.15; const newScale = clampScale(scale * dir); if (newScale === scale) return; scale = newScale; apply(); }, { passive: false });
+
+            // Resize fit
+            const ro = new ResizeObserver(() => fitToWidth()); ro.observe(stage);
+            // Initial fit for wide diagrams
+            fitToWidth();
+
+            // Download SVG
+            btnDownload && btnDownload.addEventListener('click', () => {
+                try {
+                    const serializer = new XMLSerializer();
+                    const src = serializer.serializeToString(svg);
+                    const blob = new Blob([src], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = (viewer.querySelector('.dt-title')?.textContent || 'diagram') + '.svg';
+                    document.body.appendChild(a); a.click(); a.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch (_) {}
+            });
+
+            // Hydrate toolbar icons
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        } catch (_) {}
     }
 
     // Navigate to path

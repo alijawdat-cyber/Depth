@@ -102,6 +102,31 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+
+/* =============== Diagram Viewer (Mermaid) =============== */
+.diagram-viewer {
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--bg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+}
+.diagram-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border); background: color-mix(in oklab, var(--primary) 6%, var(--bg)); }
+.diagram-toolbar .dt-left { display: flex; gap: 8px; align-items: center; }
+.diagram-toolbar .dt-right { display: flex; gap: 6px; align-items: center; }
+.diagram-toolbar .dt-title { font-weight: 600; color: var(--text-primary); }
+.diagram-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; }
+.diagram-btn:hover { background: color-mix(in oklab, var(--primary) 8%, var(--bg)); color: var(--text-primary); }
+
+.diagram-stage { position: relative; overflow: auto; max-width: 100%; max-height: 65vh; background: color-mix(in oklab, var(--bg) 92%, #fff); }
+.diagram-content { transform-origin: 0 0; transition: transform 0.08s linear; padding: 12px; min-width: 100%; }
+.diagram-content svg { width: 100%; height: auto; display: block; }
+.diagram-caption { padding: 8px 10px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
+
+@media (max-width: 768px) {
+    .diagram-stage { max-height: 55vh; }
+}
         padding: 10px 12px;
         background: color-mix(in oklab, var(--primary) 6%, var(--bg));
         border-bottom: 1px solid var(--border);
