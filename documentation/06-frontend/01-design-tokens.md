@@ -1,21 +1,21 @@
 # Frontend Design Tokens (Draft)
 
-Status: Draft — pending Brand sign‑off
+Status: Final — aligned with Brand SSOT (2025‑08‑23)
 
 هذه الوثيقة توحّد الألوان والخطوط والمسافات والظلال وحالات التفاعل وبريك‑بوينتس كمتغيرات CSS لاستخدامها عبر الواجهة.
 
 ## Principles
-- SSOT للألوان والخطوط من `depth-site/docs/brand-identity/...`.
+- SSOT للألوان والخطوط: depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html
 - RTL/LTR مدعوم عبر منطق اتجاه عام (body[dir]).
 - Light/Dark مدعومان بمتغيرات جذرية.
 
 ## Tokens — Colors
 ```css
 :root {
-  /* Brand */
-  --color-primary: #6C2BFF; /* Pending: align with Brand Spec */
+  /* Brand (SSOT) */
+  --color-primary: #6C2BFF; /* Purple 2025 */
   --color-primary-600: #4A1FC9;
-  --color-accent: #f59e0b;   /* Gold (if kept) */
+  --color-alternate: #3E5BFF; /* Indigo 2025 */
 
   /* Base */
   --bg: #ffffff; --bg-secondary: #f8f9fa;
@@ -31,13 +31,13 @@ Status: Draft — pending Brand sign‑off
 ```
 
 ## Tokens — Typography
-- Arabic: Dubai (fallbacks TBC)
-- English: Inter (fallbacks TBC)
+- Arabic: Dubai, system-ui, -apple-system, Segoe UI, Arial, sans-serif
+- English: Inter, system-ui, -apple-system, Segoe UI, Arial, sans-serif
 
 ```css
 :root {
-  --font-ar: 'Dubai', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  --font-en: 'Inter', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  --font-ar: 'Dubai', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --font-en: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 ```
@@ -70,6 +70,6 @@ Status: Draft — pending Brand sign‑off
 - Focus ring: 2px outline using `--color-primary` with 2px offset.
 - Disabled: reduce opacity to 0.5 and disable pointer events.
 
-## Next
-- مزامنة الألوان من Brand Spec بالضبط، وتحديث `styles.css` لاحقاً.
-- تأكيد خط Arabic/English النهائي.
+## Notes
+- SSOT — مصدر الحقيقة الوحيد: عمود الألوان في 02-Color-Palettes-Spec.html.
+- تستخدم الواجهات المتغير `--color-primary` كمرجع للحالات (hover/focus/active).

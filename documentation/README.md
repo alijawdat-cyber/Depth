@@ -23,6 +23,11 @@
 - **04-development/** - دليل التطوير
 - **05-mobile/** - تطبيقات الموبايل
 - **06-frontend/** - [الواجهات الأمامية](./06-frontend/00-frontend-overview.md)
+	- 00-frontend-overview.md
+	- 01-design-tokens.md
+	- 02-performance-and-a11y.md
+	- 02-design-system.md (Placeholder)
+	- 03-component-library.md (Placeholder)
 - **07-security/** - الأمان
 - **08-operations/** - [العمليات والبنية التحتية](./08-operations/00-operations-overview.md)
 - **99-reference/** - [المراجع والموارد](./99-reference/00-resources.md)

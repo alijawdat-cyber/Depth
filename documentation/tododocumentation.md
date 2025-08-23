@@ -14,20 +14,17 @@
 ### P0 — عاجل خلال 48 ساعة
 
 1) الهوية البصرية والتصميم
-- [ ] تحديث `documentation/06-frontend/00-frontend-overview.md`: استبدال Tajawal → Dubai (AR) وتثبيت Inter (EN) + إزالة اللون القديم `#1e3a8a`.
-- [ ] تحديث `documentation/06-frontend/01-design-tokens.md`: قفل الألوان Primary `#6C2BFF` وAlternate `#3E5BFF` + إضافة رابط SSOT: `depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`.
+- [x] (2025-08-23) تحديث `documentation/06-frontend/00-frontend-overview.md`: استبدال Tajawal → Dubai (AR) وتثبيت Inter (EN) + إزالة اللون القديم `#1e3a8a`، وتوحيد الألوان وفق SSOT.
+- [x] (2025-08-23) تحديث `documentation/06-frontend/01-design-tokens.md`: قفل الألوان Primary `#6C2BFF` وAlternate `#3E5BFF` + إضافة رابط SSOT: `depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html`.
 
 2) SSOT Badges وإزالة التكرارات
-- [ ] إضافة شارة "SSOT — مصدر الحقيقة الوحيد" أعلى الملفات التالية مع روابطها المرجعية:
-   - [ ] التسعير: ضع شارة وربط إلى `99-reference/02-enums-standard.md` + `03-api/features/04-pricing.md` داخل: `MASTER-DOCUMENT-V2.0.md`, `01-requirements/00-requirements-v2.0.md`.
-   - [ ] RBAC: ضع شارة وربط إلى `99-reference/05-roles-matrix.md` داخل: `03-api/admin/02-governance.md` وأي نسخ تحت `depth-site/docs/roles/*`.
-   - [ ] الأخطاء: ضع شارة وربط إلى `03-api/core/04-error-handling.md` في الصفحات ذات الصلة.
+- [x] (2025-08-23) إضافة شارة SSOT في: `MASTER-DOCUMENT-V2.0.md`, `01-requirements/00-requirements-v2.0.md`, `03-api/admin/02-governance.md`, `03-api/core/04-error-handling.md` مع الروابط المرجعية.
 
 3) قاعدة البيانات
-- [ ] مواءمة قيم الحالة (Status) في `02-database/01-database-schema.md` مع `99-reference/02-enums-standard.md` + إضافة لافتة: "القيم المعيارية في SSOT".
+- [x] (2025-08-23) إضافة لافتة مواءمة SSOT أعلى `02-database/01-database-schema.md` مع الإشارة للتعدادات والمعادلات المرجعية.
 
 4) الفهارس والبنية التنظيمية
-- [ ] تحديث `documentation/README.md` لإدراج كل ملفات `06-frontend` (بما فيها `02-design-system.md`, `03-component-library.md`, `02-performance-and-a11y.md`).
+- [x] (2025-08-23) تحديث `documentation/README.md` لإدراج كل ملفات `06-frontend` بما فيها Placeholders.
 
 5) تحقق سريع للموقع
 - [ ] التحقق من توفر أصل الشعار: `https://www.depth-agency.com/brand/logo-512.png` = 200 OK، وتوثيق ذلك في `depth-site/docs/ops/EMAIL-LIVE-QA-REPORT.md`.
