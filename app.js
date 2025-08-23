@@ -20,6 +20,12 @@ class DepthDocs {
         if (window.AOS) {
             window.AOS.init({ once: true, duration: 600, easing: 'ease-out' });
         }
+        // Initialize Mermaid once
+        try {
+            if (window.mermaid && typeof window.mermaid.initialize === 'function') {
+                window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'default', fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial' });
+            }
+        } catch (_) {}
     }
 
     // Check current screen size
@@ -345,6 +351,8 @@ class DepthDocs {
                     UIComponents.injectPrevNextAndRelated(path);
                     UIComponents.enhanceCodeBlocks(docContent);
                     UIComponents.injectPageTitleIcon(path);
+                    // Mermaid render
+                    try { await this.renderMermaid(docContent); } catch (_) {}
                     if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                     const wrapper = document.querySelector('.content-wrapper');
                     if (wrapper) wrapper.classList.remove('home-full');
@@ -372,6 +380,7 @@ class DepthDocs {
                         UIComponents.injectPrevNextAndRelated(path);
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.injectPageTitleIcon(path);
+                        try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                         const wrapper = document.querySelector('.content-wrapper');
                         if (wrapper) wrapper.classList.remove('home-full');
@@ -402,6 +411,7 @@ class DepthDocs {
                         UIComponents.injectPrevNextAndRelated(path);
                         UIComponents.enhanceCodeBlocks(docContent);
                         UIComponents.injectPageTitleIcon(path);
+                        try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                         const wrapper = document.querySelector('.content-wrapper');
                         if (wrapper) wrapper.classList.remove('home-full');
@@ -422,6 +432,7 @@ class DepthDocs {
                 UIComponents.injectPrevNextAndRelated(path);
                 UIComponents.enhanceCodeBlocks(docContent);
                 UIComponents.injectPageTitleIcon(path);
+                try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                 const wrapper = document.querySelector('.content-wrapper');
                 if (wrapper) wrapper.classList.remove('home-full');
@@ -435,6 +446,26 @@ class DepthDocs {
         } catch (error) {
             console.error('خطأ في تحميل المحتوى:', error);
             UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
+        }
+    }
+
+    // Render Mermaid diagrams inside a container
+    async renderMermaid(root) {
+        if (!window.mermaid || !root) return;
+        const blocks = root.querySelectorAll('pre > code.language-mermaid, code.mermaid, .language-mermaid');
+        if (!blocks.length) return;
+        // Replace each block with Mermaid-rendered SVG
+        for (const codeEl of blocks) {
+            try {
+                const parentPre = codeEl.closest('pre');
+                const code = codeEl.textContent || '';
+                const container = document.createElement('div');
+                container.className = 'diagram mermaid-diagram';
+                // Render to SVG
+                const { svg } = await window.mermaid.render(`m-${Math.random().toString(36).slice(2)}`, code);
+                container.innerHTML = svg;
+                if (parentPre) parentPre.replaceWith(container); else codeEl.replaceWith(container);
+            } catch (_) { /* skip broken diagram */ }
         }
     }
 

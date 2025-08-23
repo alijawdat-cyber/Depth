@@ -126,6 +126,57 @@
 
 ### 2.4 المشروع (Project)
 > ملاحظة: الأسعار (creatorPrice) لا تظهر للمبدع إلا بعد موافقة الأدمن على المشروع.
+
+```mermaid
+erDiagram
+  CLIENT ||--o{ PROJECT : "has"
+  CREATOR ||--o{ PROJECT : "executes"
+  CATEGORY ||--o{ SUBCATEGORY : "contains"
+  SUBCATEGORY ||--o{ PROJECT : "typed"
+
+  PROJECT {
+    string id PK
+    string clientId FK
+    string creatorId FK
+    string categoryId FK
+    string subcategoryId FK
+    enum   status
+    int    basePrice
+    float  experienceMod
+    float  equipmentMod
+    float  ownershipFactor
+    float  processingMod
+    float  rushMod
+    int    locationAddition
+    int    creatorPrice
+    float  agencyMarginPercent
+    int    agencyMargin
+    int    clientPrice
+    enum   location
+    date   deliveryDate
+  }
+
+  CLIENT {
+    string id PK
+    string companyName
+  }
+
+  CREATOR {
+    string id PK
+    string userId FK
+  }
+
+  CATEGORY {
+    string id PK
+    string code
+  }
+
+  SUBCATEGORY {
+    string id PK
+    string categoryId FK
+    string code
+  }
+```
 | الحقل         | النوع         | مطلوب | وصف                        | مثال           | قيود         |
 |---------------|--------------|-------|----------------------------|----------------|--------------|
 | id                | string (uid) | نعم   | معرف المشروع               | p_123abc       | فريد         |
@@ -293,6 +344,19 @@ ClientPrice = 118,876 + (118,876 × 30%) = 154,538 IQD
 
 ### 2.8 التوفر الشبكي للمبدعين (CreatorAvailability)
 > جدول التوفر الشبكي كل 30 دقيقة للمبدعين مع إدارة الحجوزات والأعلام الخاصة
+
+```mermaid
+flowchart LR
+  subgraph Timeline[شبكة زمنية كل 30 دقيقة]
+    A1[09:00] --> A2[09:30] --> A3[10:00] --> A4[10:30]
+  end
+  CREATOR((Creator)) --- Timeline
+  PROJECT[(Project)] -. يحجز .- A2
+  classDef node fill:#eef,stroke:#6C2BFF,color:#111;
+  classDef booked fill:#fde68a,stroke:#ca8a04,color:#111;
+  class A1,A3 node;
+  class A2 booked;
+```
 | الحقل         | النوع         | مطلوب | وصف                        | مثال           | قيود         |
 |---------------|--------------|-------|----------------------------|----------------|--------------|
 | id            | string (uid) | نعم   | معرف الفترة                | avail_123abc   | فريد         |

@@ -199,6 +199,26 @@ body {
     transition: var(--transition);
 }
 
+/* Responsive diagrams (Mermaid) */
+.doc-content .diagram.mermaid-diagram {
+    display: block;
+    margin: 24px 0;
+    overflow: hidden;
+}
+.doc-content .diagram.mermaid-diagram svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    direction: ltr; /* Mermaid draws LTR; keep layout sane in RTL pages */
+}
+[data-theme="dark"] .doc-content .diagram.mermaid-diagram svg {
+    filter: brightness(0.95) contrast(1.05);
+}
+/* Improve text legibility */
+.doc-content .diagram.mermaid-diagram text {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+}
+
 .theme-toggle:hover {
     background: var(--bg-secondary);
 }
