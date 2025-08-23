@@ -31,7 +31,7 @@
     font-weight: 600;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 4; /* above sticky first-col */
 }
 .doc-content table th,
 .doc-content table td {
@@ -73,7 +73,7 @@
 }
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
-    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto !important; -webkit-overflow-scrolling: touch; position: relative; overscroll-behavior-x: contain; max-width: calc(100vw - 32px); }
+    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto !important; -webkit-overflow-scrolling: touch; position: relative; overscroll-behavior-x: contain; max-width: calc(100vw - 32px); background: var(--bg); will-change: scroll-position; }
     /* subtle fade to hint scroll */
     .doc-content .table-wrap::before, .doc-content .table-wrap::after { content: ''; position: sticky; top: 0; width: 18px; height: 100%; pointer-events: none; z-index: 1; }
     .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
@@ -193,12 +193,28 @@
         .json-body { padding: 8px; }
     }
 /* Sticky first column for wide tables */
+/* Sticky first column: direction-aware to work across RTL/LTR and mobile */
 .doc-content table.sticky-col th:first-child,
 .doc-content table.sticky-col td:first-child {
     position: sticky;
-    inset-inline-start: 0;
-    z-index: 2;
-    background: inherit;
+    inset-inline-start: 0; /* logical fallback */
+    z-index: 3;
+    background: var(--bg); /* solid background so content under doesn't bleed */
+}
+
+/* RTL: stick to the right edge and show divider on left */
+[dir="rtl"] .doc-content table.sticky-col th:first-child,
+[dir="rtl"] .doc-content table.sticky-col td:first-child {
+    right: 0;
+    left: auto;
+    box-shadow: -2px 0 0 0 var(--border);
+}
+
+/* LTR: stick to the left edge and show divider on right */
+[dir="ltr"] .doc-content table.sticky-col th:first-child,
+[dir="ltr"] .doc-content table.sticky-col td:first-child {
+    left: 0;
+    right: auto;
     box-shadow: 2px 0 0 0 var(--border);
 }
 
