@@ -17,6 +17,7 @@
     border-radius: 12px;
     box-shadow: var(--shadow);
     background: var(--bg);
+    max-width: 100%;
 }
 /* remove edge gradient to preserve full border visibility */
 .doc-content .table-wrap::after { content: none; }
@@ -82,6 +83,12 @@
     .doc-content table th, .doc-content table td { white-space: normal; word-break: break-word; }
     .doc-content table td { min-width: 120px; }
     .doc-content table th { min-width: 130px; }
+}
+
+/* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */
+@media (max-width: 1024px) {
+    .content-wrapper { grid-template-columns: 1fr; }
+    .floating-toc { display: none; }
 }
 
 /* Auto-direction helpers */
