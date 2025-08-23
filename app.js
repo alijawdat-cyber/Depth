@@ -33,78 +33,21 @@ class DepthDocs {
         // Toggle mobile TOC visibility per breakpoint
         const mt = document.getElementById('mobile-toc');
         if (mt) {
-            // only show on phones; keep hidden on tablet/desktop so it doesn't affect layout
             if (this.isMobile) mt.classList.remove('hidden'); else mt.classList.add('hidden');
         }
     }
 
-    // Initialize sidebar state based on screen size
-    initializeSidebarState() {
-        const sidebar = document.getElementById('sidebar');
-        const contentWrapper = document.querySelector('.content-wrapper');
-        const mainContent = document.querySelector('.main-content');
-        
-        // All devices: sidebar closed by default
-        this.sidebarOpen = false;
-        sidebar.classList.remove('active');
-    document.body.classList.remove('sidebar-open');
-        // Ensure the visual state matches the breakpoint behavior
-        if (this.isDesktop || this.isLargeDesktop) {
-            // On desktop, hide the sidebar with a class so content doesn't get overlapped
-            sidebar.classList.add('sidebar-closed');
-        } else {
-            sidebar.classList.remove('sidebar-closed');
-        }
-        if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
-        if (mainContent) mainContent.classList.add('sidebar-closed');
-        // If user changed zoom or breakpoint, make sure any mobile push styles are fully reset
-        if (mainContent) {
-            mainContent.classList.remove('pushed');
-            // Clear any leftover inline transform set while opening the mobile sidebar
-            mainContent.style.transform = '';
-        }
-        
-        this.updateBurgerButton();
-    }
-
-    // Setup all event listeners
+    // Setup event listeners
     setupEventListeners() {
-        // Burger menu
-        document.getElementById('burger-btn').addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-
-        // Logo -> navigate home reliably
-        const logo = document.querySelector('.logo');
-        if (logo) {
-            logo.addEventListener('click', (e) => {
-                // If it's an <a>, let hash update; else force it
-                e.preventDefault();
-                this.navigate('/');
-            });
-        }
-
-        // Sidebar close button
-        document.getElementById('sidebar-close').addEventListener('click', () => {
-            this.closeSidebar();
-        });
-
-        // Sidebar overlay
-        document.getElementById('sidebar-overlay').addEventListener('click', () => {
-            this.closeSidebar();
-        });
-
-        // Close sidebar when clicking or touching outside it (mobile & desktop)
-        const outsideClose = (event) => {
-            if (!this.sidebarOpen) return;
+        const outsideClose = (e) => {
             const sidebar = document.getElementById('sidebar');
-            const burger = document.getElementById('burger-btn');
-            const isInsideSidebar = sidebar.contains(event.target);
-            const isBurger = burger.contains(event.target);
-            if (!isInsideSidebar && !isBurger) {
+            const overlay = document.getElementById('sidebar-overlay');
+            const isClickInside = sidebar.contains(e.target) || overlay.contains(e.target);
+            if (!isClickInside && this.sidebarOpen) {
                 this.closeSidebar();
             }
         };
+
         document.addEventListener('click', outsideClose, { capture: true });
         document.addEventListener('pointerdown', outsideClose, { capture: true });
 
@@ -324,84 +267,102 @@ class DepthDocs {
     async loadContent(path) {
         try {
             UIComponents.showLoading();
-            
-            // Check if content exists in pageContent first
-            if (pageContent[path]) {
-                const content = pageContent[path];
+
+            // 1) Render homepage from inline content only
+            if (path === '/') {
+                const content = (typeof pageContent !== 'undefined' && pageContent['/']) ? pageContent['/'] : '<h1>Depth</h1>';
                 const docContent = document.getElementById('doc-content');
                 docContent.innerHTML = content;
-                // Strip old emoji icons from headings
                 UIComponents.sanitizeHeadings(docContent);
-                if (path !== '/') UIComponents.generateTOC(docContent); else {
-                    const tocEl = document.getElementById('floating-toc');
-                    if (tocEl) tocEl.style.display = 'none';
-                }
-                // Footer navigation and code copy
+                const tocElHome = document.getElementById('floating-toc');
+                if (tocElHome) tocElHome.style.display = 'none';
+                const wrapperHome = document.querySelector('.content-wrapper');
+                if (wrapperHome) wrapperHome.classList.add('home-full');
                 UIComponents.injectPrevNextAndRelated(path);
                 UIComponents.enhanceCodeBlocks(docContent);
-                // Inject page icon into H1 and render Lucide
                 UIComponents.injectPageTitleIcon(path);
-                if (window.lucide && typeof window.lucide.createIcons === 'function') {
-                    window.lucide.createIcons();
-                }
-                // Homepage layout adjustments
-                const tocEl = document.getElementById('floating-toc');
-                const wrapper = document.querySelector('.content-wrapper');
-                if (path === '/') {
-                    if (tocEl) tocEl.style.display = 'none';
-                    if (wrapper) wrapper.classList.add('home-full');
-                } else {
-                    if (wrapper) wrapper.classList.remove('home-full');
-                }
-                if (window.AOS) setTimeout(() => window.AOS.refreshHard(), 50);
+                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
-            
-            // If not found, try to load .md file
+
+            // 2) Try fetching the markdown file first
             const filePath = path.substring(1);
-            const mdPath = `./${filePath}.md`;
-            
-            console.log('Loading file:', mdPath);
-            
-            const response = await fetch(mdPath);
-            
-            if (!response.ok) {
-                throw new Error(`الصفحة غير موجودة: ${path}`);
+            // Prefer relative path; add version to bypass caches on GH Pages
+            const version = 'v=2.3.1';
+            const mdPath = `./${filePath}.md?${version}`;
+            let rendered = false;
+            try {
+                const response = await fetch(mdPath, { cache: 'no-store' });
+                if (response.ok) {
+                    const markdown = await response.text();
+                    const html = marked.parse(markdown);
+                    const cleanHtml = DOMPurify.sanitize(html);
+                    const docContent = document.getElementById('doc-content');
+                    docContent.innerHTML = cleanHtml;
+                    UIComponents.sanitizeHeadings(docContent);
+                    UIComponents.generateTOC(docContent);
+                    UIComponents.injectPrevNextAndRelated(path);
+                    UIComponents.enhanceCodeBlocks(docContent);
+                    UIComponents.injectPageTitleIcon(path);
+                    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                    const wrapper = document.querySelector('.content-wrapper');
+                    if (wrapper) wrapper.classList.remove('home-full');
+                    if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    rendered = true;
+                }
+            } catch (_) { /* ignore and try alt fetch */ }
+
+            // 2b) On GitHub Pages some nested routes may need an absolute path
+            if (!rendered) {
+                try {
+                    // Build absolute URL based on current origin and repo name
+                    const base = `${window.location.origin}${window.location.pathname.replace(/index\.html?$/, '')}`;
+                    const absUrl = `${base}${filePath}.md?${version}`;
+                    const response2 = await fetch(absUrl, { cache: 'no-store' });
+                    if (response2.ok) {
+                        const markdown = await response2.text();
+                        const html = marked.parse(markdown);
+                        const cleanHtml = DOMPurify.sanitize(html);
+                        const docContent = document.getElementById('doc-content');
+                        docContent.innerHTML = cleanHtml;
+                        UIComponents.sanitizeHeadings(docContent);
+                        UIComponents.generateTOC(docContent);
+                        UIComponents.injectPrevNextAndRelated(path);
+                        UIComponents.enhanceCodeBlocks(docContent);
+                        UIComponents.injectPageTitleIcon(path);
+                        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                        const wrapper = document.querySelector('.content-wrapper');
+                        if (wrapper) wrapper.classList.remove('home-full');
+                        if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        rendered = true;
+                    }
+                } catch (__) { /* ignore */ }
             }
-            
-            const markdown = await response.text();
-            const html = marked.parse(markdown);
-            const cleanHtml = DOMPurify.sanitize(html);
-            
-            const docContent = document.getElementById('doc-content');
-            docContent.innerHTML = cleanHtml;
-            // Strip old emoji icons from headings
-            UIComponents.sanitizeHeadings(docContent);
-            
-            if (path !== '/') UIComponents.generateTOC(docContent); else {
-                const tocEl = document.getElementById('floating-toc');
-                if (tocEl) tocEl.style.display = 'none';
+
+            // 3) Fallback to inline stub content (if exists)
+            if (!rendered && typeof pageContent !== 'undefined' && pageContent[path]) {
+                const content = pageContent[path];
+                const docContent = document.getElementById('doc-content');
+                docContent.innerHTML = content;
+                UIComponents.sanitizeHeadings(docContent);
+                UIComponents.generateTOC(docContent);
+                UIComponents.injectPrevNextAndRelated(path);
+                UIComponents.enhanceCodeBlocks(docContent);
+                UIComponents.injectPageTitleIcon(path);
+                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                const wrapper = document.querySelector('.content-wrapper');
+                if (wrapper) wrapper.classList.remove('home-full');
+                if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
             }
-            // Footer navigation and code copy
-            UIComponents.injectPrevNextAndRelated(path);
-            UIComponents.enhanceCodeBlocks(docContent);
-            // Inject page icon into H1 and render Lucide
-            UIComponents.injectPageTitleIcon(path);
-            if (window.lucide && typeof window.lucide.createIcons === 'function') {
-                window.lucide.createIcons();
-            }
-            const tocEl2 = document.getElementById('floating-toc');
-            const wrapper2 = document.querySelector('.content-wrapper');
-            if (path === '/') {
-                if (tocEl2) tocEl2.style.display = 'none';
-                if (wrapper2) wrapper2.classList.add('home-full');
-            } else {
-                if (wrapper2) wrapper2.classList.remove('home-full');
-            }
-            if (window.AOS) setTimeout(() => window.AOS.refreshHard(), 50);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
+
+            // 4) If nothing rendered, show error
+            if (!rendered) throw new Error(`المحتوى غير متاح: ${path}`);
         } catch (error) {
             console.error('خطأ في تحميل المحتوى:', error);
             UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
