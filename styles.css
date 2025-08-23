@@ -1,3 +1,14 @@
+/* Tables: center text horizontally and vertically in all cells */
+.doc-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.doc-content table th,
+.doc-content table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px 12px;
+}
 /* =============== Variables =============== */
 :root {
     --primary: #6C2BFF;
