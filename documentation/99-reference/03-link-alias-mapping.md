@@ -27,4 +27,4 @@
 rg '02-creators-api.md|02b-salaried-employees-api.md|04-projects-api.md|05-pricing-api.md|14-seeds-management-api.md|data-dictionary-and-domain-model.md' documentation/
 ```
 
-> آخر تحديث: 2025-08-21
+> آخر تحديث: 2025-08-23

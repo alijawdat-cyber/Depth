@@ -177,8 +177,8 @@
         "description": "تصوير المنتجات بطريقة مسطحة من الأعلى",
         "basePrice": 10000,
         "currency": "IQD",
-        "estimatedDuration": "2-3 ساعات",
-        "skillLevel": "beginner", // beginner|intermediate|advanced
+  "estimatedDuration": "2-3 ساعات",
+  "skillLevel": "fresh", // fresh|experienced|expert
         "isActive": true,
         "sortOrder": 1,
         "linkedIndustries": [
@@ -211,8 +211,8 @@
         "description": "تصوير احترافي للمنتجات التجارية",
         "basePrice": 8000,
         "currency": "IQD",
-        "estimatedDuration": "1-2 ساعة",
-        "skillLevel": "intermediate",
+  "estimatedDuration": "1-2 ساعة",
+  "skillLevel": "experienced",
         "isActive": true,
         "sortOrder": 2,
         "linkedIndustries": [
@@ -264,7 +264,7 @@
   "description": "تصوير جوي بالطائرات المسيرة",
   "basePrice": 150000,
   "estimatedDuration": "4-6 ساعات",
-  "skillLevel": "advanced",
+  "skillLevel": "expert",
   "requirements": [
     "طائرة مسيرة احترافية",
     "رخصة طيران",

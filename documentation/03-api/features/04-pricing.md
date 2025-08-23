@@ -48,32 +48,11 @@
       "description": "خبراء معتمدون (50+ مشروع)",
       "benefits": ["أولوية في المشاريع", "دعم تسويقي"]
     }
-```json
-{
-  "creatorExperienceLevels": {
-    "beginner": {
-  "agencyFeeRange": "10-50%",
-      "description": "مبدعون جدد (أقل من 10 مشاريع)",
-      "incentive": "هامش منخفض لتشجيع البدء"
-    },
-    "intermediate": {
-  "agencyFeeRange": "10-50%",
-      "description": "مبدعون متوسطون (10-50 مشروع)",
-      "factors": ["جودة العمل", "تقييم العملاء", "الالتزام بالمواعيد"]
-    },
-    "expert": {
-  "agencyFeeRange": "10-50%",
-      "description": "خبراء معتمدون (50+ مشروع)",
-      "benefits": ["أولوية في المشاريع", "دعم تسويقي"]
-    },
-    "premium": {
-  "agencyFeeRange": "10-50%",
-      "description": "مبدعون مميزون وشركاء استراتيجيون",
-      "criteria": ["تقييم 4.8+", "معدل إكمال 95%+", "عملاء VIP"]
-    }
   }
 }
 ```
+
+> ملاحظة: تمت إزالة beginner/intermediate/premium واستبدالها بالقيم المعيارية fresh/experienced/expert. راجع: `documentation/99-reference/02-enums-standard.md#2-خبرة-المبدع-creator-experience`.
 
 #### 2. حسب نوع ومعقدة المشروع
 ```json
@@ -746,7 +725,7 @@
       "governorate": "بغداد",
       "area": "الكرادة"
     },
-    "type": "new", // new | returning | premium
+  "type": "new", // new | returning | vip (شريحة عملاء مميزة - لا تؤثر على تعدادات الخبرة)
     "discountEligible": true
   },
   "creator": {
@@ -775,7 +754,7 @@
           "fee": 50000,
           "description": "رسوم الانتقال لموقع العميل"
         },
-        "urgencyPremium": {
+  "rushMod": {
           "type": "48hours",
           "percentage": 15,
           "amount": 64500,
@@ -807,7 +786,7 @@
           "description": "تصوير إضافي للأطباق الجانبية",
           "cost": 80000
         },
-        "creatorPremium": {
+  "experienceMod": {
           "level": "expert",
           "percentage": 10,
           "amount": 52950,
@@ -888,24 +867,24 @@
       "photo": {
         "product": {
           "baseRate": 450000,
-          "premium": 1.10, // زيادة 10% للخبرة
+          "experienceMod": 1.10, // زيادة للخبرة/التخصص وفق معادلات SSOT
           "finalRate": 495000
         },
         "food": {
           "baseRate": 380000,
-          "premium": 1.15, // زيادة 15% للتخصص
+          "experienceMod": 1.15, // زيادة للخبرة/التخصص وفق معادلات SSOT
           "finalRate": 437000
         },
         "events": {
           "baseRate": 320000,
-          "premium": 1.05,
+          "experienceMod": 1.05,
           "finalRate": 336000
         }
       },
       "video": {
         "reels_30s": {
           "baseRate": 280000,
-          "premium": 1.20,
+          "experienceMod": 1.20,
           "finalRate": 336000
         }
       }
