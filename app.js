@@ -343,6 +343,36 @@ class DepthDocs {
                 } catch (__) { /* ignore */ }
             }
 
+            // 2c) Fallback to raw.githubusercontent.com (CORS-enabled) if still not rendered
+            if (!rendered) {
+                try {
+                    const host = window.location.host; // e.g., alijawdat-cyber.github.io
+                    const owner = host.split('.')[0] || 'alijawdat-cyber';
+                    // Derive repo name from first segment of pathname (e.g., /Depth/ → Depth)
+                    const repo = (window.location.pathname.split('/').filter(Boolean)[0]) || 'Depth';
+                    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}.md?${version}`;
+                    const response3 = await fetch(rawUrl, { cache: 'no-store' });
+                    if (response3.ok) {
+                        const markdown = await response3.text();
+                        const html = marked.parse(markdown);
+                        const cleanHtml = DOMPurify.sanitize(html);
+                        const docContent = document.getElementById('doc-content');
+                        docContent.innerHTML = cleanHtml;
+                        UIComponents.sanitizeHeadings(docContent);
+                        UIComponents.generateTOC(docContent);
+                        UIComponents.injectPrevNextAndRelated(path);
+                        UIComponents.enhanceCodeBlocks(docContent);
+                        UIComponents.injectPageTitleIcon(path);
+                        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                        const wrapper = document.querySelector('.content-wrapper');
+                        if (wrapper) wrapper.classList.remove('home-full');
+                        if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        rendered = true;
+                    }
+                } catch (___) { /* ignore */ }
+            }
+
             // 3) Fallback to inline stub content (if exists)
             if (!rendered && typeof pageContent !== 'undefined' && pageContent[path]) {
                 const content = pageContent[path];
