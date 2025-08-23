@@ -1228,6 +1228,39 @@ class UIComponents {
             } catch (_) { /* ignore */ }
         });
     }
+
+    // =============== Auto direction: set LTR on pure-English blocks only ===============
+    static applyAutoDirection(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const ARABIC_RE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+        const LATIN_RE = /[A-Za-z]/;
+
+        // Candidate blocks (exclude code/diagram/json viewers)
+        const selectors = [
+            'p', 'li', 'blockquote', 'figcaption', 'dd', 'dt', 'h1', 'h2', 'h3', 'h4',
+            'td', 'th', '.callout-content', '.doc-related a'
+        ];
+        const nodes = Array.from(root.querySelectorAll(selectors.join(',')))
+            .filter(el => !el.closest('pre, code, .json-viewer, .diagram, .mermaid-diagram'));
+
+        const isPureEnglish = (text) => {
+            const t = (text || '').replace(/\s+/g, ' ').trim();
+            if (!t) return false;
+            if (ARABIC_RE.test(t)) return false; // any Arabic -> keep RTL
+            return LATIN_RE.test(t); // has latin letters and no Arabic
+        };
+
+        nodes.forEach(el => {
+            // don't override explicit dir
+            if (el.hasAttribute('dir')) return;
+            const text = el.innerText || el.textContent || '';
+            if (isPureEnglish(text)) {
+                el.setAttribute('dir', 'ltr');
+                el.classList.add('dir-ltr');
+            }
+        });
+    }
 }
 
 // Export for use

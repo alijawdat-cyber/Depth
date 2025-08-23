@@ -357,6 +357,7 @@ class DepthDocs {
                     UIComponents.enhanceCallouts(docContent);
                     UIComponents.enhanceImagesAndLinks(docContent);
                     UIComponents.injectPageTitleIcon(path);
+                    UIComponents.applyAutoDirection(docContent);
                     // Mermaid render
                     try { await this.renderMermaid(docContent); } catch (_) {}
                     if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
@@ -391,6 +392,7 @@ class DepthDocs {
                         UIComponents.enhanceCallouts(docContent);
                         UIComponents.enhanceImagesAndLinks(docContent);
                         UIComponents.injectPageTitleIcon(path);
+                        UIComponents.applyAutoDirection(docContent);
                         try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                         const wrapper = document.querySelector('.content-wrapper');
@@ -427,6 +429,7 @@ class DepthDocs {
                         UIComponents.enhanceCallouts(docContent);
                         UIComponents.enhanceImagesAndLinks(docContent);
                         UIComponents.injectPageTitleIcon(path);
+                        UIComponents.applyAutoDirection(docContent);
                         try { await this.renderMermaid(docContent); } catch (_) {}
                         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                         const wrapper = document.querySelector('.content-wrapper');
@@ -453,6 +456,7 @@ class DepthDocs {
                 UIComponents.enhanceCallouts(docContent);
                 UIComponents.enhanceImagesAndLinks(docContent);
                 UIComponents.injectPageTitleIcon(path);
+                UIComponents.applyAutoDirection(docContent);
                 try { await this.renderMermaid(docContent); } catch (_) {}
                 if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
                 const wrapper = document.querySelector('.content-wrapper');

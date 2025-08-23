@@ -76,6 +76,9 @@
     }
 }
 
+/* Auto-direction helpers */
+.dir-ltr { direction: ltr; text-align: left; }
+
 
     /* =============== JSON Viewer =============== */
     .json-viewer {
