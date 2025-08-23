@@ -1,5 +1,20 @@
 // UI Components
 class UIComponents {
+    // ===== Utilities for layout offsets =====
+    static getHeaderOffset() {
+        try {
+            const cs = getComputedStyle(document.documentElement);
+            const v = cs.getPropertyValue('--header-total-height') || cs.getPropertyValue('--header-height') || '64px';
+            const n = parseFloat(String(v).trim());
+            return isNaN(n) ? 64 : n;
+        } catch (_) { return 64; }
+    }
+    static scrollToHeading(h) {
+        if (!h) return;
+        const offset = UIComponents.getHeaderOffset() + 8; // small breathing room
+        const top = window.scrollY + h.getBoundingClientRect().top - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
     // Generate navigation item
     static createNavItem(item, isActive = false, sectionId = '') {
         const a = document.createElement('a');
@@ -397,7 +412,7 @@ class UIComponents {
                 link.textContent = heading.textContent;
                 link.onclick = (e) => {
                     e.preventDefault();
-                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    UIComponents.scrollToHeading(heading);
                     toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
                     link.classList.add('active');
                 };
@@ -429,7 +444,7 @@ class UIComponents {
                 link.textContent = heading.textContent;
                 link.onclick = (e) => {
                     e.preventDefault();
-                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    UIComponents.scrollToHeading(heading);
                     toc.querySelectorAll('a').forEach(a => a.classList.remove('active'));
                     link.classList.add('active');
                 };
@@ -452,8 +467,10 @@ class UIComponents {
 
     // Observe headings for active state
     static observeHeadings(headings) {
+        const topOff = UIComponents.getHeaderOffset();
         const options = {
-            rootMargin: '-20% 0% -70% 0%',
+            // push the observer top boundary below the fixed header
+            rootMargin: `${-Math.round(topOff + 8)}px 0px -60% 0px`,
             threshold: 0
         };
         
@@ -496,6 +513,7 @@ class UIComponents {
     // =============== Mobile TOC (phones) ===============
     static setupMobileTOC(h2Headings) {
     const isPhone = window.innerWidth < 768;
+    const headerOff = UIComponents.getHeaderOffset();
     const chip = document.getElementById('mobile-heading-chip');
     const mobileToc = document.getElementById('mobile-toc');
     const thumb = document.querySelector('.mobile-v-thumb');
@@ -527,11 +545,12 @@ class UIComponents {
         chip.style.display = 'block';
 
     // Helpers
-        const currentIndex = () => {
+    const currentIndex = () => {
             let idx = 0;
             for (let i = 0; i < h2Headings.length; i++) {
                 const r = h2Headings[i].getBoundingClientRect();
-                if (r.top <= window.innerHeight * 0.25) idx = i; else break;
+        // consider a heading active once its top passes under the header edge
+        if ((r.top - headerOff) <= 8) idx = i; else break;
             }
             return idx;
         };
@@ -685,7 +704,7 @@ class UIComponents {
         // Click navigates to the current heading (center it)
         chip.onclick = () => {
             const idx = currentIndex();
-            h2Headings[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            UIComponents.scrollToHeading(h2Headings[idx]);
         };
     }
 
