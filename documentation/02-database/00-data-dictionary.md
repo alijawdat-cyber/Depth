@@ -141,7 +141,6 @@
 | processingMod     | float        | نعم   | معامل المعالجة             | 1.3            | من ProcessingModifiers |
 | rushMod           | float        | نعم   | معامل الاستعجال            | 1.0            | من RushModifiers |
 | locationAddition  | int          | نعم   | إضافة الموقع الثابتة       | 0              | من LocationAdditions |
-<!-- تم حذف معاملات الموقع النسبية (locationMod) والاعتماد فقط على الإضافات الثابتة -->
 | creatorPrice      | int          | نعم   | سعر المبدع النهائي         | 15730          | محسوب تلقائياً |
 | agencyMargin      | int          | لا    | هامش الوكالة (مبلغ ثابت)   | 4719           | اختياري      |
 | agencyMarginPercent| float       | لا    | هامش الوكالة (نسبة مئوية)  | 0.30           | النطاق الرسمي 10% إلى 50% |
