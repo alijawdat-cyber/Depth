@@ -1,3 +1,20 @@
+// requestIdleCallback polyfill for iOS Safari and older browsers
+if (typeof window !== 'undefined') {
+    if (typeof window.requestIdleCallback !== 'function') {
+        window.requestIdleCallback = (cb, opts) => {
+            const start = Date.now();
+            const delay = opts && typeof opts.timeout === 'number' ? Math.min(opts.timeout, 50) : 1;
+            return setTimeout(() => cb({
+                didTimeout: false,
+                timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
+            }), delay);
+        };
+    }
+    if (typeof window.cancelIdleCallback !== 'function') {
+        window.cancelIdleCallback = (id) => clearTimeout(id);
+    }
+}
+
 // Main Application Logic
 class DepthDocs {
     constructor() {
@@ -56,6 +73,15 @@ class DepthDocs {
                 window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'default', fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial' });
             }
         } catch (_) {}
+    }
+
+    // Schedule work during idle time with safe fallback
+    scheduleIdle(cb, timeout = 500) {
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(cb, { timeout });
+        } else {
+            setTimeout(cb, 0);
+        }
     }
 
     // Check current screen size
@@ -343,7 +369,7 @@ class DepthDocs {
                 this.preloadAdjacentPages(path);
                 return;
             }
-            requestIdleCallback(async () => {
+            this.scheduleIdle(async () => {
                 try {
                     const cleanHtml = await this.fetchContent(path);
                     // cap cache to 10 entries
@@ -358,7 +384,7 @@ class DepthDocs {
                     console.error('خطأ في تحميل المحتوى:', error);
                     UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
                 }
-            }, { timeout: 500 });
+            }, 500);
         } catch (error) {
             console.error('خطأ في تحميل المحتوى:', error);
             UIComponents.showError(`لم يتم العثور على الصفحة: ${path}`);
@@ -388,13 +414,13 @@ class DepthDocs {
         adj.forEach(path => {
             if (this.pageCache.has(path) || this.preloadQueue.has(path)) return;
             this.preloadQueue.add(path);
-            requestIdleCallback(async () => {
+            this.scheduleIdle(async () => {
                 try {
                     const html = await this.fetchContent(path);
                     this.pageCache.set(path, html);
                 } catch (_) {}
                 this.preloadQueue.delete(path);
-            }, { timeout: 2000 });
+            }, 2000);
         });
     }
 
