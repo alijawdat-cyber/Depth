@@ -1071,8 +1071,11 @@ body {
 }
 
 /* Hide TOC on homepage only */
-body.is-home #floating-toc { display: none !important; }
-body.is-home #mobile-toc { display: none !important; }
+/* إخفاء TOC الطافي والنسخة المحمولة على الصفحة الرئيسية فقط */
+@supports (-webkit-touch-callout: none) {
+    body.is-home #floating-toc { display: none !important; }
+    body.is-home #mobile-toc { display: none !important; }
+}
 /* Hide footer nav on home as well (desktop stays fine) */
 body.is-home .doc-footer { display: none; }
 
@@ -1334,8 +1337,9 @@ body.is-home .doc-footer { display: none; }
         bottom: 20px; 
         left: 16px; /* مسافة أكبر من الحافة */
         width: 28px; /* عرض أكبر قليلاً */
-        z-index: 950; /* تحت الهيدر (1000) لتفادي تغطية الشعار/الأزرار */
+        z-index: 850; /* أقل لتجنّب التداخل مع المحتوى القابل للنقر */
         pointer-events: none; 
+        will-change: transform;
     }
     /* Override desktop guard: show even when inside .content-wrapper */
     .content-wrapper > .mobile-toc { display: block !important; }
@@ -1374,6 +1378,16 @@ body.is-home .doc-footer { display: none; }
     #mobile-heading-chip:active { transform: translateY(-50%) scale(0.98); }
 
     /* Footer cards are visible on phones; large floating area remains removed */
+}
+
+/* معالجة قصّ بداية الجداول على الهاتف مع العمود الأول اللاصق ووجود سكة TOC اليسرى */
+@media (max-width: 768px) {
+    .content-wrapper { position: relative; }
+    .doc-content .table-wrap { padding-left: 8px; }
+    /* عندما يكون العمود الأول sticky في RTL، أضف هامشًا داخليًا صغيرًا لتعويض ظلّ العمود والتراكب */
+    [dir="rtl"] .doc-content .mobile-sticky-first { border-right: 0; }
+    [dir="rtl"] .doc-content .mobile-sticky-first th:first-child,
+    [dir="rtl"] .doc-content .mobile-sticky-first td:first-child { box-shadow: -3px 0 6px rgba(0,0,0,0.08); }
 }
 
 /* Micro-mobile (<= 360px) */

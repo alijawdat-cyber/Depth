@@ -45,12 +45,11 @@ class DepthDocs {
         const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
         const isIOSSafari = isIOS && isSafari;
-        if (window.AOS) {
+    if (window.AOS) {
             const isMobile = window.innerWidth < 768;
             if (isIOSSafari) {
                 window.AOS.init({ disable: true });
-                // Use custom iOS animations via components
-                try { UIComponents.applyIOSAnimations(document.getElementById('doc-content') || document.body); } catch (_) {}
+        // لا تطبق أنيميشن iOS بشكل عام هنا؛ سيتم تطبيقها انتقائيًا لاحقًا داخل applyContent عند الحاجة
             } else {
                 window.AOS.init({
                     once: true,
@@ -293,6 +292,8 @@ class DepthDocs {
             let path = hash.replace(/^#/, '');
             if (!path) path = '/';
             this.currentPath = path;
+            // ضع علامة الصفحة الرئيسية على البودي لاستخدام أنماط خاصة (إخفاء TOC على iPhone)
+            try { document.body.classList.toggle('is-home', path === '/'); } catch (_) {}
             // Update breadcrumbs
             UIComponents.updateBreadcrumbs(path);
             // Highlight active nav item
@@ -353,26 +354,60 @@ class DepthDocs {
         UIComponents.sanitizeHeadings(docContent);
         UIComponents.generateTOC(docContent);
         UIComponents.injectPrevNextAndRelated(path);
-        UIComponents.enhanceJSONBlocks(docContent);
-        UIComponents.enhanceCodeBlocks(docContent);
-        UIComponents.enhanceTables(docContent);
         UIComponents.addHeadingAnchors(docContent);
-        UIComponents.enhanceInlineTOC(docContent);
-        UIComponents.enhanceCallouts(docContent);
-        UIComponents.enhanceImagesAndLinks(docContent);
+        // نفّذ تحسينات ثقيلة تدريجيًا على iOS للصفحات الكبيرة لتجنب البطء
+        const uaX = navigator.userAgent || '';
+        const isiPadOSX = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isIOSX = (/iPad|iPhone|iPod/.test(uaX) && !window.MSStream) || isiPadOSX;
+        const isSafariX = /^((?!chrome|android).)*safari/i.test(uaX);
+        const isIOSSafariX = isIOSX && isSafariX;
+        const isHeavyPageX = typeof path === 'string' && path.includes('/documentation/02-database/00-data-dictionary');
+        const runIdle = (fn, t=200) => { if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(() => fn(), { timeout: t }); else setTimeout(fn, 0); };
+        if (isIOSSafariX && isHeavyPageX) {
+            runIdle(() => UIComponents.enhanceTables(docContent), 200);
+            runIdle(() => UIComponents.enhanceJSONBlocks(docContent), 300);
+            runIdle(() => UIComponents.enhanceCodeBlocks(docContent), 300);
+            runIdle(() => UIComponents.enhanceInlineTOC(docContent), 400);
+            runIdle(() => UIComponents.enhanceCallouts(docContent), 450);
+            runIdle(() => UIComponents.enhanceImagesAndLinks(docContent), 500);
+        } else {
+            UIComponents.enhanceJSONBlocks(docContent);
+            UIComponents.enhanceCodeBlocks(docContent);
+            UIComponents.enhanceTables(docContent);
+            UIComponents.enhanceInlineTOC(docContent);
+            UIComponents.enhanceCallouts(docContent);
+            UIComponents.enhanceImagesAndLinks(docContent);
+        }
         UIComponents.injectPageTitleIcon(path);
         UIComponents.applyAutoDirection(docContent);
-        if (window.UIComponents && UIComponents.applyAOSAttributes) UIComponents.applyAOSAttributes(docContent);
+        // في iOS Safari: تجنب أي أنيميشن على الصفحة الرئيسية والصفحات الثقيلة لتفادي اختفاء المحتوى أو الثقل
+        const ua = navigator.userAgent || '';
+        const isiPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || isiPadOS;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+        const isIOSSafari = isIOS && isSafari;
+        const isHeavyPage = typeof this.currentPath === 'string' && this.currentPath.includes('/documentation/02-database/00-data-dictionary');
+        if (!(isIOSSafari && (this.currentPath === '/' || isHeavyPage))) {
+            if (window.UIComponents && UIComponents.applyAOSAttributes) UIComponents.applyAOSAttributes(docContent);
+        }
         try { await this.renderMermaid(docContent); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
-        const wrapper = document.querySelector('.content-wrapper');
-        if (wrapper) wrapper.classList.remove('home-full');
+    const wrapper = document.querySelector('.content-wrapper');
+    if (wrapper) { if (path === '/') wrapper.classList.add('home-full'); else wrapper.classList.remove('home-full'); }
     // Avoid AOS refresh on iOS Safari where custom animations are used
-    const ua = navigator.userAgent || '';
-    const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-    const isIOSSafari = isIOS && isSafari;
-    if (window.AOS && !isIOSSafari) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+        const ua2 = navigator.userAgent || '';
+        const isIOS2 = (/iPad|iPhone|iPod/.test(ua2) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isSafari2 = /^((?!chrome|android).)*safari/i.test(ua2);
+        const isIOSSafari2 = isIOS2 && isSafari2;
+        if (window.AOS && !isIOSSafari2) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+        // إخفاء Mobile TOC على الصفحة الرئيسية في iPhone فقط، وإخفاؤه أيضًا في صفحات ثقيلة لتخفيف الحمل
+        try {
+            const mt = document.getElementById('mobile-toc');
+            if (mt) {
+                if (isIOSSafari2 && (path === '/' || (typeof path === 'string' && path.includes('/documentation/02-database/00-data-dictionary')))) mt.classList.add('hidden');
+                else mt.classList.remove('hidden');
+            }
+        } catch (_) {}
         if (window.UIComponents && UIComponents.fixMobileStickyColumns) UIComponents.fixMobileStickyColumns();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -509,26 +544,7 @@ class DepthDocs {
 
         if (window.innerWidth > 768) return;
 
-        // تحسين التمرير للجداول
-        const setupTableScroll = () => {
-            document.querySelectorAll('.table-wrap').forEach(wrap => {
-                const onScroll = () => {
-                    requestAnimationFrame(() => {
-                        // تحديث موضع sticky columns (تعويض ثنائي)
-                        const stickyEls = wrap.querySelectorAll('.mobile-sticky-first td:first-child, .mobile-sticky-first th:first-child');
-                        stickyEls.forEach(el => {
-                            el.style.webkitTransform = `translateX(${wrap.scrollLeft}px)`;
-                            el.style.transform = `translateX(${wrap.scrollLeft}px)`;
-                        });
-                    });
-                };
-                wrap.addEventListener('scroll', onScroll, passiveOpt);
-            });
-        };
-
-        // تشغيل فوري ومع تأخير للجداول المحملة لاحقاً
-        setupTableScroll();
-        setTimeout(setupTableScroll, 1000);
+    // لا حاجة لتحريك الأعمدة اللاصقة بالـ JS؛ CSS sticky كافٍ على iOS
     }
 }
 
