@@ -49,7 +49,7 @@
 const techStack = {
   backend: {
     runtime: "Node.js 18+",
-    framework: "Next.js 14",
+  framework: "Next.js 15",
     language: "TypeScript",
     api: "RESTful + GraphQL (selective)"
   },
@@ -205,12 +205,7 @@ const projects = await fetch('https://api.depth-agency.com/projects', {
 
 ### معدلات الطلبات (Rate Limiting)
 
-| نوع المستخدم | الحد الأقصى | النافذة الزمنية |
-|--------------|-------------|-----------------|
-| غير مصادق | 60 طلب | دقيقة |
-| مستخدم عادي | 600 طلب | دقيقة |
-| مستخدم Premium | 1200 طلب | دقيقة |
-| Admin | غير محدود | - |
+لمواصفات الحدود المحدثة وآليات التنفيذ الرسمية، راجع الوثيقة المخصصة: [تحديد المعدل والتحكم في الطلبات](../03-api/core/02-rate-limiting.md) — هذه الوثيقة هي المرجع المعتمد (SSOT) للأرقام والسياسات.
 
 ### الأمان
 

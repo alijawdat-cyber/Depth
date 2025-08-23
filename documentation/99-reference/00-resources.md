@@ -17,7 +17,6 @@
 ## 📖 مراجع التقنيات
 
 ### Frontend Technologies
-### Frontend Technologies
 - **Next.js 15**: [nextjs.org/docs](https://nextjs.org/docs)
 - **React 19**: [react.dev](https://react.dev)
 - **TypeScript**: [typescriptlang.org/docs](https://typescriptlang.org/docs)

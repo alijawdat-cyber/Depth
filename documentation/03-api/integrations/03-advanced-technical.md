@@ -38,12 +38,12 @@
     },
     "architecture": {
       "frontend": {
-        "framework": "Next.js 14",
+  "framework": "Next.js 15",
         "runtime": "Node.js 20",
         "hosting": "Vercel Edge Runtime",
         "cdn": "Cloudflare Global CDN",
         "languages": ["TypeScript", "React"],
-        "stateManagement": "Zustand + React Query"
+  "stateManagement": "SWR"
       },
       "backend": {
         "runtime": "Node.js 20",
