@@ -1138,6 +1138,26 @@ class UIComponents {
                 const cols = firstRow ? (firstRow.children ? firstRow.children.length : 0) : 0;
                 if (cols >= 6) table.classList.add('sticky-col');
             } catch (_) {}
+
+            // Mark responsive and add data-labels for stacked view on phones
+            try {
+                const headers = (() => {
+                    const hs = Array.from(table.querySelectorAll('thead th'));
+                    if (hs.length) return hs.map(h => (h.textContent || '').trim());
+                    const fr = table.querySelector('tr');
+                    return fr ? Array.from(fr.children).map(c => (c.textContent || '').trim()) : [];
+                })();
+                table.classList.add('is-responsive');
+                const bodyRows = Array.from(table.querySelectorAll('tbody tr')).length ? Array.from(table.querySelectorAll('tbody tr')) : Array.from(table.querySelectorAll('tr')).slice(1);
+                bodyRows.forEach(row => {
+                    Array.from(row.children).forEach((cell, i) => {
+                        if (!cell.getAttribute('data-label')) {
+                            const label = headers[i] || '';
+                            if (label) cell.setAttribute('data-label', label);
+                        }
+                    });
+                });
+            } catch (_) {}
         });
     }
 

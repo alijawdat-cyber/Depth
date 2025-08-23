@@ -69,11 +69,24 @@
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
     .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; }
+    .doc-content .table-wrap { scroll-snap-type: x mandatory; }
+    .doc-content .table-wrap > table { scroll-snap-align: start; }
     .doc-content table th,
     .doc-content table td {
         padding: 10px 12px;
         font-size: 0.95rem;
     }
+    /* Stacked cards layout for narrow screens */
+    .doc-content table.is-responsive { width: 100%; min-width: 0; }
+    .doc-content table.is-responsive thead { display: none; }
+    .doc-content table.is-responsive tbody,
+    .doc-content table.is-responsive tr,
+    .doc-content table.is-responsive td { display: block; width: 100%; }
+    .doc-content table.is-responsive tr { margin: 0 0 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg); }
+    .doc-content table.is-responsive td { border: 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 42% 58%; align-items: center; gap: 8px; }
+    .doc-content table.is-responsive td:last-child { border-bottom: 0; }
+    .doc-content table.is-responsive td::before { content: attr(data-label); color: var(--text-secondary); font-weight: 600; text-align: start; padding-inline-start: 8px; }
+    .doc-content table.is-responsive td { text-align: start; }
 }
 
 /* Auto-direction helpers */
