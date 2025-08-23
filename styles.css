@@ -251,6 +251,9 @@ body {
     direction: rtl;
     transition: var(--transition);
     overflow-x: hidden;
+    /* Keep text size stable on mobile */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* Page title icon next to H1 */
@@ -305,6 +308,10 @@ body {
 .app-container {
     display: flex;
     min-height: 100vh;
+}
+/* Prevent pinch/gesture zoom and layout jitter on touch devices */
+@media (pointer: coarse) {
+    html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
 }
 
 /* =============== Header =============== */
@@ -665,6 +672,16 @@ body {
 
 @media (min-width: 1400px) {
     .doc-content { padding: 18px; }
+}
+
+/* Code blocks and wide content handling per device */
+/* Desktop/tablet: avoid horizontal scroll by wrapping long lines */
+@media (min-width: 768px) {
+    .doc-content pre { white-space: pre-wrap; word-break: break-word; }
+}
+/* Phones: allow horizontal scroll for code blocks only inside the pre container */
+@media (max-width: 767.98px) {
+    .doc-content pre { white-space: pre; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 /* ===== Homepage (/) ===== */
