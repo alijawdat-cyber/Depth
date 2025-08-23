@@ -300,8 +300,8 @@ Authorization: Bearer {access_token}</code></pre>
         
         <h2>الجداول الأساسية</h2>
         
-        <h3>جدول المستخدمين (users)</h3>
-        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+    <h3>جدول المستخدمين (users)</h3>
+    <table style="border-collapse: collapse; margin: 16px 0;">
             <thead>
                 <tr style="background: var(--bg-secondary);">
                     <th style="border: 1px solid var(--border); padding: 8px; text-align: right;">الحقل</th>

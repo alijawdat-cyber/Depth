@@ -8,12 +8,13 @@
     background: var(--bg);
     margin: 0; /* wrapper will manage margins */
 }
-/* once wrapped, allow horizontal growth inside the scrollable wrapper only */
-.doc-content .table-wrap > table { width: max-content; min-width: 100%; }
+/* once wrapped, default to fit container on larger screens; mobile will override */
+.doc-content .table-wrap > table { width: 100%; min-width: 100%; }
 /* wrapper to handle horizontal scroll with padding */
 .doc-content .table-wrap {
     position: relative;
-    overflow-x: auto;
+    /* desktop/tablet: avoid horizontal scroll; mobile media query will enable it */
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     margin: 16px 0;
     border: 1px solid var(--border);
@@ -72,7 +73,7 @@
 }
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
-    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
+    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; overscroll-behavior-x: contain; }
     /* subtle fade to hint scroll */
     .doc-content .table-wrap::before, .doc-content .table-wrap::after { content: ''; position: sticky; top: 0; width: 18px; height: 100%; pointer-events: none; z-index: 1; }
     .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
@@ -82,8 +83,10 @@
     .doc-content .table-wrap > table td { padding: 12px 14px; font-size: 0.98rem; }
 
     /* Keep table wide and readable without squishing (inside wrapper only) */
-    .doc-content .table-wrap > table { width: max-content; min-width: 100%; }
-    .doc-content .table-wrap > table th, .doc-content .table-wrap > table td { white-space: normal; word-break: break-word; }
+    .doc-content .table-wrap > table { width: max-content !important; min-width: 100%; }
+    /* Force horizontal growth on phone: prevent wrapping so wrapper scrolls */
+    .doc-content .table-wrap > table th,
+    .doc-content .table-wrap > table td { white-space: nowrap; word-break: normal; }
     .doc-content .table-wrap > table td { min-width: 120px; }
     .doc-content .table-wrap > table th { min-width: 130px; }
 }

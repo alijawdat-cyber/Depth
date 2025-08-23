@@ -1122,6 +1122,17 @@ class UIComponents {
         const root = rootEl || document.getElementById('doc-content');
         if (!root) return;
         const tables = Array.from(root.querySelectorAll('table'));
+        const isPhone = window.innerWidth < 768;
+        // Mobile-only: remove inline width that may block horizontal growth
+        if (isPhone) {
+            tables.forEach((t) => {
+                const inlineWidth = t.getAttribute('width') || (t.style ? t.style.width : '') || '';
+                if (inlineWidth) {
+                    t.removeAttribute('width');
+                    try { if (t.style) t.style.removeProperty('width'); } catch (_) {}
+                }
+            });
+        }
         tables.forEach((table) => {
             // Skip if already wrapped
             if (!table.closest('.table-wrap')) {
