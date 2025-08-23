@@ -39,6 +39,16 @@ class DepthDocs {
 
     // Setup event listeners
     setupEventListeners() {
+    // Burger/open toggle
+    const burger = document.getElementById('burger-btn');
+    if (burger) burger.addEventListener('click', (e) => { e.preventDefault(); this.toggleSidebar(); });
+    // Close button in sidebar
+    const closeBtn = document.getElementById('sidebar-close');
+    if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); this.closeSidebar(); });
+    // Click on overlay closes on mobile/tablet
+    const overlay = document.getElementById('sidebar-overlay');
+    if (overlay) overlay.addEventListener('click', () => this.closeSidebar());
+
         const outsideClose = (e) => {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -98,6 +108,35 @@ class DepthDocs {
                 }
             }, 250);
         });
+    }
+
+    // Initialize sidebar state for current breakpoint
+    initializeSidebarState() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const mainContent = document.querySelector('.main-content');
+        if (!sidebar) return;
+
+        this.sidebarOpen = false;
+        sidebar.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        if (overlay) overlay.classList.remove('active');
+
+        if (this.isDesktop || this.isLargeDesktop) {
+            sidebar.classList.add('sidebar-closed');
+            if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
+            if (mainContent) mainContent.classList.add('sidebar-closed');
+            if (mainContent) { mainContent.classList.remove('pushed'); mainContent.style.transform = ''; }
+            document.body.style.overflow = '';
+        } else {
+            sidebar.style.width = '';
+            document.body.style.overflow = '';
+            if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
+            if (mainContent) { mainContent.classList.remove('sidebar-closed'); mainContent.classList.remove('pushed'); mainContent.style.transform = ''; }
+        }
+
+        this.updateBurgerButton();
     }
 
     // Toggle sidebar with proper handling for all screen sizes
