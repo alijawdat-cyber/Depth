@@ -4,8 +4,8 @@
 @supports (-webkit-touch-callout: none) {
     /* iOS Detection */
     
-    /* تفعيل الـ GPU لكل العناصر */
-    * {
+    /* GPU hint utility class for elements that need hardware acceleration */
+    .gpu-hint {
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
         -webkit-backface-visibility: hidden;
@@ -119,10 +119,6 @@
 
 /* Safe Areas لـ iPhone 16 Pro Max */
 @supports (padding: max(0px)) {
-    .header {
-        padding-top: max(var(--header-height, 56px), env(safe-area-inset-top));
-    }
-    
     .doc-content {
         padding-left: max(16px, env(safe-area-inset-left));
         padding-right: max(16px, env(safe-area-inset-right));
