@@ -101,6 +101,51 @@
     .doc-content table.sticky-col td:first-child { min-width: 110px; }
 }
 
+/* === حل مشكلة sticky column على الهاتف === */
+@media (max-width: 768px) {
+    /* Wrapper with sticky column behavior */
+    .doc-content .table-wrap.has-sticky-col {
+        position: relative;
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+
+    /* Fix the first column for mobile-specific class */
+    .doc-content .mobile-sticky-first th:first-child,
+    .doc-content .mobile-sticky-first td:first-child {
+        position: sticky;
+        right: 0; /* RTL: stick to right */
+        left: auto;
+        z-index: 10;
+        background: var(--bg);
+        border-left: 2px solid var(--border);
+        box-shadow: -2px 0 4px rgba(0,0,0,0.06);
+        min-width: 80px;
+    }
+
+    /* Header cell above rows */
+    .doc-content .mobile-sticky-first thead th:first-child {
+        position: sticky;
+        right: 0;
+        top: 0;
+        z-index: 15;
+        background: var(--bg-secondary);
+    }
+
+    /* Visual divider gradient */
+    .doc-content .mobile-sticky-first th:first-child::after,
+    .doc-content .mobile-sticky-first td:first-child::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -5px;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
+        pointer-events: none;
+    }
+}
+
 /* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */
 @media (max-width: 1024px) {
     .content-wrapper { grid-template-columns: 1fr; }

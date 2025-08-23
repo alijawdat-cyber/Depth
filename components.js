@@ -1154,10 +1154,53 @@ class UIComponents {
             try {
                 const firstRow = table.querySelector('tr');
                 const cols = firstRow ? (firstRow.children ? firstRow.children.length : 0) : 0;
-                if (isPhone || cols >= 5) table.classList.add('sticky-col');
+                if (isPhone) {
+                    // On phones, apply a dedicated mobile sticky class only for 4+ columns
+                    if (cols >= 4) {
+                        table.classList.add('mobile-sticky-first');
+                        wrap && wrap.classList.add('has-sticky-col');
+                    } else {
+                        table.classList.remove('mobile-sticky-first');
+                        wrap && wrap.classList.remove('has-sticky-col');
+                    }
+                    // Do not add desktop sticky-col on phones
+                    table.classList.remove('sticky-col');
+                } else {
+                    // Desktop/tablet: use sticky-col for wider tables
+                    if (cols >= 5) table.classList.add('sticky-col');
+                    else table.classList.remove('sticky-col');
+                    // Remove mobile flags just in case of resize
+                    table.classList.remove('mobile-sticky-first');
+                    wrap && wrap.classList.remove('has-sticky-col');
+                }
             } catch (_) {}
 
             // Keep original table shape; scrolling handled by wrapper for phones
+        });
+    }
+
+    // تحسين sticky columns للهاتف: fallback transform-based pinning
+    static fixMobileStickyColumns() {
+        if (window.innerWidth > 768) return;
+        const wrappers = document.querySelectorAll('.table-wrap');
+        wrappers.forEach(wrapper => {
+            const table = wrapper.querySelector('table');
+            if (!table) return;
+            const firstCells = table.querySelectorAll('tr > *:first-child');
+            // Sync on scroll to emulate pinning when native sticky misbehaves
+            const onScroll = () => {
+                const scrollLeft = wrapper.scrollLeft;
+                firstCells.forEach(cell => {
+                    cell.style.transform = `translateX(${scrollLeft}px)`;
+                    cell.style.position = 'relative';
+                    cell.style.zIndex = '5';
+                    const bg = getComputedStyle(cell).backgroundColor;
+                    cell.style.background = bg && bg !== 'rgba(0, 0, 0, 0)' ? bg : 'var(--bg)';
+                });
+            };
+            wrapper.removeEventListener('scroll', wrapper._stickyEmuScroll);
+            wrapper._stickyEmuScroll = onScroll;
+            wrapper.addEventListener('scroll', onScroll, { passive: true });
         });
     }
 

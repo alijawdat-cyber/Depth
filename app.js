@@ -300,6 +300,10 @@ class DepthDocs {
                 const wrapper = document.querySelector('.content-wrapper');
                 if (wrapper) wrapper.classList.remove('home-full');
                 if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                // Ensure sticky first column stability on phones
+                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
+                    UIComponents.fixMobileStickyColumns();
+                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
@@ -338,6 +342,10 @@ class DepthDocs {
                 const wrapper = document.querySelector('.content-wrapper');
                 if (wrapper) wrapper.classList.remove('home-full');
                 if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                // Ensure sticky first column stability on phones
+                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
+                    UIComponents.fixMobileStickyColumns();
+                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return true;
             };
@@ -393,6 +401,10 @@ class DepthDocs {
                 const wrapper = document.querySelector('.content-wrapper');
                 if (wrapper) wrapper.classList.remove('home-full');
                 if (window.AOS) setTimeout(() => window.AOS.refreshHard && window.AOS.refreshHard(), 50);
+                // Ensure sticky first column stability on phones
+                if (window.UIComponents && UIComponents.fixMobileStickyColumns) {
+                    UIComponents.fixMobileStickyColumns();
+                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
