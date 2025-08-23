@@ -38,6 +38,8 @@ class DepthDocs {
         this.handleRoute();
         this.setupScrollEffects();
         this.loadTheme();
+        this.initMobileOptimizations(); // إضافة تحسينات الهاتف
+        
         // Initialize AOS if available (responsive config) and not on iOS Safari
         const ua = navigator.userAgent || '';
         const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -483,6 +485,34 @@ class DepthDocs {
     loadTheme() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.body.setAttribute('data-theme', savedTheme);
+    }
+
+    // تحسين أداء التمرير على الهاتف
+    initMobileOptimizations() {
+        if (window.innerWidth > 768) return;
+        
+        // Passive listeners للتمرير
+        document.addEventListener('touchstart', () => {}, { passive: true });
+        document.addEventListener('touchmove', () => {}, { passive: true });
+        
+        // تحسين التمرير للجداول
+        const setupTableScroll = () => {
+            document.querySelectorAll('.table-wrap').forEach(wrap => {
+                wrap.addEventListener('scroll', () => {
+                    requestAnimationFrame(() => {
+                        // تحديث موضع sticky columns
+                        const stickyEls = wrap.querySelectorAll('.mobile-sticky-first td:first-child, .mobile-sticky-first th:first-child');
+                        stickyEls.forEach(el => {
+                            el.style.transform = `translateX(${wrap.scrollLeft}px)`;
+                        });
+                    });
+                }, { passive: true });
+            });
+        };
+        
+        // تشغيل فوري ومع تأخير للجداول المحملة لاحقاً
+        setupTableScroll();
+        setTimeout(setupTableScroll, 1000);
     }
 }
 

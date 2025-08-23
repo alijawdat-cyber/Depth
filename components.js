@@ -1136,25 +1136,54 @@ class UIComponents {
         if (!root) return;
         const tables = Array.from(root.querySelectorAll('table'));
         const isPhone = window.innerWidth < 768;
-        // Mobile-only: remove inline width that may block horizontal growth
-        if (isPhone) {
-            tables.forEach((t) => {
-                const inlineWidth = t.getAttribute('width') || (t.style ? t.style.width : '') || '';
-                if (inlineWidth) {
-                    t.removeAttribute('width');
-                    try { if (t.style) t.style.removeProperty('width'); } catch (_) {}
-                }
+        
+        // تنظيف أي أنماط inline قديمة
+        tables.forEach((t) => {
+            const cells = t.querySelectorAll('th, td');
+            cells.forEach(cell => {
+                cell.style.removeProperty('width');
+                cell.style.removeProperty('min-width');
+                cell.style.removeProperty('max-width');
             });
-        }
+            
+            const inlineWidth = t.getAttribute('width') || (t.style ? t.style.width : '') || '';
+            if (inlineWidth) {
+                t.removeAttribute('width');
+                try { if (t.style) t.style.removeProperty('width'); } catch (_) {}
+            }
+        });
+        
         tables.forEach((table) => {
-            // Skip if already wrapped
+            // إضافة wrapper إذا لم يكن موجود
             let wrap = table.closest('.table-wrap');
             if (!wrap) {
                 wrap = document.createElement('div');
                 wrap.className = 'table-wrap';
+                
+                // إضافة classes حسب الجهاز
+                if (isPhone) {
+                    wrap.classList.add('mobile-scrollable');
+                    wrap.setAttribute('role', 'region');
+                    wrap.setAttribute('aria-label', 'جدول قابل للتمرير');
+                    wrap.setAttribute('tabindex', '0');
+                }
+                
                 table.parentNode.insertBefore(wrap, table);
                 wrap.appendChild(table);
             }
+            
+            // تطبيق sticky columns للهاتف فقط
+            const firstRow = table.querySelector('tr');
+            const cols = firstRow ? firstRow.children.length : 0;
+            
+            if (isPhone && cols >= 4) {
+                table.classList.add('mobile-sticky-first');
+                wrap.classList.add('has-sticky-col');
+            } else {
+                table.classList.remove('mobile-sticky-first');
+                wrap.classList.remove('has-sticky-col');
+            }
+            
             // tag wraps on phones for CSS targeting (overflow-x only on phones)
             if (isPhone) {
                 wrap.classList.add('mobile-scrollable');
@@ -1165,8 +1194,6 @@ class UIComponents {
             table.classList.add('sticky-head');
             // If table has many columns, make first column sticky for readability
             try {
-                const firstRow = table.querySelector('tr');
-                const cols = firstRow ? (firstRow.children ? firstRow.children.length : 0) : 0;
                 if (isPhone) {
                     // On phones, apply a dedicated mobile sticky class only for 4+ columns
                     if (cols >= 4) {
