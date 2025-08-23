@@ -1,13 +1,13 @@
-# Frontend Design Tokens (Draft)
+# Frontend Design Tokens
 
-Status: Final — aligned with Brand SSOT (2025‑08‑23)
+Status: Final — aligned with Brand SSOT (2025-08-24)
 
-> ✅ **تم التحديث (2025-08-23):** قفل الألوان Primary #6C2BFF وAlternate #3E5BFF + إضافة رابط SSOT: depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html
+> ✅ **تم التحديث (2025-08-24):** قفل الألوان Primary #6C2BFF وAlternate #3E5BFF. مصدر الهوية البصرية محفوظ داخلياً ضمن هذا المستودع.
 
 هذه الوثيقة توحّد الألوان والخطوط والمسافات والظلال وحالات التفاعل وبريك‑بوينتس كمتغيرات CSS لاستخدامها عبر الواجهة.
 
 ## Principles
-- SSOT للألوان والخطوط: depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html
+- SSOT للألوان والخطوط: هذا الملف + المواصفات في `99-reference/00-resources.md`
 - RTL/LTR مدعوم عبر منطق اتجاه عام (body[dir]).
 - Light/Dark مدعومان بمتغيرات جذرية.
 

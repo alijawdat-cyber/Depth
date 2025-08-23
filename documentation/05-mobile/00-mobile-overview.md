@@ -18,7 +18,7 @@
 - **الخرائط**: React Native Maps (Google Maps)
 - **الكاميرا**: Expo Camera
 
-## Creator App Features
+## Creator App Features (MVP Scope)
 
 ### Core Features
 - ✅ **Authentication** - Login/Register with OTP
@@ -28,17 +28,17 @@
 - ✅ **Gallery Management** - Organize and upload files
 - ✅ **Availability Calendar** - Manage working schedule
 - ✅ **Push Notifications** - Real-time updates
-- ✅ **Earnings Tracking** - Financial dashboard
+- ✅ **Earnings Tracking** - Basic earnings summary (بدون مدفوعات داخل التطبيق)
 
-### Advanced Features
+### Advanced Features (Post-2.0)
 - 📸 **Advanced Camera Controls** - Manual settings
 - 🎨 **Basic Editing Tools** - Crop, filters, adjustments  
 - 📊 **Analytics Dashboard** - Performance metrics
-- 💬 **In-app Chat** - Client communication
+- 💬 **In-app Chat** - Client communication (Deferred)
 - 📍 **Location Services** - GPS tracking for shoots
 - 🔄 **Offline Sync** - Work without internet
 
-## Client App Features
+## Client App Features (MVP Scope)
 
 ### Core Features
 - ✅ **Authentication** - Business account setup
@@ -46,7 +46,7 @@
 - ✅ **Creator Discovery** - Browse and select creators
 - ✅ **Project Tracking** - Monitor progress
 - ✅ **Gallery Review** - Approve deliverables
-- ✅ **Payment Management** - Handle invoices
+- ✅ **Payment Management** - View invoices only (بدون دفع إلكتروني في v2.0)
 - ✅ **Push Notifications** - Project updates
 
 ### Advanced Features
@@ -70,7 +70,7 @@
 - Project creation workflow
 - Creator browsing and selection
 - Basic project tracking
-- Payment integration
+- Payment integration (Deferred)
 
 ### Phase 3: Advanced Features (Weeks 9-12)
 - Advanced camera controls

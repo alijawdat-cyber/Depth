@@ -627,6 +627,8 @@
 
 ## أنظمة الدفع
 
+> الحالة: Deferred في V2.0 — التكاملات أدناه مواصفات مرجعية/تجريبية (Pilot) وليست جزءاً من نطاق الإنتاج المغلق في هذه النسخة. أي تفعيل يتطلب فتح إصدار لاحق (2.1+).
+
 ### `GET /integrations/payments/providers`
 جلب مقدمي خدمات الدفع المتاحين.
 
@@ -639,7 +641,7 @@
       {
         "id": "stripe",
         "name": "Stripe",
-        "status": "active",
+  "status": "pilot",
         "type": "international",
         "supportedCurrencies": ["USD", "EUR", "IQD"],
         "methods": ["card", "bank_transfer", "wallet"],
@@ -655,7 +657,7 @@
       {
         "id": "local_banks",
         "name": "البنوك العراقية",
-        "status": "active",
+  "status": "pilot",
         "type": "local",
         "supportedCurrencies": ["IQD"],
         "methods": ["bank_transfer", "cash"],
@@ -673,7 +675,7 @@
       {
         "id": "fastpay",
         "name": "FastPay",
-        "status": "active",
+  "status": "pilot",
         "type": "mobile_wallet",
         "supportedCurrencies": ["IQD"],
         "methods": ["mobile_wallet"],

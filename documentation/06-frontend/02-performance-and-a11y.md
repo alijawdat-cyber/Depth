@@ -1,6 +1,6 @@
 # Performance and Accessibility Budgets (Draft)
 
-Status: Draft — to be enforced via CI later
+Status: Draft — Reference-only in V2.0 (سيتم فرضها عبر CI في إصدار لاحق)
 
 ## Web Performance Budgets
 - Core Web Vitals (mobile): LCP ≤ 2.5s, CLS ≤ 0.1, INP ≤ 200ms

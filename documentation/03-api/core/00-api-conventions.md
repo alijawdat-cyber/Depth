@@ -1,4 +1,4 @@
-# اتفاقيات واجهة برمجة التطبيقات (API Conventions) - مسودة
+# اتفاقيات واجهة برمجة التطبيقات (API Conventions) - Final V2.0
 
 > مصطلحات هذا المستند:
 > - واجهة برمجة التطبيقات: Application Programming Interface — API
@@ -6,7 +6,7 @@
 > - التحكم بالوصول المعتمد على الأدوار: Role-Based Access Control — RBAC
 > (انظر أيضًا: `99-reference/06-terminology-glossary-ar.md`)
 
-Status: Draft — aligns v2.0
+Status: Final — aligned with V2.0 (آخر تحديث: 2025-08-24)
 
 ## إصدارات واجهة برمجة التطبيقات والمسار الأساسي (Versioning & Base)
 - المسار الأساسي: `/api/v2` (مثال)
@@ -14,7 +14,7 @@ Status: Draft — aligns v2.0
 
 ## قواعد التسمية (Naming Conventions)
 - Kebab-case للمسارات: `/auth/sign-in`, `/projects/{id}`
-- snake_case لحقول JSON
+- camelCase لحقول JSON وخصائص النماذج والقيم (enums) بصيغة lowerCamel
 - الجمع للمجموعات `/projects` والمفرد للموارد `/projects/{id}`
 
 ## رؤوس الطلبات المطلوبة (Required Headers)
@@ -31,7 +31,7 @@ X-Device-ID: {uuid}
 {
   "success": false,
   "error": {
-    "code": "AUTH/INVALID_TOKEN",
+  "code": "AUTH_INVALID_TOKEN",
     "message": "Session expired",
     "details": {"retryAfter": 30}
   }

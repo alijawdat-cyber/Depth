@@ -287,6 +287,13 @@ const otpVerification = {
 }
 ```
 
+**سياسة OTP (V2.0):**
+- الطول: 6 أرقام
+- الصلاحية: 5 دقائق (300 ثانية)
+- الحد الأقصى للمحاولات: 3 محاولات لكل جلسة
+- مبرّد (Cooldown): 60 ثانية بين المحاولات
+- الشبكات العراقية: asiacell | korek | zain (كشف تلقائي حسب البادئة)
+
 **الاستجابة الناجحة (200):**
 ```json
 {
@@ -294,8 +301,8 @@ const otpVerification = {
   "data": {
     "otpSession": "otp_session_unique_id",
     "phoneNumber": "07719956000",
-    "expiresIn": 300,
-    "attemptsRemaining": 3,
+  "expiresIn": 300,
+  "attemptsRemaining": 3,
     "carrier": "asiacell",
     "provider": "firebase"
   },

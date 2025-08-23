@@ -576,8 +576,8 @@
 | code          | string       | نعم   | كود التحقق (مشفر)          | encrypted_code |              |
 | purpose       | enum         | نعم   | غرض الكود                  | registration   | registration/password_reset/phone_change |
 | isUsed        | boolean      | نعم   | تم استخدام الكود            | false          |              |
-| attemptCount  | int          | نعم   | عدد المحاولات              | 0              | ≤5           |
-| expiresAt     | timestamp    | نعم   | تاريخ انتهاء الصلاحية      | 2025-08-20     | +10 دقائق    |
+| attemptCount  | int          | نعم   | عدد المحاولات              | 0              | ≤3           |
+| expiresAt     | timestamp    | نعم   | تاريخ انتهاء الصلاحية      | 2025-08-20     | +5 دقائق     |
 | usedAt        | timestamp    | لا    | تاريخ الاستخدام             | 2025-08-20     |              |
 | lastAttemptAt | timestamp    | لا    | تاريخ آخر محاولة           | 2025-08-21     |              |
 | createdAt     | timestamp    | نعم   | تاريخ الإنشاء              | 2025-08-20     |              |
