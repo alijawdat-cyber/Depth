@@ -1,12 +1,15 @@
 /* Tables: professional styling */
 .doc-content table {
-    width: max-content; /* allow wide tables to extend and scroll */
-    min-width: 100%;
+    /* keep base tables contained to the page to avoid global horizontal scroll
+       before JS wraps them; width expansion is applied only when inside .table-wrap */
+    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     background: var(--bg);
     margin: 0; /* wrapper will manage margins */
 }
+/* once wrapped, allow horizontal growth inside the scrollable wrapper only */
+.doc-content .table-wrap > table { width: max-content; min-width: 100%; }
 /* wrapper to handle horizontal scroll with padding */
 .doc-content .table-wrap {
     position: relative;
@@ -75,14 +78,14 @@
     .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
     .doc-content .table-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
-    .doc-content table th,
-    .doc-content table td { padding: 12px 14px; font-size: 0.98rem; }
+    .doc-content .table-wrap > table th,
+    .doc-content .table-wrap > table td { padding: 12px 14px; font-size: 0.98rem; }
 
-    /* Keep table wide and readable without squishing */
-    .doc-content table { width: max-content; min-width: 100%; }
-    .doc-content table th, .doc-content table td { white-space: normal; word-break: break-word; }
-    .doc-content table td { min-width: 120px; }
-    .doc-content table th { min-width: 130px; }
+    /* Keep table wide and readable without squishing (inside wrapper only) */
+    .doc-content .table-wrap > table { width: max-content; min-width: 100%; }
+    .doc-content .table-wrap > table th, .doc-content .table-wrap > table td { white-space: normal; word-break: break-word; }
+    .doc-content .table-wrap > table td { min-width: 120px; }
+    .doc-content .table-wrap > table th { min-width: 130px; }
 }
 
 /* Stack layout on tablets/phones so the page itself doesn't scroll horizontally */
