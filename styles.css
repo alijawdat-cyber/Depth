@@ -1,13 +1,67 @@
-/* Tables: center text horizontally and vertically in all cells */
+/* Tables: professional styling */
 .doc-content table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin: 16px 0;
+}
+.doc-content table thead th {
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-weight: 600;
 }
 .doc-content table th,
 .doc-content table td {
     text-align: center;
     vertical-align: middle;
-    padding: 10px 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+}
+/* column separators in RTL/LTR safely */
+.doc-content table th:not(:first-child),
+.doc-content table td:not(:first-child) {
+    border-inline-start: 1px solid var(--border);
+}
+/* zebra rows */
+.doc-content table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+}
+[data-theme="dark"] .doc-content table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-secondary) 60%, transparent);
+}
+/* row hover */
+.doc-content table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary) 6%, var(--bg));
+}
+/* links and code inside table */
+.doc-content table a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+.doc-content table code {
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+/* responsive scroll on small screens */
+@media (max-width: 768px) {
+    .doc-content table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+    .doc-content table th,
+    .doc-content table td {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+    }
 }
 /* =============== Variables =============== */
 :root {
