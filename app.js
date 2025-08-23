@@ -15,6 +15,30 @@ if (typeof window !== 'undefined') {
     }
 }
 
+// LRU Cache implementation (placed before use)
+class LRUCache {
+    constructor(maxSize = 5) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+    get(key) {
+        if (!this.cache.has(key)) return null;
+        const value = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, value);
+        return value;
+    }
+    set(key, value) {
+        if (this.cache.has(key)) this.cache.delete(key);
+        this.cache.set(key, value);
+        if (this.cache.size > this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+    }
+    has(key) { return this.cache.has(key); }
+}
+
 // Main Application Logic
 class DepthDocs {
     constructor() {
@@ -177,6 +201,24 @@ class DepthDocs {
                 }
             }, 250);
         });
+
+        // Debounced navigation clicks from sidebar (prevents double-trigger on iOS)
+        const nav = document.getElementById('sidebar-nav');
+        if (nav) {
+            let clickTimer;
+            nav.addEventListener('click', (e) => {
+                const link = e.target && e.target.closest ? e.target.closest('.nav-item') : null;
+                if (!link) return;
+                const href = link.getAttribute('href') || '';
+                if (!href) return;
+                e.preventDefault();
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    if (href.startsWith('#')) this.navigate(href.replace('#', ''));
+                    else this.navigate(href);
+                }, 100);
+            }, { capture: true });
+        }
     }
 
     // Initialize sidebar state for current breakpoint
@@ -350,7 +392,8 @@ class DepthDocs {
     // Apply content HTML into the page and enhance progressively
     async applyContent(cleanHtml, path) {
         const docContent = document.getElementById('doc-content');
-        docContent.innerHTML = cleanHtml;
+    docContent.innerHTML = cleanHtml;
+    try { docContent.setAttribute('data-path', String(path || '')); } catch(_) {}
         UIComponents.sanitizeHeadings(docContent);
         UIComponents.generateTOC(docContent);
         UIComponents.injectPrevNextAndRelated(path);
@@ -362,14 +405,17 @@ class DepthDocs {
         const isSafariX = /^((?!chrome|android).)*safari/i.test(uaX);
         const isIOSSafariX = isIOSX && isSafariX;
         const isHeavyPageX = typeof path === 'string' && path.includes('/documentation/02-database/00-data-dictionary');
-        const runIdle = (fn, t=200) => { if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(() => fn(), { timeout: t }); else setTimeout(fn, 0); };
         if (isIOSSafariX && isHeavyPageX) {
-            runIdle(() => UIComponents.enhanceTables(docContent), 200);
-            runIdle(() => UIComponents.enhanceJSONBlocks(docContent), 300);
-            runIdle(() => UIComponents.enhanceCodeBlocks(docContent), 300);
-            runIdle(() => UIComponents.enhanceInlineTOC(docContent), 400);
-            runIdle(() => UIComponents.enhanceCallouts(docContent), 450);
-            runIdle(() => UIComponents.enhanceImagesAndLinks(docContent), 500);
+            // Render core elements immediately for responsiveness
+            try { UIComponents.enhanceTables(docContent); } catch (_) {}
+            try { UIComponents.enhanceJSONBlocks(docContent); } catch (_) {}
+            // Defer secondary enhancements to the next frame
+            requestAnimationFrame(() => {
+                try { UIComponents.enhanceCodeBlocks(docContent); } catch (_) {}
+                try { UIComponents.enhanceInlineTOC(docContent); } catch (_) {}
+                try { UIComponents.enhanceCallouts(docContent); } catch (_) {}
+                try { UIComponents.enhanceImagesAndLinks(docContent); } catch (_) {}
+            });
         } else {
             UIComponents.enhanceJSONBlocks(docContent);
             UIComponents.enhanceCodeBlocks(docContent);
@@ -393,7 +439,16 @@ class DepthDocs {
         try { await this.renderMermaid(docContent); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
-    if (wrapper) { if (path === '/') wrapper.classList.add('home-full'); else wrapper.classList.remove('home-full'); }
+    if (wrapper) {
+        if (path === '/') {
+            wrapper.classList.add('home-full');
+            // Ensure homepage content is visible on iOS
+            const dc = document.getElementById('doc-content');
+            if (dc) { dc.style.visibility = 'visible'; dc.style.opacity = '1'; }
+        } else {
+            wrapper.classList.remove('home-full');
+        }
+    }
     // Avoid AOS refresh on iOS Safari where custom animations are used
         const ua2 = navigator.userAgent || '';
         const isIOS2 = (/iPad|iPhone|iPod/.test(ua2) && !window.MSStream) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -548,28 +603,7 @@ class DepthDocs {
     }
 }
 
-// بسيط: LRU Cache للاحتفاظ بآخر N صفحات
-class LRUCache {
-    constructor(maxSize = 5) {
-        this.maxSize = maxSize;
-        this.cache = new Map();
-    }
-    get(key) {
-        if (!this.cache.has(key)) return null;
-        const val = this.cache.get(key);
-        this.cache.delete(key);
-        this.cache.set(key, val);
-        return val;
-    }
-    set(key, val) {
-        if (this.cache.has(key)) this.cache.delete(key);
-        this.cache.set(key, val);
-        if (this.cache.size > this.maxSize) {
-            const firstKey = this.cache.keys().next().value;
-            this.cache.delete(firstKey);
-        }
-    }
-}
+// (LRUCache defined above)
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

@@ -79,28 +79,32 @@
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
     .doc-content .table-wrap { 
-        margin: 12px -12px; 
+        /* avoid edge clipping */
+        margin: 12px 0; 
         padding-inline: 0; 
-    overflow-x: auto !important; 
-    -webkit-overflow-scrolling: touch; 
+        overflow-x: auto !important; 
+        -webkit-overflow-scrolling: touch; 
         position: relative; 
-    overscroll-behavior-x: contain; 
-    scroll-snap-type: x proximity;
-        max-width: 100vw;
-        width: 100vw;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
+        overscroll-behavior-x: contain; 
+        scroll-snap-type: x proximity;
+        max-width: calc(100vw - 40px); /* account for mobile TOC rail spacing */
+        width: 100%;
+        left: auto;
+        right: auto;
+        margin-left: 0;
+        margin-right: 0;
         background: var(--bg); 
-    will-change: scroll-position; 
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+        will-change: scroll-position; 
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        /* extra padding to avoid first/last cell cut */
+        padding-left: 4px;
+        padding-right: 4px;
     }
     /* subtle fade to hint scroll */
     .doc-content .table-wrap::before, .doc-content .table-wrap::after { content: ''; position: sticky; top: 0; width: 18px; height: 100%; pointer-events: none; z-index: 1; }
-    .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-    .doc-content .table-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+    .doc-content .table-wrap::before { left: 0; width: 12px; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .doc-content .table-wrap::after { right: 0; width: 12px; background: linear-gradient(to left, var(--bg), transparent); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
     .doc-content .table-wrap > table th,
     .doc-content .table-wrap > table td { padding: 8px 10px; font-size: 0.9rem; }
@@ -150,7 +154,8 @@
         background: var(--bg);
         border-left: 2px solid var(--border);
         box-shadow: -3px 0 6px rgba(0,0,0,0.08); /* ظل أوضح */
-        min-width: 100px; /* عرض أكبر */
+        min-width: 90px; /* narrower to reduce overlap */
+        max-width: 120px; /* keep within reasonable bounds */
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
         backface-visibility: hidden;
@@ -1075,6 +1080,8 @@ body {
 @supports (-webkit-touch-callout: none) {
     body.is-home #floating-toc { display: none !important; }
     body.is-home #mobile-toc { display: none !important; }
+    /* Ensure homepage content is visible on iOS */
+    body.is-home .doc-content { visibility: visible !important; opacity: 1 !important; display: block !important; min-height: 300px; }
 }
 /* Hide footer nav on home as well (desktop stays fine) */
 body.is-home .doc-footer { display: none; }
@@ -1308,13 +1315,14 @@ body.is-home .doc-footer { display: none; }
     }
     
     .content-wrapper { 
+        position: relative;
         grid-template-columns: 1fr; 
-        padding: 16px 12px; 
+        padding: 16px 12px 16px 40px; /* reserve space for mobile TOC */
         max-width: 100vw;
         overflow-x: hidden;
     }
     
-    .doc-content { padding: 16px; }
+    .doc-content { padding: 16px; position: relative; width: 100%; max-width: 100%; overflow: visible; }
     
     .doc-content h1 { font-size: clamp(24px, 6vw, 32px); }
     .doc-content h2 { font-size: clamp(20px, 5vw, 24px); }
@@ -1335,9 +1343,9 @@ body.is-home .doc-footer { display: none; }
         position: fixed; 
         top: calc(var(--header-total-height) + 12px); 
         bottom: 20px; 
-        left: 16px; /* مسافة أكبر من الحافة */
-        width: 28px; /* عرض أكبر قليلاً */
-        z-index: 850; /* أقل لتجنّب التداخل مع المحتوى القابل للنقر */
+        left: 8px !important; /* slimmer rail */
+        width: 24px;
+        z-index: 1200; /* ensure above tables */
         pointer-events: none; 
         will-change: transform;
     }
@@ -1388,6 +1396,8 @@ body.is-home .doc-footer { display: none; }
     [dir="rtl"] .doc-content .mobile-sticky-first { border-right: 0; }
     [dir="rtl"] .doc-content .mobile-sticky-first th:first-child,
     [dir="rtl"] .doc-content .mobile-sticky-first td:first-child { box-shadow: -3px 0 6px rgba(0,0,0,0.08); }
+    /* الجداول داخل صفحة قاموس البيانات: لا تُحرك للخارج */
+    [data-path*="data-dictionary"] .table-wrap { margin-left: 0; margin-right: 0; }
 }
 
 /* Micro-mobile (<= 360px) */
