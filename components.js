@@ -946,6 +946,94 @@ class UIComponents {
             } catch (_) {}
         });
     }
+
+    // =============== Markdown polish: anchors, callouts, images, links ===============
+    static addHeadingAnchors(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const heads = root.querySelectorAll('h2, h3, h4');
+        let idx = 0;
+        heads.forEach(h => {
+            if (!h.id) { h.id = `sec-${idx++}`; }
+            if (h.querySelector('.heading-anchor')) return;
+            const a = document.createElement('a');
+            a.className = 'heading-anchor';
+            a.href = `#${h.id}`;
+            a.setAttribute('aria-label', 'نسخ رابط العنوان');
+            const i = document.createElement('i');
+            i.setAttribute('data-lucide', 'link-2');
+            a.appendChild(i);
+            h.appendChild(a);
+        });
+    }
+
+    static enhanceCallouts(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const bqs = Array.from(root.querySelectorAll('blockquote'));
+        const map = {
+            '[!NOTE]': { cls: 'note', label: 'ملاحظة', icon: 'info' },
+            '[!TIP]': { cls: 'tip', label: 'نصيحة', icon: 'lightbulb' },
+            '[!WARNING]': { cls: 'warning', label: 'تحذير', icon: 'triangle-alert' },
+            '[!IMPORTANT]': { cls: 'important', label: 'مهم', icon: 'alert-octagon' },
+            '[!INFO]': { cls: 'info', label: 'معلومة', icon: 'info' }
+        };
+        bqs.forEach(bq => {
+            const text = (bq.textContent || '').trim();
+            const key = Object.keys(map).find(k => text.startsWith(k));
+            if (!key) return;
+            const cfg = map[key];
+            // Extract inner HTML after the key
+            const html = bq.innerHTML.replace(key, '').trim();
+            const wrap = document.createElement('div');
+            wrap.className = `callout ${cfg.cls}`;
+            wrap.innerHTML = `
+                <div class="callout-icon"><i data-lucide="${cfg.icon}"></i></div>
+                <div class="callout-body">
+                    <div class="callout-title">${cfg.label}</div>
+                    <div class="callout-content">${html}</div>
+                </div>
+            `;
+            bq.replaceWith(wrap);
+        });
+    }
+
+    static enhanceImagesAndLinks(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        // Images responsive + optional caption from alt
+        const imgs = Array.from(root.querySelectorAll('img'));
+        imgs.forEach(img => {
+            img.loading = img.loading || 'lazy';
+            if (img.closest('figure')) return;
+            const fig = document.createElement('figure');
+            fig.className = 'md-figure';
+            const clone = img.cloneNode(true);
+            clone.classList.add('md-image');
+            img.replaceWith(fig);
+            fig.appendChild(clone);
+            if (clone.alt && clone.alt.trim()) {
+                const cap = document.createElement('figcaption');
+                cap.textContent = clone.alt;
+                fig.appendChild(cap);
+            }
+        });
+        // External links open in new tab
+        const links = Array.from(root.querySelectorAll('a[href]'));
+        links.forEach(a => {
+            const href = a.getAttribute('href') || '';
+            const isAnchor = href.startsWith('#');
+            const isMail = href.startsWith('mailto:') || href.startsWith('tel:');
+            try {
+                const url = new URL(href, window.location.href);
+                const isExternal = url.origin !== window.location.origin;
+                if (!isAnchor && !isMail && isExternal) {
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                }
+            } catch (_) { /* ignore */ }
+        });
+    }
 }
 
 // Export for use
