@@ -68,25 +68,20 @@
 }
 /* responsive scroll on small screens */
 @media (max-width: 768px) {
-    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; }
-    .doc-content .table-wrap { scroll-snap-type: x mandatory; }
-    .doc-content .table-wrap > table { scroll-snap-align: start; }
+    .doc-content .table-wrap { margin: 12px 0; padding-inline: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
+    /* subtle fade to hint scroll */
+    .doc-content .table-wrap::before, .doc-content .table-wrap::after { content: ''; position: sticky; top: 0; width: 18px; height: 100%; pointer-events: none; z-index: 1; }
+    .doc-content .table-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .doc-content .table-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
     .doc-content table th,
-    .doc-content table td {
-        padding: 10px 12px;
-        font-size: 0.95rem;
-    }
-    /* Stacked cards layout for narrow screens */
-    .doc-content table.is-responsive { width: 100%; min-width: 0; }
-    .doc-content table.is-responsive thead { display: none; }
-    .doc-content table.is-responsive tbody,
-    .doc-content table.is-responsive tr,
-    .doc-content table.is-responsive td { display: block; width: 100%; }
-    .doc-content table.is-responsive tr { margin: 0 0 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg); }
-    .doc-content table.is-responsive td { border: 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 42% 58%; align-items: center; gap: 8px; }
-    .doc-content table.is-responsive td:last-child { border-bottom: 0; }
-    .doc-content table.is-responsive td::before { content: attr(data-label); color: var(--text-secondary); font-weight: 600; text-align: start; padding-inline-start: 8px; }
-    .doc-content table.is-responsive td { text-align: start; }
+    .doc-content table td { padding: 12px 14px; font-size: 0.98rem; }
+
+    /* Keep table wide and readable without squishing */
+    .doc-content table { width: max-content; min-width: 100%; }
+    .doc-content table th, .doc-content table td { white-space: normal; word-break: break-word; }
+    .doc-content table td { min-width: 120px; }
+    .doc-content table th { min-width: 130px; }
 }
 
 /* Auto-direction helpers */
