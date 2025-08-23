@@ -490,7 +490,7 @@ body {
 /* =============== Header =============== */
 .header {
     position: fixed;
-    top: 0;
+    top: var(--safe-top);
     left: 0;
     right: 0;
     height: var(--header-height);
@@ -825,7 +825,7 @@ body {
 /* =============== Main Content =============== */
 .main-content {
     flex: 1;
-    margin-top: var(--header-total-height);
+    padding-top: var(--header-total-height);
     min-height: calc(100vh - var(--header-total-height));
     transition: margin-right 0.3s ease, transform 0.3s ease;
     width: 100%;
