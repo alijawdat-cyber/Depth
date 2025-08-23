@@ -21,8 +21,8 @@
 - 👥 **الموظفين**: فريق داخلي براتب ثابت
 
 ### الإصدار الحالي
-- **Version**: 2.0.1
-- **تاريخ الإصدار**: 2025-08-21
+- **Version**: V2.0
+- **تاريخ الإصدار**: 2025-08-23
 - **حالة API**: Production Ready
 - **التوافق**: iOS 14+, Android 8+, Web Modern Browsers
 
@@ -145,7 +145,7 @@ const response = await fetch('https://api.depth-agency.com/auth/signin', {
   headers: {
     'Content-Type': 'application/json',
     'X-Platform': 'web',
-    'X-App-Version': '2.0.1'
+  'X-App-Version': '{semver}'
   },
   body: JSON.stringify({
     email: 'user@example.com',
@@ -219,7 +219,7 @@ const projects = await fetch('https://api.depth-agency.com/projects', {
 Authorization: Bearer {token}
 Content-Type: application/json
 X-Platform: android|ios|web
-X-App-Version: 2.0.1
+X-App-Version: {semver}
 X-Device-ID: unique_device_id
 X-Request-ID: unique_request_id (optional)
 ```
@@ -247,7 +247,7 @@ X-Request-ID: unique_request_id (optional)
 ### Production
 - **URL**: `https://api.depth-agency.com`
 - **Status**: ✅ Active
-- **Version**: 2.0.1
+- **Version**: V2.0
 
 ### Staging
 - **URL**: `https://staging-api.depth-agency.com`
@@ -303,7 +303,9 @@ X-Request-ID: unique_request_id (optional)
 
 ---
 
-*آخر تحديث: 2025-08-21 | النسخة: 2.0.1 | الحالة: Production Ready*# 📚 فهرس شامل - Depth API Documentation v2.0
+*آخر تحديث: 2025-08-23 | النسخة: V2.0 | الحالة: Production Ready*
+
+# 📚 فهرس شامل - Depth API Documentation V2.0
 
 � **نسبة التوافق الحالية: 100%** - تم حل جميع التعارضات
 
@@ -554,8 +556,6 @@ X-Request-ID: unique_request_id (optional)
     "baseCurrency": "IQD",
     "amount": 1500000,
     "formattedAmount": "1,500,000 IQD",
-    "usdEquivalent": 1010.10,
-    "exchangeRate": 1485,
     "rateUpdatedAt": "2025-08-26T12:00:00.000Z"
   }
 }

@@ -1,19 +1,19 @@
-# 🔌 WebSockets والاتصال في الوقت الفعلي
+# 🔌 WebSockets والاتصال في الوقت الفعلي (WebSockets & Real-time Communication)
 
-## نظرة عامة
+## نظرة عامة (Overview)
 تستخدم منصة Depth تقنية WebSockets لميزات الوقت الفعلي بما في ذلك التعاون المباشر والمراسلة الفورية والإشعارات.
 
-## البنية المعمارية
+## البنية المعمارية (Architecture)
 
-### المكدس التقني
-- **الخادم**: Socket.io مع محول Redis
-- **العميل**: Socket.io client (ويب وموبايل)
-- **التوسع**: Redis Pub/Sub للتوسع الأفقي
-- **البروتوكول**: WebSocket مع احتياط long-polling
+### المكدس التقني (Tech Stack)
+- **الخادم (Server)**: Socket.io مع محول Redis
+- **العميل (Client)**: Socket.io client (ويب وموبايل)
+- **التوسع (Scaling)**: Redis Pub/Sub للتوسع الأفقي
+- **البروتوكول (Protocol)**: WebSocket مع احتياط long-polling
 
-## إعداد الاتصال
+## إعداد الاتصال (Connection Setup)
 
-### تكوين الخادم
+### تكوين الخادم (Server Configuration)
 ```javascript
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
@@ -38,7 +38,7 @@ export const initializeWebSocket = (httpServer) => {
     pingInterval: 25000,
   });
   
-  // برمجية وسيطة للمصادقة
+  // برمجية وسيطة للمصادقة (Authentication Middleware)
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token;

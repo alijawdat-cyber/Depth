@@ -1,20 +1,20 @@
-# 🔧 إعداد بيئة التطوير المحلية
+# 🔧 إعداد بيئة التطوير المحلية (Local Development Setup)
 
-## المتطلبات الأساسية
+## المتطلبات الأساسية (Prerequisites)
 - **Node.js**: الإصدار 20.0.0 أو أحدث
 - **npm**: الإصدار 10.0.0 أو أحدث
 - **Git**: أحدث إصدار
 - **Firebase CLI**: أحدث إصدار
 
-## خطوات التثبيت
+## خطوات التثبيت (Installation Steps)
 
-### 1. استنساخ المستودع
+### 1. استنساخ المستودع (Clone Repository)
 ```bash
 git clone https://github.com/alijawdat-cyber/Depth.git
 cd Depth
 ```
 
-### 2. تثبيت التبعيات
+### 2. تثبيت التبعيات (Install Dependencies)
 ```bash
 npm install
 ```
@@ -25,7 +25,7 @@ npm install -g firebase-tools
 firebase login
 ```
 
-### 4. إعداد البيئة
+### 4. إعداد البيئة (Environment Setup)
 ```bash
 # نسخ قالب البيئة
 cp .env.example .env.local
@@ -47,14 +47,14 @@ firebase init
 # - Emulators
 ```
 
-### 6. بدء خادم التطوير
+### 6. بدء خادم التطوير (Start Development Server)
 ```bash
 npm run dev
 ```
 
-## سير عمل التطوير
+## سير عمل التطوير (Development Workflow)
 
-### سير العمل اليومي
+### سير العمل اليومي (Daily Workflow)
 1. سحب أحدث التغييرات: `git pull`
 2. تثبيت التبعيات الجديدة: `npm install`
 3. بدء خادم التطوير: `npm run dev`
@@ -63,7 +63,7 @@ npm run dev
 6. الحفظ: `git commit -m "feat: description"`
 7. الدفع: `git push`
 
-### الاختبار المحلي
+### الاختبار المحلي (Local Testing)
 ```bash
 # تشغيل جميع الاختبارات
 npm test
@@ -75,7 +75,7 @@ npm test -- --testNamePattern="Creator"
 npm run test:coverage
 ```
 
-### Database Development
+### تطوير قاعدة البيانات (Database Development)
 ```bash
 # Start Firebase emulators
 npm run firebase:emulators
@@ -87,9 +87,9 @@ npm run db:seed
 npm run db:reset
 ```
 
-## IDE Setup (VS Code)
+## إعداد بيئة التطوير المتكاملة (IDE Setup) - VS Code
 
-### Required Extensions
+### الإضافات المطلوبة (Required Extensions)
 - Firebase
 - Prettier - Code formatter
 - ESLint

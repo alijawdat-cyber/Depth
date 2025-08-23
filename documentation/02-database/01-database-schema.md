@@ -1,400 +1,551 @@
-# 📊 مخطط قاعدة البيانات والنماذج
+# 📊 مخطط قاعدة البيانات V2.0 - Firestore Collections
 
-> SSOT — مصدر الحقيقة الوحيد (التعدادات والمعادلات المرجعية):
-> - documentation/99-reference/02-enums-standard.md
-> - documentation/01-requirements/00-requirements-v2.0.md
-> ملاحظة: يحتوي هذا الملف على أمثلة توضيحية؛ قد تتضمن عينات قديمة. عند التعارض تُعتمد قيم SSOT. سيتم مواءمة الأمثلة بالكامل في تمرير لاحق.
+> 🔒 **SSOT — مصدر الحقيقة الوحيد:**
+> - المتطلبات: `documentation/01-requirements/00-requirements-v2.0.md`
+> - التعدادات والمعادلات: `documentation/99-reference/02-enums-standard.md`
+> - قاموس البيانات: `documentation/02-database/00-data-dictionary.md`
 
-## نظرة عامة
-تصف هذه الوثيقة مخطط قاعدة البيانات الكامل لمنصة Depth باستخدام Firestore.
+**تاريخ الإنشاء:** 2025-08-23  
+**النسخة:** V2.0 - مُحدث ومطابق للمتطلبات النهائية
 
-## هيكل المجموعات
+---
 
-### مجموعة المستخدمين
+## 🏗️ هيكل المجموعات (Firestore Collections)
+
+### 1. مجموعة المستخدمين (users)
 ```javascript
-// Collection: users
 {
-  uid: string,                    // Firebase Auth UID
-  email: string,
-  displayName: string,
-  phoneNumber: string,
-  photoURL: string,
-  role: 'creator' | 'client' | 'admin' | 'salariedEmployee',
-  status: 'active' | 'inactive' | 'suspended',
-  
-  // معلومات الملف الشخصي
-  profile: {
-    firstName: string,
-    lastName: string,
-    dateOfBirth: timestamp,
-    gender: 'male' | 'female' | 'other',
-    nationality: string,
-    languages: string[],
-    bio: string,
-    
-    // الموقع الجغرافي
-    location: {
-      country: string,
-      city: string,
-      zone: string,              // المنطقة الجغرافية للتسعير
-      coordinates: geopoint
-    }
+  uid: string,                    // Firebase Auth UID (PK)
+  phone: string,                  // رقم الهاتف العراقي (unique)
+  email: string,                  // البريد الإلكتروني (optional, unique if exists)
+  role: 'creator' | 'client' | 'salariedEmployee' | 'admin' | 'super_admin',
+  isActive: boolean,
+  isVerified: boolean,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 2. مجموعة الأدمنز (admins)
+```javascript
+{
+  id: string,                     // معرف الأدمن (PK)
+  userId: string,                 // FK → users (unique)
+  adminLevel: 'super_admin' | 'admin',
+  fullName: string,
+  phone: string,
+  addedBy: string,                // userId of super_admin who added them (null for seeded admin)
+  addedAt: timestamp,
+  permissions: {
+    canManageUsers: boolean,      // إدارة المستخدمين
+    canManageProjects: boolean,   // إدارة المشاريع
+    canManagePayments: boolean,   // إدارة المدفوعات
+    canViewReports: boolean,      // عرض التقارير
+    canManageSettings: boolean,   // إدارة الإعدادات
+    canManageAdmins: boolean      // إدارة الأدمنز (super_admin only)
   },
+  googleAuth: {
+    googleId: string,             // Google OAuth ID
+    email: string,                // Google email (must match user email)
+    verified: boolean,
+    verifiedAt: timestamp
+  },
+  isSeeded: boolean,              // true للأدمن المزروع
+  isActive: boolean,
+  lastLoginAt: timestamp,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 3. مجموعة جلسات المستخدمين (sessions)
+```javascript
+{
+  id: string,                     // معرف الجلسة (PK)
+  userId: string,                 // FK → users
+  token: string,                  // توكن مشفر (unique)
+  platform: 'android' | 'ios' | 'web',
+  deviceId: string,
+  deviceInfo: {
+    model: string,
+    os: string,
+    version: string
+  },
+  ipAddress: string,
+  userAgent: string,
+  isActive: boolean,
+  lastActivity: timestamp,
+  expiresAt: timestamp,           // +30 يوم
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 4. مجموعة المبدعين (creators)
+```javascript
+{
+  id: string,                     // معرف المبدع (PK)
+  userId: string,                 // FK → users (unique)
+  fullName: string,
+  displayName: string,            // unique
+  bio: string,                    // ≤500 حرف
+  profileImage: string,           // URL
+  portfolioImages: string[],      // ≤10 صور
+  
+  // الموقع
+  location: {
+    city: string,
+    area: string
+  },
+  
+  // الخبرة
+  specialties: string[],          // ['photo', 'video', 'design', 'editing']
+  experienceLevel: 'fresh' | 'experienced' | 'expert',
+  yearsOfExperience: number,      // ≥0
+  
+  // المعدات
+  equipmentTier: 'silver' | 'gold' | 'platinum',
+  hasOwnEquipment: boolean,       // true = يملك معدات، false = يستخدم معدات الوكالة
+  
+  // حالة الانضمام
+  onboardingStatus: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected',
+  onboardingStep: number,         // 1-5
+  
+  // الإحصائيات
+  isAvailable: boolean,
+  isVerified: boolean,
+  verifiedAt: timestamp,
+  verifiedBy: string,             // admin email
+  rating: number,                 // 0.0-5.0
+  totalReviews: number,
+  completedProjects: number,
+  responseTimeHours: number,
+  
+  // المالية (أساسية فقط - التفاصيل في جدول منفصل)
+  taxId: string,
   
   // التواريخ
   createdAt: timestamp,
-  updatedAt: timestamp,
-  lastLoginAt: timestamp
+  updatedAt: timestamp
 }
 ```
 
-### مجموعة المبدعين
+### 5. مجموعة العملاء (clients)
 ```javascript
-// Collection: creators
 {
-  userId: string,                 // مرجع لمجموعة المستخدمين
-  creatorId: string,             // معرف المبدع المولد تلقائياً
+  id: string,                     // معرف العميل (PK)
+  userId: string,                 // FK → users (unique)
+  fullName: string,
+  companyName: string,
+  businessType: 'individual' | 'company' | 'agency',
+  industry: string,
   
-  // حالة التأهيل
-  onboardingStatus: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected',
-  onboardingStep: number,        // الخطوة الحالية (1-5)
-  approvalStatus: 'pending' | 'approved' | 'rejected',
-  
-  // المعلومات المهنية
-  professionalInfo: {
-    experienceLevel: 'beginner' | 'intermediate' | 'professional' | 'expert',
-    yearsOfExperience: number,
-    portfolio: {
-      website: string,
-      instagram: string,
-      behance: string,
-      youtube: string,
-      other: string[]
-    },
-    
-    // الشهادات والمؤهلات
-    certifications: [{
-      name: string,
-      issuedBy: string,
-      issuedDate: timestamp,
-      expiryDate: timestamp,
-      certificateUrl: string
-    }]
-  },
-  
-  // الفئات والفئات الفرعية
-  categories: [{
-    categoryId: string,
-    categoryName: string,
-    subcategories: [{
-      subcategoryId: string,
-      subcategoryName: string,
-      processingLevels: ['basic' | 'standard' | 'premium'][]
-    }]
-  }],
-  
-  // Equipment
-  equipment: {
-    cameras: string[],
-    lenses: string[],
-    lighting: string[],
-    audio: string[],
-    other: string[]
-  },
-  
-  // Availability
-  availability: {
-    timezone: string,
-    workingHours: {
-      start: string,             // "09:00"
-      end: string               // "18:00"
-    },
-    workingDays: string[],       // ["monday", "tuesday", ...]
-    blockedDates: timestamp[],   // Unavailable dates
-    maxProjectsPerMonth: number
-  },
-  
-  // Financial
-  financial: {
-    bankDetails: {
-      accountNumber: string,     // Encrypted
-      iban: string,             // Encrypted
-      bankName: string,
-      swiftCode: string
-    },
-    taxInfo: {
-      taxId: string,            // Encrypted
-      vatNumber: string,        // Encrypted
-      taxResidency: string
-    }
-  },
-  
-  // Statistics
-  stats: {
-    totalProjects: number,
-    completedProjects: number,
-    averageRating: number,
-    totalEarnings: number,
-    responseTime: number,       // Average in minutes
-    onTimeDelivery: number      // Percentage
-  },
-  
-  // Timestamps
-  createdAt: timestamp,
-  updatedAt: timestamp,
-  approvedAt: timestamp
-}
-```
-
-### مجموعة المشاريع
-```javascript
-// Collection: projects
-{
-  projectId: string,             // مولد تلقائياً
-  clientId: string,              // مرجع للمستخدمين
-  creatorId: string,             // مرجع للمبدعين (عند التعيين)
-  
-  // المعلومات الأساسية
-  title: string,
-  description: string,
-  category: {
-    categoryId: string,
-    categoryName: string,
-    subcategoryId: string,
-    subcategoryName: string,
-    processingLevel: 'basic' | 'standard' | 'premium'
-  },
-  
-  // Location & Timing
+  // الموقع
   location: {
-    type: 'onsite' | 'studio' | 'remote',
-    address: string,
     city: string,
-    coordinates: geopoint,
-    travelRequired: boolean
+    area: string
   },
   
-  timeline: {
-    shootDate: timestamp,
-    deliveryDate: timestamp,
-    duration: number,            // in hours
-    isRush: boolean             // Rush job (< 48h delivery)
+  // الفوترة
+  billingAddress: {
+    street: string,
+    city: string,
+    postalCode: string
   },
+  taxId: string,
+  preferredLanguage: 'ar' | 'en',
+  paymentTerms: 'advance_50' | 'advance_100' | 'net_30',
   
-  // Requirements
-  requirements: {
-    equipmentNeeded: string[],
-    specialInstructions: string,
-    deliverables: string[],
-    formats: string[],          // ["RAW", "JPEG", "MP4"]
-    resolution: string,         // "4K", "HD", etc.
-    copyright: 'client' | 'creator' | 'shared'
-  },
+  // الإحصائيات
+  totalSpent: number,             // بالدينار العراقي
+  totalProjects: number,
+  rating: number,                 // 0.0-5.0
   
-  // Pricing
-  pricing: {
-    basePrice: number,
-    modifiers: {
-      experience: number,
-      equipment: number,
-      rush: number,
-      location: number,
-      travel: number
-    },
-    subtotal: number,
-    agencyMargin: number,
-    totalPrice: number,
-    currency: string,           // "SAR", "USD"
-    
-    // Payment
-    paymentTerms: '50_50' | '100_upfront' | '100_delivery',
-    paymentStatus: 'pending' | 'partial' | 'completed'
-  },
-  
-  // Status & Workflow
-  status: 'draft' | 'quoted' | 'approved' | 'assigned' | 'in_progress' | 'delivered' | 'completed' | 'cancelled',
-  
-  // Assignment
-  assignment: {
-    assignedAt: timestamp,
-    acceptedAt: timestamp,
-    creatorResponse: 'pending' | 'accepted' | 'declined',
-    reassignmentCount: number
-  },
-  
-  // Delivery
-  delivery: {
-    deliveredAt: timestamp,
-    approvalStatus: 'pending' | 'approved' | 'revision_requested',
-    revisionCount: number,
-    finalApprovalAt: timestamp
-  },
-  
-  // Files & Gallery
-  files: {
-    brief: string[],            // URLs to brief files
-    references: string[],       // Reference images/videos
-    deliverables: string[],     // Final delivered files
-    gallery: string[]           // Gallery/preview images
-  },
-  
-  // Communication
-  lastActivity: timestamp,
-  
-  // Timestamps
-  createdAt: timestamp,
-  updatedAt: timestamp,
-  completedAt: timestamp
-}
-```
-
-### مجموعة الفئات
-```javascript
-// Collection: categories  
-{
-  categoryId: string,
-  name: string,
-  nameAr: string,
-  description: string,
-  icon: string,
-  order: number,
-  isActive: boolean,
-  
-  // البيانات الوصفية
+  // التواريخ
   createdAt: timestamp,
   updatedAt: timestamp
 }
 ```
 
-### مجموعة الفئات الفرعية
+### 6. مجموعة الموظفين براتب ثابت (salariedEmployees)
 ```javascript
-// Collection: subcategories
 {
-  subcategoryId: string,
-  categoryId: string,           // الفئة الرئيسية
-  name: string,
-  nameAr: string,
-  description: string,
-  
-  // Processing levels available
-  processingLevels: ['basic' | 'standard' | 'premium'][],
-  
-  // Base pricing per processing level
-  basePricing: {
-    basic: number,
-    standard: number,
-    premium: number
-  },
-  
-  // Equipment requirements
-  requiredEquipment: string[],
-  recommendedEquipment: string[],
-  
-  // Metadata
+  id: string,                     // معرف الموظف (PK)
+  userId: string,                 // FK → users (unique)
+  employeeCode: string,           // رقم الموظف (unique)
+  fullName: string,
+  department: 'admin' | 'hr' | 'finance' | 'marketing',
+  position: string,
+  monthlySalary: number,          // بالدينار العراقي
+  hireDate: date,
   isActive: boolean,
-  order: number,
   createdAt: timestamp,
   updatedAt: timestamp
 }
 ```
 
-### Equipment Collection
+### 7. مجموعة الفئات الرئيسية (categories)
 ```javascript
-// Collection: equipment
 {
-  equipmentId: string,
-  name: string,
-  nameAr: string,
-  category: 'camera' | 'lens' | 'lighting' | 'audio' | 'other',
-  
-  // Equipment details
-  specifications: {
-    brand: string,
-    model: string,
-    type: string,
-    features: string[]
-  },
-  
-  // Pricing impact
-  tier: 'basic' | 'professional' | 'premium',
-  priceModifier: number,        // Multiplier (0.8, 1.0, 1.2)
-  
-  // Status
+  id: string,                     // معرف الفئة (PK)
+  nameAr: string,                 // unique
+  nameEn: string,                 // unique  
+  code: string,                   // unique ('photo', 'video', 'design', 'editing')
+  displayOrder: number,
   isActive: boolean,
+  createdBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 8. مجموعة الفئات الفرعية (subcategories)
+```javascript
+{
+  id: string,                     // معرف الفئة الفرعية (PK)
+  categoryId: string,             // FK → categories
+  nameAr: string,                 // unique
+  nameEn: string,                 // unique
+  code: string,                   // unique
+  basePrice: number,              // السعر الأساسي بالدينار العراقي
+  description: string,
+  displayOrder: number,
+  isActive: boolean,
+  createdBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 9. مجموعة ربط المبدع بالفئات الفرعية (creatorSubcategories)
+```javascript
+{
+  id: string,                     // معرف الربط (PK)
+  creatorId: string,              // FK → creators
+  subcategoryId: string,          // FK → subcategories
+  processingLevel: 'raw' | 'basic' | 'color_correction' | 'full_retouch' | 'advanced_composite',
+  isPreferred: boolean,
+  isActive: boolean,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 10. مجموعة المشاريع (projects)
+```javascript
+{
+  id: string,                     // معرف المشروع (PK)
+  clientId: string,               // FK → clients
+  creatorId: string,              // FK → creators
+  categoryId: string,             // FK → categories
+  subcategoryId: string,          // FK → subcategories
+  
+  // حالة المشروع
+  status: 'draft' | 'pending' | 'active' | 'completed' | 'cancelled',
+  
+  // التسعير (محسوب تلقائياً)
+  basePrice: number,              // من subcategories
+  experienceMod: number,          // معامل الخبرة
+  equipmentMod: number,           // معامل المعدات
+  ownershipFactor: number,        // 1.0 أو 0.9
+  processingMod: number,          // معامل المعالجة
+  rushMod: number,                // معامل الاستعجال
+  locationAddition: number,       // إضافة الموقع الثابتة
+  creatorPrice: number,           // السعر النهائي للمبدع
+  agencyMarginPercent: number,    // نسبة هامش الوكالة (10%-50%)
+  clientPrice: number,            // السعر النهائي للعميل
+  
+  // تفاصيل المشروع
+  isRush: boolean,
+  location: 'studio' | 'client' | 'outskirts' | 'nearby' | 'far',
+  deliveryDate: date,
+  notes: string,
+  
+  // الموافقة
+  approvedBy: string,             // admin email
+  approvedAt: timestamp,
+  
+  // التواريخ
+  createdBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 11. مجموعة طلبات المشاريع (projectRequests)
+```javascript
+{
+  id: string,                     // معرف الطلب (PK)
+  requestNumber: string,          // رقم الطلب (unique)
+  clientId: string,               // FK → clients
+  categoryId: string,             // FK → categories
+  subcategoryId: string,          // FK → subcategories
+  description: string,            // ≤1000 حرف
+  preferredLocation: 'studio' | 'client' | 'outskirts' | 'nearby' | 'far',
+  budget: {
+    min: number,
+    max: number
+  },
+  deadline: date,
+  attachments: string[],          // URLs
+  priority: 'low' | 'normal' | 'high' | 'urgent',
+  status: 'pending' | 'reviewing' | 'approved' | 'rejected',
+  estimatedPrice: number,         // بالدينار العراقي
+  assignedTo: string,             // admin email
+  reviewNotes: string,
+  reviewedAt: timestamp,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 12. مجموعة المعدات (equipment)
+```javascript
+{
+  id: string,                     // معرف المعدة (PK)
+  ownerId: string,                // FK → creators
+  type: 'camera' | 'lens' | 'lighting' | 'microphone' | 'tripod' | 'other',
+  brand: string,
+  model: string,
+  status: 'excellent' | 'good' | 'needs_approval',
+  purchaseDate: date,
   isApproved: boolean,
-  
-  // Metadata
+  approvedBy: string,             // admin email
+  approvedAt: timestamp,
+  createdBy: string,
   createdAt: timestamp,
   updatedAt: timestamp
 }
 ```
 
-### Notifications Collection
+### 13. مجموعة معاملات المعالجة (processingModifiers)
 ```javascript
-// Collection: notifications
 {
-  notificationId: string,
-  userId: string,               // Recipient
-  
-  // Content
-  type: 'project_assigned' | 'project_completed' | 'payment_received' | 'system_update',
-  title: string,
-  titleAr: string,
-  message: string,
-  messageAr: string,
-  
-  // Metadata
-  isRead: boolean,
-  priority: 'low' | 'medium' | 'high' | 'urgent',
-  
-  // Action
-  actionType: 'none' | 'navigate' | 'external_link',
-  actionData: any,              // Navigation or link data
-  
-  // Timestamps
+  id: string,                     // معرف المعامل (PK)
+  level: 'raw' | 'basic' | 'color_correction' | 'full_retouch' | 'advanced_composite',
+  nameAr: string,
+  nameEn: string,
+  modifier: number,               // المعامل
+  description: string,
+  isActive: boolean,
+  createdBy: string,              // admin email
+  updatedBy: string,              // admin email
   createdAt: timestamp,
-  readAt: timestamp
+  updatedAt: timestamp
 }
 ```
 
-## Indexes Required
-
-### Firestore Composite Indexes
+### 14. مجموعة معاملات الخبرة (experienceModifiers)
 ```javascript
-// Projects indexes
-projects:
-  - clientId, status
-  - creatorId, status
-  - category.categoryId, status
-  - status, createdAt (desc)
-  - location.city, status
-
-// Creators indexes
-creators:
-  - onboardingStatus, createdAt
-  - approvalStatus, createdAt
-  - categories.categoryId, approvalStatus
-
-// Notifications indexes
-notifications:
-  - userId, isRead, createdAt (desc)
-  - userId, type, createdAt (desc)
+{
+  id: string,                     // معرف المعامل (PK)
+  level: 'fresh' | 'experienced' | 'expert',
+  nameAr: string,
+  nameEn: string,
+  modifier: number,               // المعامل
+  minYears: number,               // ≥0
+  maxYears: number,               // null للمفتوح
+  isActive: boolean,
+  createdBy: string,              // admin email
+  updatedBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
 ```
 
-## Security Rules
+### 15. مجموعة معاملات المعدات (equipmentModifiers)
+```javascript
+{
+  id: string,                     // معرف المعامل (PK)
+  tier: 'silver' | 'gold' | 'platinum',
+  nameAr: string,
+  nameEn: string,
+  modifier: number,               // المعامل
+  description: string,
+  isActive: boolean,
+  createdBy: string,              // admin email
+  updatedBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
 
-### Basic Security Rules
+### 16. مجموعة معاملات الاستعجال (rushModifiers)
+```javascript
+{
+  id: string,                     // معرف المعامل (PK)
+  type: 'normal' | 'rush',
+  nameAr: string,
+  nameEn: string,
+  modifier: number,               // المعامل
+  isActive: boolean,
+  createdBy: string,              // admin email
+  updatedBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 17. مجموعة إضافات الموقع (locationAdditions)
+```javascript
+{
+  id: string,                     // معرف المعامل (PK)
+  location: 'studio' | 'client' | 'outskirts' | 'nearby' | 'far',
+  nameAr: string,
+  nameEn: string,
+  addition: number,               // الإضافة الثابتة بالدينار
+  isActive: boolean,
+  createdBy: string,              // admin email
+  updatedBy: string,              // admin email
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 18. مجموعة الإشعارات (notifications)
+```javascript
+{
+  id: string,                     // معرف الإشعار (PK)
+  recipientId: string,            // FK → users
+  type: 'creator_approved' | 'new_project' | 'project_completed' | 'payment_received',
+  priority: 'critical' | 'high' | 'normal' | 'low',
+  channels: string[],             // ['push', 'email', 'sms', 'inApp']
+  title: string,
+  message: string,
+  titleEn: string,
+  messageEn: string,
+  actionType: 'navigate' | 'external' | 'none',
+  actionPath: string,
+  isRead: boolean,
+  isSent: boolean,
+  sentChannels: string[],
+  failedChannels: string[],
+  relatedEntityId: string,
+  relatedEntityType: 'project' | 'client' | 'creator',
+  sentAt: timestamp,
+  readAt: timestamp,
+  expiresAt: timestamp,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 19. مجموعة التوفر الشبكي (creatorAvailability)
+```javascript
+{
+  id: string,                     // معرف الفترة (PK)
+  creatorId: string,              // FK → creators
+  date: date,
+  timeSlot: string,               // "09:00" (كل 30 دقيقة)
+  status: 'available' | 'busy' | 'blocked' | 'break',
+  projectId: string,              // FK → projects (if busy)
+  blockReason: string,
+  notes: string,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 20. مجموعة التقييمات (reviews)
+```javascript
+{
+  id: string,                     // معرف التقييم (PK)
+  projectId: string,              // FK → projects
+  reviewerId: string,             // معرف المُقيم
+  revieweeId: string,             // معرف المُقيَم
+  rating: number,                 // 1-5
+  comment: string,
+  isPublic: boolean,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 21. مجموعة أكواد التحقق (otpCodes)
+```javascript
+{
+  id: string,                     // معرف الكود (PK)
+  phoneNumber: string,            // رقم الهاتف العراقي
+  code: string,                   // مشفر
+  purpose: 'registration' | 'password_reset' | 'phone_change',
+  isUsed: boolean,
+  attemptCount: number,           // ≤5
+  expiresAt: timestamp,           // +10 دقائق
+  usedAt: timestamp,
+  lastAttemptAt: timestamp,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+---
+
+## 🔍 الفهارس المطلوبة (Composite Indexes)
+
+### الفهارس الأساسية:
+```javascript
+// Projects
+projects: [
+  ['clientId', 'status'],
+  ['creatorId', 'status'],
+  ['categoryId', 'status'],
+  ['status', 'createdAt']
+]
+
+// Creators
+creators: [
+  ['onboardingStatus', 'createdAt'],
+  ['experienceLevel', 'equipmentTier'],
+  ['isAvailable', 'rating']
+]
+
+// CreatorSubcategories
+creatorSubcategories: [
+  ['creatorId', 'isActive'],
+  ['subcategoryId', 'isActive']
+]
+
+// Notifications
+notifications: [
+  ['recipientId', 'isRead', 'createdAt'],
+  ['recipientId', 'type', 'createdAt']
+]
+
+// CreatorAvailability
+creatorAvailability: [
+  ['creatorId', 'date'],
+  ['creatorId', 'status', 'date']
+]
+
+// ProjectRequests
+projectRequests: [
+  ['status', 'createdAt'],
+  ['clientId', 'status']
+]
+
+// Sessions
+sessions: [
+  ['userId', 'isActive', 'createdAt'],
+  ['userId', 'createdAt']
+]
+```
+
+---
+
+## 🔐 قواعد الأمان (Security Rules)
+
+### قواعد Firestore:
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Users can only access their own data
+    // Users - يمكن للمستخدم الوصول لبياناته فقط
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Creators collection
+    // Creators - قراءة عامة، كتابة للمبدع والأدمن
     match /creators/{creatorId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && 
@@ -402,15 +553,21 @@ service cloud.firestore {
                        isAdmin(request.auth.uid));
     }
     
-    // Projects collection
+    // Clients - الوصول للعميل والأدمن فقط
+    match /clients/{clientId} {
+      allow read, write: if request.auth != null && 
+                            (request.auth.uid == resource.data.userId || 
+                             isAdmin(request.auth.uid));
+    }
+    
+    // Projects - الوصول للأطراف المعنية فقط
     match /projects/{projectId} {
       allow read: if request.auth != null && 
                      (request.auth.uid == resource.data.clientId ||
                       request.auth.uid == resource.data.creatorId ||
                       isAdmin(request.auth.uid));
       
-      allow create: if request.auth != null && 
-                       request.auth.uid == resource.data.clientId;
+      allow create: if request.auth != null;
       
       allow update: if request.auth != null && 
                        (request.auth.uid == resource.data.clientId ||
@@ -418,38 +575,56 @@ service cloud.firestore {
                         isAdmin(request.auth.uid));
     }
     
+    // Admin-only collections
+    match /{adminCollection}/{docId} {
+      allow read, write: if request.auth != null && isAdmin(request.auth.uid);
+      
+      // Collections: categories, subcategories, processingModifiers, 
+      // experienceModifiers, equipmentModifiers, rushModifiers, locationAdditions
+    }
+    
     // Helper functions
     function isAdmin(userId) {
       return get(/databases/$(database)/documents/users/$(userId)).data.role == 'admin';
+    }
+    
+    function isCreator(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role == 'creator';
+    }
+    
+    function isClient(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role == 'client';
     }
   }
 }
 ```
 
-## Migration Scripts
+---
 
-### Initial Data Migration
+## 🧮 معادلات التسعير المُحدّثة
+
+### معادلات التسعير:
+
+> 🔗 **مرجع معادلات التسعير النهائية:**  
+> راجع الملف الرسمي: [`documentation/01-requirements/00-requirements-v2.0.md`](../01-requirements/00-requirements-v2.0.md#معادلات-التسعير-النهائية-المحسومة)  
+> 
+> جميع المعادلات والقيم المعتمدة موثقة بالتفصيل في ملف المتطلبات.
+
+---
+
+## 📋 مثال كامل لحساب السعر
+
 ```javascript
-// migration-001-initial-categories.js
-const categories = [
-  { name: "Photography", nameAr: "التصوير الفوتوغرافي" },
-  { name: "Videography", nameAr: "التصوير المرئي" },
-  { name: "Design", nameAr: "التصميم" },
-  { name: "Content Creation", nameAr: "إنتاج المحتوى" }
-];
+// مشروع: فلات لاي (BasePrice = 10,000 IQD)
+// معالجة كاملة (1.3) + خبرة متوسطة (1.1) + معدات ذهبية (1.1) + عادي (1.0) + استوديو (+0)
+// معدات خاصة (1.0)
 
-async function migrateCategories() {
-  for (const category of categories) {
-    await db.collection('categories').add({
-      ...category,
-      categoryId: generateId(),
-      isActive: true,
-      order: categories.indexOf(category),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-  }
-}
+BaseCreatorPrice = 10000 × 1.0 × 1.3 × 1.1 × 1.1 = 15,730 IQD
+CreatorPrice = 15730 × 1.0 + 0 = 15,730 IQD
+ClientPrice = 15730 + (15730 × 30%) = 20,449 IQD
 ```
 
-This schema provides a solid foundation for the Depth platform with proper relationships, security, and scalability considerations.
+---
+
+**آخر تحديث:** 2025-08-23  
+**الحالة:** مطابق 100% للمتطلبات V2.0 ✅

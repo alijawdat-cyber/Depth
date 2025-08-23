@@ -5,7 +5,8 @@
 ## 1. الأدوار
 | الدور | الوصف | ملاحظات |
 |-------|-------|---------|
-| admin | مدير النظام | وصول شامل |
+| super_admin | مدير النظام الرئيسي | وصول شامل + إدارة أدمنز |
+| admin | مدير عادي | وصول إداري (بدون إدارة أدمنز) |
 | creator | مبدع فريلانسر | وصول مقيد بمشاريعه |
 | client | عميل | ينشئ الطلبات ويتابعها |
 | salariedEmployee | موظف براتب | لا يرى الأسعار |
@@ -38,16 +39,18 @@ CRUD مبسطة:
 | upload | رفع ملفات |
 
 ## 4. جدول الصلاحيات (مبسّط)
-| Resource → Role ↓ | admin | creator | client | salariedEmployee |
-|-------------------|-------|---------|--------|------------------|
-| users.read | ✔ | ✖ | ✖ | ✖ |
-| users.update (self) | ✔ | ✔ (ذاتياً) | ✔ (ذاتياً) | ✔ (ذاتياً) |
-| creators.read | ✔ | ✔ (ذاتياً/معلنة) | ✖ | ✖ |
-| creators.update | ✔ | ✔ (ذاتياً) | ✖ | ✖ |
-| clients.read | ✔ | ✖ | ✔ (ذاتياً) | ✖ |
-| clients.create | ✔ | ✖ | ✔ | ✖ |
-| projects.create | ✔ | ✖ | ✔ (بعد اعتماد) | ✖ |
-| projects.read | ✔ | ✔ (مُسندة) | ✔ (مملوكة) | ✔ (مُسندة) |
+| Resource → Role ↓ | super_admin | admin | creator | client | salariedEmployee |
+|-------------------|-------------|-------|---------|--------|------------------|
+| users.read | ✔ | ✔ | ✖ | ✖ | ✖ |
+| users.update (self) | ✔ | ✔ | ✔ (ذاتياً) | ✔ (ذاتياً) | ✔ (ذاتياً) |
+| admins.create | ✔ | ✖ | ✖ | ✖ | ✖ |
+| admins.read | ✔ | ✔ | ✖ | ✖ | ✖ |
+| creators.read | ✔ | ✔ | ✔ (ذاتياً/معلنة) | ✖ | ✖ |
+| creators.update | ✔ | ✔ | ✔ (ذاتياً) | ✖ | ✖ |
+| clients.read | ✔ | ✔ | ✖ | ✔ (ذاتياً) | ✖ |
+| clients.create | ✔ | ✔ | ✖ | ✔ | ✖ |
+| projects.create | ✔ | ✔ | ✖ | ✔ (بعد اعتماد) | ✖ |
+| projects.read | ✔ | ✔ | ✔ (مُسندة) | ✔ (مملوكة) | ✔ (مُسندة) |
 | projects.update | ✔ | ✔ (نطاق التنفيذ) | محدود (تعليقات) | ✔ (نطاق التنفيذ) |
 | projects.approve | ✔ | ✖ | ✖ | ✖ |
 | pricing.read | ✔ | ✔ (بعد الموافقة) | ✔ (فقط ClientPrice) | ✖ |

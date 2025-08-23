@@ -30,7 +30,7 @@
   "success": true,
   "data": {
     "system": {
-      "version": "2.0.1",
+      "version": "{semver}",
       "build": "20250902.1845",
       "environment": "production",
       "region": "multi-region",
@@ -824,7 +824,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
           "provider": "resend",
           "recipient": "client@example.com",
           "templateId": "project_completed",
-          "errorCode": "RECIPIENT_BOUNCED",
+          "code": "RECIPIENT_BOUNCED",
           "retryCount": 2
         },
         "requestId": "req_ghi789"
@@ -867,7 +867,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
   "success": true,
   "data": {
     "current": {
-      "version": "2.0.1",
+      "version": "{semver}",
       "build": "20250902.1845",
       "deployedAt": "2025-09-02T18:45:00.000Z",
       "deploymentId": "deploy_123abc",
@@ -889,7 +889,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
     },
     "history": [
       {
-        "version": "2.0.1",
+        "version": "{semver}",
         "deployedAt": "2025-09-02T18:45:00.000Z",
         "duration": "12 دقيقة",
         "status": "successful",

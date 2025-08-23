@@ -1,16 +1,16 @@
-# 🔐 متغيرات البيئة
+# 🔐 متغيرات البيئة (Environment Variables)
 
-## نظرة عامة
+## نظرة عامة (Overview)
 تحدد هذه الوثيقة جميع متغيرات البيئة المطلوبة لمنصة Depth.
 
-## ملفات البيئة
-- `.env.local` - التطوير المحلي
-- `.env.staging` - بيئة الاختبار  
-- `.env.production` - بيئة الإنتاج
+## ملفات البيئة (Environment Files)
+- `.env.local` - التطوير المحلي (Local Development)
+- `.env.staging` - بيئة الاختبار (Staging Environment)
+- `.env.production` - بيئة الإنتاج (Production Environment)
 
-## المتغيرات المطلوبة
+## المتغيرات المطلوبة (Required Variables)
 
-### إعدادات Firebase
+### إعدادات Firebase (Firebase Configuration)
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -21,7 +21,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef123456
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-ABCDEF1234
 ```
 
-### تخزين Cloudflare R2
+### تخزين Cloudflare R2 (Cloudflare R2 Storage)
 ```env
 CLOUDFLARE_ACCOUNT_ID=your_account_id
 CLOUDFLARE_R2_ACCESS_KEY_ID=your_access_key
@@ -31,21 +31,21 @@ CLOUDFLARE_R2_ENDPOINT=https://your_account_id.r2.cloudflarestorage.com
 NEXT_PUBLIC_CLOUDFLARE_R2_PUBLIC_URL=https://your_custom_domain.com
 ```
 
-### External APIs
+### واجهات برمجة التطبيقات الخارجية (External APIs)
 ```env
-# Google Services
+# خدمات Google (Google Services)
 GOOGLE_MAPS_API_KEY=your_google_maps_key
 GOOGLE_PLACES_API_KEY=your_places_key
 
-# Email Service (Resend)
+# خدمة البريد الإلكتروني (Email Service - Resend)
 RESEND_API_KEY=re_your_resend_key
 
-# SMS Service (Twilio)
+# خدمة SMS (SMS Service - Twilio مثال - للشبكات العراقية TBD)
 TWILIO_ACCOUNT_SID=ACyour_twilio_sid
 TWILIO_AUTH_TOKEN=your_twilio_token
 TWILIO_PHONE_NUMBER=+1234567890
 
-# Payment Gateway
+# بوابة الدفع (Payment Gateway)
 STRIPE_PUBLIC_KEY=pk_test_your_stripe_key
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret

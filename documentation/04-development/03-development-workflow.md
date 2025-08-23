@@ -5,7 +5,7 @@
 
 ## سير عمل Git
 
-### استراتيجية الفروع
+### استراتيجية الفروع (Git Branching Strategy)
 ```
 main
 ├── develop
@@ -27,7 +27,7 @@ test(auth): إضافة اختبارات الوحدة لتدفق تسجيل ال�
 chore(deps): ترقية التبعيات
 ```
 
-### تدفق التطوير
+### تدفق التطوير (Development Workflow)
 1. **Pull latest changes**: `git pull origin develop`
 2. **Create feature branch**: `git checkout -b feature/your-feature`
 3. **Make changes**: Code your feature
@@ -58,7 +58,7 @@ chore(deps): ترقية التبعيات
 - Follow security rules
 - Document all schemas
 
-## Testing Strategy
+## استراتيجية الاختبار (Testing Strategy)
 
 ### Unit Tests
 ```bash
@@ -87,7 +87,7 @@ npm run test:db
 npm run test:e2e
 ```
 
-## Quality Assurance
+## ضمان الجودة (Quality Assurance)
 
 ### Pre-commit Hooks
 - ESLint checking

@@ -1,8 +1,8 @@
-# 🔐 المصادقة والأمان - Depth API v2.0
+# 🔐 المصادقة والأمان (Authentication & Security) - Depth API v2.0
 
 ---
 
-## المحتويات
+## المحتويات (Contents)
 - [رموز المصادقة](#رموز-المصادقة)
 - [أنواع الأدوار والصلاحيات](#أنواع-الأدوار-والصلاحيات)
 - [تسجيل حساب جديد](#تسجيل-حساب-جديد)
@@ -17,7 +17,7 @@
 
 ---
 
-## رموز المصادقة
+## رموز المصادقة (Authentication Tokens)
 
 جميع الطلبات المحمية تتطلب رمز مصادقة Firebase في Header:
 
@@ -25,18 +25,18 @@
 Authorization: Bearer {firebase_id_token}
 Content-Type: application/json
 X-Platform: android|ios|web
-X-App-Version: 2.0.1
+X-App-Version: {semver}
 X-Device-ID: unique_device_identifier
 ```
 
-### أنواع الرموز:
+### أنواع الرموز (Token Types):
 - **Access Token**: صالح لمدة 1 ساعة
 - **Refresh Token**: صالح لمدة 30 يوماً
 - **OTP Token**: صالح لمدة 5 دقائق
 
 ---
 
-## أنواع الأدوار والصلاحيات
+## أنواع الأدوار والصلاحيات (Roles & Permissions)
 
 ```javascript
 const roles = {
@@ -136,7 +136,7 @@ const otpVerification = {
     "deviceId": "unique_device_id",
     "model": "Samsung Galaxy S23",
     "os": "Android 14",
-    "appVersion": "2.0.1"
+  "appVersion": "{semver}"
   }
 }
 ```

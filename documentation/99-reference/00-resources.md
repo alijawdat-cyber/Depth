@@ -32,7 +32,7 @@
 - **Firebase Auth**: [firebase.google.com/docs/auth](https://firebase.google.com/docs/auth)
 - **Firebase Storage**: [firebase.google.com/docs/storage](https://firebase.google.com/docs/storage)
 
-### DevOps & Deployment
+### إدارة العمليات والنشر (DevOps & Deployment)
 - **Vercel**: [vercel.com/docs](https://vercel.com/docs)
 - **GitHub Actions**: [docs.github.com/actions](https://docs.github.com/actions)
 - **Docker**: [docs.docker.com](https://docs.docker.com)
@@ -51,7 +51,7 @@
 - **Playwright**: [playwright.dev](https://playwright.dev)
 - **MSW**: [mswjs.io](https://mswjs.io)
 
-### Monitoring & Analytics
+### المراقبة والتحليلات (Monitoring & Analytics)
 - **Sentry**: [docs.sentry.io](https://docs.sentry.io)
 - **Vercel Analytics**: [vercel.com/analytics](https://vercel.com/analytics)
 - **Google Analytics**: [developers.google.com/analytics](https://developers.google.com/analytics)
@@ -191,8 +191,30 @@ chore: مهام صيانة
 - **أكاديمية حسوب**: [academy.hsoub.com](https://academy.hsoub.com)
 - **منصة رواق**: [rwaq.org](https://rwaq.org)
 
+## 📦 مكتبات ومراجع إضافية (Placeholder)
+
+### مكتبات الدفع (Payment Libraries)
+- **Stripe**: [stripe.com/docs](https://stripe.com/docs) — *محدد للسوق الدولي*
+- **PayPal**: [developer.paypal.com](https://developer.paypal.com) — *تحت المراجعة*
+- **مكتبة الدفع المحلية**: TBD — *للسوق العراقي*
+
+### مكتبات الخرائط (Maps Libraries)
+- **Google Maps**: [developers.google.com/maps](https://developers.google.com/maps) — *محدد حالياً*
+- **Mapbox**: [docs.mapbox.com](https://docs.mapbox.com) — *بديل محتمل*
+- **OpenStreetMap**: [openstreetmap.org](https://openstreetmap.org) — *خيار مفتوح المصدر*
+
+### مكتبات التقويم (Calendar Libraries)
+- **React Calendar**: [github.com/wojtekmaj/react-calendar](https://github.com/wojtekmaj/react-calendar) — *تحت التقييم*
+- **FullCalendar**: [fullcalendar.io](https://fullcalendar.io) — *للجدولة المتقدمة*
+- **Date-fns**: [date-fns.org](https://date-fns.org) — *معالجة التواريخ*
+
+### مكتبات معالجة PDF (PDF Processing)
+- **React-PDF**: [github.com/wojtekmaj/react-pdf](https://github.com/wojtekmaj/react-pdf) — *عرض PDFs*
+- **jsPDF**: [github.com/parallax/jsPDF](https://github.com/parallax/jsPDF) — *إنشاء PDFs*
+- **PDF-lib**: [pdf-lib.js.org](https://pdf-lib.js.org) — *تعديل PDFs*
+
 ---
 
-**آخر تحديث:** 2025-08-21  
+**آخر تحديث:** 2025-08-23  
 **الإصدار:** 2.0  
 **جهة الإعداد:** فريق التطوير - منصة Depth

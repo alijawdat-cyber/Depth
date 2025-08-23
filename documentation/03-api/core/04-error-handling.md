@@ -1,6 +1,7 @@
 # ⚠️ رموز الأخطاء - Depth API v2.0
 
 > SSOT — مصدر الحقيقة الوحيد (سياسة ورموز الأخطاء): هذا الملف يعد المرجع الرسمي ويُستشهد به عبر النظام.
+> ✅ **تم إضافة شارة SSOT (2025-08-23):** تأكيد الدور المرجعي لهذا الملف في نظام معالجة الأخطاء
 
 ---
 
@@ -464,8 +465,8 @@ const errorMessages = {
   }
 };
 
-function getLocalizedMessage(errorCode, language = 'ar') {
-  return errorMessages[language][errorCode] || 'حدث خطأ غير متوقع';
+function getLocalizedMessage(code, language = 'ar') {
+  return errorMessages[language][code] || 'حدث خطأ غير متوقع';
 }
 ```
 
@@ -502,7 +503,7 @@ throw createError(
 #### 2. تسجيل الأخطاء
 ```javascript
 logger.error('Database connection failed', {
-  errorCode: 'SYSTEM_DATABASE_ERROR',
+  code: 'SYSTEM_DATABASE_ERROR',
   requestId: req.id,
   userId: req.user?.id,
   endpoint: req.path,

@@ -1,4 +1,4 @@
-# API Conventions (Draft)
+# اتفاقيات واجهة برمجة التطبيقات (API Conventions) - مسودة
 
 > مصطلحات هذا المستند:
 > - واجهة برمجة التطبيقات: Application Programming Interface — API
@@ -8,16 +8,16 @@
 
 Status: Draft — aligns v2.0
 
-## Versioning & Base
-- Base path: `/api/v2` (example)
-- Semantic changes require minor/major bump per `VERSION-LOCK-V2.0.md`
+## إصدارات واجهة برمجة التطبيقات والمسار الأساسي (Versioning & Base)
+- المسار الأساسي: `/api/v2` (مثال)
+- التغييرات الدلالية تتطلب رفع إصدار فرعي/رئيسي وفق `VERSION-LOCK-V2.0.md`
 
-## Naming
-- Kebab-case for paths: `/auth/sign-in`, `/projects/{id}`
-- snake_case for JSON fields
-- Plurals for collections `/projects` and singular resources `/projects/{id}`
+## قواعد التسمية (Naming Conventions)
+- Kebab-case للمسارات: `/auth/sign-in`, `/projects/{id}`
+- snake_case لحقول JSON
+- الجمع للمجموعات `/projects` والمفرد للموارد `/projects/{id}`
 
-## Required Headers
+## رؤوس الطلبات المطلوبة (Required Headers)
 ```
 Authorization: Bearer {firebase_id_token}
 Content-Type: application/json
@@ -26,7 +26,7 @@ X-App-Version: {semver}
 X-Device-ID: {uuid}
 ```
 
-## Errors (Unified)
+## الأخطاء الموحدة (Unified Errors)
 ```json
 {
   "success": false,
@@ -37,19 +37,19 @@ X-Device-ID: {uuid}
   }
 }
 ```
-- Map error codes in `03-api/core/04-error-handling.md`
+- ربط رموز الأخطاء في `03-api/core/04-error-handling.md`
 
-## Pagination
-- Query: `?page=1&limit=20`
-- Response meta: `{ "page": 1, "limit": 20, "total": 134 }`
+## تقسيم الصفحات (Pagination)
+- استعلام: `?page=1&limit=20`
+- البيانات الوصفية للاستجابة: `{ "page": 1, "limit": 20, "total": 134 }`
 
-## Rate Limiting
-- Response headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`
-- See `02-rate-limiting.md`
+## تحديد المعدل (Rate Limiting)
+- رؤوس الاستجابة: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`
+- انظر `02-rate-limiting.md`
 
-## Idempotency (if needed)
-- Header: `Idempotency-Key: {uuid}` for POSTs that can be retried
+## عدم التأثر بالتكرار (Idempotency) - عند الحاجة
+- رأس: `Idempotency-Key: {uuid}` للـ POSTs القابلة للإعادة
 
-## Security
-- Enforce role/permission checks per `99-reference/05-roles-matrix.md`
-- Log `X-Device-ID` and platform into Sessions table
+## الأمان (Security)
+- فرض فحوصات الأدوار/الصلاحيات وفق `99-reference/05-roles-matrix.md`
+- تسجيل `X-Device-ID` والمنصة في جدول الجلسات

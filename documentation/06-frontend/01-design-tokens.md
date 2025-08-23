@@ -2,6 +2,8 @@
 
 Status: Final — aligned with Brand SSOT (2025‑08‑23)
 
+> ✅ **تم التحديث (2025-08-23):** قفل الألوان Primary #6C2BFF وAlternate #3E5BFF + إضافة رابط SSOT: depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html
+
 هذه الوثيقة توحّد الألوان والخطوط والمسافات والظلال وحالات التفاعل وبريك‑بوينتس كمتغيرات CSS لاستخدامها عبر الواجهة.
 
 ## Principles

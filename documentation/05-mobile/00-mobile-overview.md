@@ -56,7 +56,7 @@
 - 📊 **ROI Analytics** - Campaign performance
 - 🔗 **Brand Integration** - Logo, colors, guidelines
 
-## Development Roadmap
+## خريطة طريق التطوير (Development Roadmap)
 
 ### Phase 1: Creator App MVP (Weeks 1-4)
 - Basic authentication and profile
@@ -86,7 +86,7 @@
 - White-label options
 - Custom branding
 
-## Technical Architecture
+## البنية التقنية (Technical Architecture)
 
 ### App Structure
 ```

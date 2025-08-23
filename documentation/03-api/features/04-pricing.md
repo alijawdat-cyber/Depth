@@ -33,6 +33,24 @@
 ```json
 {
   "creatorExperienceLevels": {
+    "fresh": {
+      "agencyFeeRange": "10-50%",
+      "description": "مبدعون جدد (أقل من 10 مشاريع)",
+      "incentive": "هامش منخفض لتشجيع البدء"
+    },
+    "experienced": {
+      "agencyFeeRange": "10-50%",
+      "description": "مبدعون متوسطون (10-50 مشروع)",
+      "factors": ["جودة العمل", "تقييم العملاء", "الالتزام بالمواعيد"]
+    },
+    "expert": {
+      "agencyFeeRange": "10-50%",
+      "description": "خبراء معتمدون (50+ مشروع)",
+      "benefits": ["أولوية في المشاريع", "دعم تسويقي"]
+    }
+```json
+{
+  "creatorExperienceLevels": {
     "beginner": {
   "agencyFeeRange": "10-50%",
       "description": "مبدعون جدد (أقل من 10 مشاريع)",
@@ -171,38 +189,17 @@
 
 ---
 
-## معادلات التسعير المُوحدة
+## معادلات التسعير - مرجع API
 
-### المعادلات المعتمدة (متوافقة مع requirements v2.0):
+> 🔗 **معادلات التسعير النهائية:**  
+> راجع الملف الرسمي: [`documentation/01-requirements/00-requirements-v2.0.md`](../../01-requirements/00-requirements-v2.0.md#معادلات-التسعير-النهائية-المحسومة)
+> 
+> **ملاحظة API:** جميع المعادلات والمعاملات مُطبقة في هذه الواجهات وفقاً للمتطلبات الموثقة.
 
-#### 1. للمبدع مع معدات خاصة:
-```javascript
-CreatorPrice = BasePrice × OwnershipFactor × ProcessingMod × ExperienceMod × EquipmentMod × RushMod + LocationAddition
-```
-
-#### 2. للمبدع بدون معدات (يستخدم معدات الوكالة):
-```javascript  
-CreatorPrice = (BasePrice × 0.9) × ProcessingMod × ExperienceMod × RushMod + LocationAddition
-```
-
-#### 3. للموظف براتب ثابت:
-```javascript
-CreatorPrice = 0 // محسوب ضمن الراتب
-```
-
-#### 4. سعر العميل النهائي:
-```javascript
-ClientPrice = CreatorPrice + AgencyMargin
-// أو
-ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
-
-// حيث AgencyMarginPercent يتراوح من 10% إلى 50%
-```
-
-### ملاحظات مهمة:
-- **تم حذف معاملات الموقع النسبية (LocationMod)** واستبدالها بـ **إضافات ثابتة (LocationAddition)**
+### ملاحظات تطبيق API:
 - **هامش الوكالة متغير** يتراوح من **10% إلى 50%** حسب المعايير المحددة
 - جميع المعادلات **متوافقة 100%** مع متطلبات النسخة 2.0
+- **إضافات الموقع ثابتة** (وليست نسبية)
 
 ---
 
@@ -223,11 +220,6 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
   "data": {
     "pricingStructure": {
       "baseCurrency": "IQD",
-      "exchangeRates": {
-        "USD": 1485,
-        "EUR": 1623,
-        "updatedAt": "2025-08-26T12:00:00.000Z"
-      },
       "categories": [
         {
           "id": "photo",
@@ -845,8 +837,6 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
       ],
       "netTotal": 855731,
       "currency": "IQD",
-      "netTotalUSD": 576.35,
-      "exchangeRate": 1485,
       "validUntil": "2025-09-02T00:00:00.000Z"
     },
     "alternatives": [
@@ -1214,8 +1204,6 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
       "status": "sent",
       "amount": 327037,
       "currency": "IQD",
-      "amountUSD": 220.22,
-      "exchangeRate": 1485,
       "issuedAt": "2025-09-03T15:00:00.000Z",
       "dueDate": "2025-09-15T23:59:59.000Z",
       "paymentMethods": [
@@ -1349,7 +1337,7 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
 - `startDate`: تاريخ البداية
 - `endDate`: تاريخ النهاية
 - `groupBy`: day|week|month|creator|category
-- `currency`: IQD|USD
+- `currency`: IQD
 
 **الاستجابة الناجحة (200):**
 ```json
@@ -1368,7 +1356,6 @@ ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
       "averageProjectValue": 461176,
       "currency": "IQD",
       "conversionRate": 1485,
-      "revenueUSD": 10558.67
     },
     "breakdown": {
       "byCategory": [

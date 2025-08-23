@@ -185,23 +185,8 @@
     "availableSalariedEmployees": [
       {
         "id": "se_123abc",
-        "type": "salaried_employee", 
-        "name": "سارة علي الحسن",
-        "department": "photography",
-        "jobTitle": "مصورة أولى",
-        "specialization": "Product & Food Photography",
-        "availability": {
-          "status": "available",
-          "workingHours": "09:00-17:00",
-          "currentLoad": "30%" // نسبة الأعمال الحالية
-        },
-        "equipment": "agency_equipment", // يستخدم معدات الوكالة
-        "experience": "5 سنوات خبرة",
-        "matchScore": 88,
-        "cost": "no_additional_cost", // لا توجد تكلفة إضافية (ضمن الراتب)
-        "strengths": ["سرعة التنفيذ", "خبرة بالمنتجات الغذائية", "متاحة فوراً"]
-      }
-    ],
+        "type": "salariedEmployee", 
+        "name": "علي أحمد",
     "recommendation": {
       "suggested": "se_123abc",
       "reason": "متاحة فوراً وبدون تكلفة إضافية، مع خبرة ممتازة في تصوير الطعام"

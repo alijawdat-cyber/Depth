@@ -10,6 +10,7 @@
 
 ## المحتويات
 - [لوحة التحكم الرئيسية](#لوحة-التحكم-الرئيسية)
+- [إدارة الأدمنز](#إدارة-الأدمنز)
 - [إدارة المستخدمين](#إدارة-المستخدمين)
 - [مراقبة النظام](#مراقبة-النظام)
 - [التقارير والتحليلات](#التقارير-والتحليلات)
@@ -47,7 +48,8 @@
         "breakdown": {
           "clients": 156,
           "creators": 67,
-          "admins": 8,
+          "super_admins": 1,
+          "admins": 2,
           "pending": 3
         }
       },
@@ -219,6 +221,128 @@
 
 ---
 
+## إدارة الأدمنز
+
+### `GET /admin/admins`
+جلب قائمة جميع الأدمنز في النظام.
+
+**المصادقة:** Super Admin role required
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "admins": [
+      {
+        "id": "sa_001",
+        "userId": "u_sa001",
+        "adminLevel": "super_admin",
+        "profile": {
+          "fullName": "علي الربيعي",
+          "email": "admin@depth-agency.com",
+          "phone": "07719956000"
+        },
+        "isSeeded": true,
+        "isActive": true,
+        "permissions": {
+          "canManageUsers": true,
+          "canManageProjects": true,
+          "canManagePayments": true,
+          "canViewReports": true,
+          "canManageSettings": true,
+          "canManageAdmins": true
+        },
+        "lastLoginAt": "2025-09-02T15:30:00.000Z",
+        "createdAt": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "id": "ad_002",
+        "userId": "u_ad002",
+        "adminLevel": "admin",
+        "profile": {
+          "fullName": "سارة أحمد",
+          "email": "sara@depth-agency.com",
+          "phone": "07801234567"
+        },
+        "isSeeded": false,
+        "isActive": true,
+        "addedBy": "sa_001",
+        "permissions": {
+          "canManageUsers": true,
+          "canManageProjects": true,
+          "canManagePayments": false,
+          "canViewReports": true,
+          "canManageSettings": false,
+          "canManageAdmins": false
+        },
+        "lastLoginAt": "2025-09-02T14:20:00.000Z",
+        "addedAt": "2025-08-15T10:00:00.000Z"
+      }
+    ],
+    "summary": {
+      "total": 2,
+      "superAdmins": 1,
+      "admins": 1,
+      "active": 2,
+      "inactive": 0
+    }
+  }
+}
+```
+
+### `POST /admin/admins`
+إضافة أدمن جديد.
+
+**المصادقة:** Super Admin role required
+
+**البيانات المطلوبة:**
+```json
+{
+  "fullName": "أحمد محمد",
+  "email": "ahmed@depth-agency.com",
+  "phone": "07801234568",
+  "adminLevel": "admin",
+  "permissions": {
+    "canManageUsers": true,
+    "canManageProjects": true,
+    "canManagePayments": false,
+    "canViewReports": true,
+    "canManageSettings": false,
+    "canManageAdmins": false
+  }
+}
+```
+
+**الاستجابة الناجحة (201):**
+```json
+{
+  "success": true,
+  "message": "تم إضافة الأدمن بنجاح. سيتم إرسال دعوة Google OAuth.",
+  "data": {
+    "adminId": "ad_003",
+    "email": "ahmed@depth-agency.com",
+    "adminLevel": "admin",
+    "invitationSent": true
+  }
+}
+```
+
+### `PUT /admin/admins/{adminId}/status`
+تفعيل/إيقاف أدمن.
+
+**المصادقة:** Super Admin role required
+
+**البيانات المطلوبة:**
+```json
+{
+  "isActive": false,
+  "reason": "إجازة طويلة"
+}
+```
+
+---
+
 ## إدارة المستخدمين
 
 ### `GET /admin/users`
@@ -291,7 +415,8 @@
       "byRole": {
         "clients": 156,
         "creators": 67,
-        "admins": 8,
+        "super_admins": 1,
+        "admins": 2,
         "pending": 3
       },
       "byStatus": {
@@ -936,7 +1061,7 @@
   "data": {
     "general": {
       "systemName": "Depth Creative Agency Platform",
-      "version": "2.0.1",
+  "version": "{semver}",
       "environment": "production",
       "maintenanceMode": false,
       "timezone": "Asia/Baghdad",

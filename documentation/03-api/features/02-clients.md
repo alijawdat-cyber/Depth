@@ -333,8 +333,6 @@
         "projectTitle": "تصوير منتجات المطعم",
         "amount": 620000,
         "currency": "IQD",
-        "amountUSD": 417.51,
-        "exchangeRate": 1485,
         "status": "pending",
         "issueDate": "2025-08-22T10:00:00.000Z",
         "dueDate": "2025-09-06T10:00:00.000Z",

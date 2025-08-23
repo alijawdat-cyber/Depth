@@ -24,6 +24,8 @@
 - الخطوط: Dubai للعربية، Inter للإنجليزية
 - مرجع التوكِنز الرسمي: depth-site/docs/brand-identity/Depth‑Brand‑Identity/02-Color-Palettes-Spec.html (SSOT)
 
+> ✅ **تم التحديث (2025-08-23):** استبدال Tajawal → Dubai (AR) وتثبيت Inter (EN) + إزالة اللون القديم #1e3a8a، وتوحيد الألوان وفق SSOT.
+
 ## 📱 الصفحات الرئيسية
 
 ### للعامة
