@@ -84,9 +84,11 @@
 
     /* Keep table wide and readable without squishing (inside wrapper only) */
     .doc-content .table-wrap > table { width: auto; min-width: 500px; }
-    /* Allow wrapping so content can break naturally */
+    /* Phones: keep each cell in a single line; scroll horizontally in wrapper */
     .doc-content .table-wrap > table th,
-    .doc-content .table-wrap > table td { white-space: normal; word-break: break-word; }
+    .doc-content .table-wrap > table td { white-space: nowrap; word-break: normal; }
+    /* Ensure table itself does not create its own scroll */
+    .doc-content .table-wrap > table { display: table; overflow: visible; }
     .doc-content .table-wrap > table td { min-width: 60px; }
     .doc-content .table-wrap > table th { min-width: 60px; }
 }
