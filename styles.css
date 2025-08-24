@@ -282,46 +282,18 @@ pre[data-aos="flip-up"].aos-animate { transform: perspective(2500px) rotateX(0);
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-/* =============== Diagram Viewer (Mermaid) =============== */
-.diagram-viewer {
-        margin: 16px 0;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--bg);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-}
-.diagram-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border); background: color-mix(in oklab, var(--primary) 6%, var(--bg)); }
-.diagram-toolbar .dt-left { display: flex; gap: 8px; align-items: center; }
-.diagram-toolbar .dt-right { display: flex; gap: 6px; align-items: center; }
-.diagram-toolbar .dt-title { font-weight: 600; color: var(--text-primary); }
-.diagram-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; }
-.diagram-btn:hover { background: color-mix(in oklab, var(--primary) 8%, var(--bg)); color: var(--text-primary); }
-
-.diagram-stage { position: relative; overflow: hidden; max-width: 100%; max-height: 65vh; background: color-mix(in oklab, var(--bg) 92%, #fff); }
-.diagram-viewer .diagram-stage { cursor: grab; }
-.diagram-viewer.dragging .diagram-stage { cursor: grabbing; }
-.diagram-content { transform-origin: 0 0; transition: transform 0.08s linear; padding: 12px; min-width: 100%; will-change: transform; }
-.diagram-content svg { width: 100%; height: auto; display: block; shape-rendering: geometricPrecision; text-rendering: optimizeLegibility; font-family: "Dubai", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-.diagram-content svg text { fill: var(--text-primary); }
-.diagram-caption { padding: 8px 10px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
-
-@media (max-width: 768px) {
-    .diagram-stage { max-height: 55vh; }
-}
         padding: 10px 12px;
         background: color-mix(in oklab, var(--primary) 6%, var(--bg));
         border-bottom: 1px solid var(--border);
     }
-    .json-title { font-weight: 600; color: var(--text-primary); }
+    .json-title { font-weight: 600; color: var(--text); }
     .json-actions { display: flex; gap: 6px; }
     .json-action {
         display: inline-flex; align-items: center; justify-content: center;
         padding: 4px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;
     }
     .json-action i { width: 20px; height: 20px; }
-    .json-action:hover { color: var(--text-primary); background: transparent; }
+    .json-action:hover { color: var(--text); background: transparent; }
     .json-action.copied { color: var(--success, #16a34a); }
 
     .json-body { padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
@@ -349,6 +321,34 @@ pre[data-aos="flip-up"].aos-animate { transform: perspective(2500px) rotateX(0);
     @media (max-width: 768px) {
         .json-body { padding: 8px; }
     }
+
+/* =============== Diagram Viewer (Mermaid) =============== */
+.diagram-viewer {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.diagram-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border); background: color-mix(in oklab, var(--primary) 6%, var(--bg)); }
+.diagram-toolbar .dt-left { display: flex; gap: 8px; align-items: center; }
+.diagram-toolbar .dt-right { display: flex; gap: 6px; align-items: center; }
+.diagram-toolbar .dt-title { font-weight: 600; color: var(--text); }
+.diagram-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; }
+.diagram-btn:hover { background: color-mix(in oklab, var(--primary) 8%, var(--bg)); color: var(--text); }
+
+.diagram-stage { position: relative; overflow: hidden; max-width: 100%; max-height: 65vh; background: color-mix(in oklab, var(--bg) 92%, #fff); }
+.diagram-viewer .diagram-stage { cursor: grab; }
+.diagram-viewer.dragging .diagram-stage { cursor: grabbing; }
+.diagram-content { transform-origin: 0 0; transition: transform 0.08s linear; padding: 12px; min-width: 100%; will-change: transform; }
+.diagram-content svg { width: 100%; height: auto; display: block; shape-rendering: geometricPrecision; text-rendering: optimizeLegibility; font-family: "Dubai", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+.diagram-content svg text { fill: var(--text); }
+.diagram-caption { padding: 8px 10px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
+
+@media (max-width: 768px) {
+    .diagram-stage { max-height: 55vh; }
+}
 
 /* ===== Flow Links (inter-screen connectors) ===== */
 .flow-links { border: 1px dashed var(--border); border-radius: 12px; padding: 10px; background: color-mix(in oklab, var(--primary) 6%, var(--bg)); margin: 12px 0; }

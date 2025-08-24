@@ -11,9 +11,9 @@ depth-docs-simple/
 ├── index.html          # الملف الرئيسي
 ├── styles.css          # الأنماط الموحدة
 ├── sidebar-data.js     # بيانات السايدبار والمحتوى
-├── components.js       # المكونات القابلة لإعادة الاستخدام
+├── assets/js/ui/       # موديولات UIComponents المفككة (toc, code, preview, media, design...)
 ├── app.js             # المنطق الرئيسي للتطبيق
-├── icon.svg           # أيقونة الموقع
+├── logo-depth.svg     # أيقونة الموقع
 └── README.md          # هذا الملف
 ```
 
