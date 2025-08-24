@@ -16,6 +16,11 @@
   --dp-screen-y: 24px; /* مسافة أعلى للنوتش */
   /* تدوير زوايا الشاشة */
   --dp-corner: 46px;
+  /* أبعاد ومكان النوتش (جزيرة ديناميكية) نسبةً للشاشة */
+  --dp-notch-w: 118px;
+  --dp-notch-h: 40px;
+  --dp-notch-r: 20px;
+  --dp-notch-y: 10px; /* مسافة من أعلى الشاشة */
   position: relative;
   margin: 1rem 0;
 }
@@ -75,6 +80,21 @@
   /* مؤقتاً: نخفي الإطار عند الوضع الأفقي إلى أن نضيف SVG موازي */
   opacity: 0;
 }
+
+/* طبقة نوتش فوق الشاشة مباشرة */
+.device-preview .device-notch{
+  position: absolute;
+  width: var(--dp-notch-w);
+  height: var(--dp-notch-h);
+  left: calc(var(--dp-screen-x) + (var(--dp-width) - var(--dp-notch-w)) / 2);
+  top: calc(var(--dp-screen-y) + var(--dp-notch-y));
+  background: #000;
+  border-radius: var(--dp-notch-r);
+  z-index: 6; /* أعلى من الإطار والـiframe */
+  pointer-events: none;
+}
+
+.device-preview.rotated .device-notch{ opacity: 0; }
 
 /* الـiframe يحتفظ بقياس الجهاز الحقيقي ويتحوّل بمقياس */
 .device-preview .device-viewport{

@@ -68,11 +68,13 @@
   fb.innerHTML = `<div class="screen-mockup">${htmlForPreview}</div>`;
   // اخفِ الـiframe بالبداية
   iframe.style.display = 'none';
-  stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
+  // أضف طبقة النوتش فوق الشاشة
+  const notch = document.createElement('div'); notch.className = 'device-notch';
+  stage.appendChild(shell); stage.appendChild(notch); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
   let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.75;
-      const applyDims = ()=>{
+  const applyDims = ()=>{
         const screenW = (rot?cur.h:cur.w);
         const screenH = (rot?cur.w:cur.h);
         const shellW = (rot?cur.shellH:cur.shellW);
