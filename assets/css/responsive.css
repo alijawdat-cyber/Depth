@@ -70,8 +70,9 @@
         margin-right: 0; /* لا تزح المين كونتينر كله */
     }
     body.sidebar-open .doc-content {
-        margin-inline-end: var(--sidebar-width);
-        transition: margin-inline-end 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* RTL: احجز مساحة من جهة اليمين (مكان السايدبار) */
+        margin-right: var(--sidebar-width);
+        transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     /* Desktop overlay should be click-catcher only (no dim) */
@@ -123,8 +124,9 @@
         margin-right: 0; 
     }
     body.sidebar-open .doc-content {
-        margin-inline-end: var(--sidebar-width);
-        transition: margin-inline-end 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* RTL: احجز مساحة من جهة اليمين (مكان السايدبار) */
+        margin-right: var(--sidebar-width);
+        transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
