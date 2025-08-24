@@ -3,8 +3,20 @@
 
 /* ===== iOS Detection and Base Optimizations ===== */
 @supports (-webkit-touch-callout: none) {
+    /* Sticky header بدل fixed على iOS لتفادي الاهتزاز */
+    .header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+
+    @media (max-width: 767px) {
+        .header { top: env(safe-area-inset-top, 0); }
+    }
     /* iOS-specific optimizations */
-    
     /* Disable unwanted iOS behaviors */
     * {
         -webkit-tap-highlight-color: transparent;
@@ -12,16 +24,12 @@
         -webkit-user-select: none;
         user-select: none;
     }
-    
     /* Allow text selection where needed */
     .doc-content,
-    .doc-content p,
-    .doc-content li,
-    .doc-content td,
-    .doc-content pre,
-    .doc-content code,
+    .doc-content *,
     input,
-    textarea {
+    textarea,
+    select {
         -webkit-user-select: text;
         user-select: text;
     }
@@ -51,11 +59,16 @@
 /* ===== Smooth Scrolling Optimizations ===== */
 @supports (-webkit-touch-callout: none) {
     /* Smooth momentum scrolling */
+    .main-content,
+    .doc-content,
+    .content-wrapper,
     .doc-content .table-wrap,
     .sidebar-nav,
     .toc-list,
-    .floating-toc {
+    .floating-toc,
+    .mobile-toc {
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
     }
@@ -81,10 +94,7 @@
 /* ===== Safe Area Support ===== */
 @supports (padding: max(0px)) {
     /* Main content safe areas */
-    .doc-content {
-        padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right));
-    }
+    .doc-content { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     
     /* Header safe areas */
     .header-container {
@@ -93,10 +103,7 @@
     }
     
     /* Sidebar safe areas */
-    .sidebar {
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
-        padding-left: max(0px, env(safe-area-inset-left));
-    }
+    .sidebar { padding-bottom: max(20px, env(safe-area-inset-bottom)); padding-left: max(0px, env(safe-area-inset-left)); }
     
     /* Mobile TOC safe areas */
     .mobile-toc {
@@ -104,10 +111,7 @@
     }
     
     /* Content wrapper safe areas */
-    .content-wrapper {
-        padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right));
-    }
+    .content-wrapper { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     
     /* Mobile-specific safe areas */
     @media (max-width: 767px) {
@@ -120,10 +124,7 @@
             padding-right: max(12px, env(safe-area-inset-right));
         }
         
-        .doc-content {
-            padding-left: max(16px, env(safe-area-inset-left));
-            padding-right: max(16px, env(safe-area-inset-right));
-        }
+    .doc-content { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     }
 }
 

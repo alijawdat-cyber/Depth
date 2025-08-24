@@ -25,6 +25,12 @@
     --bp-xl: 1400px;
     /* Icon color for monochrome UI glyphs */
     --icon-color: var(--text-secondary);
+    /* Bridging tokens for files التي تعتمد *_primary تسميات */
+    --bg-primary: var(--bg);
+    --text-primary: var(--text);
+    --border-primary: var(--border);
+    /* ظلال أكبر مطلوبة ببعض المكونات */
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.12);
 }
 
 [data-theme="dark"] {

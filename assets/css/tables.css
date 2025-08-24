@@ -251,7 +251,7 @@
     .doc-content .mobile-sticky-first td:first-child {
         position: -webkit-sticky;
         position: sticky;
-        right: 0 !important; /* تأكيد RTL */
+        right: 0 !important; /* RTL */
         left: auto !important;
         z-index: 10;
         background: var(--bg);
@@ -287,5 +287,15 @@
         width: 5px;
         background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
         pointer-events: none;
+    }
+}
+
+/* Fallback: جداول غير ملفوفة ضمن .table-wrap على الموبايل */
+@media (max-width: 768px) {
+    .doc-content table:not(.wrapped) {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
     }
 }

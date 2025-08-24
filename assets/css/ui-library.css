@@ -1,55 +1,4 @@
 /* =============== UI LIBRARY CSS =============== */
-/* Component Library and Demo UI Elements */
-
-/* ===== Viewport Controls ===== */
-.viewport-toolbar { 
-    display: inline-flex; 
-    gap: 6px; 
-    align-items: center; 
-    border: 1px solid var(--border); 
-    background: var(--bg); 
-    border-radius: 10px; 
-    padding: 6px 8px; 
-    box-shadow: var(--shadow); 
-    margin: 8px 0 12px; 
-}
-
-.viewport-toolbar .vp-label { 
-    font-weight: 600; 
-    color: var(--text-secondary); 
-    font-size: 12px; 
-}
-
-.viewport-toolbar button { 
-    border: 1px solid var(--border); 
-    background: var(--bg-secondary); 
-    color: var(--text); 
-    border-radius: 8px; 
-    padding: 6px 10px; 
-    font-size: 12px; 
-    cursor: pointer; 
-}
-
-.viewport-toolbar button.active { 
-    background: var(--primary); 
-    color: #fff; 
-    border-color: transparent; 
-}
-
-/* Viewport width limits */
-[data-vp="mobile"] .viewport-target { 
-    max-width: 390px; 
-}
-
-[data-vp="tablet"] .viewport-target { 
-    max-width: 834px; 
-}
-
-[data-vp="desktop"] .viewport-target { 
-    max-width: 1200px; 
-}
-
-/* =============== UI LIBRARY CSS =============== */
 /* Component Library and Interactive Demo Elements */
 
 /* ===== Viewport Control Toolbar ===== */
@@ -79,7 +28,7 @@
     padding: 6px 10px; 
     font-size: 12px; 
     cursor: pointer; 
-    transition: all 0.2s ease;
+    transition: transform .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
 .viewport-toolbar button.active { 
@@ -92,6 +41,10 @@
     background: var(--bg);
     transform: translateY(-1px);
 }
+/* Viewport width limits */
+[data-vp="mobile"] .viewport-target { max-width: 390px; }
+[data-vp="tablet"] .viewport-target { max-width: 834px; }
+[data-vp="desktop"] .viewport-target { max-width: 1200px; }
 .device-frame { 
     margin: 12px auto; 
     border: 1px solid var(--border); 

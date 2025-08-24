@@ -214,6 +214,19 @@
     transition: opacity .15s ease, transform .12s ease, box-shadow .2s ease; 
 }
 
+/* RTL: انقل زر النسخ لليمين لتجنب تراكب سكة TOC بالموبايل */
+[dir="rtl"] .code-copy-btn { 
+    right: 8px; 
+    left: auto; 
+}
+
+@media (max-width: 360px) { 
+    /* مسافة إضافية داخل pre على الشاشات الصغيرة جدًا */
+    .doc-content pre { 
+        padding-inline-end: 28px; 
+    }
+}
+
 .code-copy-btn:hover { 
     opacity: 1; 
     transform: translateY(-1px); 
