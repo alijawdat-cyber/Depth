@@ -2535,6 +2535,39 @@ class UIComponents {
         };
 
         const candidates = Array.from(root.querySelectorAll('pre > code'));
+
+        // ساعدني أجيب عنوان من أقرب Heading سابق للبلوك
+        const getNearestTitle = (el) => {
+            let n = el;
+            while (n && n !== root) {
+                // جرّب الإخوة السابقين
+                let p = n.previousElementSibling;
+                while (p) {
+                    if (/^H[1-4]$/.test(p.tagName)) return (p.textContent||'').trim();
+                    p = p.previousElementSibling;
+                }
+                n = n.parentElement;
+            }
+            return '';
+        };
+
+        const normalizeAscii = (text) => {
+            const lines = (text||'').replace(/\t/g, '  ').split(/\r?\n/);
+            // قص الفراغات الفارغة بالبداية والنهاية
+            while (lines.length && !lines[0].trim()) lines.shift();
+            while (lines.length && !lines[lines.length-1].trim()) lines.pop();
+            // أقل مسافة بادئة مشتركة
+            let minIndent = Infinity;
+            lines.forEach(l => {
+                if (!l.trim()) return;
+                const m = l.match(/^[ ]+/);
+                const c = m ? m[0].length : 0;
+                minIndent = Math.min(minIndent, c);
+            });
+            if (!isFinite(minIndent)) minIndent = 0;
+            const trimmed = lines.map(l => l.slice(minIndent)).join('\n');
+            return trimmed;
+        };
         candidates.forEach(code => {
             const pre = code.closest('pre');
             if (!pre) return;
@@ -2551,9 +2584,11 @@ class UIComponents {
 
             const toolbar = document.createElement('div');
             toolbar.className = 'ascii-toolbar';
+            // عنوان من أقرب heading إن وُجد
+            const autoTitle = getNearestTitle(pre) || 'UI Mock';
             toolbar.innerHTML = `
                 <div class="at-left">
-                  <div class="at-title">UI Mock</div>
+                  <div class="at-title">${autoTitle}</div>
                 </div>
                 <div class="at-right">
                   <div class="vp-group" role="group" aria-label="Viewport">
@@ -2573,13 +2608,23 @@ class UIComponents {
             const content = document.createElement('div');
             content.className = 'ascii-content';
 
-            // انقل الـpre داخل المحتوى مع الحفاظ على النسخ
-            content.appendChild(pre.cloneNode(true));
+            // انقل الـpre داخل المحتوى مع الحفاظ على النسخ + تطبيع الفراغات
+            const preClone = pre.cloneNode(true);
+            try {
+                const codeClone = preClone.querySelector('code');
+                if (codeClone) codeClone.textContent = normalizeAscii(codeClone.textContent||'');
+            } catch(_) {}
+            content.appendChild(preClone);
+
+            // أضف غلاف جهاز (bezel/notch)
+            const device = document.createElement('div');
+            device.className = 'ascii-device';
 
             // استبدل الـpre الأصلي بالعارض
             pre.replaceWith(viewer);
             viewer.appendChild(toolbar);
-            viewer.appendChild(stage);
+            viewer.appendChild(device);
+            device.appendChild(stage);
             stage.appendChild(content);
 
             // حالة التحويل (تكبير/تصغير/تحريك)
@@ -2636,6 +2681,16 @@ class UIComponents {
             stage.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if (!t) return; start(t.clientX,t.clientY); }, { passive: true });
             window.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; if (!t) return; move(t.clientX,t.clientY); }, { passive: true });
             window.addEventListener('touchend', end, { passive: true });
+
+            // wheel zoom + double click fit
+            stage.addEventListener('wheel', (e) => {
+                if (!e.ctrlKey && Math.abs(e.deltaY) < 4) return; // دقة لمس
+                e.preventDefault();
+                const dir = e.deltaY > 0 ? 1/1.12 : 1.12;
+                scale = Math.max(0.3, Math.min(2.5, scale * dir));
+                apply();
+            }, { passive: false });
+            stage.addEventListener('dblclick', (e) => { e.preventDefault(); fit(); });
 
             // ملاءمة أولية
             setTimeout(fit, 30);
