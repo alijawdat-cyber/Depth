@@ -2,20 +2,23 @@
    DEPTH PLATFORM - PROFESSIONAL SCREEN STYLES V3.0
    ======================================== */
 
-/* === ROOT VARIABLES & THEMES === */
-:root {
+/* === MAIN CONTENT (scoped) === */
+.html-preview-frame .main-content,
+.screen-mockup .main-content {
     /* Color System */
     --primary: #6C2BFF;
     --primary-light: #8E5BFF;
     --primary-dark: #5020CC;
     --primary-gradient: linear-gradient(135deg, #6C2BFF 0%, #8E5BFF 100%);
     
-    --secondary: #00D4FF;
+.html-preview-frame .main-content.collapsed,
+.screen-mockup .main-content.collapsed {
     --secondary-light: #33DFFF;
     --secondary-dark: #00A8CC;
     
-    --success: #10B981;
-    --success-light: #34D399;
+/* === MINI KPI === */
+.html-preview-frame .mini-kpi-scroll,
+.screen-mockup .mini-kpi-scroll {
     --success-dark: #059669;
     
     --warning: #F59E0B;
@@ -23,7 +26,8 @@
     --warning-dark: #D97706;
     
     --danger: #EF4444;
-    --danger-light: #F87171;
+.html-preview-frame .mini-kpi,
+.screen-mockup .mini-kpi {
     --danger-dark: #DC2626;
     
     --info: #3B82F6;
@@ -34,29 +38,34 @@
     --gray-50: #F9FAFB;
     --gray-100: #F3F4F6;
     --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
+.html-preview-frame .mini-kpi-value,
+.screen-mockup .mini-kpi-value {
     --gray-400: #9CA3AF;
     --gray-500: #6B7280;
     --gray-600: #4B5563;
     --gray-700: #374151;
     --gray-800: #1F2937;
     --gray-900: #111827;
-    
+.html-preview-frame .mini-kpi-label,
+.screen-mockup .mini-kpi-label {
     /* Light Theme */
     --bg-primary: #FFFFFF;
     --bg-secondary: #F9FAFB;
     --bg-tertiary: #F3F4F6;
     --bg-overlay: rgba(0, 0, 0, 0.5);
-    
+.html-preview-frame .mini-kpi-change,
+.screen-mockup .mini-kpi-change {
     --text-primary: #111827;
     --text-secondary: #4B5563;
     --text-tertiary: #9CA3AF;
     --text-inverse: #FFFFFF;
-    
+.html-preview-frame .mini-kpi-change.positive,
+.screen-mockup .mini-kpi-change.positive {
     --border-primary: #E5E7EB;
     --border-secondary: #D1D5DB;
     --border-focus: var(--primary);
-    
+.html-preview-frame .mini-kpi-change.negative,
+.screen-mockup .mini-kpi-change.negative {
     /* Shadows */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -613,7 +622,8 @@ body {
     height: 48px;
 }
 
-.input-with-icon input:focus {
+.html-preview-frame .input-with-icon input:focus,
+.screen-mockup .input-with-icon input:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(108, 43, 255, 0.1);
@@ -669,8 +679,9 @@ body {
     height: 20px;
 }
 
-/* === SIDEBAR === */
-.sidebar {
+/* === SIDEBAR (scoped to previews and screen mockups) === */
+.html-preview-frame .sidebar,
+.screen-mockup .sidebar {
     width: 280px;
     height: 100vh;
     background: var(--bg-primary);
@@ -683,7 +694,8 @@ body {
     overflow-y: auto;
 }
 
-.sidebar-header {
+.html-preview-frame .sidebar-header,
+.screen-mockup .sidebar-header {
     display: flex;
     align-items: center;
     gap: var(--space-md);
@@ -692,27 +704,32 @@ body {
     border-bottom: 1px solid var(--border-primary);
 }
 
-.sidebar-logo {
+.html-preview-frame .sidebar-logo,
+.screen-mockup .sidebar-logo {
     width: 32px;
     height: 32px;
 }
 
-.sidebar-title {
+.html-preview-frame .sidebar-title,
+.screen-mockup .sidebar-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 /* === SIDEBAR NAVIGATION === */
-.sidebar-nav {
+.html-preview-frame .sidebar-nav,
+.screen-mockup .sidebar-nav {
     margin-bottom: var(--space-2xl);
 }
 
-.nav-section {
+.html-preview-frame .nav-section,
+.screen-mockup .nav-section {
     margin-bottom: var(--space-xl);
 }
 
-.nav-section-title {
+.html-preview-frame .nav-section-title,
+.screen-mockup .nav-section-title {
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-tertiary);
@@ -721,7 +738,8 @@ body {
     margin-bottom: var(--space-md);
 }
 
-.nav-item {
+.html-preview-frame .nav-item,
+.screen-mockup .nav-item {
     display: flex;
     align-items: center;
     gap: var(--space-md);
@@ -734,35 +752,41 @@ body {
     margin-bottom: var(--space-xs);
 }
 
-.nav-item:hover {
+.html-preview-frame .nav-item:hover,
+.screen-mockup .nav-item:hover {
     background: var(--bg-secondary);
     color: var(--text-primary);
     text-decoration: none;
 }
 
-.nav-item.active {
+.html-preview-frame .nav-item.active,
+.screen-mockup .nav-item.active {
     background: var(--primary);
     color: var(--text-inverse);
 }
 
-.nav-item-icon {
+.html-preview-frame .nav-item-icon,
+.screen-mockup .nav-item-icon {
     width: 20px;
     height: 20px;
     opacity: 0.7;
 }
 
-.nav-item.active .nav-item-icon {
+.html-preview-frame .nav-item.active .nav-item-icon,
+.screen-mockup .nav-item.active .nav-item-icon {
     opacity: 1;
 }
 
 /* === SIDEBAR FOOTER === */
-.sidebar-footer {
+.html-preview-frame .sidebar-footer,
+.screen-mockup .sidebar-footer {
     margin-top: auto;
     padding-top: var(--space-lg);
     border-top: 1px solid var(--border-primary);
 }
 
-.user-profile {
+.html-preview-frame .user-profile,
+.screen-mockup .user-profile {
     display: flex;
     align-items: center;
     gap: var(--space-md);
@@ -771,7 +795,8 @@ body {
     background: var(--bg-secondary);
 }
 
-.user-avatar {
+.html-preview-frame .user-avatar,
+.screen-mockup .user-avatar {
     width: 40px;
     height: 40px;
     border-radius: var(--radius-full);
@@ -783,37 +808,43 @@ body {
     font-weight: 600;
 }
 
-.user-info {
+.html-preview-frame .user-info,
+.screen-mockup .user-info {
     flex: 1;
 }
 
-.user-name {
+.html-preview-frame .user-name,
+.screen-mockup .user-name {
     font-weight: 500;
     color: var(--text-primary);
     font-size: 0.875rem;
     margin: 0;
 }
 
-.user-role {
+.html-preview-frame .user-role,
+.screen-mockup .user-role {
     font-size: 0.75rem;
     color: var(--text-tertiary);
     margin: 0;
 }
 
-/* === MAIN CONTENT === */
-.main-content {
+/* === MAIN CONTENT (scoped) === */
+.html-preview-frame .main-content,
+.screen-mockup .main-content {
     margin-right: 280px;
     padding: var(--space-2xl);
     min-height: 100vh;
     background: var(--bg-secondary);
 }
 
-.main-content.collapsed {
+.html-preview-frame .main-content.collapsed,
+.screen-mockup .main-content.collapsed {
     margin-right: 0;
 }
 
 /* === MINI KPI === */
-.mini-kpi-scroll {
+.html-preview-frame .mini-kpi-scroll,
+.screen-mockup .mini-kpi-scroll {
     display: flex;
     gap: var(--space-lg);
     overflow-x: auto;
@@ -821,7 +852,8 @@ body {
     margin-bottom: var(--space-xl);
 }
 
-.mini-kpi {
+.html-preview-frame .mini-kpi,
+.screen-mockup .mini-kpi {
     flex: 0 0 auto;
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
@@ -832,44 +864,52 @@ body {
     border: 1px solid var(--border-primary);
 }
 
-.mini-kpi-value {
+.html-preview-frame .mini-kpi-value,
+.screen-mockup .mini-kpi-value {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--primary);
     margin-bottom: var(--space-sm);
 }
 
-.mini-kpi-label {
+.html-preview-frame .mini-kpi-label,
+.screen-mockup .mini-kpi-label {
     font-size: 0.875rem;
     color: var(--text-secondary);
     font-weight: 500;
 }
 
-.mini-kpi-change {
+.html-preview-frame .mini-kpi-change,
+.screen-mockup .mini-kpi-change {
     font-size: 0.75rem;
     margin-top: var(--space-xs);
 }
 
-.mini-kpi-change.positive {
+.html-preview-frame .mini-kpi-change.positive,
+.screen-mockup .mini-kpi-change.positive {
     color: var(--success);
 }
 
-.mini-kpi-change.negative {
+.html-preview-frame .mini-kpi-change.negative,
+.screen-mockup .mini-kpi-change.negative {
     color: var(--danger);
 }
 
 /* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
-    .sidebar {
+    .html-preview-frame .sidebar,
+    .screen-mockup .sidebar {
         transform: translateX(100%);
         transition: transform var(--transition-base);
     }
     
-    .sidebar.open {
+    .html-preview-frame .sidebar.open,
+    .screen-mockup .sidebar.open {
         transform: translateX(0);
     }
     
-    .main-content {
+    .html-preview-frame .main-content,
+    .screen-mockup .main-content {
         margin-right: 0;
     }
     
