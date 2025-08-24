@@ -1,0 +1,291 @@
+/* =============== Tables Styling =============== */
+
+/* Base table styling */
+.doc-content table {
+    /* keep base tables contained to the page to avoid global horizontal scroll
+       before JS wraps them; width expansion is applied only when inside .table-wrap */
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--bg);
+    margin: 0; /* wrapper will manage margins */
+}
+
+/* once wrapped, default to fit container on larger screens; mobile will override */
+.doc-content .table-wrap > table { 
+    width: 100%; 
+    min-width: 100%; 
+}
+
+/* wrapper to handle horizontal scroll with padding */
+.doc-content .table-wrap {
+    position: relative;
+    /* desktop/tablet: no horizontal scroll; mobile media query will enable it */
+    overflow-x: visible;
+    -webkit-overflow-scrolling: touch;
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    background: var(--bg);
+    max-width: 100%;
+}
+
+/* remove edge gradient to preserve full border visibility */
+.doc-content .table-wrap::after { 
+    content: none; 
+}
+
+.doc-content table thead th {
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 4; /* above sticky first-col */
+}
+
+.doc-content table th,
+.doc-content table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: normal; /* allow wrapping */
+    word-break: break-word;
+    hyphens: auto;
+    line-height: 1.5;
+}
+
+/* column separators in RTL/LTR safely */
+.doc-content table th:not(:first-child),
+.doc-content table td:not(:first-child) {
+    border-inline-start: 1px solid var(--border);
+}
+
+/* zebra rows */
+.doc-content table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+}
+
+[data-theme="dark"] .doc-content table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-secondary) 60%, transparent);
+}
+
+/* row hover */
+.doc-content table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary) 6%, var(--bg));
+}
+
+/* Make hover/zebra apply under sticky first column without changing its bg */
+.doc-content table.sticky-col tbody tr:nth-child(even) th:first-child,
+.doc-content table.sticky-col tbody tr:nth-child(even) td:first-child { 
+    background: var(--bg); 
+}
+
+.doc-content table.sticky-col tbody tr:hover th:first-child,
+.doc-content table.sticky-col tbody tr:hover td:first-child { 
+    background: var(--bg); 
+}
+
+/* links and code inside table */
+.doc-content table a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.doc-content table code {
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+/* Sticky first column: direction-aware to work across RTL/LTR and mobile */
+.doc-content table.sticky-col th:first-child,
+.doc-content table.sticky-col td:first-child {
+    position: sticky;
+    inset-inline-start: 0; /* logical fallback */
+    z-index: 3;
+    background: var(--bg); /* solid background so content under doesn't bleed */
+}
+
+/* RTL: stick to the right edge and show divider on left */
+[dir="rtl"] .doc-content table.sticky-col th:first-child,
+[dir="rtl"] .doc-content table.sticky-col td:first-child {
+    right: 0;
+    left: auto;
+    box-shadow: -2px 0 0 0 var(--border);
+}
+
+/* LTR: stick to the left edge and show divider on right */
+[dir="ltr"] .doc-content table.sticky-col th:first-child,
+[dir="ltr"] .doc-content table.sticky-col td:first-child {
+    left: 0;
+    right: auto;
+    box-shadow: 2px 0 0 0 var(--border);
+}
+
+/* Compact density variant if needed */
+.doc-content table.compact th,
+.doc-content table.compact td { 
+    padding: 8px 10px; 
+}
+
+/* =============== Mobile Table Responsiveness =============== */
+
+/* responsive scroll on small screens */
+@media (max-width: 768px) {
+    .doc-content .table-wrap { 
+        /* avoid edge clipping */
+        margin: 12px 0; 
+        padding-inline: 0; 
+        overflow-x: auto !important; 
+        -webkit-overflow-scrolling: touch; 
+        position: relative; 
+        overscroll-behavior-x: contain; 
+        scroll-snap-type: x proximity;
+        max-width: calc(100vw - 40px); /* account for mobile TOC rail spacing */
+        width: 100%;
+        left: auto;
+        right: auto;
+        margin-left: 0;
+        margin-right: 0;
+        background: var(--bg); 
+        will-change: scroll-position; 
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        /* extra padding to avoid first/last cell cut */
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+    
+    /* subtle fade to hint scroll */
+    .doc-content .table-wrap::before, 
+    .doc-content .table-wrap::after { 
+        content: ''; 
+        position: sticky; 
+        top: 0; 
+        width: 18px; 
+        height: 100%; 
+        pointer-events: none; 
+        z-index: 1; 
+    }
+    
+    .doc-content .table-wrap::before { 
+        left: 0; 
+        width: 12px; 
+        background: linear-gradient(to right, var(--bg), transparent); 
+        border-top-left-radius: 12px; 
+        border-bottom-left-radius: 12px; 
+    }
+    
+    .doc-content .table-wrap::after { 
+        right: 0; 
+        width: 12px; 
+        background: linear-gradient(to left, var(--bg), transparent); 
+        border-top-right-radius: 12px; 
+        border-bottom-right-radius: 12px; 
+    }
+
+    .doc-content .table-wrap > table th,
+    .doc-content .table-wrap > table td { 
+        padding: 8px 10px; 
+        font-size: 0.9rem; 
+    }
+
+    /* Keep table wide and readable without squishing (inside wrapper only) */
+    .doc-content .table-wrap > table { 
+        width: auto; 
+        min-width: max-content;
+        table-layout: auto;
+    }
+    
+    /* Phones: keep each cell in a single line; scroll horizontally in wrapper */
+    .doc-content .table-wrap > table th,
+    .doc-content .table-wrap > table td { 
+        white-space: nowrap; 
+        word-break: normal; 
+    }
+    
+    /* Ensure table itself does not create its own scroll */
+    .doc-content .table-wrap > table { 
+        display: table; 
+        overflow: visible; 
+    }
+    
+    .doc-content .table-wrap > table td { 
+        min-width: 60px; 
+    }
+    
+    .doc-content .table-wrap > table th { 
+        min-width: 60px; 
+    }
+    
+    /* Ensure first column (field/الحقل) keeps a readable width and sticks smoothly */
+    .doc-content table.sticky-col th:first-child,
+    .doc-content table.sticky-col td:first-child { 
+        min-width: 110px; 
+    }
+}
+
+/* =============== Mobile Sticky Column Fix =============== */
+
+@media (max-width: 768px) {
+    /* Smooth scrolling hints and GPU acceleration */
+    .doc-content .table-wrap {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        will-change: scroll-position;
+    }
+
+    /* Wrapper with sticky column behavior */
+    .doc-content .table-wrap.has-sticky-col {
+        position: relative;
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+
+    /* Fix the first column for mobile-specific class */
+    .doc-content .mobile-sticky-first th:first-child,
+    .doc-content .mobile-sticky-first td:first-child {
+        position: -webkit-sticky;
+        position: sticky;
+        right: 0 !important; /* تأكيد RTL */
+        left: auto !important;
+        z-index: 10;
+        background: var(--bg);
+        border-left: 2px solid var(--border);
+        box-shadow: -3px 0 6px rgba(0,0,0,0.08); /* ظل أوضح */
+        min-width: 90px; /* narrower to reduce overlap */
+        max-width: 120px; /* keep within reasonable bounds */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        will-change: transform;
+        contain: layout style paint;
+        transition: none;
+    }
+
+    /* Header cell above rows */
+    .doc-content .mobile-sticky-first thead th:first-child {
+        position: sticky;
+        right: 0;
+        top: 0;
+        z-index: 15;
+        background: var(--bg-secondary);
+    }
+
+    /* Visual divider gradient */
+    .doc-content .mobile-sticky-first th:first-child::after,
+    .doc-content .mobile-sticky-first td:first-child::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -5px;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
+        pointer-events: none;
+    }
+}

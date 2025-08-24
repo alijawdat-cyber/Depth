@@ -1,0 +1,37 @@
+/* =============== CSS Variables =============== */
+:root {
+    --primary: #6C2BFF;
+    --primary-dark: #4A1FC9;
+    --primary-light: #8E5BFF;
+    --bg: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text: #1f2937;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --radius: 8px;
+    --header-height: 64px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --header-total-height: calc(var(--header-height) + var(--safe-top));
+    --sidebar-width: 280px;
+    /* تجنب transition: all لما له من تأثير سلبي على الأداء خصوصًا على Safari */
+    --transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    /* Breakpoints */
+    --bp-sm: 480px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
+    --bp-xl: 1400px;
+    /* Icon color for monochrome UI glyphs */
+    --icon-color: var(--text-secondary);
+}
+
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --bg-secondary: #1e293b;
+    --text: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
