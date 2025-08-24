@@ -34,7 +34,7 @@
         document.head.appendChild(l);
       }
     })();
-  const presets = { iphone16pm: { w: 390, h: 844, shellW: 470, shellH: 980, screenX: 40, screenY: 80 } };
+  const presets = { iphone16pm: { w: 430, h: 932, shellW: 470, shellH: 980, screenX: null, screenY: 24 } };
     // محوّل للمسارات المطلقة مثل /logo.svg إلى مسارات مناسبة ضمن GitHub Pages
     const fixAbsoluteSrcs = (html, assetFn) => {
       try {
@@ -56,7 +56,7 @@
   bar.className = 'html-preview-toolbar';
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
-      const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone16pm" class="active">iPhone 16 Pro Max</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
+  const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone16pm" class="active">iPhone 16 Pro Max</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">430×932</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار آيفون SVG
@@ -83,8 +83,11 @@
         device.style.setProperty('--dp-shell-w', shellW+'px');
         device.style.setProperty('--dp-shell-h', shellH+'px');
         // إزاحة موضع الشاشة داخل الإطار (نقلب الإحداثيات بالعرض/الارتفاع عند الدوران)
-        const offX = rot ? cur.screenY : cur.screenX;
-        const offY = rot ? cur.screenX : cur.screenY;
+  // إذا screenX غير محدد، احسب تمحور الشاشة: (عرض الإطار - عرض الشاشة)/2
+  const baseX = (cur.screenX==null ? (shellW - screenW)/2 : cur.screenX);
+  const baseY = (cur.screenY==null ? 0 : cur.screenY);
+  const offX = rot ? baseY : baseX;
+  const offY = rot ? baseX : baseY;
         device.style.setProperty('--dp-screen-x', offX+'px');
         device.style.setProperty('--dp-screen-y', offY+'px');
         device.style.setProperty('--dp-scale', String(scale));

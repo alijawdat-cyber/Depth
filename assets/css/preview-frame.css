@@ -1,21 +1,21 @@
 /* DevicePreview wrapper styles: حاوية شاشة موبايل مصغّرة داخل التوثيق */
 
 .device-preview{ 
-  --dp-width: 390px;   /* عرض الشاشة الداخلية */
-  --dp-height: 844px;  /* ارتفاع الشاشة الداخلية */
+  --dp-width: 430px;   /* عرض الشاشة الداخلية (iPhone 16 Pro Max) */
+  --dp-height: 932px;  /* ارتفاع الشاشة الداخلية */
   --dp-scale: 0.33;    /* مقياس التصغير الافتراضي */
   --dp-bg: var(--bg-secondary);
   --dp-border: var(--border-primary);
   --dp-radius: 28px;
   --dp-shadow: var(--shadow-xl);
   /* أبعاد إطار الآيفون الـ SVG (الخارج) */
-  --dp-shell-w: 470px;
+  --dp-shell-w: 470px; /* إطار SVG ثابت كصورة مزخرفة */
   --dp-shell-h: 980px;
   /* موضع الشاشة داخل الإطار */
-  --dp-screen-x: 40px;
-  --dp-screen-y: 80px;
+  --dp-screen-x: 20px; /* تُستبدل برمجياً إذا null */
+  --dp-screen-y: 24px; /* مسافة أعلى للنوتش */
   /* تدوير زوايا الشاشة */
-  --dp-corner: 42px;
+  --dp-corner: 46px;
   position: relative;
   margin: 1rem 0;
 }
