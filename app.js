@@ -58,6 +58,7 @@ class DepthDocs {
         this.checkScreenSize();
         this.initializeSidebarState();
         this.setupEventListeners();
+    this.setupSwipeGestures();
         this.renderSidebar();
         this.handleRoute();
         this.setupScrollEffects();
@@ -200,6 +201,9 @@ class DepthDocs {
                 // Re-initialize if screen category changed
                 if (oldDesktop !== this.isDesktop || oldLargeDesktop !== this.isLargeDesktop) {
                     this.initializeSidebarState();
+                    // rebind swipe gestures only when switching categories
+                    try { this._unbindSwipe && this._unbindSwipe(); } catch(_) {}
+                    this.setupSwipeGestures();
                     // Re-wire mobile TOC on breakpoint change
                     const dc = document.getElementById('doc-content');
                     if (dc) UIComponents.generateTOC(dc);
@@ -224,6 +228,65 @@ class DepthDocs {
                 }, 100);
             }, { capture: true });
         }
+    }
+
+    // Swipe gestures (RTL: السحب من يمين الشاشة لفتح، والسحب يمين لإغلاق)
+    setupSwipeGestures() {
+        const EDGE = 24; // بكسلات من يمين الشاشة كبداية فتح
+        const THRESH_OPEN = 50; // المسافة المطلوبة لفتح
+        const THRESH_CLOSE = 50; // المسافة لإغلاق
+        const MAX_SLOPE_Y = 30; // السماح بانحراف رأسي بسيط
+        let startX = 0, startY = 0, mode = 'none', active = false;
+
+        const onStart = (e) => {
+            if (window.innerWidth >= 1024) return; // ديسكتوب: لا سحب
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            startX = t.clientX; startY = t.clientY; active = true; mode = 'none';
+            const sidebar = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            const sidebarRect = sidebar ? sidebar.getBoundingClientRect() : null;
+            const rightEdge = window.innerWidth - EDGE;
+            // فتح: من حافة اليمين والشريط مغلق
+            if (!this.sidebarOpen && startX >= rightEdge) {
+                mode = 'maybe-open';
+            } else if (this.sidebarOpen) {
+                // إغلاق: إذا البداية داخل السايدبار أو على الأوفرلاي
+                const inSidebar = sidebarRect && startX >= sidebarRect.left && startX <= sidebarRect.right;
+                const onOverlay = ov && ov.classList.contains('active');
+                if (inSidebar || onOverlay) mode = 'maybe-close';
+            }
+        };
+
+        const onMove = (e) => {
+            if (!active || mode === 'none') return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            const dx = t.clientX - startX; // موجب = سحب يمين، سالب = سحب يسار
+            const dy = Math.abs(t.clientY - startY);
+            if (dy > MAX_SLOPE_Y) { return; }
+            if (mode === 'maybe-open' && dx <= -THRESH_OPEN) {
+                e.preventDefault();
+                this.openSidebar();
+                mode = 'done'; active = false;
+            } else if (mode === 'maybe-close' && dx >= THRESH_CLOSE) {
+                e.preventDefault();
+                this.closeSidebar();
+                mode = 'done'; active = false;
+            }
+        };
+
+        const onEnd = () => { active = false; mode = 'none'; };
+
+        // اربط المستمعات مع passive:false حتى نقدر نمنع السلوك الافتراضي عند تحقق الإيماءة
+        window.addEventListener('touchstart', onStart, { passive: true });
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onEnd, { passive: true });
+        this._unbindSwipe = () => {
+            window.removeEventListener('touchstart', onStart);
+            window.removeEventListener('touchmove', onMove);
+            window.removeEventListener('touchend', onEnd);
+        };
     }
 
     // Initialize sidebar state for current breakpoint
