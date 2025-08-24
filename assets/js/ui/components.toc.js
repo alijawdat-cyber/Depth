@@ -57,7 +57,7 @@
 
     NS.observeHeadings = function(headings){
       const topOff = NS.getHeaderOffset();
-      const options = { rootMargin: `${-Math.round(topOff + 8)}px 0px -60% 0px`, threshold: 0 };
+  const options = { rootMargin: `${-Math.round(topOff + 12)}px 0px -60% 0px`, threshold: 0 };
       const toc = document.getElementById('toc-list');
       const scrollIntoViewCentered = (el) => { if (!toc || !el) return; const elTop = el.offsetTop; const target = elTop - (toc.clientHeight / 2) + (el.clientHeight / 2); toc.scrollTo({ top: Math.max(0, target), behavior: 'smooth' }); };
       const observer = new IntersectionObserver((entries)=>{

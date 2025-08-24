@@ -350,6 +350,9 @@
     overflow-y: auto;
     scroll-behavior: smooth;
     will-change: scroll-position;
+    align-self: start; /* لازم للـ sticky داخل grid */
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .floating-toc h3 {
