@@ -68,33 +68,11 @@
   fb.innerHTML = `<div class="screen-mockup">${htmlForPreview}</div>`;
   // اخفِ الـiframe بالبداية
   iframe.style.display = 'none';
-  // أضف طبقة النوتش فوق الشاشة
-  const notch = document.createElement('div'); notch.className = 'device-notch';
-  // شريط الحالة (وقت + شبكة + بطارية)
-  const status = document.createElement('div'); status.className = 'device-statusbar';
-  status.innerHTML = `
-    <div class="dsb-left"><span class="dsb-time">--:--</span></div>
-    <div class="dsb-right">
-      <span class="dsb-signal" aria-hidden="true">
-        <svg viewBox="0 0 24 14" width="24" height="14"><g fill="#fff"><rect x="0" y="8" width="3" height="6" rx="1" opacity=".7"/><rect x="5" y="6" width="3" height="8" rx="1" opacity=".8"/><rect x="10" y="4" width="3" height="10" rx="1" opacity=".9"/><rect x="15" y="2" width="3" height="12" rx="1"/><rect x="20" y="0" width="3" height="14" rx="1"/></g></svg>
-      </span>
-      <span class="dsb-battery" aria-hidden="true">
-        <svg viewBox="0 0 28 14" width="28" height="14">
-          <rect x="0.5" y="1.5" width="24" height="11" rx="2.5" stroke="#fff" fill="none"/>
-          <rect x="2.5" y="3.5" width="18" height="7" rx="1.5" fill="#fff"/>
-          <rect x="25.5" y="5" width="2" height="4" rx="1" fill="#fff"/>
-        </svg>
-      </span>
-    </div>`;
-  stage.appendChild(shell); stage.appendChild(notch); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
-  stage.appendChild(status);
+  stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
   let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.75;
-  // مقاسات النوتش الافتراضية
-  const notchDims = { w: 118, h: 40, r: 20, y: 10 };
-  // هوامش شريط الحالة بالنسبة لحواف الشاشة
-  const sb = { padX: 14, top: 10, height: 20 };
+  // لا حاجة لطبقة نوتش/شريط حالة: نعتمد على إطار الـSVG الأصلي بعد رفع z-index
   const applyDims = ()=>{
         const screenW = (rot?cur.h:cur.w);
         const screenH = (rot?cur.w:cur.h);
@@ -116,54 +94,7 @@
         device.style.setProperty('--dp-scale', String(scale));
         device.classList.toggle('rotated', !!rot);
         const info = dt.querySelector('.dt-info'); if (info) info.textContent = `${screenW}×${screenH}`;
-        // عيّن ستايل النوتش inline لضمان الظهور وعدم الاعتماد على الكاش
-        if (notch){
-          if (rot){ notch.style.opacity = '0'; }
-          else {
-            const left = offX + (screenW - notchDims.w)/2;
-            const top = offY + notchDims.y;
-            notch.style.position = 'absolute';
-            notch.style.width = notchDims.w + 'px';
-            notch.style.height = notchDims.h + 'px';
-            notch.style.left = left + 'px';
-            notch.style.top = top + 'px';
-            notch.style.borderRadius = notchDims.r + 'px';
-            notch.style.background = '#000';
-            notch.style.zIndex = '6';
-            notch.style.pointerEvents = 'none';
-            notch.style.opacity = '1';
-          }
-        }
-        // موضع شريط الحالة أعلى الشاشة بعيد عن النوتش
-        if (status){
-          if (rot){ status.style.opacity = '0'; }
-          else {
-            const sLeft = offX + sb.padX;
-            const sTop = offY + sb.top;
-            const sWidth = screenW - sb.padX*2;
-            status.style.position = 'absolute';
-            status.style.left = sLeft + 'px';
-            status.style.top = sTop + 'px';
-            status.style.width = sWidth + 'px';
-            status.style.height = sb.height + 'px';
-            status.style.opacity = '1';
-          }
-        }
       };
-      // تحديث الوقت كل ثانية (ساعة واقعية)
-      const updateTime = ()=>{
-        try{
-          const tEl = status.querySelector('.dsb-time');
-          if (!tEl) return;
-          const now = new Date();
-          const hh = now.getHours();
-          const mm = now.getMinutes();
-          const fmt = (n)=> (n<10?('0'+n):String(n));
-          tEl.textContent = `${fmt(hh)}:${fmt(mm)}`;
-        }catch(_){ }
-      };
-      updateTime();
-      setInterval(updateTime, 1000);
       applyDims();
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>html,body{height:100%;margin:0;padding:0;overflow:hidden;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style></head><body><div class="screen-mockup">${htmlForPreview}</div><script src="${asset('assets/js/interactive-mockups.js')}"><\/script><script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script></body></html>`;
       const loadFrame = (theme='light')=>{ iframe.srcdoc = buildSrcDoc(theme); };
