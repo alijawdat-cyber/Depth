@@ -50,11 +50,13 @@
 
 /* الغلاف المرئي المصغّر بحجم الإطار الحقيقي × scale */
 .device-preview .device-stage{ 
-  width: calc(var(--dp-shell-w) * var(--dp-scale));
-  height: calc(var(--dp-shell-h) * var(--dp-scale));
+  width: var(--dp-shell-w);
+  height: var(--dp-shell-h);
   position: relative;
   margin-inline: auto;
   background: transparent;
+  transform-origin: top center;
+  transform: scale(var(--dp-scale));
 }
 
 /* الإطار الخارجي (SVG) */
@@ -64,7 +66,7 @@
   position: absolute;
   inset: 0;
   transform-origin: top left;
-  transform: scale(var(--dp-scale));
+  transform: none;
   pointer-events: none;
   z-index: 1; /* الإطار أسفل الشاشة */
 }
@@ -80,13 +82,13 @@
   height: var(--dp-height);
   border: 0;
   transform-origin: top left;
-  transform: scale(var(--dp-scale));
+  transform: none;
   display: block;
   background: var(--bg-primary);
   position: absolute;
-  /* ضع الشاشة داخل الإطار حسب الإحداثيات */
-  top: var(--dp-screen-y);
-  left: var(--dp-screen-x);
+  /* ضع الشاشة داخل الإطار حسب الإحداثيات وتابع الزوم */
+  top: calc(var(--dp-screen-y) * var(--dp-scale));
+  left: calc(var(--dp-screen-x) * var(--dp-scale));
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
@@ -97,10 +99,10 @@
   width: var(--dp-width);
   height: var(--dp-height);
   transform-origin: top left;
-  transform: scale(var(--dp-scale));
+  transform: none;
   position: absolute;
-  top: var(--dp-screen-y);
-  left: var(--dp-screen-x);
+  top: calc(var(--dp-screen-y) * var(--dp-scale));
+  left: calc(var(--dp-screen-x) * var(--dp-scale));
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
