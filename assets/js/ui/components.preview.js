@@ -56,7 +56,7 @@
   bar.className = 'html-preview-toolbar';
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
-  const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone16pm" class="active">iPhone 16 Pro Max</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">430×932</div>';
+  const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone16pm" class="active">iPhone 16 Pro Max</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75" class="active">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">430×932</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار آيفون SVG
@@ -71,7 +71,7 @@
   stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
-  let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.33;
+  let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.75;
       const applyDims = ()=>{
         const screenW = (rot?cur.h:cur.w);
         const screenH = (rot?cur.w:cur.h);
