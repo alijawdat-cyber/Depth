@@ -1741,6 +1741,114 @@ class UIComponents {
         }
     }
 
+    // =============== Component Library Enhancer ===============
+    static enhanceComponentLibrary(rootEl, path = '') {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const isCL = /06-frontend\/03-component-library/.test(path) || /(component library|مكتبة المكونات)/i.test((root.querySelector('h1')?.textContent||''));
+        if (!isCL) return;
+
+        const findHeading = (regex) => Array.from(root.querySelectorAll('h2, h3')).find(h => regex.test(h.textContent||''));
+
+        const injectAfter = (el, block) => { if (!el) { root.appendChild(block); } else { el.after(block); } };
+
+        // Buttons Demo
+        const buttonsHead = findHeading(/buttons|الأزرار/i);
+        if (buttonsHead && !buttonsHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div');
+            demo.className = 'comp-demo';
+            const title = document.createElement('div');
+            title.className = 'demo-title';
+            title.textContent = 'Buttons — الأحجام والأنماط';
+            const grid = document.createElement('div');
+            grid.className = 'btn-grid';
+            const variants = ['primary','secondary','outline','ghost','destructive'];
+            const sizes = ['xs','sm','md','lg','xl'];
+            sizes.forEach(sz => {
+                variants.forEach(v => {
+                    const b = document.createElement('button');
+                    b.className = `ui-btn ui-${v} ui-${sz}`;
+                    b.textContent = `${v} ${sz}`;
+                    grid.appendChild(b);
+                });
+                // full width sample per size
+                const bw = document.createElement('button');
+                bw.className = `ui-btn ui-primary ui-${sz} ui-block`;
+                bw.textContent = `Full Width (${sz})`;
+                grid.appendChild(bw);
+            });
+            // disabled + loading
+            const disabled = document.createElement('button'); disabled.className = 'ui-btn ui-secondary ui-md'; disabled.disabled = true; disabled.textContent = 'Disabled';
+            const loading = document.createElement('button'); loading.className = 'ui-btn ui-primary ui-md is-loading'; loading.textContent = 'Loading...';
+            grid.appendChild(disabled); grid.appendChild(loading);
+            demo.appendChild(title); demo.appendChild(grid);
+            injectAfter(buttonsHead, demo);
+        }
+
+        // Inputs Demo
+        const inputsHead = findHeading(/inputs|حقول|textareas|النصية/i);
+        if (inputsHead && !inputsHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Inputs & Textareas — الحالات';
+            const grid = document.createElement('div'); grid.className='input-grid';
+            const makeRow = (label, inner) => { const w=document.createElement('div'); w.className='form-field'; const l=document.createElement('label'); l.textContent=label; w.appendChild(l); w.appendChild(inner); return w; };
+            const in1 = document.createElement('input'); in1.className='ui-input'; in1.placeholder='Default';
+            const in2 = document.createElement('input'); in2.className='ui-input is-invalid'; in2.placeholder='Invalid';
+            const in3 = document.createElement('input'); in3.className='ui-input'; in3.placeholder='Disabled'; in3.disabled = true;
+            const ta = document.createElement('textarea'); ta.className='ui-textarea'; ta.rows=3; ta.placeholder='Textarea';
+            grid.appendChild(makeRow('افتراضي', in1));
+            grid.appendChild(makeRow('خطأ/Invalid', in2));
+            grid.appendChild(makeRow('معطل', in3));
+            grid.appendChild(makeRow('Textarea', ta));
+            demo.appendChild(title); demo.appendChild(grid);
+            injectAfter(inputsHead, demo);
+        }
+
+        // Selection Controls (Checkbox, Radio, Switch)
+        const selHead = findHeading(/checkbox|radio|switch|الاختيار|الراديو|سويتش/i);
+        if (selHead && !selHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Selection Controls';
+            const row = document.createElement('div'); row.className='selection-row';
+            row.innerHTML = `
+                <label class="ui-check"><input type="checkbox" checked><span>Checkbox</span></label>
+                <label class="ui-radio"><input type="radio" name="r1" checked><span>Radio A</span></label>
+                <label class="ui-radio"><input type="radio" name="r1"><span>Radio B</span></label>
+                <label class="ui-switch"><input type="checkbox" checked><span class="track"><span class="thumb"></span></span><span class="sw-label">Switch</span></label>
+            `;
+            demo.appendChild(title); demo.appendChild(row);
+            injectAfter(selHead, demo);
+        }
+
+        // Alerts
+        const alertsHead = findHeading(/alert|toast|تنبيه|تحذير|ملاحظة/i);
+        if (alertsHead && !alertsHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Alerts';
+            const grid = document.createElement('div'); grid.className='alert-grid';
+            ['info','success','warning','error'].forEach(v => {
+                const a = document.createElement('div'); a.className = `ui-alert ${v}`; a.textContent = `${v[0].toUpperCase()+v.slice(1)} message for users.`; grid.appendChild(a);
+            });
+            demo.appendChild(title); demo.appendChild(grid);
+            injectAfter(alertsHead, demo);
+        }
+
+        // Cards
+        const cardsHead = findHeading(/card|بطاقات/i);
+        if (cardsHead && !cardsHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Card';
+            const card = document.createElement('div'); card.className='ui-card';
+            card.innerHTML = `
+                <div class="card-header">عنوان البطاقة</div>
+                <div class="card-body">نص تجريبي قصير يوضح محتوى البطاقة وتخطيطها.</div>
+                <div class="card-footer"><button class="ui-btn ui-secondary ui-sm">إجراء</button></div>
+            `;
+            demo.appendChild(title); demo.appendChild(card);
+            injectAfter(cardsHead, demo);
+        }
+    }
+
     // =============== Enhance tables: wrap, sticky head, optional sticky first column ===============
     static enhanceTables(rootEl) {
         const root = rootEl || document.getElementById('doc-content');

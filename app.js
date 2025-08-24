@@ -442,6 +442,7 @@ class DepthDocs {
     // Design System blocks polish (صور/بطاقات/جريد)
     try { UIComponents.enhanceDesignSystemBlocks(docContent, path); } catch (_) {}
     try { UIComponents.enhanceUserFlowsAndFrontPreview(docContent, path); } catch (_) {}
+    try { UIComponents.enhanceComponentLibrary(docContent, path); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
     if (wrapper) {
