@@ -150,7 +150,11 @@ class DepthDocs {
         const outsideClose = (e) => {
             const sidebar = document.getElementById('sidebar');
             const ov = document.getElementById('sidebar-overlay');
+            const burgerBtn = document.getElementById('burger-btn');
             if (!sidebar) return;
+            // تجاهل نقرات زر البرجر حتى لا يصير وميض (يغلق ثم يفتح)
+            const isBurger = burgerBtn && (e.target === burgerBtn || burgerBtn.contains(e.target));
+            if (isBurger) return;
             const isClickInside = sidebar.contains(e.target) || (ov && ov.contains(e.target));
             // أغلق السايدبار عند النقر خارج بأي مقاس شاشة
             if (!isClickInside && this.sidebarOpen) {
