@@ -864,4 +864,1050 @@
 <div class="screen-mockup">
     <div class="screen-header">
         <button class="header-btn back-btn">⬅</button>
-        <h3>رفع
+        <h3>رفع الملفات المرجعية</h3>
+        <button class="header-btn">💾</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Progress Indicator -->
+        <div class="step-progress">
+            <div class="step-progress-bar">
+                <div class="step-progress-fill" style="width: 75%;"></div>
+            </div>
+        </div>
+        
+        <div class="upload-section">
+            <h2 class="section-title">أضف ملفات مرجعية</h2>
+            <p class="section-desc">ارفع صور أو مستندات تساعد في فهم متطلباتك</p>
+            
+            <!-- Drag & Drop Area -->
+            <div class="dropzone" data-dropzone>
+                <div class="dropzone-content">
+                    <div class="dropzone-icon">📁</div>
+                    <h3 class="dropzone-title">اسحب الملفات هنا</h3>
+                    <p class="dropzone-text">أو</p>
+                    <button type="button" class="btn btn-primary">
+                        اختر من الجهاز
+                    </button>
+                    <p class="dropzone-hint">
+                        المسموح: JPG, PNG, PDF, MP4 • حتى 2GB لكل ملف
+                    </p>
+                </div>
+                <input type="file" 
+                       class="dropzone-input" 
+                       multiple 
+                       accept="image/*,video/*,.pdf">
+            </div>
+            
+            <!-- Uploaded Files List -->
+            <div class="uploaded-files">
+                <h3 class="files-title">الملفات المرفوعة (3)</h3>
+                
+                <div class="file-item success">
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">venue_layout.pdf</div>
+                        <div class="file-meta">2.4 MB • PDF</div>
+                    </div>
+                    <div class="file-status">
+                        <span class="status-icon">✅</span>
+                    </div>
+                    <button class="btn-icon file-remove">
+                        <span>🗑️</span>
+                    </button>
+                </div>
+                
+                <div class="file-item success">
+                    <div class="file-preview">
+                        <img src="/preview1.jpg" alt="Preview">
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">style_reference_01.jpg</div>
+                        <div class="file-meta">854 KB • صورة</div>
+                    </div>
+                    <div class="file-status">
+                        <span class="status-icon">✅</span>
+                    </div>
+                    <button class="btn-icon file-remove">
+                        <span>🗑️</span>
+                    </button>
+                </div>
+                
+                <div class="file-item uploading">
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">guest_list.pdf</div>
+                        <div class="file-meta">456 KB • يتم الرفع...</div>
+                        <div class="upload-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 68%;"></div>
+                            </div>
+                            <span class="progress-text">68%</span>
+                        </div>
+                    </div>
+                    <button class="btn-icon file-cancel">
+                        <span>❌</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Additional Notes -->
+            <div class="form-group">
+                <label class="form-label">ملاحظات إضافية عن الملفات</label>
+                <textarea class="form-textarea" 
+                          rows="3" 
+                          placeholder="أي توضيحات عن الملفات المرفقة..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary btn-lg">
+                    ← السابق
+                </button>
+                <button class="btn btn-primary btn-lg">
+                    التالي ←
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+### الخطوة 4: المراجعة والإرسال
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>مراجعة وإرسال الطلب</h3>
+        <button class="header-btn">📋</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Progress Indicator -->
+        <div class="step-progress">
+            <div class="step-progress-bar">
+                <div class="step-progress-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+        
+        <div class="review-section">
+            <h2 class="section-title">راجع تفاصيل طلبك</h2>
+            
+            <!-- Summary Cards -->
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3 class="summary-title">📷 نوع الخدمة</h3>
+                    <button class="btn-link">تعديل</button>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <span class="item-label">الفئة الرئيسية:</span>
+                        <span class="item-value">التصوير</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">النوع:</span>
+                        <span class="item-value">تصوير حفل زفاف، تصوير بورتريه</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">مستوى المعالجة:</span>
+                        <span class="item-value">معالجة كاملة</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3 class="summary-title">📝 تفاصيل المشروع</h3>
+                    <button class="btn-link">تعديل</button>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <span class="item-label">العنوان:</span>
+                        <span class="item-value">تصوير حفل زفاف في قاعة الورود</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">الموقع:</span>
+                        <span class="item-value">بغداد - الكرادة</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">التاريخ:</span>
+                        <span class="item-value">30 أغسطس 2025</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">المدة المتوقعة:</span>
+                        <span class="item-value">5 ساعات</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3 class="summary-title">💰 الميزانية والتسليم</h3>
+                    <button class="btn-link">تعديل</button>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <span class="item-label">الميزانية:</span>
+                        <span class="item-value">500,000 - 1,000,000 د.ع</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">طلب عاجل:</span>
+                        <span class="item-value">
+                            <span class="badge badge-warning">نعم (+30%)</span>
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-label">الملفات المرفقة:</span>
+                        <span class="item-value">3 ملفات</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Important Notice -->
+            <div class="notice-card">
+                <div class="notice-icon">💡</div>
+                <div class="notice-content">
+                    <h4 class="notice-title">ماذا يحدث بعد الإرسال؟</h4>
+                    <ol class="notice-list">
+                        <li>سيتم مراجعة طلبك من قبل فريقنا خلال 2-4 ساعات</li>
+                        <li>سنرشح لك أفضل المبدعين المناسبين للمشروع</li>
+                        <li>ستحصل على عرض سعر تفصيلي خلال 24 ساعة</li>
+                        <li>يمكنك الموافقة أو طلب تعديلات على العرض</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Terms Agreement -->
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" required>
+                    <span class="checkbox-text">
+                        أوافق على 
+                        <a href="#terms">شروط الخدمة</a>
+                        و
+                        <a href="#cancellation">سياسة الإلغاء</a>
+                    </span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" checked>
+                    <span class="checkbox-text">
+                        أرغب في تلقي إشعارات عن حالة الطلب عبر:
+                    </span>
+                </label>
+                <div class="notification-options">
+                    <label class="chip-checkbox">
+                        <input type="checkbox" checked>
+                        <span class="chip">📱 التطبيق</span>
+                    </label>
+                    <label class="chip-checkbox">
+                        <input type="checkbox" checked>
+                        <span class="chip">📧 البريد</span>
+                    </label>
+                    <label class="chip-checkbox">
+                        <input type="checkbox">
+                        <span class="chip">💬 SMS</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary btn-lg">
+                    ← السابق
+                </button>
+                <button class="btn btn-primary btn-lg btn-submit">
+                    <span class="btn-icon">📤</span>
+                    <span class="btn-text">إرسال الطلب النهائي</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+<a id="client-tracking"></a>
+## 📊 متابعة المشاريع
+
+### شاشة تفاصيل المشروع مع Timeline
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>المشروع #DP2025-0142</h3>
+        <div class="header-actions">
+            <button class="btn-icon">💬</button>
+            <button class="btn-icon">📤</button>
+            <button class="btn-icon">⋮</button>
+        </div>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Project Hero -->
+        <div class="project-hero">
+            <div class="hero-badge">📷 تصوير</div>
+            <h1 class="project-title">تصوير حفل زفاف في قاعة الورود</h1>
+            <div class="project-meta-row">
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <span>سارة أحمد</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <span>25 أغسطس 2025</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📍</span>
+                    <span>بغداد - الكرادة</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timeline Component -->
+        <div class="timeline-section">
+            <h2 class="section-title">مراحل المشروع</h2>
+            <div class="timeline">
+                <div class="timeline-track">
+                    <div class="timeline-progress" style="width: 60%;"></div>
+                </div>
+                <div class="timeline-steps">
+                    <div class="timeline-step completed">
+                        <div class="timeline-step-dot">
+                            <span class="check-icon">✓</span>
+                        </div>
+                        <div class="timeline-step-label">الطلب</div>
+                        <div class="timeline-step-date">20/08</div>
+                    </div>
+                    <div class="timeline-step completed">
+                        <div class="timeline-step-dot">
+                            <span class="check-icon">✓</span>
+                        </div>
+                        <div class="timeline-step-label">المراجعة</div>
+                        <div class="timeline-step-date">21/08</div>
+                    </div>
+                    <div class="timeline-step active">
+                        <div class="timeline-step-dot">
+                            <span class="pulse"></span>
+                        </div>
+                        <div class="timeline-step-label">التنفيذ</div>
+                        <div class="timeline-step-date">الآن</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-step-dot"></div>
+                        <div class="timeline-step-label">المعاينة</div>
+                        <div class="timeline-step-date">26/08</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-step-dot"></div>
+                        <div class="timeline-step-label">التسليم</div>
+                        <div class="timeline-step-date">27/08</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Cards -->
+        <div class="status-cards-grid">
+            <div class="status-card">
+                <div class="status-icon" style="background: var(--primary-gradient);">
+                    🎯
+                </div>
+                <div class="status-content">
+                    <div class="status-label">الحالة الحالية</div>
+                    <div class="status-value">قيد التنفيذ</div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                    📊
+                </div>
+                <div class="status-content">
+                    <div class="status-label">نسبة الإنجاز</div>
+                    <div class="status-value">60%</div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                    ⏱️
+                </div>
+                <div class="status-content">
+                    <div class="status-label">الوقت المتبقي</div>
+                    <div class="status-value">3 أيام</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Feed -->
+        <div class="activity-section">
+            <h2 class="section-title">آخر التحديثات</h2>
+            <div class="activity-feed">
+                <div class="activity-item">
+                    <div class="activity-icon">📸</div>
+                    <div class="activity-content">
+                        <div class="activity-title">بدء جلسة التصوير</div>
+                        <div class="activity-desc">بدأت سارة أحمد جلسة التصوير في الموقع</div>
+                        <div class="activity-time">منذ ساعتين</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-content">
+                        <div class="activity-title">اكتمال التحضيرات</div>
+                        <div class="activity-desc">تم تجهيز جميع المعدات والوصول للموقع</div>
+                        <div class="activity-time">منذ 4 ساعات</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">💬</div>
+                    <div class="activity-content">
+                        <div class="activity-title">رسالة من المبدع</div>
+                        <div class="activity-desc">"مرحباً، سأكون في الموقع الساعة 10 صباحاً"</div>
+                        <div class="activity-time">أمس</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="project-actions-bar">
+            <button class="btn btn-secondary">
+                <span class="btn-icon">💬</span>
+                <span class="btn-text">محادثة</span>
+            </button>
+            <button class="btn btn-secondary">
+                <span class="btn-icon">📄</span>
+                <span class="btn-text">العقد</span>
+            </button>
+            <button class="btn btn-primary">
+                <span class="btn-icon">👁️</span>
+                <span class="btn-text">معاينة الملفات</span>
+            </button>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+<a id="client-preview"></a>
+## 👁️ معاينة وموافقة
+
+### معرض المعاينة مع Watermark
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>معاينة المشروع #DP2025-0138</h3>
+        <button class="header-btn">⚙️</button>
+    </div>
+    
+    <div class="screen-content">
+        <div class="gallery-container" data-gallery>
+            <!-- Main Gallery View -->
+            <div class="gallery-main">
+                <div class="gallery-image-wrapper">
+                    <img src="/sample-image.jpg" 
+                         alt="Preview" 
+                         class="gallery-image"
+                         data-watermark>
+                    <div class="gallery-watermark">
+                        © DEPTH AGENCY - PREVIEW ONLY
+                    </div>
+                    <div class="gallery-zoom-controls">
+                        <button class="btn-icon zoom-in">🔍+</button>
+                        <button class="btn-icon zoom-out">🔍-</button>
+                        <button class="btn-icon fullscreen" data-gallery-fullscreen>⛶</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gallery Controls -->
+            <div class="gallery-controls">
+                <button class="gallery-nav-btn" data-gallery-prev>
+                    <span>◀</span>
+                    <span class="nav-text">السابق</span>
+                </button>
+                <div class="gallery-counter">
+                    الصورة <span class="current">5</span> من <span class="total">20</span>
+                </div>
+                <button class="gallery-nav-btn" data-gallery-next>
+                    <span class="nav-text">التالي</span>
+                    <span>▶</span>
+                </button>
+            </div>
+            
+            <!-- Thumbnails Grid -->
+            <div class="gallery-thumbnails">
+                <div class="gallery-thumb" data-index="1">
+                    <img src="/thumb1.jpg" alt="Thumbnail 1">
+                    <span class="thumb-number">1</span>
+                </div>
+                <div class="gallery-thumb" data-index="2">
+                    <img src="/thumb2.jpg" alt="Thumbnail 2">
+                    <span class="thumb-number">2</span>
+                </div>
+                <div class="gallery-thumb" data-index="3">
+                    <img src="/thumb3.jpg" alt="Thumbnail 3">
+                    <span class="thumb-number">3</span>
+                </div>
+                <div class="gallery-thumb active" data-index="4">
+                    <img src="/thumb4.jpg" alt="Thumbnail 4">
+                    <span class="thumb-number">4</span>
+                </div>
+                <div class="gallery-thumb" data-index="5">
+                    <img src="/thumb5.jpg" alt="Thumbnail 5">
+                    <span class="thumb-number">5</span>
+                </div>
+                <!-- More thumbnails... -->
+            </div>
+            
+            <!-- Download Options -->
+            <div class="download-section">
+                <h3 class="section-title">خيارات التنزيل</h3>
+                <div class="download-options">
+                    <button class="btn btn-secondary">
+                        <span class="btn-icon">📥</span>
+                        <span class="btn-text">تنزيل معاينة منخفضة الدقة</span>
+                        <span class="btn-badge">مجاني</span>
+                    </button>
+                    <button class="btn btn-primary" disabled>
+                        <span class="btn-icon">🔒</span>
+                        <span class="btn-text">تنزيل الأصلية</span>
+                        <span class="btn-badge">بعد الموافقة</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h3 class="section-title">الملاحظات والتعليقات</h3>
+                <div class="comment-form">
+                    <textarea class="form-textarea" 
+                              placeholder="أضف ملاحظاتك على هذه الصورة..."
+                              rows="3"></textarea>
+                    <button class="btn btn-sm btn-secondary">
+                        إضافة ملاحظة
+                    </button>
+                </div>
+                
+                <div class="comments-list">
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">أنت</span>
+                            <span class="comment-time">منذ ساعة</span>
+                        </div>
+                        <div class="comment-text">
+                            أرجو تعديل الإضاءة قليلاً في الزاوية اليمنى
+                        </div>
+                    </div>
+                    
+                    <div class="comment-item creator">
+                        <div class="comment-header">
+                            <span class="comment-author">سارة أحمد (المبدع)</span>
+                            <span class="comment-time">منذ 30 دقيقة</span>
+                        </div>
+                        <div class="comment-text">
+                            تم التعديل، يرجى المراجعة
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Approval Actions -->
+            <div class="approval-section">
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div class="alert-content">
+                        <div class="alert-title">ملاحظة مهمة</div>
+                        <div class="alert-text">
+                            الصور النهائية ستكون بدون العلامة المائية بعد الموافقة والدفع
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="approval-actions">
+                    <button class="btn btn-lg btn-success w-full">
+                        <span class="btn-icon">✅</span>
+                        <span class="btn-text">موافقة نهائية على جميع الصور</span>
+                    </button>
+                    <button class="btn btn-lg btn-secondary w-full">
+                        <span class="btn-icon">📝</span>
+                        <span class="btn-text">طلب تعديلات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+<a id="client-invoices"></a>
+## 💳 الفواتير والمدفوعات
+
+### قائمة الفواتير
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>الفواتير والمدفوعات</h3>
+        <button class="header-btn">⬇️</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Summary Cards -->
+        <div class="payment-summary">
+            <div class="summary-card-mini">
+                <div class="card-icon">💳</div>
+                <div class="card-content">
+                    <div class="card-label">إجمالي المدفوعات</div>
+                    <div class="card-value">2,750,000 IQD</div>
+                </div>
+            </div>
+            <div class="summary-card-mini">
+                <div class="card-icon">⏳</div>
+                <div class="card-content">
+                    <div class="card-label">بانتظار الدفع</div>
+                    <div class="card-value">425,000 IQD</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active">الكل (15)</button>
+            <button class="filter-tab">مدفوعة (12)</button>
+            <button class="filter-tab">معلقة (2)</button>
+            <button class="filter-tab">ملغاة (1)</button>
+        </div>
+        
+        <!-- Invoices List -->
+        <div class="invoices-list">
+            <div class="invoice-card">
+                <div class="invoice-header">
+                    <div class="invoice-id">#INV-2025-0142</div>
+                    <div class="invoice-status status-pending">معلق</div>
+                </div>
+                <div class="invoice-body">
+                    <div class="invoice-project">
+                        <span class="project-icon">📷</span>
+                        <span class="project-name">تصوير حفل زفاف</span>
+                    </div>
+                    <div class="invoice-details">
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ الإصدار:</span>
+                            <span class="detail-value">20 أغسطس 2025</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ الاستحقاق:</span>
+                            <span class="detail-value">27 أغسطس 2025</span>
+                        </div>
+                    </div>
+                    <div class="invoice-amount">
+                        <div class="amount-label">المبلغ المستحق</div>
+                        <div class="amount-value">850,000 IQD</div>
+                    </div>
+                </div>
+                <div class="invoice-actions">
+                    <button class="btn btn-sm btn-secondary">
+                        <span class="btn-icon">👁️</span>
+                        عرض التفاصيل
+                    </button>
+                    <button class="btn btn-sm btn-primary">
+                        <span class="btn-icon">💳</span>
+                        دفع الآن
+                    </button>
+                </div>
+            </div>
+            
+            <div class="invoice-card">
+                <div class="invoice-header">
+                    <div class="invoice-id">#INV-2025-0138</div>
+                    <div class="invoice-status status-paid">مدفوعة</div>
+                </div>
+                <div class="invoice-body">
+                    <div class="invoice-project">
+                        <span class="project-icon">🎬</span>
+                        <span class="project-name">مونتاج فيديو تسويقي</span>
+                    </div>
+                    <div class="invoice-details">
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ الدفع:</span>
+                            <span class="detail-value">15 أغسطس 2025</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">طريقة الدفع:</span>
+                            <span class="detail-value">تحويل بنكي</span>
+                        </div>
+                    </div>
+                    <div class="invoice-amount paid">
+                        <div class="amount-label">المبلغ المدفوع</div>
+                        <div class="amount-value">425,000 IQD</div>
+                    </div>
+                </div>
+                <div class="invoice-actions">
+                    <button class="btn btn-sm btn-secondary">
+                        <span class="btn-icon">⬇️</span>
+                        تحميل الفاتورة
+                    </button>
+                    <button class="btn btn-sm btn-ghost">
+                        <span class="btn-icon">🧾</span>
+                        الإيصال
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Note about payment -->
+        <div class="payment-note">
+            <div class="note-icon">ℹ️</div>
+            <div class="note-text">
+                <strong>ملاحظة:</strong> الدفع الإلكتروني غير متاح حالياً في الإصدار 2.0. 
+                يرجى التواصل مع فريق الدعم لتنسيق طرق الدفع البديلة.
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+<a id="client-notifications"></a>
+## 🔔 الإشعارات والرسائل
+
+### شاشة الإشعارات
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>الإشعارات</h3>
+        <div class="header-actions">
+            <button class="btn-link">قراءة الكل</button>
+            <button class="btn-icon">⚙️</button>
+        </div>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Notification Settings Quick Toggle -->
+        <div class="notification-settings-bar">
+            <span class="settings-label">تلقي الإشعارات عبر:</span>
+            <div class="toggle-chips">
+                <label class="toggle-chip active">
+                    <input type="checkbox" checked>
+                    <span>📱 التطبيق</span>
+                </label>
+                <label class="toggle-chip active">
+                    <input type="checkbox" checked>
+                    <span>📧 البريد</span>
+                </label>
+                <label class="toggle-chip">
+                    <input type="checkbox">
+                    <span>💬 SMS</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Notifications List -->
+        <div class="notification-list">
+            <!-- Unread Notification -->
+            <div class="notification-item unread">
+                <div class="notification-icon success">
+                    ✅
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        اكتمل مشروعك بنجاح!
+                    </div>
+                    <div class="notification-message">
+                        تم الانتهاء من مشروع "تصوير حفل زفاف" وجاهز للمعاينة
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">منذ 5 دقائق</span>
+                        <span class="notification-project">#DP2025-0142</span>
+                    </div>
+                </div>
+                <button class="notification-action btn btn-sm btn-primary">
+                    معاينة
+                </button>
+            </div>
+            
+            <!-- Unread with Action -->
+            <div class="notification-item unread">
+                <div class="notification-icon warning">
+                    ⚠️
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        يتطلب موافقتك
+                    </div>
+                    <div class="notification-message">
+                        عرض السعر لمشروع "مونتاج فيديو تسويقي" جاهز للمراجعة
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">منذ ساعة</span>
+                        <span class="notification-project">#DP2025-0138</span>
+                    </div>
+                </div>
+                <button class="notification-action btn btn-sm btn-primary">
+                    مراجعة
+                </button>
+            </div>
+            
+            <!-- Read Notification -->
+            <div class="notification-item">
+                <div class="notification-icon info">
+                    💬
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        رسالة جديدة من سارة أحمد
+                    </div>
+                    <div class="notification-message">
+                        "مرحباً، سأكون في الموقع غداً الساعة 10 صباحاً"
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">أمس في 3:30 م</span>
+                    </div>
+                </div>
+                <button class="notification-action btn btn-sm btn-ghost">
+                    رد
+                </button>
+            </div>
+            
+            <!-- System Notification -->
+            <div class="notification-item">
+                <div class="notification-icon system">
+                    🔔
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        تحديث النظام
+                    </div>
+                    <div class="notification-message">
+                        تم إضافة ميزات جديدة لتحسين تجربتك. اكتشف المزيد
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-time">الأسبوع الماضي</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Load More -->
+        <div class="load-more">
+            <button class="btn btn-ghost w-full">
+                عرض إشعارات أقدم
+            </button>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+<a id="client-settings"></a>
+## ⚙️ الإعدادات الشخصية
+
+### شاشة الإعدادات
+
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>الإعدادات</h3>
+        <button class="header-btn">💾</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Profile Section -->
+        <div class="settings-section">
+            <h2 class="section-title">الملف الشخصي</h2>
+            <div class="profile-editor">
+                <div class="avatar-upload">
+                    <img src="/avatar.jpg" alt="Profile" class="avatar-preview">
+                    <button class="avatar-change-btn">
+                        <span class="icon">📷</span>
+                        <span class="text">تغيير</span>
+                    </button>
+                </div>
+                
+                <div class="profile-fields">
+                    <div class="form-group">
+                        <label class="form-label">اسم الشركة</label>
+                        <input type="text" 
+                               class="form-input" 
+                               value="شركة الأمل للتجارة">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">اسم المسؤول</label>
+                        <input type="text" 
+                               class="form-input" 
+                               value="أحمد الخالدي">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <div class="input-with-badge">
+                            <input type="email" 
+                                   class="form-input" 
+                                   value="ahmed@alamal.com">
+                            <span class="input-badge verified">✓ مُحقق</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف</label>
+                        <div class="input-with-badge">
+                            <input type="tel" 
+                                   class="form-input" 
+                                   value="07501234567">
+                            <span class="input-badge verified">✓ مُحقق</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Settings -->
+        <div class="settings-section">
+            <h2 class="section-title">الأمان</h2>
+            <div class="settings-list">
+                <div class="settings-item">
+                    <div class="settings-icon">🔐</div>
+                    <div class="settings-content">
+                        <div class="settings-title">كلمة المرور</div>
+                        <div class="settings-desc">آخر تغيير منذ 3 أشهر</div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary">تغيير</button>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-icon">🔑</div>
+                    <div class="settings-content">
+                        <div class="settings-title">التحقق بخطوتين</div>
+                        <div class="settings-desc">مفعّل عبر SMS</div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary">إدارة</button>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-icon">📱</div>
+                    <div class="settings-content">
+                        <div class="settings-title">الأجهزة الموثوقة</div>
+                        <div class="settings-desc">3 أجهزة نشطة</div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary">عرض</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preferences -->
+        <div class="settings-section">
+            <h2 class="section-title">التفضيلات</h2>
+            <div class="settings-list">
+                <div class="settings-item">
+                    <div class="settings-icon">🌐</div>
+                    <div class="settings-content">
+                        <div class="settings-title">اللغة</div>
+                        <div class="settings-desc">العربية</div>
+                    </div>
+                    <select class="form-select form-select-sm">
+                        <option selected>العربية</option>
+                        <option>English</option>
+                        <option>كوردی</option>
+                    </select>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-icon">🌙</div>
+                    <div class="settings-content">
+                        <div class="settings-title">وضع العرض</div>
+                        <div class="settings-desc">تلقائي حسب النظام</div>
+                    </div>
+                    <div class="theme-toggle">
+                        <button class="theme-option">☀️</button>
+                        <button class="theme-option active">🌓</button>
+                        <button class="theme-option">🌙</button>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-icon">💰</div>
+                    <div class="settings-content">
+                        <div class="settings-title">العملة المفضلة</div>
+                        <div class="settings-desc">دينار عراقي (IQD)</div>
+                    </div>
+                    <select class="form-select form-select-sm">
+                        <option selected>IQD</option>
+                        <option>USD</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="settings-section danger">
+            <h2 class="section-title">منطقة الخطر</h2>
+            <div class="danger-actions">
+                <button class="btn btn-outline-danger">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">حذف الحساب</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+---
+
+## 📊 ملاحظات التوافق والتنفيذ
+
+### ✅ التحسينات المنفذة:
+1. **إزالة جميع مخططات ASCII** - تم استبدالها بـ HTML/CSS احترافي
+2. **مكونات تفاعلية حديثة** - أزرار، نماذج، معارض، timelines
+3. **تصميم متجاوب** - يعمل على جميع الأحجام (Mobile, Tablet, Desktop)
+4. **دعم RTL كامل** - متوافق مع اللغة العربية
+5. **إمكانية الوصول** - ARIA labels وfocus states
+6. **أنيميشنز احترافية** - transitions وanimations سلسة
+7. **Dark Mode** - دعم كامل للوضع الداكن
+
+### 🔧 التقنيات المستخدمة:
+- **HTML5** - Semantic markup
+- **CSS3** - Custom properties, Grid, Flexbox
+- **JavaScript ES6+** - Classes, Modules, Async/Await
+- **Design System** - متغيرات موحدة للألوان والمسافات
+
+### 📱 التوافق مع المتطلبات:
+- ✅ **OTP System**: 6 أرقام، 5 دقائق صلاحية
+- ✅ **File Upload**: 2GB حد أقصى، chunked upload
+- ✅ **Pricing**: التقريب لأقرب 500 د.ع
+- ✅ **Notifications**: In-App, Email, SMS
+- ✅ **Project Status**: Timeline تفاعلي
+- ✅ **Watermark**: معاينة احترافية مع علامة مائية
+
+### 🚀 الخطوات التالية:
+1. دمج الملف مع نظام التصميم (CSS/JS)
+2. تطبيق التفاعلات JavaScript
+3. ربط مع Backend APIs
+4. اختبار على أجهزة مختلفة
+5. تحسين الأداء والسرعة
+
+---
+
+**الحالة:** ✅ تم تطوير الملف بالكامل وإزالة جميع مخططات ASCII
+**الإصدار:** 2.0 Professional
+**آخر تحديث:** أغسطس 2025
