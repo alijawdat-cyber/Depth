@@ -2,71 +2,60 @@
    DEPTH PLATFORM - PROFESSIONAL SCREEN STYLES V3.0
    ======================================== */
 
-/* === MAIN CONTENT (scoped) === */
-.html-preview-frame .main-content,
-.screen-mockup .main-content {
-    /* Color System */
+/* === THEME TOKENS (GLOBAL) === */
+:root {
+    /* Brand Colors */
     --primary: #6C2BFF;
     --primary-light: #8E5BFF;
     --primary-dark: #5020CC;
     --primary-gradient: linear-gradient(135deg, #6C2BFF 0%, #8E5BFF 100%);
-    
-.html-preview-frame .main-content.collapsed,
-.screen-mockup .main-content.collapsed {
+
+    /* Secondary (optional, rarely used directly) */
+    --secondary: #06B6D4; /* cyan */
     --secondary-light: #33DFFF;
     --secondary-dark: #00A8CC;
-    
-/* === MINI KPI === */
-.html-preview-frame .mini-kpi-scroll,
-.screen-mockup .mini-kpi-scroll {
+
+    /* Semantic */
+    --success: #10B981;
+    --success-light: #34D399;
     --success-dark: #059669;
-    
     --warning: #F59E0B;
     --warning-light: #FCD34D;
     --warning-dark: #D97706;
-    
     --danger: #EF4444;
-.html-preview-frame .mini-kpi,
-.screen-mockup .mini-kpi {
     --danger-dark: #DC2626;
-    
     --info: #3B82F6;
     --info-light: #60A5FA;
     --info-dark: #2563EB;
-    
-    /* Neutral Colors */
+
+    /* Neutral */
     --gray-50: #F9FAFB;
     --gray-100: #F3F4F6;
     --gray-200: #E5E7EB;
-.html-preview-frame .mini-kpi-value,
-.screen-mockup .mini-kpi-value {
+    --gray-300: #D1D5DB;
     --gray-400: #9CA3AF;
     --gray-500: #6B7280;
     --gray-600: #4B5563;
     --gray-700: #374151;
     --gray-800: #1F2937;
     --gray-900: #111827;
-.html-preview-frame .mini-kpi-label,
-.screen-mockup .mini-kpi-label {
-    /* Light Theme */
+
+    /* Light Theme Surfaces & Text */
     --bg-primary: #FFFFFF;
     --bg-secondary: #F9FAFB;
     --bg-tertiary: #F3F4F6;
     --bg-overlay: rgba(0, 0, 0, 0.5);
-.html-preview-frame .mini-kpi-change,
-.screen-mockup .mini-kpi-change {
     --text-primary: #111827;
     --text-secondary: #4B5563;
     --text-tertiary: #9CA3AF;
     --text-inverse: #FFFFFF;
-.html-preview-frame .mini-kpi-change.positive,
-.screen-mockup .mini-kpi-change.positive {
+
+    /* Borders */
     --border-primary: #E5E7EB;
     --border-secondary: #D1D5DB;
     --border-focus: var(--primary);
-.html-preview-frame .mini-kpi-change.negative,
-.screen-mockup .mini-kpi-change.negative {
-    /* Shadows */
+
+    /* Elevation */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 6px -2px rgba(0, 0, 0, 0.08);
@@ -75,21 +64,21 @@
     --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
     --shadow-glow: 0 0 20px rgba(108, 43, 255, 0.3);
-    
-    /* Transitions */
+
+    /* Motion */
     --transition-fast: 150ms ease;
     --transition-base: 300ms ease;
     --transition-slow: 500ms ease;
     --transition-spring: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    
-    /* Border Radius */
+
+    /* Radius */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
     --radius-full: 9999px;
-    
+
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -97,8 +86,8 @@
     --space-lg: 1.5rem;
     --space-xl: 2rem;
     --space-2xl: 3rem;
-    
-    /* Z-Index */
+
+    /* Layers */
     --z-base: 0;
     --z-dropdown: 100;
     --z-sticky: 200;
@@ -680,14 +669,20 @@ body {
 }
 
 /* === SIDEBAR (scoped to previews and screen mockups) === */
+/* عزل السايدبار داخل إطار المعاينة: نجعله مطلق داخل الحاوية بدل ثابت على نافذة الصفحة */
+.html-preview-frame,
+.screen-mockup {
+    position: relative;
+}
+
 .html-preview-frame .sidebar,
 .screen-mockup .sidebar {
     width: 280px;
-    height: 100vh;
+    height: 100%; /* بدال 100vh حتى يبقى داخل إطار المعاينة */
     background: var(--bg-primary);
     border-left: 1px solid var(--border-primary);
     padding: var(--space-lg);
-    position: fixed;
+    position: absolute; /* بدال fixed حتى ما يطلع خارج المعاينة */
     right: 0;
     top: 0;
     z-index: var(--z-sticky);
@@ -833,8 +828,15 @@ body {
 .screen-mockup .main-content {
     margin-right: 280px;
     padding: var(--space-2xl);
-    min-height: 100vh;
+    min-height: 100%; /* حتى ينسجم ويتمد داخل حاوية المعاينة */
     background: var(--bg-secondary);
+    overflow: auto; /* تمرير داخلي للمحتوى داخل المعاينة */
+}
+
+/* منع تأثير سايدبار الموقع على معاينات .main-content داخل الإطار */
+body.sidebar-open .html-preview-frame .main-content,
+body.sidebar-open .screen-mockup .main-content {
+    margin-right: 280px !important; /* خليه ثابت ضمن إطار المعاينة */
 }
 
 .html-preview-frame .main-content.collapsed,
