@@ -450,8 +450,13 @@ class DepthDocs {
     try { UIComponents.annotateColorChips(docContent); } catch (_) {}
     // أسهم ترابطية وتchips للتنقل بين الأقسام/الصفحات من كتل flowmap
     try { UIComponents.enhanceFlowLinks(docContent); } catch (_) {}
-    // تهيئة التفاعلات للشاشات (OTP وغيرها)
-    try { window.Mockups && window.Mockups.initOtp && window.Mockups.initOtp(docContent); } catch (_) {}
+    // تهيئة التفاعلات للشاشات (OTP، Gallery)
+    try {
+        if (window.Mockups) {
+            window.Mockups.initOtp && window.Mockups.initOtp(docContent);
+            window.Mockups.initGallery && window.Mockups.initGallery(docContent);
+        }
+    } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
     if (wrapper) {

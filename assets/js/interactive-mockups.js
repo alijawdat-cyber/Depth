@@ -64,6 +64,26 @@
     });
   }
 
+  function initGallery(root=document){
+    const galleries = root.querySelectorAll('.gallery');
+    galleries.forEach(g => {
+      const thumbs = g.querySelectorAll('.thumb');
+      const main = g.querySelector('.gallery-main .current');
+      const prev = g.querySelector('[data-prev]');
+      const next = g.querySelector('[data-next]');
+      let idx = 0;
+      const set = (i) => {
+        idx = (i+thumbs.length)%thumbs.length;
+        thumbs.forEach((t, k)=> t.classList.toggle('active', k===idx));
+        if (main) main.textContent = `صورة ${idx+1}`;
+      };
+      thumbs.forEach((t, i)=> t.addEventListener('click', ()=> set(i)));
+      prev && prev.addEventListener('click', ()=> set(idx-1));
+      next && next.addEventListener('click', ()=> set(idx+1));
+      set(0);
+    });
+  }
+
   // expose
-  window.Mockups = { initOtp };
+  window.Mockups = { initOtp, initGallery };
 })();
