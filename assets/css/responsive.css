@@ -64,8 +64,9 @@
         padding-right: 14px; 
     }
     
+    /* ادفع المحتوى لليسار بمقدار عرض السايدبار حتى ما يتغطي */
     body.sidebar-open .main-content { 
-        margin-right: 0; 
+        margin-right: var(--sidebar-width); 
     }
     
     /* Desktop overlay should be click-catcher only (no dim) */
@@ -110,8 +111,9 @@
         display: block; 
     }
     
+    /* عند فتح السايدبار على اللابتوب، احجز مسافة يمين المحتوى */
     body.sidebar-open .main-content { 
-        margin-right: 0; 
+        margin-right: var(--sidebar-width); 
     }
 }
 
