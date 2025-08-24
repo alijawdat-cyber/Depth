@@ -230,9 +230,9 @@ class DepthDocs {
         }
     }
 
-    // Swipe gestures (RTL: السحب من يمين الشاشة لفتح، والسحب يمين لإغلاق)
+    // Swipe gestures (RTL): فتح من أي مكان بالسحب يمين→يسار، وغلق بالسحب يسار→يمين
     setupSwipeGestures() {
-        const EDGE = 24; // بكسلات من يمين الشاشة كبداية فتح
+        const EDGE = 24; // لم يعد ضروري للفتح، بس أبقيناه احتياط لبعض الحالات
         const THRESH_OPEN = 50; // المسافة المطلوبة لفتح
         const THRESH_CLOSE = 50; // المسافة لإغلاق
         const MAX_SLOPE_Y = 30; // السماح بانحراف رأسي بسيط
@@ -246,9 +246,22 @@ class DepthDocs {
             const sidebar = document.getElementById('sidebar');
             const ov = document.getElementById('sidebar-overlay');
             const sidebarRect = sidebar ? sidebar.getBoundingClientRect() : null;
-            const rightEdge = window.innerWidth - EDGE;
-            // فتح: من حافة اليمين والشريط مغلق
-            if (!this.sidebarOpen && startX >= rightEdge) {
+            // تجنب البدء فوق عناصر قابلة للتمرير الأفقي/حقول إدخال حتى لا نفتح بالغلط
+            let blocked = false; 
+            try {
+                const target = e.target;
+                const isForm = target && (/^(INPUT|TEXTAREA|SELECT)$/).test(target.tagName);
+                if (isForm) blocked = true;
+                let node = target && target.nodeType === 1 ? target : null; let hops = 0;
+                while (node && node !== document.body && hops < 6) {
+                    const cs = window.getComputedStyle(node);
+                    if ((node.scrollWidth - node.clientWidth) > 8 && (cs.overflowX === 'auto' || cs.overflowX === 'scroll')) { blocked = true; break; }
+                    if (node.classList && (node.classList.contains('mobile-v-rail') || node.classList.contains('mobile-toc'))) { blocked = true; break; }
+                    node = node.parentElement; hops++;
+                }
+            } catch (_) {}
+            // فتح: من أي مكان إذا مو محظور والسايدبار مسدود
+            if (!this.sidebarOpen && !blocked) {
                 mode = 'maybe-open';
             } else if (this.sidebarOpen) {
                 // إغلاق: إذا البداية داخل السايدبار أو على الأوفرلاي
