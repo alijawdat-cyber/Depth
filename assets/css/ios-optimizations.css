@@ -1,0 +1,372 @@
+/* =============== iOS OPTIMIZATIONS CSS =============== */
+/* Performance and Compatibility Fixes for iOS Safari */
+
+/* ===== iOS Detection and Base Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* iOS-specific optimizations */
+    
+    /* Disable unwanted iOS behaviors */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Allow text selection where needed */
+    .doc-content,
+    .doc-content p,
+    .doc-content li,
+    .doc-content td,
+    .doc-content pre,
+    .doc-content code,
+    input,
+    textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+    
+    /* Font rendering optimizations */
+    html,
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+    
+    /* Prevent zoom on form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* ===== Smooth Scrolling Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Smooth momentum scrolling */
+    .doc-content .table-wrap,
+    .sidebar-nav,
+    .toc-list,
+    .floating-toc {
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* Enhanced scrolling for main content */
+    .main-content,
+    .doc-content {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Sticky positioning optimizations */
+    .floating-toc,
+    .mobile-v-thumb {
+        position: -webkit-sticky;
+        position: sticky;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+}
+
+/* ===== Safe Area Support ===== */
+@supports (padding: max(0px)) {
+    /* Main content safe areas */
+    .doc-content {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+    
+    /* Header safe areas */
+    .header-container {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+    
+    /* Sidebar safe areas */
+    .sidebar {
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-left: max(0px, env(safe-area-inset-left));
+    }
+    
+    /* Mobile TOC safe areas */
+    .mobile-toc {
+        left: max(8px, env(safe-area-inset-left));
+    }
+    
+    /* Content wrapper safe areas */
+    .content-wrapper {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+    
+    /* Mobile-specific safe areas */
+    @media (max-width: 767px) {
+        .mobile-toc {
+            left: max(8px, calc(env(safe-area-inset-left) + 8px));
+        }
+        
+        .content-wrapper {
+            padding-left: max(12px, env(safe-area-inset-left));
+            padding-right: max(12px, env(safe-area-inset-right));
+        }
+        
+        .doc-content {
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+        }
+    }
+}
+
+/* ===== Performance Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* GPU acceleration for interactive elements */
+    .btn,
+    .home-card,
+    .doc-nav-link,
+    .nav-item,
+    .toc-item a {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+    
+    /* Optimize table scrolling */
+    .doc-content table {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* Optimize animations */
+    .animate-slide-up,
+    .animate-slide-down,
+    .animate-slide-right,
+    .animate-slide-left,
+    .animate-zoom-in,
+    .animate-fade-in {
+        will-change: transform, opacity;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+}
+
+/* ===== Touch and Interaction Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Better tap targets */
+    .btn,
+    .nav-item,
+    .toc-item a,
+    .doc-nav-link,
+    .home-card {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Improved touch feedback */
+    .btn:active,
+    .nav-item:active,
+    .toc-item a:active {
+        -webkit-transform: translateZ(0) scale(0.98);
+        transform: translateZ(0) scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Prevent double-tap zoom on specific elements */
+    .header,
+    .sidebar,
+    .floating-toc,
+    .mobile-toc {
+        touch-action: manipulation;
+    }
+    
+    /* Allow pinch-zoom on main content */
+    .doc-content {
+        touch-action: auto;
+    }
+}
+
+/* ===== iOS Dark Mode Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    @media (prefers-color-scheme: dark) {
+        /* Enhanced contrast for iOS dark mode */
+        .doc-content {
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
+        
+        /* Better visibility for interactive elements */
+        .btn,
+        .home-card,
+        .doc-nav-link {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Improved text rendering */
+        .doc-content h1,
+        .doc-content h2,
+        .doc-content h3 {
+            -webkit-font-smoothing: antialiased;
+        }
+    }
+}
+
+/* ===== Memory and Battery Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Reduce repaints for off-screen elements */
+    .sidebar:not(.active) {
+        visibility: hidden;
+    }
+    
+    .sidebar.active {
+        visibility: visible;
+    }
+    
+    /* Optimize images and media */
+    img,
+    video,
+    .ds-image-grid img {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* Reduce compositing layers when not needed */
+    .doc-content table:not(:hover) {
+        will-change: auto;
+    }
+    
+    .doc-content table:hover {
+        will-change: transform;
+    }
+}
+
+/* ===== iOS Orientation Change Fixes ===== */
+@supports (-webkit-touch-callout: none) {
+    @media screen and (orientation: landscape) {
+        /* Adjust layout for landscape */
+        .mobile-toc {
+            display: none !important;
+        }
+        
+        .content-wrapper {
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+        }
+    }
+    
+    @media screen and (orientation: portrait) {
+        /* Ensure proper spacing in portrait */
+        .doc-content {
+            margin-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* ===== iOS Keyboard Appearance Fixes ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Prevent viewport jumping when keyboard appears */
+    .fixed-viewport {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+    }
+    
+    /* Better input focus handling */
+    input:focus,
+    textarea:focus {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(94, 23, 235, 0.2);
+    }
+}
+
+/* ===== iOS Performance Monitoring Helpers ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Debug helpers (remove in production) */
+    .debug-gpu {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        outline: 1px solid rgba(255, 0, 0, 0.3);
+    }
+    
+    .debug-repaint {
+        background: rgba(0, 255, 0, 0.1);
+    }
+    
+    /* Performance critical elements */
+    .perf-critical {
+        will-change: transform, opacity;
+        contain: layout style paint;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+}
+
+/* ===== iOS 16+ Specific Features ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Dynamic Island safe area (iPhone 14 Pro/Pro Max and newer) */
+    @media screen and (min-device-width: 393px) and (max-device-width: 430px) {
+        .header {
+            padding-top: max(8px, env(safe-area-inset-top));
+        }
+    }
+    
+    /* Enhanced hover effects for Magic Mouse/Trackpad */
+    @media (hover: hover) and (pointer: fine) {
+        .btn:hover,
+        .home-card:hover,
+        .nav-item:hover {
+            -webkit-transform: translateZ(0) translateY(-1px);
+            transform: translateZ(0) translateY(-1px);
+        }
+    }
+}
+
+/* ===== Accessibility Improvements for iOS ===== */
+@supports (-webkit-touch-callout: none) {
+    /* VoiceOver optimizations */
+    [aria-hidden="true"] {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Better focus indicators */
+    .btn:focus-visible,
+    .nav-item:focus-visible,
+    .doc-nav-link:focus-visible {
+        outline: 3px solid rgba(94, 23, 235, 0.6);
+        outline-offset: 2px;
+    }
+    
+    /* Improved contrast for low vision */
+    @media (prefers-contrast: high) {
+        .btn,
+        .home-card,
+        .doc-nav-link {
+            border-width: 2px;
+        }
+    }
+    
+    /* Respect reduced transparency */
+    @media (prefers-reduced-transparency: reduce) {
+        .home-card,
+        .floating-toc,
+        .btn {
+            backdrop-filter: none;
+            background-color: var(--bg);
+        }
+    }
+}

@@ -49,7 +49,49 @@
     max-width: 1200px; 
 }
 
-/* ===== Device Frames ===== */
+/* =============== UI LIBRARY CSS =============== */
+/* Component Library and Interactive Demo Elements */
+
+/* ===== Viewport Control Toolbar ===== */
+.viewport-toolbar { 
+    display: inline-flex; 
+    gap: 6px; 
+    align-items: center; 
+    border: 1px solid var(--border); 
+    background: var(--bg); 
+    border-radius: 10px; 
+    padding: 6px 8px; 
+    box-shadow: var(--shadow); 
+    margin: 8px 0 12px; 
+}
+
+.viewport-toolbar .vp-label { 
+    font-weight: 600; 
+    color: var(--text-secondary); 
+    font-size: 12px; 
+}
+
+.viewport-toolbar button { 
+    border: 1px solid var(--border); 
+    background: var(--bg-secondary); 
+    color: var(--text); 
+    border-radius: 8px; 
+    padding: 6px 10px; 
+    font-size: 12px; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+}
+
+.viewport-toolbar button.active { 
+    background: var(--primary); 
+    color: #fff; 
+    border-color: transparent; 
+}
+
+.viewport-toolbar button:hover:not(.active) {
+    background: var(--bg);
+    transform: translateY(-1px);
+}
 .device-frame { 
     margin: 12px auto; 
     border: 1px solid var(--border); 

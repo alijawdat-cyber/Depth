@@ -386,6 +386,25 @@ body.is-home .doc-footer {
     }
 }
 
+/* ===== Performance Optimizations ===== */
+@supports (-webkit-touch-callout: none) {
+    /* iOS-specific smooth scrolling */
+    .doc-content .table-wrap,
+    .sidebar-nav,
+    .toc-list {
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* Sticky positioning optimizations */
+    .floating-toc {
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        will-change: transform;
+    }
+}
+
 /* ===== Responsive Token Components ===== */
 @media (max-width: 768px) {
     .spacing-item { 
