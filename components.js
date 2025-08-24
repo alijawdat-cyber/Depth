@@ -1208,6 +1208,253 @@ class UIComponents {
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     }
 
+    // =============== Design Tokens Enhancer (Colors / Shadows / Typography) ===============
+    static enhanceDesignTokens(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+
+        // Helper: find the first <pre><code> after a heading that matches a label
+        const findCodeAfterHeading = (includesText) => {
+            const heads = Array.from(root.querySelectorAll('h2, h3'));
+            const target = heads.find(h => (h.textContent || '').toLowerCase().includes(includesText));
+            if (!target) return null;
+            // walk next siblings until we hit a pre>code
+            let el = target.nextElementSibling;
+            while (el) {
+                if (el.matches('pre') && el.querySelector('code')) return el.querySelector('code');
+                // stop when another heading encountered
+                if (/^H[1-6]$/.test(el.tagName)) break;
+                el = el.nextElementSibling;
+            }
+            return null;
+        };
+
+        // Colors
+        try {
+            const colorCode = findCodeAfterHeading('tokens — colors');
+            if (colorCode) {
+                const text = colorCode.textContent || '';
+                const colors = UIComponents.extractColorTokens(text);
+                if (colors.length) {
+                    const palette = UIComponents.renderColorPalette(colors);
+                    const hostPre = colorCode.closest('pre');
+                    hostPre && hostPre.after(palette);
+                }
+            }
+        } catch (_) {}
+
+        // Typography
+        try {
+            const typoCode = findCodeAfterHeading('tokens — typography');
+            if (typoCode) {
+                const text = typoCode.textContent || '';
+                const stacks = UIComponents.extractTypographyStacks(text);
+                if (stacks && (stacks.ar || stacks.en)) {
+                    const demo = UIComponents.renderTypographyPreview(stacks);
+                    const hostPre = typoCode.closest('pre');
+                    hostPre && hostPre.after(demo);
+                }
+            } else {
+                // fallback: from bullet list lines that include Arabic:/English:
+                const lis = Array.from(root.querySelectorAll('li'));
+                const stacks = { ar: '', en: '' };
+                lis.forEach(li => {
+                    const t = (li.textContent || '').trim();
+                    if (t.toLowerCase().startsWith('arabic:')) stacks.ar = t.split(':').slice(1).join(':').trim();
+                    if (t.toLowerCase().startsWith('english:')) stacks.en = t.split(':').slice(1).join(':').trim();
+                });
+                if (stacks.ar || stacks.en) {
+                    const demo = UIComponents.renderTypographyPreview(stacks);
+                    // append after the list block
+                    const anyLi = lis[0] && lis[0].closest('ul, ol');
+                    anyLi && anyLi.after(demo);
+                }
+            }
+        } catch (_) {}
+
+        // Shadows / Elevation
+        try {
+            const elevCode = findCodeAfterHeading('tokens — spacing & radius') || findCodeAfterHeading('tokens — elevation') || findCodeAfterHeading('elevation');
+            const firstCssCode = elevCode || root.querySelector('pre code.language-css, pre code[class*="css"]');
+            if (firstCssCode) {
+                const text = firstCssCode.textContent || '';
+                const shadows = UIComponents.extractShadowTokens(text);
+                if (shadows.length) {
+                    const grid = UIComponents.renderShadowGrid(shadows);
+                    const hostPre = firstCssCode.closest('pre');
+                    hostPre && hostPre.after(grid);
+                }
+            }
+        } catch (_) {}
+    }
+
+    // ---- Parsers ----
+    static extractColorTokens(cssText) {
+        const colors = [];
+        const lines = (cssText || '').split(/\n|;|\r/);
+        const colorRe = /(#[0-9a-fA-F]{3,8})|rgb[a]?\([^\)]*\)|hsl[a]?\([^\)]*\)/;
+        lines.forEach(line => {
+            const m = colorRe.exec(line);
+            if (!m) return;
+            // try extract var name like --color-primary: #...
+            const nameMatch = /(--[\w-]+)\s*:/.exec(line);
+            const name = nameMatch ? nameMatch[1] : (line.trim().split(':')[0] || '').trim();
+            const value = m[0];
+            if (value) colors.push({ name, value });
+        });
+        // dedupe by value+name
+        const seen = new Set();
+        return colors.filter(c => {
+            const k = `${c.name}|${c.value}`;
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+        }).slice(0, 64);
+    }
+
+    static extractTypographyStacks(cssText) {
+        const stacks = { ar: '', en: '' };
+        // e.g. ; font-ar: 'Dubai', system-ui, ...; font-en: 'Inter', ...
+        const ar = /font-ar\s*:\s*([^;\n]+)/i.exec(cssText);
+        const en = /font-en\s*:\s*([^;\n]+)/i.exec(cssText);
+        if (ar) stacks.ar = ar[1].trim();
+        if (en) stacks.en = en[1].trim();
+        return stacks;
+    }
+
+    static extractShadowTokens(cssText) {
+        const res = [];
+        const lines = (cssText || '').split(/\n|;|\r/);
+        lines.forEach(line => {
+            if (/shadow\s*:\s*/i.test(line)) {
+                const nameMatch = /(--[\w-]+)\s*:/.exec(line);
+                const name = nameMatch ? nameMatch[1] : 'shadow';
+                const value = line.split(':').slice(1).join(':').trim();
+                if (value) res.push({ name, value });
+            }
+        });
+        // no tokens? fall back to typical small shadow var
+        if (!res.length) {
+            const m = /--shadow\s*:\s*([^;\n]+)/i.exec(cssText || '');
+            if (m) res.push({ name: '--shadow', value: m[1].trim() });
+        }
+        return res.slice(0, 12);
+    }
+
+    // ---- Renderers ----
+    static renderColorPalette(colors) {
+        const grid = document.createElement('div');
+        grid.className = 'token-palette';
+
+        const contrastRatio = (hex) => {
+            // compute contrast vs white/black quickly
+            const parse = (c) => {
+                // supports #RGB, #RRGGBB, rgba(), hsl() via canvas
+                const ctx = UIComponents._c2d || (UIComponents._c2d = document.createElement('canvas').getContext('2d'));
+                try { ctx.fillStyle = c; } catch { ctx.fillStyle = '#000'; }
+                const s = ctx.fillStyle; // normalized rgb(a)
+                const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(s);
+                if (!m) return { r: 0, g: 0, b: 0 };
+                const r = parseInt(m[1]);
+                const g = parseInt(m[2]);
+                const b = parseInt(m[3]);
+                return { r, g, b };
+            };
+            const { r, g, b } = parse(hex);
+            const lum = (v) => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            };
+            const L = 0.2126 * lum(r) + 0.7152 * lum(g) + 0.0722 * lum(b);
+            const Lwhite = 1, Lblack = 0;
+            const cW = (Lwhite + 0.05) / (L + 0.05);
+            const cB = (L + 0.05) / (Lblack + 0.05);
+            return cB > cW ? { color: '#000', ratio: cB } : { color: '#fff', ratio: cW };
+        };
+
+        colors.forEach(({ name, value }) => {
+            const card = document.createElement('div');
+            card.className = 'token-swatch';
+            const header = document.createElement('div');
+            header.className = 'swatch-color';
+            header.style.background = value;
+            const cr = contrastRatio(value);
+            header.style.color = cr.color;
+            header.textContent = value;
+            const body = document.createElement('div');
+            body.className = 'swatch-meta';
+            const n = document.createElement('div');
+            n.className = 'swatch-name';
+            n.textContent = name || 'color';
+            const copy = document.createElement('button');
+            copy.type = 'button';
+            copy.className = 'swatch-copy';
+            copy.setAttribute('aria-label', 'نسخ اللون');
+            copy.innerHTML = '<i data-lucide="copy"></i>';
+            copy.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try { await navigator.clipboard.writeText(value); copy.classList.add('copied'); setTimeout(()=>copy.classList.remove('copied'), 1000); } catch(_) {}
+            });
+            body.appendChild(n);
+            body.appendChild(copy);
+            card.appendChild(header);
+            card.appendChild(body);
+            grid.appendChild(card);
+        });
+
+        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        return grid;
+    }
+
+    static renderShadowGrid(shadows) {
+        const grid = document.createElement('div');
+        grid.className = 'shadow-grid';
+        shadows.forEach(({ name, value }) => {
+            const card = document.createElement('div');
+            card.className = 'shadow-card';
+            const box = document.createElement('div');
+            box.className = 'shadow-box';
+            box.style.boxShadow = value;
+            const meta = document.createElement('div');
+            meta.className = 'shadow-meta';
+            meta.textContent = `${name}: ${value}`;
+            card.appendChild(box);
+            card.appendChild(meta);
+            grid.appendChild(card);
+        });
+        return grid;
+    }
+
+    static renderTypographyPreview(stacks) {
+        const wrap = document.createElement('div');
+        wrap.className = 'typography-preview';
+        const mk = (label, stack, sample, dir = 'rtl') => {
+            if (!stack) return null;
+            const card = document.createElement('div');
+            card.className = 'typo-card';
+            const title = document.createElement('div');
+            title.className = 'typo-title';
+            title.textContent = `${label}`;
+            const text = document.createElement('div');
+            text.className = 'typo-sample';
+            text.textContent = sample;
+            text.style.fontFamily = stack;
+            text.setAttribute('dir', dir);
+            const stackEl = document.createElement('div');
+            stackEl.className = 'typo-stack';
+            stackEl.textContent = stack;
+            card.appendChild(title);
+            card.appendChild(text);
+            card.appendChild(stackEl);
+            return card;
+        };
+        const ar = mk('Arabic', stacks.ar, 'مثال نص عربي — وزن عادي 16px، للمعاينة.', 'rtl');
+        const en = mk('English', stacks.en, 'The quick brown fox jumps over the lazy dog. 16px regular.', 'ltr');
+        ar && wrap.appendChild(ar);
+        en && wrap.appendChild(en);
+        return wrap;
+    }
+
     // =============== Enhance tables: wrap, sticky head, optional sticky first column ===============
     static enhanceTables(rootEl) {
         const root = rootEl || document.getElementById('doc-content');

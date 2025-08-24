@@ -1,0 +1,68 @@
+documentation
+├── 00-overview
+│   └── 00-introduction.md
+├── 01-requirements
+│   └── 00-requirements-v2.0.md
+├── 02-database
+│   ├── 00-data-dictionary.md
+│   ├── 01-database-schema.md
+│   └── 02-indexes-and-queries.md
+├── 03-api
+│   ├── admin
+│   │   ├── 01-admin-panel.md
+│   │   ├── 02-governance.md
+│   │   └── 03-seeds-management.md
+│   ├── core
+│   │   ├── 00-api-conventions.md
+│   │   ├── 01-authentication.md
+│   │   ├── 02-rate-limiting.md
+│   │   ├── 03-websockets.md
+│   │   └── 04-error-handling.md
+│   ├── features
+│   │   ├── 01-creators.md
+│   │   ├── 02-clients.md
+│   │   ├── 03-projects.md
+│   │   ├── 04-pricing.md
+│   │   ├── 05-storage.md
+│   │   ├── 06-notifications.md
+│   │   ├── 07-messaging.md
+│   │   └── 08-salaried-employees.md
+│   └── integrations
+│       ├── 01-external-services.md
+│       ├── 02-webhooks.md
+│       └── 03-advanced-technical.md
+├── 04-development
+│   ├── 00-getting-started.md
+│   ├── 01-local-setup.md
+│   ├── 02-environment-variables.md
+│   ├── 03-development-workflow.md
+│   └── 04-testing-strategy.md
+├── 05-mobile
+│   └── 00-mobile-overview.md
+├── 06-frontend
+│   ├── 00-frontend-overview.md
+│   ├── 01-design-tokens.md
+│   ├── 02-design-system.md
+│   ├── 02-performance-and-a11y.md
+│   └── 03-component-library.md
+├── 07-security
+│   ├── 00-security-overview.md
+│   ├── 01-threat-model.md
+│   └── 02-key-management.md
+├── 08-operations
+│   ├── 00-operations-overview.md
+│   ├── 01-deployment.md
+│   ├── 02-incident-response.md
+│   ├── 03-monitoring.md
+│   ├── 04-backup-and-restore.md
+│   └── 05-disaster-recovery.md
+└── 99-reference
+    ├── 00-resources.md
+    ├── 01-glossary.md
+    ├── 02-enums-standard.md
+    ├── 03-link-alias-mapping.md
+    ├── 04-naming-conventions.md
+    ├── 05-roles-matrix.md
+    └── 06-terminology-glossary-ar.md
+
+15 directories, 51 files

@@ -1464,3 +1464,24 @@ html, body { max-width: 100vw; overflow-x: hidden; }
         }
     }
 }
+
+/* =============== Design Tokens UI (palette, shadows, typography) =============== */
+.token-palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 12px 0 16px; }
+.token-swatch { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg); box-shadow: var(--shadow); }
+.token-swatch .swatch-color { height: 84px; display: flex; align-items: flex-end; justify-content: flex-start; padding: 8px 10px; font-weight: 600; letter-spacing: .2px; border-bottom: 1px solid var(--border); }
+.token-swatch .swatch-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; }
+.swatch-name { font-size: 12px; color: var(--text-secondary); direction: ltr; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.swatch-copy { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.swatch-copy:hover { background: color-mix(in oklab, var(--primary) 6%, var(--bg)); color: var(--text); }
+.swatch-copy.copied { background: #22c55e; color: #fff; border-color: transparent; }
+
+.shadow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 12px 0 16px; }
+.shadow-card { border: 1px solid var(--border); border-radius: 12px; background: var(--bg); box-shadow: var(--shadow); overflow: hidden; }
+.shadow-box { height: 90px; margin: 14px; border-radius: 12px; background: linear-gradient(135deg, color-mix(in oklab, var(--bg) 92%, #fff), var(--bg)); }
+.shadow-meta { padding: 8px 12px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; direction: ltr; }
+
+.typography-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 12px 0 16px; }
+.typo-card { border: 1px solid var(--border); border-radius: 12px; background: var(--bg); box-shadow: var(--shadow); overflow: hidden; }
+.typo-title { padding: 8px 10px; font-weight: 700; border-bottom: 1px solid var(--border); }
+.typo-sample { padding: 12px 10px; font-size: 16px; line-height: 1.8; }
+.typo-stack { padding: 8px 10px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
