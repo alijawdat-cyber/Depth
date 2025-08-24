@@ -1,0 +1,58 @@
+/* DevicePreview wrapper styles: حاوية شاشة موبايل مصغّرة داخل التوثيق */
+
+.device-preview{ 
+  --dp-width: 390px;   /* عرض الجهاز الفعلي (iPhone 14) */
+  --dp-height: 844px;  /* ارتفاع الجهاز الفعلي */
+  --dp-scale: 0.33;    /* مصغّر ×3 افتراضي */
+  --dp-bg: var(--bg-secondary);
+  --dp-border: var(--border-primary);
+  --dp-radius: 24px;
+  --dp-shadow: var(--shadow-xl);
+  position: relative;
+  margin: 1rem 0;
+}
+
+.device-preview .device-toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+.device-preview .device-toolbar .dt-group{ display:flex; gap:.4rem; align-items:center; }
+.device-preview .device-toolbar button,
+.device-preview .device-toolbar .dt-info{
+  padding: .35rem .6rem;
+  border: 1px solid var(--dp-border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .85rem;
+}
+.device-preview .device-toolbar button.active{ background: var(--primary); color: var(--text-inverse); border-color: var(--primary); }
+
+/* الغلاف المرئي المصغّر بحجم فعلي × scale */
+.device-preview .device-stage{ 
+  width: calc(var(--dp-width) * var(--dp-scale));
+  height: calc(var(--dp-height) * var(--dp-scale));
+  position: relative;
+  border: 1px solid var(--dp-border);
+  border-radius: var(--dp-radius);
+  background: var(--dp-bg);
+  box-shadow: var(--dp-shadow);
+  overflow: hidden;
+}
+
+/* الـiframe يحتفظ بقياس الجهاز الحقيقي ويتحوّل بمقياس */
+.device-preview .device-viewport{
+  width: var(--dp-width);
+  height: var(--dp-height);
+  border: 0;
+  transform-origin: top left;
+  transform: scale(var(--dp-scale));
+  display: block;
+  background: var(--bg-primary);
+}
+
+/* ملاحظة: أي حركـات أو AOS تبقى خارج الغلاف؛ ما نضيف أنيميشن على .device-stage */

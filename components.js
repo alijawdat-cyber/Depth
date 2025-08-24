@@ -1211,7 +1211,7 @@ class UIComponents {
         });
     }
 
-    // =============== Render HTML code fences as live previews (with toggle) ===============
+    // =============== Render HTML code fences as live previews (with toggle or device iframe) ===============
     static enhanceHtmlPreviews(rootEl) {
         const root = rootEl || document.getElementById('doc-content');
         if (!root) return;
@@ -1239,7 +1239,7 @@ class UIComponents {
             document.head.appendChild(style);
         }
 
-        htmlBlocks.forEach(code => {
+    htmlBlocks.forEach(code => {
             const pre = code.parentElement;
             if (!pre) return;
             if (pre.closest('.html-preview-wrapper')) return; // already processed
@@ -1264,54 +1264,116 @@ class UIComponents {
                 }
             } catch(_) {}
 
+            // نمط جديد: DevicePreview (iframe sandbox) + إمكانية عرض الكود
             const wrapper = document.createElement('div');
             wrapper.className = 'html-preview-wrapper';
-            const toolbar = document.createElement('div');
-            toolbar.className = 'html-preview-toolbar';
-            toolbar.innerHTML = `
+            const bar = document.createElement('div');
+            bar.className = 'html-preview-toolbar';
+            bar.innerHTML = `
                 <button type="button" data-view="preview" class="active">معاينة</button>
                 <button type="button" data-view="code">الكود</button>
             `;
-            const preview = document.createElement('div');
-            preview.className = 'html-preview-frame';
-            preview.innerHTML = safe;
+
+            // غلاف الجهاز وأدواته
+            const device = document.createElement('div');
+            device.className = 'device-preview';
+            const dt = document.createElement('div'); dt.className = 'device-toolbar';
+            dt.innerHTML = `
+              <div class="dt-group">
+                <button type="button" data-device="iphone14" class="active">iPhone 14</button>
+                <button type="button" data-rotate>↻ تدوير</button>
+              </div>
+              <div class="dt-group">
+                <button type="button" data-zoom="0.33" class="active">×3</button>
+                <button type="button" data-zoom="0.5">50%</button>
+                <button type="button" data-theme>ثيم</button>
+                <button type="button" data-refresh>إعادة</button>
+              </div>
+              <div class="dt-info" aria-hidden="true">390×844</div>
+            `;
+            const stage = document.createElement('div'); stage.className = 'device-stage';
+            const iframe = document.createElement('iframe');
+            iframe.className = 'device-viewport';
+            iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
+            stage.appendChild(iframe);
+            device.appendChild(dt);
+            device.appendChild(stage);
 
             const codeView = pre.cloneNode(true);
             codeView.style.display = 'none';
 
-            // Replace original pre with wrapper containing toolbar+preview+code
+            // استبدال
             pre.replaceWith(wrapper);
-            wrapper.appendChild(toolbar);
-            wrapper.appendChild(preview);
+            wrapper.appendChild(bar);
+            wrapper.appendChild(device);
             wrapper.appendChild(codeView);
 
-            const showPreview = () => {
-                preview.style.display = 'block';
-                codeView.style.display = 'none';
-                // Initialize interactions inside the preview only
-                try {
-                    if (window.Mockups) {
-                        window.Mockups.initOtp && window.Mockups.initOtp(preview);
-                        window.Mockups.initGallery && window.Mockups.initGallery(preview);
-                    }
-                } catch(_) {}
-                try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch(_) {}
-            };
-            const showCode = () => {
-                preview.style.display = 'none';
-                codeView.style.display = 'block';
-            };
+            // حمّل CSS الإطار لو ما محمّل
+            (()=>{
+                const id = 'preview-frame-css';
+                if (!document.getElementById(id)){
+                    const l = document.createElement('link');
+                    l.id = id; l.rel = 'stylesheet'; l.href = 'assets/css/preview-frame.css';
+                    document.head.appendChild(l);
+                }
+            })();
 
-            toolbar.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-                toolbar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                if (btn.dataset.view === 'preview') showPreview(); else showCode();
+            // إعدادات الجهاز
+            const presets = {
+                iphone14: { w: 390, h: 844 }
+            };
+            let cur = { ...presets.iphone14 };
+            let rot = false;
+            let scale = 0.33;
+
+            const applyDims = ()=>{
+                device.style.setProperty('--dp-width', (rot?cur.h:cur.w)+'px');
+                device.style.setProperty('--dp-height', (rot?cur.w:cur.h)+'px');
+                device.style.setProperty('--dp-scale', String(scale));
+                const info = dt.querySelector('.dt-info');
+                if (info) info.textContent = `${rot?cur.h:cur.w}×${rot?cur.w:cur.h}`;
+            };
+            applyDims();
+
+            // حقن srcdoc المعقّم داخل iframe
+            const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="stylesheet" href="/assets/css/custom-screens.css">
+                <style>html,body{height:100%;margin:0;overflow:auto;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style>
+            </head><body>
+                <div class="screen-mockup">
+                  ${safe}
+                </div>
+                <script src="/assets/js/interactive-mockups.js"><\/script>
+                <script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script>
+            </body></html>`;
+
+            const loadFrame = (theme='light')=>{ iframe.srcdoc = buildSrcDoc(theme); };
+            loadFrame('light');
+
+            // أزرار التحكم
+            dt.addEventListener('click', (e)=>{
+                const b = e.target.closest('button'); if (!b) return;
+                if (b.hasAttribute('data-rotate')){ rot = !rot; applyDims(); return; }
+                if (b.hasAttribute('data-device')){ dt.querySelectorAll('[data-device]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); cur = presets[b.dataset.device] || cur; applyDims(); return; }
+                if (b.hasAttribute('data-zoom')){ dt.querySelectorAll('[data-zoom]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); scale = parseFloat(b.getAttribute('data-zoom'))||scale; applyDims(); return; }
+                if (b.hasAttribute('data-theme')){ try{ const doc=iframe.contentDocument; const html=doc && doc.documentElement; const curT=html?.getAttribute('data-theme')||'light'; const next= curT==='light'?'dark':'light'; html && html.setAttribute('data-theme', next); }catch(_){} return; }
+                if (b.hasAttribute('data-refresh')){ const doc = iframe.contentDocument; const theme = doc && doc.documentElement.getAttribute('data-theme') || 'light'; loadFrame(theme); return; }
             });
 
-            // Default to preview mode
-            showPreview();
+            // تبديل معاينة/كود
+            bar.addEventListener('click', (e)=>{
+                const btn = e.target.closest('button'); if (!btn) return;
+                bar.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+                btn.classList.add('active');
+                const v = btn.dataset.view;
+                if (v==='code'){ device.style.display='none'; codeView.style.display='block'; }
+                else { codeView.style.display='none'; device.style.display='block'; }
+            });
+
+            // أيقونات
+            try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch(_) {}
         });
     }
 

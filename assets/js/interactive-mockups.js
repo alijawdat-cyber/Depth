@@ -1198,11 +1198,18 @@ const DepthUI = (() => {
         console.log('✅ DepthUI initialized successfully');
     };
 
-    // Auto-initialize on DOM ready
+    // Auto-initialize على DOM ready
+    // ملاحظة: إذا نحن في الصفحة العليا ويوجد معاينات iframe (DevicePreview)،
+    // نخلي التهيئة تتم داخل الـiframe فقط لتجنّب التكرار/التسرّب.
+    const isTop = (function(){ try { return window.top === window.self; } catch(_) { return true; } })();
+    const hasDevicePreviews = () => {
+        try { return isTop && document.querySelector('.device-preview'); } catch(_) { return false; }
+    };
+    const shouldInitHere = !hasDevicePreviews();
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => { if (shouldInitHere) init(); });
     } else {
-        init();
+        if (shouldInitHere) init();
     }
 
     // Public API
