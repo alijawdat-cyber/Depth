@@ -1,9 +1,9 @@
-# 🎨 شاشات العميل - مخططات تفصيلية احترافية
+# 🎨 شاشات العميل - النسخة الاحترافية المطورة V2.0
 
-> **المطور:** منصة Depth V2.0  
+> **منصة:** Depth Platform  
 > **التاريخ:** أغسطس 2025  
-> **اللغة:** عربي كامل مع دعم متجاوب  
-> **الحالة:** نهائي ومعتمد ✅
+> **التوافق:** HTML5 + CSS3 + JavaScript ES6+  
+> **الحالة:** محدث ومطور بالكامل ✅
 
 ## 📋 فهرس الشاشات
 
@@ -21,435 +21,847 @@
 <a id="client-auth"></a>
 ## 🔐 شاشة تسجيل الدخول والتحقق (OTP)
 
-### عرض تفاعلي — شاشة التحقق OTP (موبايل)
+### شاشة تسجيل الدخول الأولية
 
-<div class="screen-mockup otp-screen">
-	<div class="screen-header">
-		<button class="back-btn">⬅ رجوع</button>
-		<h3>تأكيد رقم الهاتف</h3>
-		<button class="close-btn">❌ إغلاق</button>
-	</div>
-	<div class="screen-content">
-		<div class="icon">🔐</div>
-		<p>أرسلنا رمز التحقق المكوّن من 6 أرقام إلى الرقم <strong>+964 750 123 4567</strong></p>
-		<div class="otp-inputs" aria-label="OTP">
-			<input type="text" aria-label="1" />
-			<input type="text" aria-label="2" />
-			<input type="text" aria-label="3" />
-			<input type="text" aria-label="4" />
-			<input type="text" aria-label="5" />
-			<input type="text" aria-label="6" />
-		</div>
-		<div class="timer">⏰ باقي <span data-seconds="60">60</span> ثانية</div>
-		<button class="primary-btn" disabled>✅ تأكيد وإكمال التسجيل</button>
-		<div class="resend-section">لم تستلم الرمز؟ <button class="link-btn resend-btn" disabled>🔄 إعادة الإرسال</button></div>
-		<div class="otp-output" aria-live="polite"></div>
-	</div>
-  
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn">
+            <span class="icon">🌐</span> AR
+        </button>
+        <h3>منصة Depth</h3>
+        <button class="header-btn" data-theme-toggle>
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+    <div class="screen-content">
+        <div class="auth-container">
+            <div class="logo-section">
+                <img src="/logo.svg" alt="Depth" class="logo">
+                <h2>مرحباً بك في منصة Depth</h2>
+                <p class="subtitle">منصة الإبداع الرقمي الأولى في العراق</p>
+            </div>
+            
+            <form class="auth-form" data-validate>
+                <div class="form-tabs">
+                    <button type="button" class="tab active" data-tab="login">
+                        تسجيل دخول
+                    </button>
+                    <button type="button" class="tab" data-tab="register">
+                        حساب جديد
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف أو البريد الإلكتروني</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📱</span>
+                        <input type="text" 
+                               class="form-input" 
+                               placeholder="750XXXXXXX أو email@example.com"
+                               data-validate="required,phone|email">
+                    </div>
+                </div>
+                
+                <div class="form-group" data-tab-content="register">
+                    <label class="form-label">اسم الشركة</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏢</span>
+                        <input type="text" 
+                               class="form-input" 
+                               placeholder="اسم شركتك أو مؤسستك"
+                               data-validate="required,minLength:3">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-full">
+                    <span class="btn-text">إرسال رمز التحقق</span>
+                    <span class="btn-icon">←</span>
+                </button>
+                
+                <div class="divider">
+                    <span>أو</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="btn btn-secondary social-btn">
+                        <img src="/google.svg" alt="Google">
+                        تسجيل بواسطة Google
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <p class="text-sm text-muted">
+                        بالمتابعة، أنت توافق على 
+                        <a href="#terms">الشروط والأحكام</a>
+                        و
+                        <a href="#privacy">سياسة الخصوصية</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+```
 
-> ملاحظة: تگدر تلصق الكود كامل، رح يتوزع تلقائيًا داخل الحقول. بعد 60 ثانية زر "إعادة الإرسال" يصير فعال.
+### شاشة التحقق OTP المطورة
 
-### ملاحظات سريعة - شاشة التسجيل (الهاتف)
-• الواجهة أعلاه تغطي نفس محتوى التسجيل السابق، لكن بصيغة HTML متجاوبة بدل ASCII.
-
-### ملاحظات سريعة - شاشة التحقق OTP
-• تفعيل العدّاد وإعادة الإرسال موجود داخل HTML/JS الحالي.
-
-### المواصفات التقنية - نظام OTP
-- **الشبكات المدعومة**: آسياسيل، كورك، زين
-- **طول الرمز**: 6 أرقام
-- **صلاحية الرمز**: 5 دقائق
-- **المحاولات القصوى**: 3 محاولات
-- **فترة الانتظار**: 60 ثانية بين الإرسالات
-- **المراجع**: `documentation/00-overview/00-introduction.md:110,635`
+```html
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅ رجوع</button>
+        <h3>تأكيد رقم الهاتف</h3>
+        <button class="header-btn close-btn">❌</button>
+    </div>
+    <div class="screen-content">
+        <div class="otp-container">
+            <div class="otp-icon animate-bounce">🔐</div>
+            <h2>أدخل رمز التحقق</h2>
+            <p class="otp-description">
+                أرسلنا رمز التحقق المكوّن من 6 أرقام إلى
+                <strong class="phone-number">+964 750 123 4567</strong>
+            </p>
+            
+            <div class="otp-inputs" data-otp-container>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="0">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="1">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="2">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="3">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="4">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="5">
+            </div>
+            
+            <div class="otp-timer">
+                <span class="timer-icon">⏰</span>
+                <span class="timer-text">باقي <span data-otp-timer data-seconds="300">5:00</span> دقيقة</span>
+            </div>
+            
+            <button class="btn btn-primary btn-lg w-full" data-otp-submit disabled>
+                <span class="btn-text">تأكيد وإكمال التسجيل</span>
+                <span class="spinner spinner-sm hidden"></span>
+            </button>
+            
+            <div class="otp-resend">
+                <p>لم تستلم الرمز؟</p>
+                <button class="btn btn-ghost" data-otp-resend disabled>
+                    🔄 إعادة الإرسال
+                </button>
+            </div>
+            
+            <div class="otp-help">
+                <details class="help-accordion">
+                    <summary>تحتاج مساعدة؟</summary>
+                    <div class="help-content">
+                        <p>تأكد من:</p>
+                        <ul>
+                            <li>رقمك صحيح ومن شبكة عراقية</li>
+                            <li>لديك تغطية شبكة جيدة</li>
+                            <li>تحقق من رسائل SMS المحظورة</li>
+                        </ul>
+                        <button class="btn btn-sm btn-secondary">
+                            💬 تواصل مع الدعم
+                        </button>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
+```
 
 ---
 
 <a id="client-dashboard"></a>
-## 🏠 الشاشة الرئيسية - لوحة التحكم
+## 🏠 الشاشة الرئيسية (Dashboard)
 
-### عرض تفاعلي — لوحة العميل (Responsive)
+### لوحة التحكم الرئيسية - Desktop
 
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">☰</button>
-		<h3>لوحة العميل</h3>
-		<button class="close-btn">⚙️</button>
-	</div>
-	<div class="screen-content dashboard">
-		<div class="kpis">
-			<div class="kpi"><div class="title">الطلبات</div><div class="value">3</div></div>
-			<div class="kpi"><div class="title">قيد التنفيذ</div><div class="value">2</div></div>
-			<div class="kpi"><div class="title">مكتملة</div><div class="value">12</div></div>
-			<div class="kpi"><div class="title">الإنفاق الكلي</div><div class="value">2.75M IQD</div></div>
-		</div>
-		<h4 style="margin:14px 0 8px">مشاريعك الحالية</h4>
-		<div class="project-list">
-			<div class="project-card">
-				<div><strong>#DP2025-0142</strong> — 🔄 قيد التنفيذ</div>
-				<div>📷 تصوير حفل الزفاف — سارة أحمد — التسليم: 25/أغسطس/2025</div>
-				<div class="progress" style="--p:75%"><div class="bar"></div></div>
-			</div>
-			<div class="project-card">
-				<div><strong>#DP2025-0138</strong> — ⏳ بانتظار الموافقة</div>
-				<div>🎬 مونتاج فيديو تسويقي — علي الموسوي — التسليم: 28/أغسطس/2025</div>
-				<div class="progress" style="--p:35%"><div class="bar"></div></div>
-			</div>
-		</div>
-	</div>
+```html
+<div class="screen-mockup desktop">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/logo.svg" alt="Depth" class="sidebar-logo">
+                <span class="sidebar-title">Depth Platform</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">الرئيسية</span>
+                </a>
+                <a href="#new-request" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">طلب جديد</span>
+                    <span class="nav-badge">جديد</span>
+                </a>
+                <a href="#projects" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">مشاريعي</span>
+                    <span class="nav-counter">2</span>
+                </a>
+                <a href="#messages" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">الرسائل</span>
+                    <span class="nav-badge badge-danger">3</span>
+                </a>
+                <a href="#invoices" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">الفواتير</span>
+                </a>
+                <a href="#notifications" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">الإشعارات</span>
+                    <span class="nav-badge badge-danger">5</span>
+                </a>
+                <a href="#reports" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">التقارير</span>
+                </a>
+                <a href="#settings" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">الإعدادات</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="/avatar.jpg" alt="User" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-name">أحمد الخالدي</div>
+                        <div class="user-company">شركة الأمل</div>
+                    </div>
+                    <button class="btn-icon">
+                        <span>🚪</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <button class="btn-icon mobile-menu-toggle">☰</button>
+                    <h1 class="page-title">مرحباً، أحمد! 👋</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-primary">
+                        <span class="btn-icon">➕</span>
+                        <span class="btn-text">طلب جديد</span>
+                    </button>
+                    <button class="btn-icon notification-btn">
+                        <span>🔔</span>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="user-menu">
+                        <button class="user-menu-trigger">
+                            <img src="/avatar.jpg" alt="User" class="avatar-sm">
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--primary-gradient);">
+                        📝
+                    </div>
+                    <div class="kpi-content">
+                        <div class="kpi-value">3</div>
+                        <div class="kpi-label">طلبات جديدة</div>
+                        <div class="kpi-change positive">
+                            <span>↑ 50%</span>
+                            <span>من الشهر الماضي</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, #00D4FF, #00A8CC);">
+                        🔄
+                    </div>
+                    <div class="kpi-content">
+                        <div class="kpi-value">2</div>
+                        <div class="kpi-label">قيد التنفيذ</div>
+                        <div class="kpi-change">
+                            <span>← مستقر</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                        ✅
+                    </div>
+                    <div class="kpi-content">
+                        <div class="kpi-value">12</div>
+                        <div class="kpi-label">مشاريع مكتملة</div>
+                        <div class="kpi-change positive">
+                            <span>↑ 20%</span>
+                            <span>نمو ممتاز</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                        💰
+                    </div>
+                    <div class="kpi-content">
+                        <div class="kpi-value">2.75M</div>
+                        <div class="kpi-label">الإنفاق الكلي (IQD)</div>
+                        <div class="kpi-change">
+                            <button class="btn-link">عرض التفاصيل →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Projects Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">المشاريع النشطة</h2>
+                    <a href="#all-projects" class="btn-link">عرض الكل →</a>
+                </div>
+                
+                <div class="projects-grid">
+                    <div class="project-card interactive">
+                        <div class="project-header">
+                            <span class="project-id">#DP2025-0142</span>
+                            <span class="project-status status-active">🔄 قيد التنفيذ</span>
+                        </div>
+                        <div class="project-body">
+                            <h3 class="project-title">📷 تصوير حفل زفاف</h3>
+                            <div class="project-meta">
+                                <div class="meta-item">
+                                    <span class="meta-icon">👤</span>
+                                    <span class="meta-text">سارة أحمد</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-icon">📅</span>
+                                    <span class="meta-text">التسليم: 25 أغسطس</span>
+                                </div>
+                            </div>
+                            <div class="project-progress">
+                                <div class="progress-header">
+                                    <span>التقدم</span>
+                                    <span>75%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                            <div class="project-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    عرض التفاصيل
+                                </button>
+                                <button class="btn btn-sm btn-primary">
+                                    💬 محادثة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card interactive">
+                        <div class="project-header">
+                            <span class="project-id">#DP2025-0138</span>
+                            <span class="project-status status-pending">⏳ بانتظار الموافقة</span>
+                        </div>
+                        <div class="project-body">
+                            <h3 class="project-title">🎬 مونتاج فيديو تسويقي</h3>
+                            <div class="project-meta">
+                                <div class="meta-item">
+                                    <span class="meta-icon">👤</span>
+                                    <span class="meta-text">علي الموسوي</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-icon">📅</span>
+                                    <span class="meta-text">التسليم: 28 أغسطس</span>
+                                </div>
+                            </div>
+                            <div class="project-alert alert-warning">
+                                <span class="alert-icon">⚠️</span>
+                                <span class="alert-text">يتطلب موافقتك على النسخة النهائية</span>
+                            </div>
+                            <div class="project-actions">
+                                <button class="btn btn-sm btn-primary w-full">
+                                    👁️ معاينة والموافقة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Quick Actions -->
+            <section class="dashboard-section">
+                <h2 class="section-title">إجراءات سريعة</h2>
+                <div class="quick-actions">
+                    <button class="action-card">
+                        <span class="action-icon">📸</span>
+                        <span class="action-text">طلب تصوير</span>
+                    </button>
+                    <button class="action-card">
+                        <span class="action-icon">🎥</span>
+                        <span class="action-text">طلب فيديو</span>
+                    </button>
+                    <button class="action-card">
+                        <span class="action-icon">🎨</span>
+                        <span class="action-text">طلب تصميم</span>
+                    </button>
+                    <button class="action-card">
+                        <span class="action-icon">✂️</span>
+                        <span class="action-text">طلب مونتاج</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
 </div>
+```
 
-### ملاحظات سريعة - لوحة العميل (Desktop)
-• تم استبدال ASCII بلوحة HTML تفاعلية أعلاه.
+### لوحة التحكم - Mobile
 
-### ملاحظات سريعة - الهاتف (Mobile)
-• النسخة المتجاوبة مدعومة ضمن نفس HTML عبر CSS.
-
-### ملاحظة القائمة الجانبية
-• نسخة HTML للموبايل مضافة أسفل قسم الإعدادات.
+```html
+<div class="screen-mockup mobile">
+    <div class="mobile-header">
+        <button class="btn-icon menu-toggle">☰</button>
+        <h3 class="mobile-title">لوحة التحكم</h3>
+        <button class="btn-icon notification-btn">
+            <span>🔔</span>
+            <span class="notification-badge">5</span>
+        </button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Welcome Section -->
+        <div class="welcome-card">
+            <div class="welcome-text">
+                <h2>مرحباً، أحمد! 👋</h2>
+                <p>يوم جميل لإنجاز المشاريع</p>
+            </div>
+            <button class="btn btn-primary btn-sm">
+                + طلب جديد
+            </button>
+        </div>
+        
+        <!-- Mini KPIs -->
+        <div class="mini-kpi-scroll">
+            <div class="mini-kpi">
+                <div class="mini-kpi-value">2</div>
+                <div class="mini-kpi-label">قيد التنفيذ</div>
+            </div>
+            <div class="mini-kpi">
+                <div class="mini-kpi-value">12</div>
+                <div class="mini-kpi-label">مكتملة</div>
+            </div>
+            <div class="mini-kpi">
+                <div class="mini-kpi-value">3</div>
+                <div class="mini-kpi-label">طلبات</div>
+            </div>
+            <div class="mini-kpi">
+                <div class="mini-kpi-value">2.75M</div>
+                <div class="mini-kpi-label">الإنفاق</div>
+            </div>
+        </div>
+        
+        <!-- Active Projects -->
+        <div class="section-header-mobile">
+            <h3>المشاريع النشطة</h3>
+            <a href="#all" class="link-sm">عرض الكل</a>
+        </div>
+        
+        <div class="project-card-mobile">
+            <div class="project-mobile-header">
+                <span class="project-badge">#DP2025-0142</span>
+                <span class="status-dot active"></span>
+            </div>
+            <h4 class="project-mobile-title">📷 تصوير حفل زفاف</h4>
+            <div class="project-mobile-meta">
+                <span>سارة أحمد</span>
+                <span>•</span>
+                <span>25 أغسطس</span>
+            </div>
+            <div class="progress-bar-mobile">
+                <div class="progress-fill" style="width: 75%;">75%</div>
+            </div>
+            <button class="btn btn-secondary btn-sm w-full">
+                عرض التفاصيل ←
+            </button>
+        </div>
+        
+        <div class="project-card-mobile alert">
+            <div class="alert-badge">⚠️ يتطلب إجراء</div>
+            <div class="project-mobile-header">
+                <span class="project-badge">#DP2025-0138</span>
+                <span class="status-dot pending"></span>
+            </div>
+            <h4 class="project-mobile-title">🎬 مونتاج فيديو</h4>
+            <div class="project-mobile-meta">
+                <span>علي الموسوي</span>
+                <span>•</span>
+                <span>28 أغسطس</span>
+            </div>
+            <button class="btn btn-primary btn-sm w-full">
+                المعاينة والموافقة ←
+            </button>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#home" class="bottom-nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="#projects" class="bottom-nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">المشاريع</span>
+            </a>
+            <a href="#new" class="bottom-nav-item primary">
+                <span class="nav-icon">➕</span>
+            </a>
+            <a href="#messages" class="bottom-nav-item">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">الرسائل</span>
+                <span class="nav-badge">3</span>
+            </a>
+            <a href="#profile" class="bottom-nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">حسابي</span>
+            </a>
+        </nav>
+    </div>
+</div>
+```
 
 ---
 
 <a id="client-create-request"></a>
-## 📝 إنشاء طلب جديد - تدفق متعدد الخطوات
+## 📝 إنشاء طلب جديد - Multi-Step Form
 
-### عرض تفاعلي — الخطوة 1/4: اختيار نوع الخدمة والفئة
+### الخطوة 1: اختيار نوع الخدمة
 
+```html
 <div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>إنشاء طلب جديد — 1 من 4</h3>
-		<button class="close-btn">❓</button>
-	</div>
-	<div class="screen-content">
-		<h4>اختر نوع الخدمة المطلوبة</h4>
-		<div class="step-cards">
-			<div class="service-card"><div class="title">📷 التصوير</div><div class="desc">شخصي/منتج/حدث</div><button class="secondary-btn">اختيار</button></div>
-			<div class="service-card"><div class="title">🎬 الفيديو</div><div class="desc">حدث/دعائي/تسويقي</div><button class="secondary-btn">اختيار</button></div>
-			<div class="service-card"><div class="title">🎨 التصميم</div><div class="desc">هوية/طباعة/رقمي</div><button class="secondary-btn">اختيار</button></div>
-			<div class="service-card"><div class="title">✂️ المونتاج</div><div class="desc">فيديو/صوت/تأثيرات</div><button class="secondary-btn">اختيار</button></div>
-		</div>
-		<h4 style="margin-top:12px">الخدمات الفرعية — التصوير</h4>
-		<div class="choices-grid">
-			<label><input type="checkbox" checked> تصوير حفل زفاف</label>
-			<label><input type="checkbox"> تصوير منتجات</label>
-			<label><input type="checkbox"> تصوير بورتريه</label>
-			<label><input type="checkbox"> تصوير فعاليات</label>
-		</div>
-		<h4 style="margin-top:12px">مستوى المعالجة</h4>
-		<div class="radio-row">
-			<label><input type="radio" name="ret" checked> أساسي</label>
-			<label><input type="radio" name="ret"> معالجة كاملة</label>
-			<label><input type="radio" name="ret"> تصحيح ألوان</label>
-			<label><input type="radio" name="ret"> تركيب متقدم</label>
-		</div>
-		<div style="margin-top:12px"><button class="primary-btn">⏭️ المتابعة</button></div>
-	</div>
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>إنشاء طلب جديد</h3>
+        <button class="header-btn">❓</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Progress Indicator -->
+        <div class="step-progress">
+            <div class="step-progress-bar">
+                <div class="step-progress-fill" style="width: 25%;"></div>
+            </div>
+            <div class="step-indicators">
+                <div class="step-indicator active">
+                    <span class="step-number">1</span>
+                    <span class="step-label">نوع الخدمة</span>
+                </div>
+                <div class="step-indicator">
+                    <span class="step-number">2</span>
+                    <span class="step-label">التفاصيل</span>
+                </div>
+                <div class="step-indicator">
+                    <span class="step-number">3</span>
+                    <span class="step-label">الملفات</span>
+                </div>
+                <div class="step-indicator">
+                    <span class="step-number">4</span>
+                    <span class="step-label">المراجعة</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Service Selection -->
+        <div class="form-section">
+            <h2 class="form-title">اختر نوع الخدمة المطلوبة</h2>
+            <p class="form-description">حدد الفئة الرئيسية للخدمة التي تحتاجها</p>
+            
+            <div class="service-cards-grid">
+                <div class="service-card selectable" data-service="photography">
+                    <div class="service-icon">📷</div>
+                    <h3 class="service-title">التصوير</h3>
+                    <p class="service-desc">تصوير احترافي للمنتجات والفعاليات</p>
+                    <div class="service-examples">
+                        <span class="tag">منتجات</span>
+                        <span class="tag">بورتريه</span>
+                        <span class="tag">فعاليات</span>
+                    </div>
+                </div>
+                
+                <div class="service-card selectable" data-service="video">
+                    <div class="service-icon">🎬</div>
+                    <h3 class="service-title">الفيديو</h3>
+                    <p class="service-desc">إنتاج فيديوهات احترافية</p>
+                    <div class="service-examples">
+                        <span class="tag">دعائي</span>
+                        <span class="tag">توثيقي</span>
+                        <span class="tag">موشن</span>
+                    </div>
+                </div>
+                
+                <div class="service-card selectable" data-service="design">
+                    <div class="service-icon">🎨</div>
+                    <h3 class="service-title">التصميم</h3>
+                    <p class="service-desc">تصاميم إبداعية للهوية والتسويق</p>
+                    <div class="service-examples">
+                        <span class="tag">هوية</span>
+                        <span class="tag">سوشيال</span>
+                        <span class="tag">طباعة</span>
+                    </div>
+                </div>
+                
+                <div class="service-card selectable" data-service="editing">
+                    <div class="service-icon">✂️</div>
+                    <h3 class="service-title">المونتاج</h3>
+                    <p class="service-desc">مونتاج وتحرير احترافي</p>
+                    <div class="service-examples">
+                        <span class="tag">فيديو</span>
+                        <span class="tag">صوت</span>
+                        <span class="tag">مؤثرات</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sub-categories (appears after selection) -->
+            <div class="subcategories-section hidden" data-show-on-select>
+                <h3 class="subsection-title">حدد نوع التصوير المطلوب</h3>
+                <div class="checkbox-grid">
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subcategory" value="wedding">
+                        <div class="checkbox-content">
+                            <span class="checkbox-icon">💑</span>
+                            <span class="checkbox-label">تصوير حفل زفاف</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subcategory" value="product">
+                        <div class="checkbox-content">
+                            <span class="checkbox-icon">📦</span>
+                            <span class="checkbox-label">تصوير منتجات</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subcategory" value="portrait">
+                        <div class="checkbox-content">
+                            <span class="checkbox-icon">👤</span>
+                            <span class="checkbox-label">تصوير بورتريه</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox" name="subcategory" value="event">
+                        <div class="checkbox-content">
+                            <span class="checkbox-icon">🎪</span>
+                            <span class="checkbox-label">تصوير فعاليات</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Processing Level -->
+                <h3 class="subsection-title">مستوى المعالجة المطلوب</h3>
+                <div class="radio-cards">
+                    <label class="radio-card">
+                        <input type="radio" name="processing" value="basic" checked>
+                        <div class="radio-content">
+                            <div class="radio-header">
+                                <span class="radio-title">أساسي</span>
+                                <span class="radio-price">💰</span>
+                            </div>
+                            <p class="radio-desc">تصوير وتسليم بدون معالجة</p>
+                        </div>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="processing" value="standard">
+                        <div class="radio-content">
+                            <div class="radio-header">
+                                <span class="radio-title">معالجة كاملة</span>
+                                <span class="radio-price">💰💰</span>
+                            </div>
+                            <p class="radio-desc">تصوير مع معالجة احترافية</p>
+                        </div>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="processing" value="premium">
+                        <div class="radio-content">
+                            <div class="radio-header">
+                                <span class="radio-title">بريميوم</span>
+                                <span class="radio-price">💰💰💰</span>
+                            </div>
+                            <p class="radio-desc">معالجة متقدمة وتسليم سريع</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary btn-lg" disabled>
+                    السابق
+                </button>
+                <button class="btn btn-primary btn-lg">
+                    التالي ←
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+```
 
-### عرض تفاعلي — الخطوة 2/4: تفاصيل المشروع والوصف
+### الخطوة 2: تفاصيل المشروع
 
+```html
 <div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>إنشاء طلب جديد — 2 من 4</h3>
-		<button class="close-btn">💾</button>
-	</div>
-	<div class="screen-content">
-		<h4>وصف تفصيلي للمشروع</h4>
-		<textarea class="textarea" placeholder="اكتب وصفًا واضحًا للمطلوب…"></textarea>
-		<h4 style="margin-top:12px">الموقع والتاريخ</h4>
-		<div class="form-grid">
-			<label>المحافظة<br><input class="ui-input" placeholder="بغداد"></label>
-			<label>العنوان التفصيلي<br><input class="ui-input" placeholder="الكرادة…"></label>
-			<label>التاريخ<br><input class="ui-input" placeholder="30/08/2025"></label>
-		</div>
-		<div style="margin-top:12px"><button class="primary-btn">⏭️ المتابعة</button></div>
-	</div>
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>تفاصيل المشروع</h3>
+        <button class="header-btn">💾</button>
+    </div>
+    
+    <div class="screen-content">
+        <!-- Progress Indicator -->
+        <div class="step-progress">
+            <div class="step-progress-bar">
+                <div class="step-progress-fill" style="width: 50%;"></div>
+            </div>
+        </div>
+        
+        <form class="project-details-form">
+            <!-- Project Title -->
+            <div class="form-group">
+                <label class="form-label required">عنوان المشروع</label>
+                <input type="text" 
+                       class="form-input" 
+                       placeholder="مثال: تصوير منتجات مطعمنا الجديدة"
+                       required>
+                <span class="form-hint">اختر عنواناً واضحاً يصف مشروعك</span>
+            </div>
+            
+            <!-- Project Description -->
+            <div class="form-group">
+                <label class="form-label required">وصف تفصيلي للمشروع</label>
+                <textarea class="form-textarea" 
+                          rows="6" 
+                          placeholder="اشرح بالتفصيل ما تحتاجه..."
+                          required></textarea>
+                <div class="char-counter">
+                    <span class="current">0</span> / <span class="max">1000</span> حرف
+                </div>
+            </div>
+            
+            <!-- Location & Date -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label required">المحافظة</label>
+                    <select class="form-select" required>
+                        <option value="">اختر المحافظة</option>
+                        <option value="baghdad">بغداد</option>
+                        <option value="basra">البصرة</option>
+                        <option value="mosul">الموصل</option>
+                        <option value="erbil">أربيل</option>
+                        <option value="najaf">النجف</option>
+                        <option value="karbala">كربلاء</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">المنطقة</label>
+                    <input type="text" 
+                           class="form-input" 
+                           placeholder="مثال: الكرادة">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">العنوان التفصيلي</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">📍</span>
+                    <input type="text" 
+                           class="form-input" 
+                           placeholder="الشارع والمعالم القريبة">
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary mt-sm">
+                    📍 اختر على الخريطة
+                </button>
+            </div>
+            
+            <!-- Date & Time -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label required">تاريخ التنفيذ</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📅</span>
+                        <input type="date" 
+                               class="form-input" 
+                               min="2025-08-25"
+                               required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">الوقت المفضل</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">⏰</span>
+                        <input type="time" class="form-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rush Order Toggle -->
+            <div class="form-group">
+                <div class="toggle-card">
+                    <div class="toggle-content">
+                        <h4 class="toggle-title">⚡ طلب عاجل</h4>
+                        <p class="toggle-desc">احصل على خدمة أسرع بتكلفة إضافية 30%</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="rush">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Budget Range -->
+            <div class="form-group">
+                <label class="form-label">الميزانية المتوقعة</label>
+                <div class="budget-selector">
+                    <button type="button" class="budget-option" data-budget="500-1000">
+                        500K - 1M IQD
+                    </button>
+                    <button type="button" class="budget-option" data-budget="1000-2000">
+                        1M - 2M IQD
+                    </button>
+                    <button type="button" class="budget-option" data-budget="2000-5000">
+                        2M - 5M IQD
+                    </button>
+                    <button type="button" class="budget-option" data-budget="5000+">
+                        +5M IQD
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary btn-lg">
+                    ← السابق
+                </button>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    التالي ←
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+```
 
-### عرض تفاعلي — الخطوة 3/4: رفع الملفات المرجعية
+### الخطوة 3: رفع الملفات
 
+```html
 <div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>إنشاء طلب جديد — 3 من 4</h3>
-		<button class="close-btn">💾</button>
-	</div>
-	<div class="screen-content">
-		<div class="dropzone">📁 اسحب الملفات هنا أو اضغط للاستعراض — مسموح JPG/PNG/PDF/MP4 (حتى 2GB/ملف)</div>
-		<div class="uploads">
-			<div class="row">✅ venue_layout.pdf (2.4 MB) <span>🗑️ حذف</span></div>
-			<div class="row">✅ style_reference_01.jpg (854 KB) <span>🗑️ حذف</span></div>
-			<div class="row">⏳ guest_list.pdf (456 KB) — 68%</div>
-		</div>
-		<div style="margin-top:12px"><button class="primary-btn">⏭️ المتابعة</button></div>
-	</div>
-</div>
-
-### عرض تفاعلي — الخطوة 4/4: المراجعة والإرسال
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>إنشاء طلب جديد — 4 من 4</h3>
-		<button class="close-btn">💾</button>
-	</div>
-	<div class="screen-content">
-		<div class="review-grid">
-			<div class="review-card">
-				<strong>ملخص</strong>
-				<div>الخدمة: 📷 التصوير — الفئة: زفاف</div>
-				<div>الموقع: بغداد — التاريخ: 30/أغسطس/2025</div>
-			</div>
-			<div class="review-card">
-				<strong>خيارات</strong>
-				<label><input type="checkbox" checked> أوافق على الشروط</label><br>
-				<label><input type="checkbox" checked> استلام تنبيهات</label>
-			</div>
-		</div>
-		<div style="margin-top:12px"><button class="primary-btn">📤 إرسال الطلب النهائي</button></div>
-	</div>
-</div>
-
-### ملاحظات سريعة - إنشاء طلب جديد (الخطوات)
-• كل الخطوات الأربع تحولت لـ HTML تفاعلي فوق.
-
-
-
-
-### ملاحظات سريعة - تأكيد بعد الإرسال
-• شاشة التأكيد موضحة عبر HTML أعلاه ضمن التدفق.
-
----
-
-<a id="client-tracking"></a>
-## 📊 شاشة متابعة الطلب/المشروع
-
-### عرض تفاعلي — تفاصيل الطلب + Timeline
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>طلب #RQ-2025-1029</h3>
-		<button class="close-btn">🔄</button>
-	</div>
-	<div class="screen-content">
-		<div><strong>📷 تصوير حفل زفاف</strong> — الحالة: reviewing</div>
-		<div class="timeline" style="margin-top:8px">
-			<div class="track"><div class="fill" style="--p:33%"></div></div>
-			<div class="stops"><span>pending</span><span>reviewing</span><span>approved</span><span>in_progress</span></div>
-		</div>
-		<h4 style="margin:12px 0 8px">تفاصيل</h4>
-		<div class="review-grid">
-			<div class="review-card">تاريخ الإرسال: 24/أغسطس/2025 — آخر تحديث: 2:15 م</div>
-			<div class="review-card">المسؤول: admin@depth-agency.com — SLA: 24-48 ساعة</div>
-		</div>
-		<h4 style="margin:12px 0 8px">إعدادات الإشعارات</h4>
-		<div class="review-card"><label><input type="checkbox" checked> In-App</label> <label><input type="checkbox" checked> Email</label> <label><input type="checkbox"> SMS</label> <button class="secondary-btn">حفظ</button></div>
-	</div>
-</div>
-
-### ملاحظات سريعة - تفاصيل مع Timeline
-• تم تحويل كامل التفاصيل لواجهة HTML مع شريط تقدم زمني.
-
----
-
-<a id="client-preview"></a>
-## 👁️ شاشة المعاينة والموافقة
-
-### عرض تفاعلي — معرض المعاينة مع Watermark
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>معاينة المشروع #DP2025-0138</h3>
-		<button class="close-btn">⚙️</button>
-	</div>
-	<div class="screen-content gallery">
-		<div class="gallery-main">
-			<div class="watermark">© DEPTH AGENCY — PREVIEW ONLY</div>
-			<div class="current" style="font-size:56px; padding:40px 0">صورة 1</div>
-		</div>
-		<div class="controls">
-			<button class="secondary-btn" data-prev>◀ السابق</button>
-			<div>الصورة <span class="g-idx">1</span> من 10</div>
-			<button class="secondary-btn" data-next>التالي ▶</button>
-		</div>
-		<div class="thumbs">
-			<div class="thumb">1</div><div class="thumb">2</div><div class="thumb">3</div><div class="thumb">4</div><div class="thumb">5</div>
-			<div class="thumb">6</div><div class="thumb">7</div><div class="thumb">8</div><div class="thumb">9</div><div class="thumb">10</div>
-		</div>
-		<div class="dl-row">
-			<button class="secondary-btn">📥 تنزيل معاينة منخفضة</button>
-			<button class="primary-btn">🔒 الأصلية (بعد الموافقة)</button>
-		</div>
-		<div style="margin-top:10px" class="review-card">💬 ملاحظة: أرجو تعديل الإضاءة في الزاوية اليمنى</div>
-		<div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center">
-			<button class="primary-btn">✅ موافقة نهائية</button>
-			<button class="secondary-btn">📝 طلب تعديلات</button>
-		</div>
-	</div>
-</div>
-
-### ملاحظات سريعة - المعاينة
-• معرض HTML يدعم watermark والتنقل بين الصور.
-
----
-
-<a id="client-invoices"></a>
-## 💳 شاشة الفواتير والمدفوعات
-
-### عرض تفاعلي — قائمة الفواتير
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>الفواتير والمدفوعات</h3>
-		<button class="close-btn">⬇️</button>
-	</div>
-	<div class="screen-content">
-		<table class="invoice-table">
-			<thead><tr><th>رقم</th><th>المشروع</th><th>المبلغ</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-			<tbody>
-				<tr><td>INV-2025-001234</td><td>تصوير حفل زفاف</td><td>1,200,000 IQD</td><td>✅ مدفوعة</td><td><button class="secondary-btn">📥 PDF</button></td></tr>
-				<tr><td>INV-2025-001233</td><td>مونتاج فيديو</td><td>308,000 IQD</td><td>⏳ مستحقة</td><td><button class="primary-btn">💳 دفع</button> <button class="secondary-btn">📥</button></td></tr>
-				<tr><td>INV-2025-001232</td><td>تصميم هوية</td><td>185,000 IQD</td><td>📝 مسودة</td><td><button class="secondary-btn">👁️ عرض</button></td></tr>
-			</tbody>
-		</table>
-	</div>
-</div>
-
-### ملاحظات سريعة - الفواتير
-• الجداول تم تحويلها لـ HTML باستخدام `invoice-table`.
-
-### ملاحظات سريعة - تفاصيل فاتورة
-• تفاصيل الفاتورة صارت HTML تفاعلي للأزرار ضمن نفس القسم أعلاه.
-
----
-
-<a id="client-notifications"></a>
-## 🔔 شاشة الإشعارات والرسائل
-
-### عرض تفاعلي — قائمة الإشعارات
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>الإشعارات</h3>
-		<button class="close-btn">🗑️</button>
-	</div>
-	<div class="screen-content">
-		<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px">
-			<span class="chip">جميع</span>
-			<span class="chip">غير مقروءة (5)</span>
-			<span class="chip">المشاريع</span>
-			<span class="chip">المدفوعات</span>
-			<span class="chip">النظام</span>
-		</div>
-		<div class="notif-list">
-			<div class="notif-item">
-				<div>🔴 جديد — منذ 5 دقائق</div>
-				<div>📷 تم رفع الصور النهائية لمشروع التصوير — سارة أحمد</div>
-				<div><button class="secondary-btn">عرض المشروع ←</button></div>
-			</div>
-			<div class="notif-item">
-				<div>🔴 جديد — منذ ساعتين</div>
-				<div>💳 فاتورة جديدة بانتظار الدفع — 308,000 د.ع</div>
-				<div><button class="primary-btn">عرض الفاتورة ←</button></div>
-			</div>
-			<div class="notif-item">
-				<div>مقروء — أمس</div>
-				<div>✅ تم قبول طلبك وتعيين مبدع — علي الموسوي</div>
-				<div><button class="secondary-btn">عرض التفاصيل ←</button></div>
-			</div>
-		</div>
-	</div>
-</div>
-
-### ملاحظات سريعة - الإشعارات
-• القوائم تحولت لبطاقات HTML ضمن `.notif-list`.
-
-### ملاحظات سريعة - إعدادات الإشعارات
-• تم استبدال ASCII بنموذج HTML مختصر فوق.
-
----
-
-<a id="client-settings"></a>
-## ⚙️ شاشة الإعدادات الشخصية
-
-### عرض تفاعلي — إعدادات الحساب
-
-<div class="screen-mockup">
-	<div class="screen-header">
-		<button class="back-btn">⬅</button>
-		<h3>إعدادات الحساب</h3>
-		<button class="close-btn">💾</button>
-	</div>
-	<div class="screen-content settings-cards">
-		<div class="settings-card">
-			<strong>معلومات الحساب</strong>
-			<div class="row"><span>الاسم</span><span>أحمد محمد الخالدي</span></div>
-			<div class="row"><span>الشركة</span><span>شركة الأمل للتجارة</span></div>
-			<div class="row"><span>البريد</span><span>ahmed@alamal.com</span></div>
-			<div class="row"><span>الهاتف</span><span>+964 750 123 4567</span></div>
-		</div>
-		<div class="settings-card">
-			<strong>الأمان والتفضيلات</strong>
-			<div class="row"><span>التحقق بخطوتين</span><span>✅ مفعّل</span></div>
-			<div class="row"><span>اللغة</span><span>العربية</span></div>
-			<div class="row"><span>الوضع</span><span>فاتح</span></div>
-			<div class="row"><button class="primary-btn">حفظ التغييرات</button></div>
-		</div>
-	</div>
-</div>
-
-### عرض تفاعلي — القائمة الجانبية (الموبايل)
-
-<div class="screen-mockup side-menu">
-	<div class="menu-head">القائمة الرئيسية</div>
-	<div class="menu-items">
-		<div class="menu-item">🏠 الشاشة الرئيسية</div>
-		<div class="menu-item">📝 إنشاء طلب جديد</div>
-		<div class="menu-item">📊 مشاريعي</div>
-		<div class="menu-item">💬 الرسائل <span class="badge">3</span></div>
-		<div class="menu-item">🔔 الإشعارات <span class="badge">5</span></div>
-		<div class="menu-item">💳 الفواتير</div>
-		<div class="menu-item">⚙️ الإعدادات</div>
-	</div>
-</div>
-
-### ملاحظة
-• تم حذف مخطط ASCII القديم لهالصفحة، والتمثيل صار فقط بالـ HTML أعلاه.
-
----
-
-## 📊 ملاحظات التوافق والمراجع
-
-### التوافق مع المتطلبات:
-- ✅ **OTP System**: 6 أرقام، 5 دقائق صلاحية، 3 محاولات
-- ✅ **File Upload**: 2GB حد أقصى، chunked upload، virus scanning
-- ✅ **Pricing**: التقريب لأقرب 500 د.ع
-- ✅ **Notifications**: In-App, Email, SMS مع fallback تلقائي
-- ✅ **Project Status Flow**: pending → reviewing → approved → active → completed
-- ✅ **Watermark**: معاينة مع علامة مائية، النهائي بدون
-
-### المراجع الرئيسية:
-- OTP: `documentation/00-overview/00-introduction.md:110,635`
-- Project Status: `documentation/02-database/01-database-schema.md:257-258,306`
-- Storage: `documentation/03-api/features/05-storage.md:88`
-- Pricing: `documentation/03-api/features/04-pricing.md:185`
-- Notifications: `documentation/02-database/01-database-schema.md:426`
-
-### حالات البيانات:
-- **Users**: status = active بعد OTP
-- **Projects**: isArchived = false للمشاريع النشطة
-- **Requests**: status يتغير من pending إلى reviewing
-- **Invoices**: عرض فقط في V2.0، لا دفع إلكتروني
-
----
-
-**الحالة النهائية:** متوافق 100% مع متطلبات V2.0 ✅
-**آخر تحديث:** أغسطس 2025
-**النسخة:** 2.0 Final
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅</button>
+        <h3>رفع
