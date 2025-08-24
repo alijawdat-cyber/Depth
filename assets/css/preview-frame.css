@@ -86,9 +86,9 @@
   display: block;
   background: var(--bg-primary);
   position: absolute;
-  /* ضع الشاشة داخل الإطار حسب الإحداثيات وتابع الزوم */
-  top: calc(var(--dp-screen-y) * var(--dp-scale));
-  left: calc(var(--dp-screen-x) * var(--dp-scale));
+  /* ضع الشاشة داخل الإطار حسب الإحداثيات (بدون ضرب بالـscale لأن الحاوية نفسها تتحجّم) */
+  top: var(--dp-screen-y);
+  left: var(--dp-screen-x);
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
@@ -101,8 +101,8 @@
   transform-origin: top left;
   transform: none;
   position: absolute;
-  top: calc(var(--dp-screen-y) * var(--dp-scale));
-  left: calc(var(--dp-screen-x) * var(--dp-scale));
+  top: var(--dp-screen-y);
+  left: var(--dp-screen-x);
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
