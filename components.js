@@ -2572,131 +2572,15 @@ class UIComponents {
             const pre = code.closest('pre');
             if (!pre) return;
             // لا تكرر التغليف
-            if (pre.closest('.ascii-viewer')) return;
+            if (pre.closest('.ascii-viewer') || pre.parentElement?.classList.contains('ascii-center')) return;
             const langClass = Array.from(code.classList).join(' ');
             const text = code.textContent || '';
             if (!isAsciiDiagram(text, langClass)) return;
-
-            // أنشئ العارض
-            const viewer = document.createElement('div');
-            viewer.className = 'ascii-viewer';
-            viewer.setAttribute('data-vp', 'desktop');
-
-            const toolbar = document.createElement('div');
-            toolbar.className = 'ascii-toolbar';
-            // عنوان من أقرب heading إن وُجد
-            const autoTitle = getNearestTitle(pre) || 'UI Mock';
-            toolbar.innerHTML = `
-                <div class="at-left">
-                  <div class="at-title">${autoTitle}</div>
-                </div>
-                <div class="at-right">
-                  <div class="vp-group" role="group" aria-label="Viewport">
-                    <button class="vp-btn" data-vp="mobile" title="Mobile">Mobile</button>
-                    <button class="vp-btn" data-vp="tablet" title="Tablet">Tablet</button>
-                    <button class="vp-btn active" data-vp="desktop" title="Desktop">Desktop</button>
-                    <button class="vp-btn" data-vp="full" title="Full">Full</button>
-                  </div>
-                  <button class="az-btn" data-zoom="out" title="تصغير"><i data-lucide="zoom-out"></i></button>
-                  <button class="az-btn" data-zoom="in" title="تكبير"><i data-lucide="zoom-in"></i></button>
-                  <button class="az-btn" data-fit title="ملاءمة"><i data-lucide="maximize"></i></button>
-                  <button class="az-btn" data-reset title="إعادة"><i data-lucide="rotate-ccw"></i></button>
-                </div>`;
-
-            const stage = document.createElement('div');
-            stage.className = 'ascii-stage';
-            const content = document.createElement('div');
-            content.className = 'ascii-content';
-
-            // انقل الـpre داخل المحتوى مع الحفاظ على النسخ + تطبيع الفراغات
-            const preClone = pre.cloneNode(true);
-            try {
-                const codeClone = preClone.querySelector('code');
-                if (codeClone) codeClone.textContent = normalizeAscii(codeClone.textContent||'');
-            } catch(_) {}
-            content.appendChild(preClone);
-
-            // أضف غلاف جهاز (bezel/notch)
-            const device = document.createElement('div');
-            device.className = 'ascii-device';
-
-            // استبدل الـpre الأصلي بالعارض
-            pre.replaceWith(viewer);
-            viewer.appendChild(toolbar);
-            viewer.appendChild(device);
-            device.appendChild(stage);
-            stage.appendChild(content);
-
-            // حالة التحويل (تكبير/تصغير/تحريك)
-            let scale = 1, tx = 0, ty = 0;
-            const apply = () => { content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
-            const fit = () => {
-                try {
-                    // قياس المحتوى الفعلي داخل pre
-                    const preEl = content.querySelector('pre');
-                    if (!preEl) return;
-                    // حدد المقاس
-                    const box = preEl.getBoundingClientRect();
-                    const host = stage.getBoundingClientRect();
-                    if (box.width <= 0 || box.height <= 0 || host.width <= 0 || host.height <= 0) return;
-                    const sx = (host.width - 24) / box.width;
-                    const sy = (host.height - 24) / Math.max(box.height, 200);
-                    scale = Math.max(0.5, Math.min(1.15, Math.min(sx, sy)));
-                    tx = 12; ty = 12; apply();
-                } catch (_) {}
-            };
-            const reset = () => { scale = 1; tx = 0; ty = 0; apply(); };
-
-            // أزرار التولبار
-            toolbar.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-                if (btn.classList.contains('vp-btn')) {
-                    const mode = btn.getAttribute('data-vp');
-                    viewer.setAttribute('data-vp', mode);
-                    toolbar.querySelectorAll('.vp-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    setTimeout(fit, 10);
-                    return;
-                }
-                if (btn.hasAttribute('data-zoom')) {
-                    const dir = btn.getAttribute('data-zoom');
-                    scale = Math.max(0.3, Math.min(2.5, scale * (dir === 'in' ? 1.2 : 1/1.2)));
-                    apply();
-                } else if (btn.hasAttribute('data-fit')) {
-                    fit();
-                } else if (btn.hasAttribute('data-reset')) {
-                    reset();
-                }
-            });
-
-            // سحب للتحريك
-            let dragging = false; let sx = 0, sy = 0, ox = 0, oy = 0;
-            const start = (clientX, clientY) => { dragging = true; viewer.classList.add('dragging'); sx = clientX; sy = clientY; ox = tx; oy = ty; };
-            const move = (clientX, clientY) => { if (!dragging) return; tx = ox + (clientX - sx); ty = oy + (clientY - sy); apply(); };
-            const end = () => { dragging = false; viewer.classList.remove('dragging'); };
-            stage.addEventListener('mousedown', (e)=>{ if (e.button!==0) return; start(e.clientX,e.clientY); e.preventDefault(); });
-            window.addEventListener('mousemove', (e)=> move(e.clientX,e.clientY));
-            window.addEventListener('mouseup', end);
-            stage.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if (!t) return; start(t.clientX,t.clientY); }, { passive: true });
-            window.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; if (!t) return; move(t.clientX,t.clientY); }, { passive: true });
-            window.addEventListener('touchend', end, { passive: true });
-
-            // wheel zoom + double click fit
-            stage.addEventListener('wheel', (e) => {
-                if (!e.ctrlKey && Math.abs(e.deltaY) < 4) return; // دقة لمس
-                e.preventDefault();
-                const dir = e.deltaY > 0 ? 1/1.12 : 1.12;
-                scale = Math.max(0.3, Math.min(2.5, scale * dir));
-                apply();
-            }, { passive: false });
-            stage.addEventListener('dblclick', (e) => { e.preventDefault(); fit(); });
-
-            // ملاءمة أولية
-            setTimeout(fit, 30);
-
-            // حدّث الأيقونات
-            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+            // التفاف بسيط للتوسيط فقط
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ascii-center';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
         });
     }
 
