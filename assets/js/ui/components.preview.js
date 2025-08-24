@@ -97,18 +97,41 @@
       };
       applyDims();
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>
+  :root{ --ios-safe-top: 54px; }
   html,body{height:100%;margin:0;padding:0;overflow:hidden;-webkit-overflow-scrolling:touch;}
   body{background:var(--bg-primary);} 
-  .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;}
+  /* محتوى الشاشة: نضيف بادينغ علوي يساوي ارتفاع شريط الحالة ليبقى التطبيق أسفله دائمًا */
+  .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;padding-top:max(var(--ios-safe-top), env(safe-area-inset-top, 0px))!important;background-clip:padding-box;}
   .toast-container{position:fixed;inset:auto auto 12px 12px;}
-  /* شريط الحالة المقدم (SVG) مثبت أعلى الشاشة */
-  .ios-statusbar{position:fixed;top:0px;left:0;right:0;display:block;width:100%;height:auto;z-index:9999;pointer-events:none}
-  [data-theme="dark"] .ios-statusbar{ filter: invert(1) contrast(1.1); }
+  /* حاوية شريط الحالة بخلفية بيضاء ثابتة */
+  .ios-statusbar-wrap{position:fixed;top:0;left:0;right:0;background:#fff;z-index:9999;pointer-events:none}
+  .ios-statusbar{display:block;width:100%;height:auto;pointer-events:none}
+  /* لا نستخدم عكس الألوان في الوضع الداكن — المنطقة العلوية تبقى بيضاء دومًا */
   </style></head><body>
-  <img class="ios-statusbar" src="${asset('assets/img/Status Bar.svg')}" alt="iOS Status Bar"/>
+  <div class="ios-statusbar-wrap">
+    <img class="ios-statusbar" src="${asset('assets/img/Status Bar.svg')}" alt="iOS Status Bar"/>
+  </div>
   <div class="screen-mockup">${htmlForPreview}</div>
   <script src="${asset('assets/js/interactive-mockups.js')}"><\/script>
-  <script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script>
+  <script>
+  // عيّن قيمة البادينغ العلوي حسب ارتفاع صورة شريط الحالة الفعلي
+  window.addEventListener('DOMContentLoaded',()=>{
+    try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){}
+    try{
+      const img = document.querySelector('.ios-statusbar');
+      const setSafe = ()=>{
+        if(!img) return;
+        const h = Math.round((img.getBoundingClientRect().height||img.naturalHeight||54));
+        document.documentElement.style.setProperty('--ios-safe-top', h+'px');
+      };
+      if (img){
+        if (img.complete) setSafe();
+        img.addEventListener('load', setSafe);
+        window.addEventListener('resize', setSafe);
+      }
+    }catch(_){ }
+  });
+  <\/script>
   </body></html>`;
       const loadFrame = (theme='light')=>{ iframe.srcdoc = buildSrcDoc(theme); };
       loadFrame('light');
