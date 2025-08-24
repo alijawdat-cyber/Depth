@@ -415,6 +415,7 @@ class DepthDocs {
                 try { UIComponents.enhanceInlineTOC(docContent); } catch (_) {}
                 try { UIComponents.enhanceCallouts(docContent); } catch (_) {}
                 try { UIComponents.enhanceImagesAndLinks(docContent); } catch (_) {}
+                    try { UIComponents.enhanceAsciiDiagrams(docContent); } catch (_) {}
             });
         } else {
             UIComponents.enhanceJSONBlocks(docContent);
@@ -423,6 +424,7 @@ class DepthDocs {
             UIComponents.enhanceInlineTOC(docContent);
             UIComponents.enhanceCallouts(docContent);
             UIComponents.enhanceImagesAndLinks(docContent);
+                UIComponents.enhanceAsciiDiagrams(docContent);
         }
         UIComponents.injectPageTitleIcon(path);
         UIComponents.applyAutoDirection(docContent);

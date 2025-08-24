@@ -2513,6 +2513,138 @@ class UIComponents {
         try { UIComponents.lazyLoadImages(root); } catch (_) {}
     }
 
+    // =============== ASCII UI Diagrams Enhancer ===============
+    static enhanceAsciiDiagrams(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        // اختبر إن كانت كتلة code مرسومة بخطوط صندوقية أو ASCII box-drawing
+        const isAsciiDiagram = (text, langClass) => {
+            const t = (text || '').trim();
+            if (!t) return false;
+            const lang = (langClass || '').toLowerCase();
+            // لو محدد لغة برمجية معروفة، نتجنبه
+            if (/json|js|ts|html|css|sql|bash|sh|yaml|yml|mermaid|flow|graph|bash|shell/.test(lang)) return false;
+            // حروف الرسم الشائعة
+            const BOX_RE = /[┌┐└┘├┤┬┴┼─│╭╮╯╰╱╲]/;
+            // وجود أكثر من سطرين + عرض أسطر متقارب ووجود خطوط أفقية طويلة
+            const lines = t.split(/\r?\n/);
+            if (lines.length < 3) return false;
+            const hasBoxChars = BOX_RE.test(t);
+            const longHoriz = lines.some(l => /[─\-]{6,}/.test(l));
+            return hasBoxChars || longHoriz;
+        };
+
+        const candidates = Array.from(root.querySelectorAll('pre > code'));
+        candidates.forEach(code => {
+            const pre = code.closest('pre');
+            if (!pre) return;
+            // لا تكرر التغليف
+            if (pre.closest('.ascii-viewer')) return;
+            const langClass = Array.from(code.classList).join(' ');
+            const text = code.textContent || '';
+            if (!isAsciiDiagram(text, langClass)) return;
+
+            // أنشئ العارض
+            const viewer = document.createElement('div');
+            viewer.className = 'ascii-viewer';
+            viewer.setAttribute('data-vp', 'desktop');
+
+            const toolbar = document.createElement('div');
+            toolbar.className = 'ascii-toolbar';
+            toolbar.innerHTML = `
+                <div class="at-left">
+                  <div class="at-title">UI Mock</div>
+                </div>
+                <div class="at-right">
+                  <div class="vp-group" role="group" aria-label="Viewport">
+                    <button class="vp-btn" data-vp="mobile" title="Mobile">Mobile</button>
+                    <button class="vp-btn" data-vp="tablet" title="Tablet">Tablet</button>
+                    <button class="vp-btn active" data-vp="desktop" title="Desktop">Desktop</button>
+                    <button class="vp-btn" data-vp="full" title="Full">Full</button>
+                  </div>
+                  <button class="az-btn" data-zoom="out" title="تصغير"><i data-lucide="zoom-out"></i></button>
+                  <button class="az-btn" data-zoom="in" title="تكبير"><i data-lucide="zoom-in"></i></button>
+                  <button class="az-btn" data-fit title="ملاءمة"><i data-lucide="maximize"></i></button>
+                  <button class="az-btn" data-reset title="إعادة"><i data-lucide="rotate-ccw"></i></button>
+                </div>`;
+
+            const stage = document.createElement('div');
+            stage.className = 'ascii-stage';
+            const content = document.createElement('div');
+            content.className = 'ascii-content';
+
+            // انقل الـpre داخل المحتوى مع الحفاظ على النسخ
+            content.appendChild(pre.cloneNode(true));
+
+            // استبدل الـpre الأصلي بالعارض
+            pre.replaceWith(viewer);
+            viewer.appendChild(toolbar);
+            viewer.appendChild(stage);
+            stage.appendChild(content);
+
+            // حالة التحويل (تكبير/تصغير/تحريك)
+            let scale = 1, tx = 0, ty = 0;
+            const apply = () => { content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
+            const fit = () => {
+                try {
+                    // قياس المحتوى الفعلي داخل pre
+                    const preEl = content.querySelector('pre');
+                    if (!preEl) return;
+                    // حدد المقاس
+                    const box = preEl.getBoundingClientRect();
+                    const host = stage.getBoundingClientRect();
+                    if (box.width <= 0 || box.height <= 0 || host.width <= 0 || host.height <= 0) return;
+                    const sx = (host.width - 24) / box.width;
+                    const sy = (host.height - 24) / Math.max(box.height, 200);
+                    scale = Math.max(0.5, Math.min(1.15, Math.min(sx, sy)));
+                    tx = 12; ty = 12; apply();
+                } catch (_) {}
+            };
+            const reset = () => { scale = 1; tx = 0; ty = 0; apply(); };
+
+            // أزرار التولبار
+            toolbar.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                if (btn.classList.contains('vp-btn')) {
+                    const mode = btn.getAttribute('data-vp');
+                    viewer.setAttribute('data-vp', mode);
+                    toolbar.querySelectorAll('.vp-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    setTimeout(fit, 10);
+                    return;
+                }
+                if (btn.hasAttribute('data-zoom')) {
+                    const dir = btn.getAttribute('data-zoom');
+                    scale = Math.max(0.3, Math.min(2.5, scale * (dir === 'in' ? 1.2 : 1/1.2)));
+                    apply();
+                } else if (btn.hasAttribute('data-fit')) {
+                    fit();
+                } else if (btn.hasAttribute('data-reset')) {
+                    reset();
+                }
+            });
+
+            // سحب للتحريك
+            let dragging = false; let sx = 0, sy = 0, ox = 0, oy = 0;
+            const start = (clientX, clientY) => { dragging = true; viewer.classList.add('dragging'); sx = clientX; sy = clientY; ox = tx; oy = ty; };
+            const move = (clientX, clientY) => { if (!dragging) return; tx = ox + (clientX - sx); ty = oy + (clientY - sy); apply(); };
+            const end = () => { dragging = false; viewer.classList.remove('dragging'); };
+            stage.addEventListener('mousedown', (e)=>{ if (e.button!==0) return; start(e.clientX,e.clientY); e.preventDefault(); });
+            window.addEventListener('mousemove', (e)=> move(e.clientX,e.clientY));
+            window.addEventListener('mouseup', end);
+            stage.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if (!t) return; start(t.clientX,t.clientY); }, { passive: true });
+            window.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; if (!t) return; move(t.clientX,t.clientY); }, { passive: true });
+            window.addEventListener('touchend', end, { passive: true });
+
+            // ملاءمة أولية
+            setTimeout(fit, 30);
+
+            // حدّث الأيقونات
+            if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        });
+    }
+
     // Lazy loading for images using IntersectionObserver
     static lazyLoadImages(root) {
         const images = root.querySelectorAll('img');
