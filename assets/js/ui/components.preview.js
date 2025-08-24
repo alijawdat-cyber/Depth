@@ -102,7 +102,7 @@
   .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;}
   .toast-container{position:fixed;inset:auto auto 12px 12px;}
   /* شريط الحالة المقدم (SVG) مثبت أعلى الشاشة */
-  .ios-statusbar{position:fixed;top:1px;left:0;right:0;display:block;width:100%;height:auto;z-index:9999;pointer-events:none}
+  .ios-statusbar{position:fixed;top:0px;left:0;right:0;display:block;width:100%;height:auto;z-index:9999;pointer-events:none}
   [data-theme="dark"] .ios-statusbar{ filter: invert(1) contrast(1.1); }
   </style></head><body>
   <img class="ios-statusbar" src="${asset('assets/img/Status Bar.svg')}" alt="iOS Status Bar"/>
