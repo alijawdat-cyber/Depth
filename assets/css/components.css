@@ -349,10 +349,7 @@
     max-height: calc(100vh - var(--header-total-height) - 32px);
     overflow-y: auto;
     scroll-behavior: smooth;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: transform;
+    will-change: scroll-position;
 }
 
 .floating-toc h3 {

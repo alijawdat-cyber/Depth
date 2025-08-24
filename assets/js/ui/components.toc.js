@@ -30,7 +30,8 @@
           if (currentGroup && currentGroup.sublist) currentGroup.sublist.appendChild(item); else toc.appendChild(item);
         }
       });
-      NS.observeHeadings(headings);
+  NS.observeHeadings(headings);
+  NS.attachTOCScrollSync(headings);
       const h2s = Array.from(headings).filter(h=>h.tagName.toLowerCase()==='h2');
       NS.setupMobileTOC(h2s);
       try { NS.enhanceFloatingTOC && NS.enhanceFloatingTOC(); } catch(_) {}
@@ -82,12 +83,40 @@
       headings.forEach(heading => observer.observe(heading));
     };
 
-    NS.enhanceFloatingTOC = function(){
-      const toc = document.querySelector('.floating-toc');
-      if (!toc || window.innerWidth < 1024) return;
-      let lastY = window.scrollY; let ticking = false;
-      const rafUpdate = () => { const y = window.scrollY; const delta = Math.max(0, y - lastY); toc.style.willChange = 'transform'; toc.style.transform = `translateY(${delta}px)`; requestAnimationFrame(()=>{ toc.style.transform=''; toc.style.willChange=''; }); lastY = y; ticking = false; };
-      const onScroll = () => { if (!ticking) { requestAnimationFrame(rafUpdate); ticking = true; } };
+    // اجعل الفلوتنغ TOC ثابت (يعتمد فقط على sticky في CSS)
+    NS.enhanceFloatingTOC = function(){ /* لا حاجة لحركات JS هنا للحفاظ على الثبات */ };
+
+    // مزامنة العناوين مع التمرير بشكل سلس جدًا (ديسكتوب)
+    NS.attachTOCScrollSync = function(headings){
+      try { window.removeEventListener('scroll', NS._tocScrollSync); } catch(_) {}
+      if (!headings || !headings.length || window.innerWidth < 1024) return;
+      const tocEl = document.getElementById('toc-list');
+      const map = new Map();
+      tocEl && tocEl.querySelectorAll('.toc-item a').forEach(a=>{ const href=a.getAttribute('href')||''; if (href.startsWith('#')) map.set(href.slice(1), a); });
+      const headerOff = NS.getHeaderOffset();
+      let prevId = '';
+      const centerActive = (a)=>{ if (!tocEl || !a) return; const target = a.offsetTop - (tocEl.clientHeight/2) + (a.clientHeight/2); tocEl.scrollTo({ top: Math.max(0, target), behavior: 'smooth' }); };
+      const setActive = (id)=>{
+        if (!id || id===prevId) return; prevId = id;
+        const links = tocEl ? tocEl.querySelectorAll('a') : [];
+        links && links.forEach(l=>l.classList.remove('active'));
+        const a = map.get(id); if (a) { a.classList.add('active'); centerActive(a); const group=a.closest('.toc-group'); if (group && group.classList.contains('collapsed')) { group.classList.remove('collapsed'); const c=group.querySelector('.toc-caret'); c&&c.setAttribute('aria-expanded','true'); } }
+      };
+      let ticking=false; let lastRun=0;
+      const onScroll = ()=>{
+        const now = performance.now(); if (now-lastRun<16) return; lastRun=now;
+        if (ticking) return; ticking=true;
+        requestAnimationFrame(()=>{
+          let current = headings[0];
+          for (let i=0;i<headings.length;i++){
+            const r = headings[i].getBoundingClientRect();
+            if ((r.top - headerOff) <= 10) current = headings[i]; else break;
+          }
+          setActive(current && current.id);
+          ticking=false;
+        });
+      };
+      NS._tocScrollSync = onScroll;
       window.addEventListener('scroll', onScroll, { passive: true });
     };
 
