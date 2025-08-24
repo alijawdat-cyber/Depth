@@ -21,6 +21,35 @@
 <a id="client-auth"></a>
 ## 🔐 شاشة تسجيل الدخول والتحقق (OTP)
 
+### عرض تفاعلي — شاشة التحقق OTP (موبايل)
+
+<div class="screen-mockup otp-screen">
+	<div class="screen-header">
+		<button class="back-btn">⬅ رجوع</button>
+		<h3>تأكيد رقم الهاتف</h3>
+		<button class="close-btn">❌ إغلاق</button>
+	</div>
+	<div class="screen-content">
+		<div class="icon">🔐</div>
+		<p>أرسلنا رمز التحقق المكوّن من 6 أرقام إلى الرقم <strong>+964 750 123 4567</strong></p>
+		<div class="otp-inputs" aria-label="OTP">
+			<input type="text" aria-label="1" />
+			<input type="text" aria-label="2" />
+			<input type="text" aria-label="3" />
+			<input type="text" aria-label="4" />
+			<input type="text" aria-label="5" />
+			<input type="text" aria-label="6" />
+		</div>
+		<div class="timer">⏰ باقي <span data-seconds="60">60</span> ثانية</div>
+		<button class="primary-btn" disabled>✅ تأكيد وإكمال التسجيل</button>
+		<div class="resend-section">لم تستلم الرمز؟ <button class="link-btn resend-btn" disabled>🔄 إعادة الإرسال</button></div>
+		<div class="otp-output" aria-live="polite"></div>
+	</div>
+  
+</div>
+
+> ملاحظة: تگدر تلصق الكود كامل، رح يتوزع تلقائيًا داخل الحقول. بعد 60 ثانية زر "إعادة الإرسال" يصير فعال.
+
 ### المخطط التفصيلي - شاشة التسجيل (الهاتف)
 
 ```
