@@ -1284,6 +1284,33 @@ class UIComponents {
                     const hostPre = firstCssCode.closest('pre');
                     hostPre && hostPre.after(grid);
                 }
+                // Spacing & Radius
+                const spaces = UIComponents.extractSpacingTokens(text);
+                if (spaces.length) {
+                    const grid = UIComponents.renderSpacingGrid(spaces);
+                    const hostPre = firstCssCode.closest('pre');
+                    hostPre && hostPre.after(grid);
+                }
+                const radii = UIComponents.extractRadiusTokens(text);
+                if (radii.length) {
+                    const grid = UIComponents.renderRadiusGrid(radii);
+                    const hostPre = firstCssCode.closest('pre');
+                    hostPre && hostPre.after(grid);
+                }
+            }
+        } catch (_) {}
+
+        // Breakpoints
+        try {
+            const bpCode = findCodeAfterHeading('tokens — breakpoints') || root.querySelector('pre code.language-css, pre code[class*="css"]');
+            if (bpCode) {
+                const text = bpCode.textContent || '';
+                const bps = UIComponents.extractBreakpoints(text);
+                if (bps.length) {
+                    const row = UIComponents.renderBreakpoints(bps);
+                    const hostPre = bpCode.closest('pre');
+                    hostPre && hostPre.after(row);
+                }
             }
         } catch (_) {}
     }
@@ -1339,6 +1366,45 @@ class UIComponents {
             if (m) res.push({ name: '--shadow', value: m[1].trim() });
         }
         return res.slice(0, 12);
+    }
+
+    static extractSpacingTokens(cssText) {
+        const res = [];
+        const lines = (cssText || '').split(/\n|;|\r/);
+        lines.forEach(line => {
+            const m = /(\-\-space[-\w]*)\s*:\s*([0-9.]+)px/i.exec(line);
+            if (!m) return;
+            const name = m[1];
+            const px = parseFloat(m[2]);
+            if (!isNaN(px)) res.push({ name, px });
+        });
+        return res.sort((a,b)=>a.px-b.px).slice(0, 16);
+    }
+
+    static extractRadiusTokens(cssText) {
+        const res = [];
+        const lines = (cssText || '').split(/\n|;|\r/);
+        lines.forEach(line => {
+            const m = /(\-\-radius[-\w]*)\s*:\s*([0-9.]+)px/i.exec(line);
+            if (!m) return;
+            const name = m[1];
+            const px = parseFloat(m[2]);
+            if (!isNaN(px)) res.push({ name, px });
+        });
+        return res.sort((a,b)=>a.px-b.px).slice(0, 12);
+    }
+
+    static extractBreakpoints(cssText) {
+        const res = [];
+        const lines = (cssText || '').split(/\n|;|\r/);
+        lines.forEach(line => {
+            const m = /(\-\-bp[-\w]*)\s*:\s*([0-9.]+)px/i.exec(line);
+            if (!m) return;
+            const name = m[1];
+            const px = parseFloat(m[2]);
+            if (!isNaN(px)) res.push({ name, px });
+        });
+        return res.sort((a,b)=>a.px-b.px).slice(0, 8);
     }
 
     // ---- Renderers ----
@@ -1453,6 +1519,73 @@ class UIComponents {
         ar && wrap.appendChild(ar);
         en && wrap.appendChild(en);
         return wrap;
+    }
+
+    static renderSpacingGrid(spaces) {
+        const wrap = document.createElement('div');
+        wrap.className = 'spacing-grid';
+        const max = Math.max(...spaces.map(s=>s.px), 1);
+        spaces.forEach(({ name, px }) => {
+            const row = document.createElement('div');
+            row.className = 'spacing-item';
+            const label = document.createElement('div');
+            label.className = 'spacing-label';
+            label.textContent = `${name}`;
+            const bar = document.createElement('div');
+            bar.className = 'spacing-bar';
+            bar.style.width = `${Math.max(8, (px/max)*100)}%`;
+            const val = document.createElement('div');
+            val.className = 'spacing-value';
+            val.textContent = `${px}px`;
+            row.appendChild(label);
+            row.appendChild(bar);
+            row.appendChild(val);
+            wrap.appendChild(row);
+        });
+        return wrap;
+    }
+
+    static renderRadiusGrid(radii) {
+        const grid = document.createElement('div');
+        grid.className = 'radius-grid';
+        radii.forEach(({ name, px }) => {
+            const card = document.createElement('div');
+            card.className = 'radius-card';
+            const box = document.createElement('div');
+            box.className = 'radius-box';
+            box.style.borderRadius = `${px}px`;
+            const meta = document.createElement('div');
+            meta.className = 'radius-meta';
+            meta.textContent = `${name}: ${px}px`;
+            card.appendChild(box);
+            card.appendChild(meta);
+            grid.appendChild(card);
+        });
+        return grid;
+    }
+
+    static renderBreakpoints(bps) {
+        const row = document.createElement('div');
+        row.className = 'bp-chips';
+        const max = Math.max(...bps.map(b=>b.px), 1);
+        bps.forEach(({ name, px }) => {
+            const chip = document.createElement('div');
+            chip.className = 'bp-chip';
+            const title = document.createElement('div');
+            title.className = 'bp-name';
+            title.textContent = name;
+            const preview = document.createElement('div');
+            preview.className = 'bp-preview';
+            preview.style.width = `${Math.max(20, (px/max)*100)}%`;
+            const v = document.createElement('div');
+            v.className = 'bp-value';
+            v.textContent = `${px}px`;
+            chip.appendChild(title);
+            chip.appendChild(preview);
+            chip.appendChild(v);
+            row.appendChild(chip);
+        });
+        return row;
     }
 
     // =============== Enhance tables: wrap, sticky head, optional sticky first column ===============
