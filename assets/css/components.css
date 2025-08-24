@@ -355,6 +355,47 @@
     pointer-events: auto;
 }
 
+/* ===== Inline TOC (داخل المقال) — ثابتة مثل الهيدر ===== */
+.inline-toc {
+    position: -webkit-sticky;
+    position: sticky;
+    top: calc(var(--header-total-height) + 12px);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin: 0 0 16px 0;
+    max-height: calc(100vh - var(--header-total-height) - 28px);
+    overflow-y: auto;
+}
+
+.inline-toc-title {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.inline-toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.inline-toc-list a {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.inline-toc-list a:hover,
+.inline-toc-list a:focus-visible { background: var(--bg-secondary); }
+
 .floating-toc h3 {
     font-size: 14px;
     font-weight: 600;

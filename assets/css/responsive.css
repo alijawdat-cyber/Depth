@@ -289,6 +289,8 @@
         max-width: 100%; 
         overflow: visible; 
     }
+    /* لا تعرض inline-toc بالموبايل لأن أكو Mobile TOC خاص */
+    .inline-toc { display: none !important; }
     
     /* Typography scaling for mobile */
     .doc-content h1 { 
