@@ -85,6 +85,17 @@ const sidebarData = [
         ]
     },
     {
+        title: 'Frontend',
+        id: 'frontend',
+        items: [
+            { name: 'UX Flows', path: '/documentation/06-frontend/04-ux-flows' },
+            { name: 'Client Screens', path: '/documentation/06-frontend/05-ui-screens-client' },
+            { name: 'Admin Screens', path: '/documentation/06-frontend/06-ui-screens-admin' },
+            { name: 'Creator Screens', path: '/documentation/06-frontend/07-ui-screens-creator' },
+            { name: 'Salaried Screens', path: '/documentation/06-frontend/08-ui-screens-salaried' }
+        ]
+    },
+    {
         title: 'الأمان',
         id: 'security',
         items: [
@@ -230,6 +241,15 @@ const pageContent = {
             <li><strong>نظام التسعير:</strong> مرن وقابل للتخصيص</li>
             <li><strong>نظام الإشعارات:</strong> متعدد القنوات</li>
             <li><strong>نظام التقارير:</strong> تحليلات شاملة</li>
+        </ul>
+
+        <h3>واجهات Frontend — روابط سريعة</h3>
+        <ul>
+            <li><a href="#/documentation/06-frontend/04-ux-flows">UX Flows</a></li>
+            <li><a href="#/documentation/06-frontend/05-ui-screens-client">Client Screens</a></li>
+            <li><a href="#/documentation/06-frontend/06-ui-screens-admin">Admin Screens</a></li>
+            <li><a href="#/documentation/06-frontend/07-ui-screens-creator">Creator Screens</a></li>
+            <li><a href="#/documentation/06-frontend/08-ui-screens-salaried">Salaried Screens</a></li>
         </ul>
     `,
     '/documentation/03-api/core/01-authentication': `
