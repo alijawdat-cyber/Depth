@@ -69,10 +69,11 @@
     body.sidebar-open .main-content { 
         margin-right: 0; /* لا تزح المين كونتينر كله */
     }
+    /* خلي للمقال انتقال ثابت حتى ينسجم الفتح/الإغلاق */
+    .doc-content { transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     body.sidebar-open .doc-content {
         /* RTL: احجز مساحة من جهة اليمين (مكان السايدبار) */
         margin-right: var(--sidebar-width);
-        transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     /* Desktop overlay should be click-catcher only (no dim) */
@@ -123,10 +124,11 @@
     body.sidebar-open .main-content { 
         margin-right: 0; 
     }
+    /* انتقال دائم للمقال لضمان تزامن الرجوع */
+    .doc-content { transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     body.sidebar-open .doc-content {
         /* RTL: احجز مساحة من جهة اليمين (مكان السايدبار) */
         margin-right: var(--sidebar-width);
-        transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
