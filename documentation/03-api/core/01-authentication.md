@@ -442,9 +442,13 @@ const otpVerification = {
 ```json
 {
   "fileUploadPolicy": {
-    "allowedTypes": ["image/jpeg", "image/png", "video/mp4"],
-    "maxSize": 104857600,
-    "virusScanning": true,
+  "allowedTypes": "*/*",
+  "denylist": ["exe","js","sh","bat"],
+  "maxSize": 2147483648,
+  "chunked": true,
+  "mimeSniffing": true,
+  "virusScanning": true,
+  "quotaPerProject": "configurable",
     "watermarkRequired": false,
     "encryptionRequired": true
   }

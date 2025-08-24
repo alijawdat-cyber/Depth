@@ -237,13 +237,26 @@
 {
   id: string,                     // معرف المشروع (PK)
   clientId: string,               // FK → clients
-  creatorId: string,              // FK → creators
   categoryId: string,             // FK → categories
-  subcategoryId: string,          // FK → subcategories
-  
+  subcategoryId: string,          // FK → subcategories (لا يتغير بعد التحويل من الطلب)
+
+  // البنود والتعيينات (يدعم تعدد المبدعين/الأدوار)
+  lineItems: [{
+    subcategoryId: string,
+    quantity: number,
+    processingLevel: 'raw'|'basic'|'color_correction'|'full_retouch'|'advanced_composite',
+    assignedCreators: string[]    // IDs لمبدعين متعددين
+  }],
+  assignments: [{
+    role: 'shoot'|'edit'|'design',
+    type: 'creator'|'salaried',
+    assigneeId: string            // creatorId أو salariedEmployeeId
+  }],
+
   // حالة المشروع
   status: 'draft' | 'pending' | 'active' | 'completed' | 'cancelled',
-  
+  isArchived: boolean,            // الأرشفة كفلاغ مستقل دون تغيير SSOT
+
   // التسعير (محسوب تلقائياً)
   basePrice: number,              // من subcategories
   experienceMod: number,          // معامل الخبرة
@@ -255,17 +268,17 @@
   creatorPrice: number,           // السعر النهائي للمبدع
   agencyMarginPercent: number,    // نسبة هامش الوكالة (10%-50%)
   clientPrice: number,            // السعر النهائي للعميل
-  
+
   // تفاصيل المشروع
   isRush: boolean,
   location: 'studio' | 'client' | 'outskirts' | 'nearby' | 'far',
   deliveryDate: date,
   notes: string,
-  
+
   // الموافقة
   approvedBy: string,             // admin email
   approvedAt: timestamp,
-  
+
   // التواريخ
   createdBy: string,              // admin email
   createdAt: timestamp,
