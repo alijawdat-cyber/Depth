@@ -1847,7 +1847,203 @@ class UIComponents {
             demo.appendChild(title); demo.appendChild(card);
             injectAfter(cardsHead, demo);
         }
+
+        // Tabs
+        const tabsHead = findHeading(/tabs|التبويبات/i);
+        if (tabsHead && !tabsHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Tabs';
+            const tabs = document.createElement('div'); tabs.className='ui-tabs';
+            tabs.innerHTML = `
+                <div class="tab-list" role="tablist">
+                    <button class="tab active" role="tab" data-tab="one">الأول</button>
+                    <button class="tab" role="tab" data-tab="two">الثاني</button>
+                    <button class="tab" role="tab" data-tab="three">الثالث</button>
+                </div>
+                <div class="tab-panels">
+                    <div class="tab-panel active" data-panel="one">محتوى تبويب 1</div>
+                    <div class="tab-panel" data-panel="two">محتوى تبويب 2</div>
+                    <div class="tab-panel" data-panel="three">محتوى تبويب 3</div>
+                </div>`;
+            tabs.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab'); if (!btn) return;
+                const name = btn.getAttribute('data-tab');
+                tabs.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t===btn));
+                tabs.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.getAttribute('data-panel')===name));
+            });
+            demo.appendChild(title); demo.appendChild(tabs); injectAfter(tabsHead, demo);
+        }
+
+        // Modal & Drawer
+        const modalHead = findHeading(/modal|drawer|مودال|سحب/i);
+        if (modalHead && !modalHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Modal & Drawer';
+            const row = document.createElement('div'); row.className='selection-row';
+            row.innerHTML = `
+                <button class="ui-btn ui-primary ui-sm" data-open="modal">فتح Modal</button>
+                <button class="ui-btn ui-secondary ui-sm" data-open="drawer">فتح Drawer</button>
+                <div class="ui-modal" hidden>
+                  <div class="ui-overlay" data-close></div>
+                  <div class="ui-dialog">
+                    <div class="ui-dialog-h">عنوان</div>
+                    <div class="ui-dialog-b">نص داخل مودال بسيط للتجربة.</div>
+                    <div class="ui-dialog-f"><button class="ui-btn ui-secondary ui-sm" data-close>إغلاق</button></div>
+                  </div>
+                </div>
+                <div class="ui-drawer" hidden>
+                  <div class="ui-overlay" data-close></div>
+                  <div class="ui-drawer-p">
+                    <div class="ui-drawer-h">القائمة الجانبية</div>
+                    <div class="ui-drawer-b">محتوى السحب الجانبي</div>
+                  </div>
+                </div>`;
+            row.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-open]');
+                if (btn) {
+                    const kind = btn.getAttribute('data-open');
+                    const el = row.querySelector(kind==='modal'?'.ui-modal':'.ui-drawer');
+                    el.hidden = false;
+                    return;
+                }
+                if (e.target.closest('[data-close]')) {
+                    row.querySelectorAll('.ui-modal,.ui-drawer').forEach(x=>x.hidden=true);
+                }
+            });
+            demo.appendChild(title); demo.appendChild(row); injectAfter(modalHead, demo);
+        }
+
+        // Table
+        const tableHead = findHeading(/table|جدول/i);
+        if (tableHead && !tableHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Table';
+            const wrap = document.createElement('div'); wrap.className='table-wrap';
+            const tbl = document.createElement('table'); tbl.className='ui-table';
+            tbl.innerHTML = `
+                <thead><tr><th>الاسم</th><th>الدور</th><th>الحالة</th></tr></thead>
+                <tbody>
+                  <tr><td>أحمد</td><td>مدير</td><td><span class="ui-badge success">نشط</span></td></tr>
+                  <tr><td>نور</td><td>مصمم</td><td><span class="ui-badge warning">معلّق</span></td></tr>
+                  <tr><td>سارة</td><td>مهندسة</td><td><span class="ui-badge error">موقوف</span></td></tr>
+                </tbody>`;
+            wrap.appendChild(tbl); demo.appendChild(title); demo.appendChild(wrap); injectAfter(tableHead, demo);
+        }
+
+        // Breadcrumbs
+        const bcHead = findHeading(/breadcrumbs|فتات الخبز|مسار التنقل/i);
+        if (bcHead && !bcHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Breadcrumbs';
+            const bc = document.createElement('nav'); bc.className='ui-breadcrumbs';
+            bc.innerHTML = `<a href="#">الرئيسية</a><span>/</span><a href="#">Frontend</a><span>/</span><span class="current">Component Library</span>`;
+            demo.appendChild(title); demo.appendChild(bc); injectAfter(bcHead, demo);
+        }
+
+        // Pagination
+        const pagHead = findHeading(/pagination|التقسيم الصفحات/i);
+        if (pagHead && !pagHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Pagination';
+            const p = document.createElement('div'); p.className='ui-pagination';
+            p.innerHTML = `<button class="ui-btn ui-outline ui-sm">◄</button>
+                           <button class="ui-btn ui-sm">1</button>
+                           <button class="ui-btn ui-sm ui-primary">2</button>
+                           <button class="ui-btn ui-sm">3</button>
+                           <button class="ui-btn ui-outline ui-sm">►</button>`;
+            demo.appendChild(title); demo.appendChild(p); injectAfter(pagHead, demo);
+        }
+
+        // Badges & Chips & Tooltip
+        const badgeHead = findHeading(/badge|chip|وسم|شيب|تولتيب|tooltip/i);
+        if (badgeHead && !badgeHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Badges/Chips/Tooltip';
+            const row = document.createElement('div'); row.className='selection-row';
+            row.innerHTML = `
+                <span class="ui-badge info">Info</span>
+                <span class="ui-badge success">Success</span>
+                <span class="ui-badge warning">Warning</span>
+                <span class="ui-badge error">Error</span>
+                <span class="ui-chip">Tag <button class="x">×</button></span>
+                <button class="ui-btn ui-secondary ui-sm ui-tooltip" data-tip="معلومة سريعة">Hover</button>`;
+            row.addEventListener('click', (e)=>{
+                if (e.target.matches('.ui-chip .x')) e.target.closest('.ui-chip').remove();
+            });
+            demo.appendChild(title); demo.appendChild(row); injectAfter(badgeHead, demo);
+        }
+
+        // Progress & Skeleton
+        const progHead = findHeading(/progress|skeleton|تحميل|شريط/i);
+        if (progHead && !progHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Progress & Skeleton';
+            const box = document.createElement('div'); box.innerHTML = `
+                <div class="ui-progress"><div class="bar" style="--p:65%"></div></div>
+                <div class="ui-skeleton" style="height: 12px; width: 60%"></div>
+                <div class="ui-skeleton" style="height: 12px; width: 40%"></div>`;
+            demo.appendChild(title); demo.appendChild(box); injectAfter(progHead, demo);
+        }
+
+        // Avatars & Toast
+        const avatarHead = findHeading(/avatar|صورة|هوية/i);
+        if (avatarHead && !avatarHead.nextElementSibling?.classList?.contains('comp-demo')) {
+            const demo = document.createElement('div'); demo.className='comp-demo';
+            const title = document.createElement('div'); title.className='demo-title'; title.textContent='Avatars & Toast';
+            const row = document.createElement('div'); row.className='selection-row';
+            row.innerHTML = `
+                <span class="ui-avatar" data-initials="AJ"></span>
+                <span class="ui-avatar" data-initials="DZ"></span>
+                <button class="ui-btn ui-primary ui-sm" id="toast-btn">إظهار Toast</button>
+                <div class="ui-toast-stack" aria-live="polite"></div>`;
+            row.querySelectorAll('.ui-avatar').forEach(a=>{
+                const init = a.getAttribute('data-initials')||'';
+                a.textContent = init;
+            });
+            row.addEventListener('click', (e)=>{
+                if (e.target.id==='toast-btn') {
+                    const stack = row.querySelector('.ui-toast-stack');
+                    const t = document.createElement('div'); t.className='ui-toast'; t.textContent='تم تنفيذ العملية بنجاح';
+                    stack.appendChild(t);
+                    setTimeout(()=>{ t.classList.add('show'); }, 10);
+                    setTimeout(()=>{ t.classList.remove('show'); t.addEventListener('transitionend', ()=> t.remove(), {once:true}); }, 2500);
+                }
+            });
+            demo.appendChild(title); demo.appendChild(row); injectAfter(avatarHead, demo);
+        }
     }
+
+    // =============== Color Chips Annotator ===============
+    static annotateColorChips(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const targets = Array.from(root.querySelectorAll('.comp-demo, pre code'));
+        const colorRe = /(#[0-9a-fA-F]{3,8}\b|rgba?\([^\)]+\)|hsla?\([^\)]+\))/g;
+        targets.forEach(t => {
+            const walker = document.createTreeWalker(t, NodeFilter.SHOW_TEXT, null);
+            const texts = [];
+            let n; while ((n = walker.nextNode())) { if ((n.nodeValue||'').match(colorRe)) texts.push(n); }
+            texts.forEach(textNode => {
+                const frag = document.createDocumentFragment();
+                const parts = (textNode.nodeValue||'').split(colorRe);
+                for (let i=0; i<parts.length; i++) {
+                    const part = parts[i];
+                    if (!part) continue;
+                    if (colorRe.test(part)) {
+                        const span = document.createElement('span');
+                        span.className='color-chip';
+                        const dot = document.createElement('i'); dot.style.background = part; span.appendChild(dot);
+                        const label = document.createElement('span'); label.className='t'; label.textContent = part; span.appendChild(label);
+                        frag.appendChild(span);
+                    } else {
+                        frag.appendChild(document.createTextNode(part));
+                    }
+                }
+                textNode.parentNode.replaceChild(frag, textNode);
+            });
+        });
+    }
+    
 
     // =============== Enhance tables: wrap, sticky head, optional sticky first column ===============
     static enhanceTables(rootEl) {

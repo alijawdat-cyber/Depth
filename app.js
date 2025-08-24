@@ -443,6 +443,7 @@ class DepthDocs {
     try { UIComponents.enhanceDesignSystemBlocks(docContent, path); } catch (_) {}
     try { UIComponents.enhanceUserFlowsAndFrontPreview(docContent, path); } catch (_) {}
     try { UIComponents.enhanceComponentLibrary(docContent, path); } catch (_) {}
+    try { UIComponents.annotateColorChips(docContent); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
     if (wrapper) {
