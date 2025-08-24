@@ -124,7 +124,8 @@
         padding-right: max(16px, env(safe-area-inset-right));
     }
     
-    .sidebar {
+    /* حصر التأثير على السايدبار الرئيسي فقط لتجنب تعارض مع سايدبارات المعاينات */
+    #sidebar {
         padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
 }
