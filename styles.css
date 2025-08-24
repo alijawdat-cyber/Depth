@@ -1534,3 +1534,18 @@ html, body { max-width: 100vw; overflow-x: hidden; }
 @media (max-width: 768px) {
     .bp-chip { grid-template-columns: 110px 1fr 44px; }
 }
+
+/* ============ Design System polish ============ */
+.ds-image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+.ds-image-grid figure { margin: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-secondary); }
+.ds-image-grid img { display: block; width: 100%; height: auto; }
+
+.ds-card-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 12px 0; padding: 0; list-style: none; }
+.ds-card-li { border: 1px solid var(--border); background: var(--bg); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); }
+.ds-card-li > p:first-child { margin-top: 0; }
+
+pre.spec-card { position: relative; border: 1px solid var(--border) !important; box-shadow: 0 4px 18px -6px rgba(0,0,0,.25); border-radius: 14px; overflow: hidden; }
+.spec-badge { position: absolute; top: 6px; left: 6px; background: #ffd166; color: #222; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 11px; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+
+.grid-preview { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; margin: 14px 0; }
+.grid-preview .grid-col { background: linear-gradient(180deg,#6ea8ff,#4c7bd6); color: #fff; text-align: center; padding: 8px; border-radius: 10px; font-weight: 600; font-size: 12px; }

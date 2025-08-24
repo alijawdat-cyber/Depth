@@ -439,6 +439,8 @@ class DepthDocs {
     try { await this.renderMermaid(docContent); } catch (_) {}
     // Design tokens previews (ألوان/ظلال/خطوط) — تعمل لو توفرّت الأكواد في الـMarkdown
     try { UIComponents.enhanceDesignTokens(docContent); } catch (_) {}
+    // Design System blocks polish (صور/بطاقات/جريد)
+    try { UIComponents.enhanceDesignSystemBlocks(docContent, path); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
     if (wrapper) {
