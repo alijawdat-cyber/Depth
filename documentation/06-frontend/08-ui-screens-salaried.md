@@ -1,36 +1,43 @@
 # 🖼️ شاشات الموظف براتب (Salaried Employee UI)
 
 ## الفهرس
-- [شاشة: مهامي (Salaried)](#شاشة-مهامي-salaried)
-- [شاشة: رفع ملفات (Salaried)](#شاشة-رفع-ملفات-salaried)
-- [شاشة: تحديث حالة مهمة (Salaried)](#شاشة-تحديث-حالة-مهمة-salaried)
+- [تسجيل/OTP + Dashboard](#salaried-auth)
+- [مهامي اليوم](#salaried-today)
+- [رفع ملفات/تحديث حالة (بدون أسعار)](#salaried-uploads)
 
-## شاشة: مهامي (Salaried)
-- الشاشة/الدور: مهامي — Salaried
-- الخطوات: عرض قائمة المهام.
-- شنو يشوف/أزرار: جدول مهام مع تواريخ.
+<a id="salaried-auth"></a>
+## شاشة: تسجيل/OTP + Dashboard (Salaried)
+- الخطوات: تسجيل → OTP → دخول.
+- حالات: pending/active.
+- مراجع: OTP — `documentation/00-overview/00-introduction.md:110,635`; تعريف الدور — `documentation/02-database/01-database-schema.md:171–182`.
+
+```text
+[ phone/email ] [ Send OTP ]  OTP:[   ] [ Verify ]
+Dashboard: مهامي المفتوحة اليوم (عدد)
+```
+
+<a id="salaried-today"></a>
+## شاشة: مهامي اليوم (Salaried)
+- العرض: قائمة مهام بتواريخ واستحقاقات.
 - حالات: فارغ/تحميل.
-- التحقق: صلاحيات.
-- البيانات/الـAPI: assignments (type: salaried) — `documentation/02-database/01-database-schema.md:250–259`.
-- ملاحظات UI: ماكو أسعار.
-- قبل/بعد: لا تغيير.
+- مراجع: assignments type='salaried' — `documentation/02-database/01-database-schema.md:250–259`.
 
-## شاشة: رفع ملفات (Salaried)
-- الشاشة/الدور: رفع — Salaried
-- الخطوات: اختيار ملفات كبيرة (chunked) → رفع.
-- شنو يشوف/أزرار: شريط تقدم، ملاحظات أمان.
-- حالات: حجم/نوع/كوتا/نجاح/فشل.
-- التحقق: denylist + MIME sniffing + virus scanning.
-- البيانات/الـAPI: سياسة الرفع — `documentation/03-api/features/05-storage.md:88`, `documentation/03-api/core/01-authentication.md:445–451`.
-- ملاحظات UI: رسالة “لا تعرض الأسعار”.
-- قبل/بعد: تثبيت السياسة الجديدة.
+```text
+My Tasks Today
+#1  Project p_12  due 14:00   [ Open ]
+#2  Project p_13  due 16:00   [ Open ]
+```
 
-## شاشة: تحديث حالة مهمة (Salaried)
-- الشاشة/الدور: تحديث — Salaried
-- الخطوات: اختيار مهمة → تغيير status.
-- شنو يشوف/أزرار: Dropdown حالة.
-- حالات: نجاح/فشل.
-- التحقق: الصلاحيات.
-- البيانات/الـAPI: assignments.role/type — `documentation/02-database/01-database-schema.md:250–259`.
-- ملاحظات UI: أظهر إشعار نجاح.
-- قبل/بعد: لا تغيير.
+<a id="salaried-uploads"></a>
+## شاشة: رفع ملفات/تحديث حالة (بدون أسعار)
+- سياسة: لا يرى الأسعار مطلقاً.
+- رفع: 2GB + chunked + denylist + MIME sniffing + virus scan + quota.
+- مراجع: التخزين — `documentation/03-api/features/05-storage.md:88`; لا أسعار — `documentation/02-database/00-data-dictionary.md:162` تنبيه الرؤية.
+
+```text
+[ + Add Files ] (max 2GB, chunked)
+Scanning: virus/MIME/denylist
+[ Upload ]  Progress: 42%
+Status: [ pending | active | completed | cancelled ]
+[ Save ]
+```

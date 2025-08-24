@@ -1,47 +1,80 @@
 # 🖼️ شاشات المبدع (Creator UI)
 
 ## الفهرس
-- [شاشة: مشاريعي (Creator)](#شاشة-مشاريعي-creator)
-- [شاشة: تفاصيل مشروع (Creator)](#شاشة-تفاصيل-مشروع-creator)
-- [شاشة: رفع مسودّات/نهائي (Creator)](#شاشة-رفع-مسودّاتنهائي-creator)
-- [شاشة: بروفايل/معرض (≤10) (Creator)](#شاشة-بروفايلمعرض-≤10-creator)
+- [Onboarding + تسجيل/OTP](#creator-onboarding)
+- [Dashboard / مشاريعي](#creator-dashboard)
+- [تفاصيل مشروع + Ready for Review](#creator-project-details)
+- [رفع مسودّات → نهائي](#creator-uploads)
+- [بروفايل + portfolioImages ≤ 10 (عرض فقط)](#creator-profile)
+- [جدول التوفر + إشعارات](#creator-availability)
 
-## شاشة: مشاريعي (Creator)
-- الشاشة/الدور: قائمة المشاريع — Creator
-- الخطوات: يعرض active/pending.
-- شنو يشوف/أزرار: بطاقات مشاريع، حالات، تواريخ.
-- حالات: فارغ، تحميل.
-- التحقق: مشاريع تخص المبدع.
-- البيانات/الـAPI: حالات المشروع — `documentation/02-database/01-database-schema.md:240–320`.
-- ملاحظات UI: استخدم Badges للحالات.
-- قبل/بعد: لا تغيير.
+<a id="creator-onboarding"></a>
+## شاشة: Onboarding + تسجيل/OTP (Creator)
+- الخطوات: اختيار فئات رئيسية/فرعية/صنعة + معدات + توفر → OTP → تفعيل.
+- حالات: onboardingStatus: pending→in_progress→completed→approved/rejected — `documentation/02-database/01-database-schema.md:112–119`.
+- مراجع: equipmentTier, experienceLevel — `documentation/02-database/01-database-schema.md:104,108`; OTP — `documentation/02-database/01-database-schema.md:478`.
 
-## شاشة: تفاصيل مشروع (Creator)
-- الشاشة/الدور: تفاصيل — Creator
-- الخطوات: عرض lineItems + assignments.
-- شنو يشوف/أزرار: تبويب “Ready for Review”.
-- حالات: مسودّة/جاهز/مرفوض.
-- التحقق: يتحقق من التعيين.
-- البيانات/الـAPI: lineItems/assignments — `documentation/02-database/01-database-schema.md:244–259`.
-- ملاحظات UI: أظهر processingLevel.
-- قبل/بعد: لا تغيير.
+```text
+[ Select Categories/Subcategories ]
+[ Experience v ] [ Equipment v ] [ Availability Grid ]
+[ Send OTP ]  OTP:[    ]  [ Verify ]
+```
 
-## شاشة: رفع مسودّات/نهائي (Creator)
-- الشاشة/الدور: رفع — Creator
-- الخطوات: اختيار ملفات كبيرة (chunked) → رفع.
-- شنو يشوف/أزرار: شريط تقدم، نتائج فحص فيروس.
-- حالات: حجم/نوع/كوتا/نجاح.
-- التحقق: denylist + MIME sniffing.
-- البيانات/الـAPI: سياسة الرفع — `documentation/03-api/features/05-storage.md:88`, `documentation/03-api/core/01-authentication.md:445–451`.
-- ملاحظات UI: وضّح retry للقطع.
-- قبل/بعد: تثبيت 2GB.
+<a id="creator-dashboard"></a>
+## شاشة: Dashboard / مشاريعي (Creator)
+- العرض: بطاقات مشاريع بالحالات.
+- حالات: فارغ/تحميل.
+- مراجع: projects.status — `documentation/02-database/01-database-schema.md:257–258`.
 
-## شاشة: بروفايل/معرض (≤10) (Creator)
-- الشاشة/الدور: معرض — Creator
-- الخطوات: عرض portfolioImages (≤10 روابط) — عرض فقط.
-- شنو يشوف/أزرار: شبكة صور.
-- حالات: فارغ.
-- التحقق: حد أقصى 10.
-- البيانات/الـAPI: ملاحظة V2.0 — `documentation/02-database/00-data-dictionary.md:~112` (عرض فقط ≤10).
-- ملاحظات UI: رسالة توضيح سبب الحد.
-- قبل/بعد: لا تغيير.
+```text
+My Projects
+[ Active (2) ]  [ Pending (1) ]  [ Completed (8) ]
+```
+
+<a id="creator-project-details"></a>
+## شاشة: تفاصيل مشروع + Ready for Review (Creator)
+- العرض: lineItems + assignments.
+- أزرار: "Mark Ready for Review".
+- مراجع: lineItems/assignments — `documentation/02-database/01-database-schema.md:244–259`.
+
+```text
+Project p_123
+Line Items: [ subcategoryId | processingLevel | qty ]
+Assignments: [ type=creator | assigneeId=c_123 ]
+[ Mark Ready for Review ]
+```
+
+<a id="creator-uploads"></a>
+## شاشة: رفع مسودّات → نهائي (Creator)
+- سياسة: 2GB + chunked + denylist (exe/js/sh/bat) + MIME sniffing + virus scan + quota.
+- مراجع: التخزين — `documentation/03-api/features/05-storage.md:88`.
+
+```text
+[ + Add Files ] (max 2GB, chunked)
+Scanning: virus/MIME/denylist
+[ Upload ]   Progress: 68%
+[ Submit Final ]
+```
+
+<a id="creator-profile"></a>
+## شاشة: بروفايل + portfolioImages ≤ 10 (عرض فقط)
+- العرض: شبكة صور ≤10.
+- مراجع: الحد الأقصى — `documentation/02-database/01-database-schema.md:93`, `documentation/02-database/02-indexes-and-queries.md:145`.
+
+```text
+Portfolio (≤10)
+[img][img][img][img]
+[img][img][img][img]
+[img][img]
+```
+
+<a id="creator-availability"></a>
+## شاشة: جدول التوفر + إشعارات
+- العرض: تقويم توفر + toggles.
+- مراجع: creatorAvailability — `documentation/02-database/01-database-schema.md:447–455,528–531`؛ إشعارات — `documentation/02-database/01-database-schema.md:419–447`.
+
+```text
+Availability Grid
+[✓] Mon am  [ ] Mon pm  ...
+Notifications: In-App/Email/SMS
+```

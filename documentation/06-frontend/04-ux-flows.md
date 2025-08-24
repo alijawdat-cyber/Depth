@@ -1,47 +1,128 @@
 # ♻️ UX Flows – Depth V2.0
 
 ## الفهرس
-- [فلو: إنشاء طلب (Client)](#فلو-إنشاء-طلب-client)
-- [فلو: تحويل طلب إلى مشروع (Admin)](#فلو-تحويل-طلب-إلى-مشروع-admin)
-- [فلو: تعيين مبدع/إعادة ترشيح (Admin)](#فلو-تعيين-مبدع-إعادة-ترشيح-admin)
-- [فلو: إعداد عرض السعر (Admin→Client)](#فلو-إعداد-عرض-السعر-admin→client)
-- [فلو: تنفيذ المشروع وتسليم (Creator→Client)](#فلو-تنفيذ-المشروع-وتسليم-creator→client)
-- [فلو: مهام الموظف (SalariedEmployee)](#فلو-مهام-الموظف-salariedemployee)
+- [فلو: إنشاء حساب/OTP (كل الأدوار)](#flow-auth-otp)
+- [فلو: إنشاء طلب (Client)](#flow-client-request)
+- [فلو: تحويل طلب إلى مشروع (Admin)](#flow-admin-convert)
+- [فلو: تعيين مبدع/إعادة ترشيح (Admin)](#flow-admin-assign)
+- [فلو: إعداد عرض السعر (Admin→Client)](#flow-admin-quote)
+- [فلو: تنفيذ المشروع وتسليم (Creator→Client)](#flow-creator-deliver)
+- [فلو: مهام الموظف (SalariedEmployee)](#flow-salaried-tasks)
+- [فلو: إعدادات الإشعارات + fallback](#flow-notifications-fallback)
 
+<a id="flow-auth-otp"></a>
+## فلو: إنشاء حساب/OTP (كل الأدوار)
+- الخطوات (1→2→3): إدخال هاتف/إيميل → استلام OTP → تحقق وتفعيل الدور.
+- الحالات: pending → active، فشل OTP يعاد الإرسال.
+- شنو يطلع: حقل OTP، عدّاد مؤقت، زر إعادة إرسال.
+- مراجع: OTP — `documentation/00-overview/00-introduction.md:110,635`; مجموعة `otpCodes` — `documentation/02-database/01-database-schema.md:478`.
+
+```mermaid
+flowchart TD
+  A[Register/Login] --> B[Send OTP]
+  B --> C{OTP Valid?}
+  C -- نعم --> D[Set status=active]
+  C -- لا --> E[Resend/Retry]
+```
+
+<a id="flow-client-request"></a>
 ## فلو: إنشاء طلب (Client)
-- الخطوات (1→2→3): يختار Category/Subcategory → وصف اختياري + Rush (off) + ProcessingLevel → يرفع مرفقات ويضغط إرسال.
+- الخطوات (1→2→3): Category/Subcategory إلزامي → ProcessingLevel + Rush (افتراضي Off) → مرفقات → إرسال.
 - تفريعات: Rush on/off.
-- شنو يطلع بالشاشة: بانر تأكيد “تم استلام طلبك — الحالة: pending. لما الأدمن يفتح الطلب تصير reviewing”.
-- الملفات المرجعية:
-  - status: 'pending'|'reviewing' — `documentation/02-database/01-database-schema.md:306`
-  - description اختياري + rush — `documentation/02-database/00-data-dictionary.md:200–240`
+- شنو يطلع: بانر “تم الاستلام — status=pending. عند مراجعة الأدمن تصير reviewing”.
+- مراجع: `status: 'pending'|'reviewing'` — `documentation/02-database/01-database-schema.md:306`; lineItems/processingLevel — `documentation/02-database/01-database-schema.md:244–247`.
 
+```text
++--------------------------------------------------------------+
+| طلب جديد                                                     |
+| Step 1: [Category v][Subcategory v*]                         |
+| Step 2: [ProcessingLevel v]  Rush: [ Off ] (toggle)          |
+|         [Description (optional ≤1000)]                       |
+| Step 3: Attachments [ + Add files ]  [ Upload ]              |
+|                                     [إرسال الطلب]           |
+| Banner: تم الاستلام — status=pending → reviewing             |
++--------------------------------------------------------------+
+```
+
+<a id="flow-admin-convert"></a>
 ## فلو: تحويل طلب إلى مشروع (Admin)
 - الخطوات: فتح طلب pending → مراجعة → تحويل إلى مشروع بدون تغيير subcategory → إنشاء lineItems.
 - تفريعات: تعدد lineItems.
 - شنو يطلع: رسالة “تم إنشاء المشروع”.
-- مراجع: عدم تغيير subcategory — `documentation/03-api/features/03-projects.md:365`
+- مراجع: subcategory لا يتغير — `documentation/02-database/01-database-schema.md:241`; lineItems — `documentation/02-database/01-database-schema.md:244–259`.
 
+```mermaid
+flowchart LR
+  P[ProjectRequest status=pending] --> R[Review]
+  R -->|Convert| M[Create Project]
+  R -. لا تغيّر subcategory .-> M
+  M --> Done[Success]
+```
+
+<a id="flow-admin-assign"></a>
 ## فلو: تعيين مبدع/إعادة ترشيح (Admin)
-- الخطوات: تصفية حسب subcategoryId + processingLevel → اختيار مبدع → إذا رفض يعاد الترشيح تلقائياً.
+- الخطوات: فلترة subcategoryId + processingLevel + isAvailable → ترتيب rating ↓ → تعيين/إعادة ترشيح.
 - تفريعات: رفض/قبول.
-- شنو يطلع: توست “تم التعيين/رفض — جاري إعادة الترشيح”.
-- مراجع: الفلترة — `documentation/02-database/02-indexes-and-queries.md:1–120`, `documentation/03-api/features/01-creators.md:…`
+- شنو يطلع: توست “تم التعيين/رفض — إعادة ترشيح…”.
+- مراجع: الفهارس والفلترة — `documentation/02-database/02-indexes-and-queries.md:74–84,94`, `documentation/02-database/01-database-schema.md:512–519`.
 
+```text
+Filter: [subcategoryId] [processingLevel] [isAvailable]
+Sort: rating desc
+List:
+  (● avail) Ali — 4.8 ★
+  (○ busy) Sara — 4.6 ★
+[Assign]  [Re-nominate]
+```
+
+<a id="flow-admin-quote"></a>
 ## فلو: إعداد عرض السعر (Admin→Client)
-- الخطوات: تثبيت الهامش → نشر Quote → يشوف العميل lineItemTotal + الإجمالي فقط.
-- تفريعات: تعديل الهامش قبل النشر.
-- شنو يطلع: “العرض جاهز”.
-- مراجع: Quote للرؤية المحدودة — `documentation/03-api/features/03-projects.md:598`, `documentation/01-requirements/00-requirements-v2.0.md:160–168`
+- الخطوات: حساب التكلفة = BasePrice × معاملات (Ownership/Processing/Experience/Equipment/Rush) + LocationAddition → تقريب لأقرب 500 IQD → تعيين الهامش → نشر Quote.
+- عرض العميل: الإجماليات فقط (بدون CreatorPrice/Margin/اسم المبدع).
+- مراجع: المعاملات/الأسعار — `documentation/02-database/01-database-schema.md:261–268,273`; مثال الحساب — `documentation/02-database/01-database-schema.md:636–638`.
 
+```mermaid
+flowchart TD
+  A[BasePrice × Mods + LocationAddition] --> B[Rounding 500 IQD]
+  B --> C[Set Margin%]
+  C --> D[Publish Quote]
+  D --> E[Client sees totals only]
+```
+
+<a id="flow-creator-deliver"></a>
 ## فلو: تنفيذ المشروع وتسليم (Creator→Client)
-- الخطوات: المبدع يرفع مسودّات/نهائي → العميل يوافق.
-- تفريعات: Ready for Review.
-- شنو يطلع: إشعارات In-App/Email.
-- مراجع: Storage سياسة الرفع الكبيرة — `documentation/03-api/features/05-storage.md:88`, `documentation/03-api/core/01-authentication.md:445–451`
+- الخطوات: رفع مسودّات (Draft) → Ready for Review → رفع نهائي.
+- شنو يطلع: إشعارات In-App/Email للعميل.
+- مراجع: سياسة الرفع 2GB + chunked + denylist + MIME + virus scan — `documentation/03-api/features/05-storage.md:88`; القنوات — `documentation/02-database/01-database-schema.md:426`.
 
+```text
+Project Files
+  [ Upload Draft ]  (2GB, chunked)
+  Scan: virus OK | MIME OK | denylist OK
+  [ Mark Ready for Review ] → Notify Client (In-App/Email)
+  [ Upload Final ]
+```
+
+<a id="flow-salaried-tasks"></a>
 ## فلو: مهام الموظف (SalariedEmployee)
-- الخطوات: يشوف مهامه → يرفع ملفات → يحدث حالة المهمة.
-- تفريعات: لا يرى الأسعار.
-- شنو يطلع: حالات قائمة المهام.
-- مراجع: لا يرى الأسعار — `documentation/99-reference/02-enums-standard.md:12–20`
+- الخطوات: يشوف مهامه → يرفع ملفات → يحدّث حالة المهمة.
+- سياسة: ما يشوف أسعار نهائياً.
+- مراجع: assignments (type) — `documentation/02-database/01-database-schema.md:250–259`.
+
+```mermaid
+flowchart LR
+  T[My Tasks] --> U[Upload Files]
+  U --> S[Set Status]
+  S --> Done[Completed]
+  note right of T: لا أسعار
+```
+
+<a id="flow-notifications-fallback"></a>
+## فلو: إعدادات الإشعارات + fallback
+- القنوات: In-App/Email/SMS — `documentation/02-database/01-database-schema.md:426`, نظرة عامة — `documentation/00-overview/00-introduction.md:370`.
+- fallback: فشل SMS → Email تلقائي، تسجيل في notifications — `documentation/02-database/02-indexes-and-queries.md:23–24,62`.
+
+```text
+Preference: [In-App] [Email] [SMS]
+Send → if SMS fail → auto Email → channelFallback="sms→email"
+```

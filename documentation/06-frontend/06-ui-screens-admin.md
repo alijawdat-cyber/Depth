@@ -1,58 +1,87 @@
 # 🖼️ شاشات الأدمن (Admin UI)
 
 ## الفهرس
-- [شاشة: الطلبات الجديدة (Admin)](#شاشة-الطلبات-الجديدة-admin)
-- [شاشة: تحويل ل‍مشروع (Admin)](#شاشة-تحويل-لمشروع-admin)
-- [شاشة: تعيين مبدع (Admin)](#شاشة-تعيين-مبدع-admin)
-- [شاشة: إعداد الهامش وإصدار عرض سعر (Admin)](#شاشة-إعداد-الهامش-وإصدار-عرض-سعر-admin)
-- [شاشة: متابعة التنفيذ (Admin)](#شاشة-متابعة-التنفيذ-admin)
+- [تسجيل/OTP + Dashboard](#admin-auth)
+- [طلبات جديدة → تحويل لمشروع](#admin-requests)
+- [تعيين مبدع/إعادة ترشيح](#admin-assign)
+- [إعداد الهامش + إصدار Quote](#admin-quote)
+- [لوحة المشاريع (lineItems + assignments + isArchived)](#admin-projects)
+- [تقارير أولية (٣ تقارير)](#admin-reports)
 
-## شاشة: الطلبات الجديدة (Admin)
-- الشاشة/الدور: طلبات واردة — Admin
-- الخطوات: تصفية pending → فتح طلب.
-- شنو يشوف/أزرار: قائمة طلبات، زر “تحويل لمشروع”.
-- حالات: فارغ، تحميل، نجاح.
-- التحقق: صلاحيات أدمن فقط.
-- البيانات/الـAPI: status: pending/reviewing — `documentation/02-database/01-database-schema.md:306`.
-- ملاحظات UI: أظهر processingLevel الذي اختاره العميل.
-- قبل/بعد: لا تغيير.
+<a id="admin-auth"></a>
+## شاشة: تسجيل/OTP + Dashboard (Admin)
+- الخطوات: تسجيل → OTP → دخول للوحة.
+- أزرار: إرسال OTP، تحقق.
+- حالات: pending/active.
+- مراجع: OTP — `documentation/00-overview/00-introduction.md:110,635`؛ صلاحيات الأدمن — `documentation/02-database/01-database-schema.md:592–602`.
 
-## شاشة: تحويل ل‍مشروع (Admin)
-- الشاشة/الدور: إنشاء مشروع — Admin
-- الخطوات: تحويل بدون تغيير subcategory → إعداد lineItems.
-- شنو يشوف/أزرار: فورم lineItems، زر “إنشاء مشروع”.
-- حالات: نجاح/فشل.
-- التحقق: subcategory لا يتغير.
-- البيانات/الـAPI: لا تغيّر subcategory — `documentation/03-api/features/03-projects.md:365`; lineItems schema — `documentation/02-database/01-database-schema.md:244–259`.
-- ملاحظات UI: أضف سطر تحذير “لا تغيّر subcategory من الطلب”.
-- قبل/بعد: تثبيت سياسة عدم التغيير.
+```text
+[ email/phone ] [ Send OTP ]  OTP: [    ] [ Verify ]
+Dashboard: بطاقات (طلبات جديدة، مشاريع نشطة)
+```
 
-## شاشة: تعيين مبدع (Admin)
-- الشاشة/الدور: تعيين — Admin
-- الخطوات: فلترة subcategoryId + processingLevel → اختيار مبدع → حفظ.
-- شنو يشوف/أزرار: قائمة مبدعين مع rating/isAvailable.
-- حالات: رفض/قبول/إعادة ترشيح.
-- التحقق: أدمن فقط.
-- البيانات/الـAPI: الفلترة — `documentation/02-database/02-indexes-and-queries.md:1–120`, `documentation/03-api/features/01-creators.md:…`.
-- ملاحظات UI: عند الرفض يظهر زر “إعادة ترشيح”.
-- قبل/بعد: إضافة سلوك إعادة الترشيح.
+<a id="admin-requests"></a>
+## شاشة: الطلبات الجديدة → تحويل لمشروع (Admin)
+- الخطوات: فتح pending → مراجعة → تحويل مشروع بدون تغيير subcategory.
+- أزرار: "تحويل لمشروع".
+- حالات: فارغ/تحميل/نجاح.
+- مراجع: لا تغيّر subcategory — `documentation/02-database/01-database-schema.md:241`; lineItems — `documentation/02-database/01-database-schema.md:244–259`.
 
-## شاشة: إعداد الهامش وإصدار عرض سعر (Admin)
-- الشاشة/الدور: Quote — Admin
-- الخطوات: تحديد الهامش 10–50% → نشر العرض.
-- شنو يشوف/أزرار: حقل Margin%، زر “نشر”.
-- حالات: خطأ خارج النطاق.
-- التحقق: تحقق 10–50%.
-- البيانات/الـAPI: نطاق الهامش — `documentation/01-requirements/00-requirements-v2.0.md:173–190`.
-- ملاحظات UI: التقريب لأقرب 500.
-- قبل/بعد: تثبيت قاعدة التقريب.
+```text
+Requests (status=pending)
+#1029  subcategory=portrait/editing   [ فتح ] [ تحويل لمشروع ]
+note: لا تغيّر Subcategory بعد التحويل
+```
 
-## شاشة: متابعة التنفيذ (Admin)
-- الشاشة/الدور: تتبع — Admin
-- الخطوات: استعراض Milestones/Deliverables.
-- شنو يشوف/أزرار: جدول التقدم.
-- حالات: on_track/at_risk/delayed.
-- التحقق: صلاحيات أدمن.
-- البيانات/الـAPI: تقدم المشروع — `documentation/03-api/features/03-projects.md:430–520` تقريباً.
-- ملاحظات UI: بانر خطر عند at_risk.
-- قبل/بعد: لا تغيير.
+<a id="admin-assign"></a>
+## شاشة: تعيين مبدع/إعادة ترشيح (Admin)
+- الخطوات: فلترة subcategoryId + processingLevel + isAvailable → sort rating desc → تعيين.
+- أزرار: Assign، Re-nominate.
+- حالات: قبول/رفض.
+- مراجع: فلاتر المؤشرات — `documentation/02-database/02-indexes-and-queries.md:74–84,94`; علاقات الربط — `documentation/02-database/01-database-schema.md:512–519`.
+
+```text
+[ subcategoryId v ] [ processingLevel v ] [ isAvailable: ✓ ]
+Sort: rating ↓
+Ali (4.8) [ Assign ]   Sara (4.6) [ Assign ]
+[ Re-nominate ]
+```
+
+<a id="admin-quote"></a>
+## شاشة: إعداد الهامش + إصدار Quote (Admin)
+- الخطوات: أدخل Margin% (10–50) → Publish.
+- عرض العميل: الإجماليات فقط.
+- مراجع: التسعير والمعاملات — `documentation/02-database/01-database-schema.md:261–268,273`; rounding 500 — `documentation/03-api/features/04-pricing.md:185`.
+
+```text
+Creator Base: 15,730   (after mods + location)
+Margin %: [ 30 ]
+Client Total: 20,500   (rounded to 500)
+[ Publish Quote ]
+```
+
+<a id="admin-projects"></a>
+## شاشة: لوحة المشاريع (lineItems + assignments + isArchived)
+- العرض: جدول بالمشاريع وخانات isArchived.
+- أزرار: أرشفة/إلغاء.
+- مراجع: lineItems/assignments/isArchived — `documentation/02-database/01-database-schema.md:244–259`.
+
+```text
+#ID    Client   Status     isArchived  Actions
+p_12   cl_1     active     [ ]         [Open] [Archive]
+p_13   cl_2     completed  [✓]         [Open] [Unarchive]
+```
+
+<a id="admin-reports"></a>
+## شاشة: تقارير أولية (٣ تقارير)
+- 1) ملخص المشاريع: أعداد حسب الحالة.
+- 2) أداء المبدعين: rating, completedProjects.
+- 3) نجاح الإشعارات: sent/delivered/read، وقنوات fallback.
+- مراجع: حالات المشروع — `documentation/02-database/01-database-schema.md:257–258`; تقييمات — `documentation/02-database/01-database-schema.md:163,470`; إشعارات — `documentation/02-database/01-database-schema.md:419–447`.
+
+```text
+Reports
+- Projects by Status: draft/pending/active/completed/cancelled
+- Creators Performance: rating, totalReviews, completedProjects
+- Notifications: by channel, fallback sms→email
+```
