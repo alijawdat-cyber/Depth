@@ -74,6 +74,8 @@
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
   let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.75;
+  // مقاسات النوتش الافتراضية
+  const notchDims = { w: 118, h: 40, r: 20, y: 10 };
   const applyDims = ()=>{
         const screenW = (rot?cur.h:cur.w);
         const screenH = (rot?cur.w:cur.h);
@@ -95,6 +97,24 @@
         device.style.setProperty('--dp-scale', String(scale));
         device.classList.toggle('rotated', !!rot);
         const info = dt.querySelector('.dt-info'); if (info) info.textContent = `${screenW}×${screenH}`;
+        // عيّن ستايل النوتش inline لضمان الظهور وعدم الاعتماد على الكاش
+        if (notch){
+          if (rot){ notch.style.opacity = '0'; }
+          else {
+            const left = offX + (screenW - notchDims.w)/2;
+            const top = offY + notchDims.y;
+            notch.style.position = 'absolute';
+            notch.style.width = notchDims.w + 'px';
+            notch.style.height = notchDims.h + 'px';
+            notch.style.left = left + 'px';
+            notch.style.top = top + 'px';
+            notch.style.borderRadius = notchDims.r + 'px';
+            notch.style.background = '#000';
+            notch.style.zIndex = '6';
+            notch.style.pointerEvents = 'none';
+            notch.style.opacity = '1';
+          }
+        }
       };
       applyDims();
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>html,body{height:100%;margin:0;padding:0;overflow:hidden;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style></head><body><div class="screen-mockup">${htmlForPreview}</div><script src="${asset('assets/js/interactive-mockups.js')}"><\/script><script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script></body></html>`;
