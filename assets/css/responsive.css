@@ -57,6 +57,7 @@
         margin: 0 auto;
         /* العمود الثاني مخصص للـ floating TOC ويبقى ثابت */
         grid-template-columns: minmax(0, 1fr) 300px;
+        align-items: start; /* مهم حتى sticky يشتغل داخل الـ grid بسفاري */
     }
     
     /* When sidebar is open, reserve only a tiny visual gap next to it */
@@ -73,6 +74,8 @@
     .sidebar-overlay.active { 
         background: transparent; 
     }
+    /* تأكيد أن الـ TOC يبقى ظاهر ولا يتعطل بالـ sticky */
+    #floating-toc { position: sticky; top: calc(var(--header-total-height) + 16px); display: block; }
 }
 
 /* ===== Desktop (1024px - 1399px) ===== */
@@ -90,8 +93,9 @@
     }
     
     .content-wrapper { 
-        grid-template-columns: 1fr 260px; 
+    grid-template-columns: 1fr 260px; 
         padding: 24px 14px; 
+    align-items: start; /* خلّي عناصر الجريد تبدي من أعلى حتى الـ sticky يشتغل */
     }
     
     /* Minimal gap when sidebar is open on laptop widths */
@@ -107,9 +111,8 @@
         margin-right: 0;
     }
     
-    .floating-toc { 
-        display: block; 
-    }
+    .floating-toc { display: block; }
+    #floating-toc { position: sticky; top: calc(var(--header-total-height) + 16px); }
     
     /* عند فتح السايدبار على اللابتوب، احجز مسافة يمين المحتوى */
     body.sidebar-open .main-content { 
@@ -141,6 +144,10 @@
     .main-content.pushed {
         transform: translateX(calc(-1 * var(--sidebar-width)));
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* ضمان الدفع حتى لو كلاس pushed ما نضف */
+    body.sidebar-open .main-content { 
+        transform: translateX(calc(-1 * var(--sidebar-width)));
     }
     
     .content-wrapper { 
@@ -206,6 +213,10 @@
     .main-content.pushed {
         transform: translateX(calc(-1 * min(var(--sidebar-width), 85vw)));
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* ضمان الدفع حتى لو كلاس pushed ما نضف لأي سبب */
+    body.sidebar-open .main-content { 
+        transform: translateX(calc(-1 * min(var(--sidebar-width), 85vw)));
     }
     
     .sidebar-close {
