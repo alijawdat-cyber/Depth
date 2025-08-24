@@ -58,13 +58,18 @@
         grid-template-columns: minmax(0, 1fr) 300px;
     }
     
-    /* When sidebar is actually open, reserve space */
+    /* When sidebar is open, reserve only a tiny visual gap next to it */
     body.sidebar-open .content-wrapper { 
-        padding-right: calc(14px + var(--sidebar-width)); 
+        padding-right: 14px; 
     }
     
     body.sidebar-open .main-content { 
-        margin-right: var(--sidebar-width); 
+        margin-right: calc(var(--sidebar-width) + 8px); 
+    }
+    
+    /* Desktop overlay should be click-catcher only (no dim) */
+    .sidebar-overlay.active { 
+        background: transparent; 
     }
 }
 
@@ -87,9 +92,9 @@
         padding: 24px 14px; 
     }
     
-    /* Reserve a bit less space on laptop widths when sidebar is open */
+    /* Minimal gap when sidebar is open on laptop widths */
     body.sidebar-open .content-wrapper { 
-        padding-right: calc(14px + 220px); 
+        padding-right: 14px; 
     }
     
     .content-wrapper.sidebar-closed {
@@ -105,7 +110,7 @@
     }
     
     body.sidebar-open .main-content { 
-        margin-right: var(--sidebar-width); 
+        margin-right: calc(var(--sidebar-width) + 8px); 
     }
 }
 
@@ -127,6 +132,12 @@
     
     .main-content {
         margin-right: 0;
+    }
+    
+    /* Push content left when sidebar is open (tablet) */
+    .main-content.pushed {
+        transform: translateX(calc(-1 * var(--sidebar-width)));
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .content-wrapper { 
@@ -186,10 +197,12 @@
         box-shadow: -4px 0 20px rgba(0,0,0,0.15);
     }
     
-    .main-content {
-        transform: none !important;
-        transition: none !important;
-        margin-right: 0;
+    .main-content { margin-right: 0; }
+    
+    /* Push content left when sidebar is open (mobile) */
+    .main-content.pushed {
+        transform: translateX(calc(-1 * min(var(--sidebar-width), 85vw)));
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .sidebar-close {

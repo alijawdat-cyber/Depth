@@ -143,7 +143,7 @@ class DepthDocs {
         // Close button in sidebar
         const closeBtn = document.getElementById('sidebar-close');
         if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); this.closeSidebar(); });
-        // Click on overlay closes on mobile/tablet
+    // Click on overlay closes on all sizes (desktop uses transparent overlay)
         const overlay = document.getElementById('sidebar-overlay');
         if (overlay) overlay.addEventListener('click', () => this.closeSidebar());
 
@@ -152,7 +152,7 @@ class DepthDocs {
             const ov = document.getElementById('sidebar-overlay');
             if (!sidebar) return;
             const isClickInside = sidebar.contains(e.target) || (ov && ov.contains(e.target));
-            if (!isClickInside && this.sidebarOpen && !this.isDesktop) {
+            if (!isClickInside && this.sidebarOpen && (this.isMobile || this.isTablet)) {
                 this.closeSidebar();
             }
         };
@@ -274,9 +274,10 @@ class DepthDocs {
         if (this.isDesktop || this.isLargeDesktop) {
             if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
             if (mainContent) mainContent.classList.remove('sidebar-closed');
-            if (overlay) overlay.classList.remove('active');
+            // Activate transparent overlay on desktop to catch outside clicks
+            if (overlay) overlay.classList.add('active');
         } else {
-            if (overlay) overlay.classList.remove('active'); // keep no overlay on phones
+            if (overlay) overlay.classList.add('active'); // show dim overlay on phones
             if (mainContent) mainContent.classList.add('pushed');
         }
         this.updateBurgerButton();
@@ -291,7 +292,7 @@ class DepthDocs {
         this.sidebarOpen = false;
         sidebar.classList.remove('active');
         document.body.classList.remove('sidebar-open');
-        if (overlay) overlay.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
         if (this.isDesktop || this.isLargeDesktop) {
             sidebar.classList.add('sidebar-closed');
             if (contentWrapper) contentWrapper.classList.add('sidebar-closed');
