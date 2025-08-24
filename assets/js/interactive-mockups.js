@@ -1206,7 +1206,7 @@ const DepthUI = (() => {
     }
 
     // Public API
-    return {
+    const DepthUI = {
         utils,
         ThemeManager,
         OTPInput,
@@ -1215,11 +1215,30 @@ const DepthUI = (() => {
         ToastManager,
         ModalManager,
         DataTable,
-        init
+        init,
+        // Legacy methods for app.js compatibility
+        initOtp: (container) => {
+            const otpContainers = container ? container.querySelectorAll('.otp-container') : document.querySelectorAll('.otp-container');
+            otpContainers.forEach(otpContainer => {
+                new OTPInput(otpContainer);
+            });
+        },
+        initGallery: (container) => {
+            const galleryContainers = container ? container.querySelectorAll('.gallery-container') : document.querySelectorAll('.gallery-container');
+            galleryContainers.forEach(galleryContainer => {
+                new Gallery(galleryContainer);
+            });
+        }
     };
+
+    // Make available globally as both DepthUI and Mockups
+    window.DepthUI = DepthUI;
+    window.Mockups = DepthUI;
+
+    return DepthUI;
 })();
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = DepthUI;
+    module.exports = window.DepthUI;
 }
