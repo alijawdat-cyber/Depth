@@ -1309,11 +1309,21 @@ class UIComponents {
             wrapper.appendChild(codeView);
 
             // حمّل CSS الإطار لو ما محمّل
+            // مولّد رابط أصول آمن للمسارات الفرعية (GitHub Pages وغيرها)
+            const _asset = (p) => {
+                try {
+                    const path = (window.location.pathname || '/').replace(/index\.html?$/,'');
+                    const base = path.endsWith('/') ? path : path + '/';
+                    const full = base + String(p).replace(/^\//,'');
+                    return new URL(full, window.location.origin).href;
+                } catch (_) { return p; }
+            };
+
             (()=>{
                 const id = 'preview-frame-css';
                 if (!document.getElementById(id)){
                     const l = document.createElement('link');
-                    l.id = id; l.rel = 'stylesheet'; l.href = 'assets/css/preview-frame.css';
+                    l.id = id; l.rel = 'stylesheet'; l.href = _asset('assets/css/preview-frame.css');
                     document.head.appendChild(l);
                 }
             })();
@@ -1339,13 +1349,13 @@ class UIComponents {
             const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
-                <link rel="stylesheet" href="/assets/css/custom-screens.css">
+                <link rel="stylesheet" href="${_asset('assets/css/custom-screens.css')}">
                 <style>html,body{height:100%;margin:0;overflow:auto;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style>
             </head><body>
                 <div class="screen-mockup">
                   ${safe}
                 </div>
-                <script src="/assets/js/interactive-mockups.js"><\/script>
+                <script src="${_asset('assets/js/interactive-mockups.js')}"><\/script>
                 <script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script>
             </body></html>`;
 
