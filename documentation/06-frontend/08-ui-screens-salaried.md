@@ -1,4 +1,4 @@
-# 🖼️ شاشات الموظف براتب (Salaried Employee UI)
+# 🖼️ شاشات الموظف براتب (Salaried Employee UI) — HTML تفاعلي فقط
 
 ## الفهرس
 - [تسجيل/OTP + Dashboard](#salaried-auth)
@@ -6,38 +6,52 @@
 - [رفع ملفات/تحديث حالة (بدون أسعار)](#salaried-uploads)
 
 <a id="salaried-auth"></a>
-## شاشة: تسجيل/OTP + Dashboard (Salaried)
-- الخطوات: تسجيل → OTP → دخول.
-- حالات: pending/active.
-- مراجع: OTP — `documentation/00-overview/00-introduction.md:110,635`; تعريف الدور — `documentation/02-database/01-database-schema.md:171–182`.
+## تسجيل/OTP + Dashboard
 
-```text
-[ phone/email ] [ Send OTP ]  OTP:[   ] [ Verify ]
-Dashboard: مهامي المفتوحة اليوم (عدد)
-```
+<div class="screen-mockup">
+  <div class="screen-header"><button class="back-btn">⬅</button><h3>تسجيل الموظف</h3><button class="close-btn">❌</button></div>
+  <div class="screen-content">
+    <div class="form-grid">
+      <label>الهاتف/الايميل<br><input class="ui-input" placeholder="0770... أو name@site.com"></label>
+      <label>OTP<br><input class="ui-input" placeholder="6-digits"></label>
+      <label>&nbsp;<br><button class="primary-btn">تحقق</button></label>
+    </div>
+  </div>
+  <div class="screen-content dashboard">
+    <h4>مهامي اليوم (مفتوحة)</h4>
+    <div class="project-list">
+      <div class="project-card"><div><strong>#p_12</strong> — due 14:00</div><div>📷 تجهيز معدات — موقع العميل</div></div>
+      <div class="project-card"><div><strong>#p_13</strong> — due 16:00</div><div>🎬 تسليم ملفات الفيديو</div></div>
+    </div>
+  </div>
+</div>
 
 <a id="salaried-today"></a>
-## شاشة: مهامي اليوم (Salaried)
-- العرض: قائمة مهام بتواريخ واستحقاقات.
-- حالات: فارغ/تحميل.
-- مراجع: assignments type='salaried' — `documentation/02-database/01-database-schema.md:250–259`.
+## مهامي اليوم
 
-```text
-My Tasks Today
-#1  Project p_12  due 14:00   [ Open ]
-#2  Project p_13  due 16:00   [ Open ]
-```
+<div class="screen-mockup">
+  <div class="screen-header"><button class="back-btn">⬅</button><h3>قائمة المهام</h3><button class="close-btn">🔄</button></div>
+  <div class="screen-content">
+    <div class="review-grid">
+      <div class="review-card"><strong>#1 p_12</strong><div>due 14:00 — <button class="secondary-btn">Open</button></div></div>
+      <div class="review-card"><strong>#2 p_13</strong><div>due 16:00 — <button class="secondary-btn">Open</button></div></div>
+    </div>
+  </div>
+</div>
 
 <a id="salaried-uploads"></a>
-## شاشة: رفع ملفات/تحديث حالة (بدون أسعار)
-- سياسة: لا يرى الأسعار مطلقاً.
-- رفع: 2GB + chunked + denylist + MIME sniffing + virus scan + quota.
-- مراجع: التخزين — `documentation/03-api/features/05-storage.md:88`; لا أسعار — `documentation/02-database/00-data-dictionary.md:162` تنبيه الرؤية.
+## رفع ملفات/تحديث حالة (بدون أسعار)
 
-```text
-[ + Add Files ] (max 2GB, chunked)
-Scanning: virus/MIME/denylist
-[ Upload ]  Progress: 42%
-Status: [ pending | active | completed | cancelled ]
-[ Save ]
-```
+<div class="screen-mockup">
+  <div class="screen-header"><button class="back-btn">⬅</button><h3>رفع الملفات</h3><button class="close-btn">💾</button></div>
+  <div class="screen-content">
+    <div class="dropzone">📁 اسحب الملفات هنا — 2GB/ملف — فحص فيروس/MIME — denylist</div>
+    <div class="uploads">
+      <div class="row">⏳ report.pdf (456KB) — 42%</div>
+    </div>
+    <div class="form-grid" style="margin-top:12px">
+      <label>الحالة<br><input class="ui-input" placeholder="pending|active|completed|cancelled"></label>
+      <label>&nbsp;<br><button class="primary-btn">حفظ</button></label>
+    </div>
+  </div>
+</div>
