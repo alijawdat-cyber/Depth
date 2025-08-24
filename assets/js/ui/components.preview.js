@@ -40,7 +40,9 @@
       let safe = raw;
       try { if (window.DOMPurify) { safe = window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['div','span','img','button','a','p','h1','h2','h3','h4','h5','h6','ul','ol','li','form','input','label','section','article','nav','main','aside','header','footer','strong','em','small','hr','br','details','summary'], ALLOWED_ATTR: ['class','id','href','src','alt','title','type','role','aria-label','aria-expanded','aria-controls','placeholder','value','maxlength','inputmode','dir','target','rel','data-otp-submit','data-otp-resend','data-otp-timer','data-seconds','data-theme-toggle'], KEEP_CONTENT: true }); } } catch(_){ }
       const wrapper = document.createElement('div'); wrapper.className = 'html-preview-wrapper';
-      const bar = document.createElement('div'); bar.className = 'html-preview-toolbar'; bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button>';
+  const bar = document.createElement('div');
+  bar.className = 'html-preview-toolbar';
+  bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
       const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone14" class="active">iPhone 14</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.33" class="active">×3</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
       const stage = document.createElement('div'); stage.className = 'device-stage';
@@ -64,7 +66,17 @@
       });
       bar.addEventListener('click', (e)=>{
         const btn = e.target.closest('button'); if (!btn) return;
-        bar.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+        if (btn.hasAttribute('data-copy')){
+          try {
+            const codeEl = codeView.querySelector('code');
+            const text = codeEl ? codeEl.innerText : '';
+            if (text) navigator.clipboard.writeText(text);
+            btn.textContent = 'تم!';
+            setTimeout(()=>{ btn.textContent = 'نسخ'; }, 1000);
+          } catch(_) {}
+          return;
+        }
+        bar.querySelectorAll('button[data-view]').forEach(x=>x.classList.remove('active'));
         btn.classList.add('active');
         const v = btn.dataset.view;
         if (v==='code'){ device.style.display='none'; codeView.style.display='block'; }

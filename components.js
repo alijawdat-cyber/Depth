@@ -1272,6 +1272,7 @@ class UIComponents {
             bar.innerHTML = `
                 <button type="button" data-view="preview" class="active">معاينة</button>
                 <button type="button" data-view="code">الكود</button>
+                <button type="button" data-copy title="نسخ الكود">نسخ</button>
             `;
 
             // غلاف الجهاز وأدواته
@@ -1375,7 +1376,17 @@ class UIComponents {
             // تبديل معاينة/كود
             bar.addEventListener('click', (e)=>{
                 const btn = e.target.closest('button'); if (!btn) return;
-                bar.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+                if (btn.hasAttribute('data-copy')){
+                    try {
+                        const codeEl = codeView.querySelector('code');
+                        const text = codeEl ? codeEl.innerText : '';
+                        if (text) navigator.clipboard.writeText(text);
+                        btn.textContent = 'تم!';
+                        setTimeout(()=>{ btn.textContent = 'نسخ'; }, 1000);
+                    } catch(_) {}
+                    return;
+                }
+                bar.querySelectorAll('button[data-view]').forEach(x=>x.classList.remove('active'));
                 btn.classList.add('active');
                 const v = btn.dataset.view;
                 if (v==='code'){ device.style.display='none'; codeView.style.display='block'; }
