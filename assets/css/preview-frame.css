@@ -55,4 +55,12 @@
   background: var(--bg-primary);
 }
 
+/* Fallback داخلي إذا الـiframe ما عبّى محتوى */
+.device-preview .device-stage .html-fallback{
+  width: var(--dp-width);
+  height: var(--dp-height);
+  transform-origin: top left;
+  transform: scale(var(--dp-scale));
+}
+
 /* ملاحظة: أي حركـات أو AOS تبقى خارج الغلاف؛ ما نضيف أنيميشن على .device-stage */

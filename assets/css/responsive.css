@@ -80,8 +80,8 @@
     .sidebar-overlay.active { 
         background: transparent; 
     }
-    /* تأكيد أن الـ TOC يبقى ظاهر ولا يتعطل بالـ sticky */
-    #floating-toc { position: sticky; top: calc(var(--header-total-height) + 16px); display: block; }
+    /* خلي الفهرس الجانبي غير sticky حتى يتحرك ويا التمرير */
+    #floating-toc { position: relative; top: auto; display: block; }
 }
 
 /* ===== Desktop (1024px - 1399px) ===== */
@@ -118,7 +118,7 @@
     }
     
     .floating-toc { display: block; }
-    #floating-toc { position: sticky; top: calc(var(--header-total-height) + 16px); }
+    #floating-toc { position: relative; top: auto; }
     
     /* لابتوب: طبّق الإزاحة فقط على المقال حتى يبقى الفلوتنغ TOC ثابت */
     body.sidebar-open .main-content { 

@@ -79,11 +79,10 @@
         -webkit-overflow-scrolling: touch;
     }
     
-    /* Sticky positioning optimizations */
+    /* لا نستخدم sticky للـ floating-toc حتى ينزل ويا التمرير */
     .floating-toc,
     .mobile-v-thumb {
-        position: -webkit-sticky;
-        position: sticky;
+        position: relative;
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
         -webkit-backface-visibility: hidden;
