@@ -1549,3 +1549,27 @@ pre.spec-card { position: relative; border: 1px solid var(--border) !important; 
 
 .grid-preview { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; margin: 14px 0; }
 .grid-preview .grid-col { background: linear-gradient(180deg,#6ea8ff,#4c7bd6); color: #fff; text-align: center; padding: 8px; border-radius: 10px; font-weight: 600; font-size: 12px; }
+
+/* ============ Frontend/device frames & flows ============ */
+.viewport-toolbar { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--border); background: var(--bg); border-radius: 10px; padding: 6px 8px; box-shadow: var(--shadow); margin: 8px 0 12px; }
+.viewport-toolbar .vp-label { font-weight: 600; color: var(--text-secondary); font-size: 12px; }
+.viewport-toolbar button { border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+.viewport-toolbar button.active { background: var(--primary); color: #fff; border-color: transparent; }
+
+/* limit content width by mode */
+[data-vp="mobile"] .viewport-target { max-width: 390px; }
+[data-vp="tablet"] .viewport-target { max-width: 834px; }
+[data-vp="desktop"] .viewport-target { max-width: 1200px; }
+
+.device-frame { margin: 12px auto; border: 1px solid var(--border); border-radius: 24px; padding: 14px; background: var(--bg); box-shadow: 0 10px 30px rgba(0,0,0,.08); overflow: hidden; }
+.device-frame img { width: 100%; height: auto; display: block; border-radius: 12px; }
+.device-mobile { border-radius: 36px; padding: 12px; max-width: 420px; }
+.device-tablet { border-radius: 28px; padding: 14px; max-width: 900px; }
+.device-desktop { border-radius: 18px; padding: 12px; max-width: 1280px; }
+
+/* flow steps */
+.flow-steps { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; padding: 0; margin: 12px 0; }
+.flow-step { position: relative; border: 1px solid var(--border); background: var(--bg); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); }
+.flow-step-num { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 12px; }
+.flow-thumb { margin-top: 8px; border: 1px dashed var(--border); border-radius: 10px; padding: 6px; background: var(--bg-secondary); }
+.flow-thumb img { border-radius: 8px; }
