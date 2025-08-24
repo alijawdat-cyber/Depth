@@ -437,6 +437,8 @@ class DepthDocs {
             if (window.UIComponents && UIComponents.applyAOSAttributes) UIComponents.applyAOSAttributes(docContent);
         }
     try { await this.renderMermaid(docContent); } catch (_) {}
+    // ترقية عارض المخططات (تكبير/تصغير/تحريك/ملاءمة)
+    try { UIComponents.upgradeMermaidViewers(docContent); } catch (_) {}
     // Design tokens previews (ألوان/ظلال/خطوط) — تعمل لو توفرّت الأكواد في الـMarkdown
     try { UIComponents.enhanceDesignTokens(docContent); } catch (_) {}
     // Design System blocks polish (صور/بطاقات/جريد)
@@ -444,6 +446,8 @@ class DepthDocs {
     try { UIComponents.enhanceUserFlowsAndFrontPreview(docContent, path); } catch (_) {}
     try { UIComponents.enhanceComponentLibrary(docContent, path); } catch (_) {}
     try { UIComponents.annotateColorChips(docContent); } catch (_) {}
+    // أسهم ترابطية وتchips للتنقل بين الأقسام/الصفحات من كتل flowmap
+    try { UIComponents.enhanceFlowLinks(docContent); } catch (_) {}
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const wrapper = document.querySelector('.content-wrapper');
     if (wrapper) {

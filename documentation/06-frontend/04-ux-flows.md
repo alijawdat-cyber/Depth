@@ -126,3 +126,15 @@ flowchart LR
 Preference: [In-App] [Email] [SMS]
 Send → if SMS fail → auto Email → channelFallback="sms→email"
 ```
+
+### روابط تدفق مختصرة (تجربة)
+حتى تشوف الأسهم بين الأقسام بنفس الصفحة، هذا مثال بسيط:
+
+```flowmap
+#flow-auth-otp -> #flow-client-request
+#flow-client-request -> #flow-admin-convert
+#flow-admin-convert -> #flow-admin-assign
+#flow-admin-assign -> #flow-admin-quote
+#flow-admin-quote -> #flow-creator-deliver
+#flow-creator-deliver -> #flow-notifications-fallback
+```

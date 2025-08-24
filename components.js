@@ -41,6 +41,216 @@ class UIComponents {
         return a;
     }
 
+    // =============== Diagram Viewer (Mermaid) with pan/zoom/fit ===============
+    static upgradeMermaidViewers(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        const diagrams = Array.from(root.querySelectorAll('.diagram.mermaid-diagram'));
+        diagrams.forEach(diagram => {
+            // لا تكرر التغليف
+            if (diagram.closest('.diagram-viewer')) return;
+            const title = (diagram.getAttribute('data-title') || '').trim();
+            const viewer = document.createElement('div');
+            viewer.className = 'diagram-viewer';
+            // شريط الأدوات
+            const toolbar = document.createElement('div');
+            toolbar.className = 'diagram-toolbar';
+            toolbar.innerHTML = `
+                <div class="dt-left">
+                  <div class="dt-title">${title || 'Diagram'}</div>
+                </div>
+                <div class="dt-right">
+                  <button class="diagram-btn" data-zoom="out" aria-label="تصغير"><i data-lucide="zoom-out"></i></button>
+                  <button class="diagram-btn" data-zoom="in" aria-label="تكبير"><i data-lucide="zoom-in"></i></button>
+                  <button class="diagram-btn" data-fit aria-label="ملاءمة"><i data-lucide="maximize"></i></button>
+                  <button class="diagram-btn" data-reset aria-label="إعادة"><i data-lucide="rotate-ccw"></i></button>
+                </div>`;
+            const stage = document.createElement('div');
+            stage.className = 'diagram-stage';
+            const content = document.createElement('div');
+            content.className = 'diagram-content';
+            // انقل الـSVG داخل المحتوى
+            content.appendChild(diagram);
+            stage.appendChild(content);
+            viewer.appendChild(toolbar);
+            viewer.appendChild(stage);
+            // تعليق اختياري من عنوان العنصر الأب
+            const captionText = diagram.getAttribute('alt') || '';
+            if (captionText) {
+                const cap = document.createElement('div');
+                cap.className = 'diagram-caption';
+                cap.textContent = captionText;
+                viewer.appendChild(cap);
+            }
+            // استبدال
+            const host = content.parentNode;
+            const parent = host.parentNode;
+            parent.replaceChild(viewer, host);
+
+            // حالة التحويل
+            let scale = 1, tx = 0, ty = 0;
+            const apply = () => { content.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; };
+            const fit = () => {
+                try {
+                    const svg = content.querySelector('svg');
+                    if (!svg) return;
+                    const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+                    const stageRect = stage.getBoundingClientRect();
+                    const svgW = isFinite(vb[2]) ? vb[2] : svg.clientWidth || 800;
+                    const svgH = isFinite(vb[3]) ? vb[3] : svg.clientHeight || 600;
+                    const sx = (stageRect.width - 24) / svgW;
+                    const sy = (stageRect.height - 24) / svgH;
+                    scale = Math.max(0.2, Math.min(1.2, Math.min(sx, sy)));
+                    tx = 12; ty = 12; apply();
+                } catch(_) { /* silent */ }
+            };
+            const reset = () => { scale = 1; tx = 0; ty = 0; apply(); };
+            // أزرار
+            toolbar.addEventListener('click', (e) => {
+                const btn = e.target.closest('button'); if (!btn) return;
+                if (btn.hasAttribute('data-zoom')) {
+                    const dir = btn.getAttribute('data-zoom');
+                    scale = Math.max(0.2, Math.min(2.5, scale * (dir === 'in' ? 1.2 : 1/1.2)));
+                    apply();
+                } else if (btn.hasAttribute('data-fit')) {
+                    fit();
+                } else if (btn.hasAttribute('data-reset')) {
+                    reset();
+                }
+            });
+            // سحب للتحريك
+            let dragging = false; let sx = 0, sy = 0, ox = 0, oy = 0;
+            const start = (clientX, clientY) => { dragging = true; viewer.classList.add('dragging'); sx = clientX; sy = clientY; ox = tx; oy = ty; };
+            const move = (clientX, clientY) => { if (!dragging) return; tx = ox + (clientX - sx); ty = oy + (clientY - sy); apply(); };
+            const end = () => { dragging = false; viewer.classList.remove('dragging'); };
+            stage.addEventListener('mousedown', (e)=>{ if (e.button!==0) return; start(e.clientX,e.clientY); e.preventDefault(); });
+            window.addEventListener('mousemove', (e)=> move(e.clientX,e.clientY));
+            window.addEventListener('mouseup', end);
+            stage.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if (!t) return; start(t.clientX,t.clientY); }, { passive: true });
+            window.addEventListener('touchmove', (e)=>{ const t=e.touches[0]; if (!t) return; move(t.clientX,t.clientY); }, { passive: true });
+            window.addEventListener('touchend', end, { passive: true });
+            // ملاءمة أولية بعد رسم
+            setTimeout(fit, 30);
+        });
+        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+    }
+
+    // =============== Flow links & connectors (same-page + cross-doc chips) ===============
+    static enhanceFlowLinks(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+        // ابحث عن كتل code من نوع flowmap
+        const blocks = Array.from(root.querySelectorAll('pre > code.language-flowmap, pre > code.language-flow, pre > code.language-graph'));
+        if (!blocks.length) return;
+        // طبقة رسم للأسهم داخل الصفحة
+        let layer = root.querySelector('.flow-connector-layer');
+        if (!layer) {
+            layer = document.createElement('svg');
+            layer.className = 'flow-connector-layer';
+            layer.setAttribute('width', '100%');
+            layer.setAttribute('height', '0');
+            layer.setAttribute('viewBox', `0 0 100 100`);
+            layer.setAttribute('preserveAspectRatio', 'none');
+            root.appendChild(layer);
+        }
+
+        const pairs = [];
+        blocks.forEach(code => {
+            const text = (code.textContent || '').trim();
+            const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            // صيغة: fromId -> toId  |  أو  /path#id -> /path#id
+            lines.forEach(ln => {
+                const m = ln.split(/\s*->\s*/);
+                if (m.length !== 2) return;
+                pairs.push({ from: m[0], to: m[1] });
+            });
+            // حوّل الكتلة إلى قائمة روابط أنيقة
+            const pre = code.closest('pre');
+            const box = document.createElement('div');
+            box.className = 'flow-links';
+            const title = document.createElement('div'); title.className = 'flow-links-title'; title.textContent = 'تدفق مترابط';
+            const list = document.createElement('div'); list.className = 'flow-links-list';
+            pairs.forEach(p => {
+                const a = document.createElement('a'); a.className = 'flow-link-chip';
+                const isCross = /\//.test(p.to) || /\//.test(p.from);
+                const label = `${p.from} → ${p.to}`;
+                a.textContent = label;
+                if (isCross) {
+                    // استعمل الرابط كما هو، لو يحتوي path
+                    const href = p.to.startsWith('#') ? p.to : `#${p.to.replace(/^#/, '')}`;
+                    a.href = href;
+                    a.onclick = (e) => { /* خلي المتصفح يروح */ };
+                } else {
+                    a.href = '#';
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tgt = root.querySelector(p.to.startsWith('#') ? p.to : `#${p.to}`);
+                        if (tgt) UIComponents.scrollToHeading(tgt);
+                    });
+                }
+                list.appendChild(a);
+            });
+            box.appendChild(title); box.appendChild(list);
+            pre.replaceWith(box);
+        });
+
+        // ارسم أسهم داخل الصفحة فقط (لو الطرفين موجودين هنا)
+        const computeAndDraw = () => {
+            // امسح
+            while (layer.firstChild) layer.removeChild(layer.firstChild);
+            const hostRect = root.getBoundingClientRect();
+            const width = hostRect.width; const height = root.scrollHeight; // تقريب
+            layer.setAttribute('width', `${width}`);
+            layer.style.height = `${height}px`;
+            layer.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            const mkMarker = () => {
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('orient', 'auto');
+                marker.setAttribute('markerWidth', '8');
+                marker.setAttribute('markerHeight', '6');
+                marker.setAttribute('refX', '8');
+                marker.setAttribute('refY', '3');
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M0,0 L8,3 L0,6 Z');
+                path.setAttribute('fill', 'currentColor');
+                marker.appendChild(path);
+                defs.appendChild(marker);
+                layer.appendChild(defs);
+            };
+            mkMarker();
+
+            const curPairs = pairs.filter(p => !(/[\/]/.test(p.from) || /[\/]/.test(p.to)));
+            curPairs.forEach(p => {
+                const fromEl = root.querySelector(p.from.startsWith('#') ? p.from : `#${p.from}`);
+                const toEl = root.querySelector(p.to.startsWith('#') ? p.to : `#${p.to}`);
+                if (!fromEl || !toEl) return;
+                const fr = fromEl.getBoundingClientRect();
+                const tr = toEl.getBoundingClientRect();
+                const sx = (fr.right - hostRect.left); // RTL: من اليمين
+                const sy = (fr.top - hostRect.top) + fr.height / 2;
+                const ex = (tr.right - hostRect.left);
+                const ey = (tr.top - hostRect.top) + tr.height / 2;
+                const dx = (sx - ex);
+                const c = Math.max(40, Math.min(160, Math.abs(dx) * 0.6));
+                const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                pathEl.setAttribute('d', `M ${sx} ${sy} C ${sx - c} ${sy}, ${ex + c} ${ey}, ${ex} ${ey}`);
+                pathEl.setAttribute('fill', 'none');
+                pathEl.setAttribute('stroke', 'var(--primary)');
+                pathEl.setAttribute('stroke-width', '2');
+                pathEl.setAttribute('marker-end', 'url(#arrowhead)');
+                pathEl.setAttribute('opacity', '0.7');
+                layer.appendChild(pathEl);
+            });
+        };
+
+        const throttled = (()=>{ let raf=null; return ()=>{ if (raf) return; raf=requestAnimationFrame(()=>{ computeAndDraw(); raf=null; }); }; })();
+        window.addEventListener('scroll', throttled, { passive: true });
+        window.addEventListener('resize', throttled);
+        setTimeout(computeAndDraw, 80);
+    }
+
     // Generate navigation section
     static createNavSection(section) {
     const div = document.createElement('div');

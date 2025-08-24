@@ -349,6 +349,15 @@ pre[data-aos="flip-up"].aos-animate { transform: perspective(2500px) rotateX(0);
     @media (max-width: 768px) {
         .json-body { padding: 8px; }
     }
+
+/* ===== Flow Links (inter-screen connectors) ===== */
+.flow-links { border: 1px dashed var(--border); border-radius: 12px; padding: 10px; background: color-mix(in oklab, var(--primary) 6%, var(--bg)); margin: 12px 0; }
+.flow-links-title { font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.flow-links-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.flow-link-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; font-size: 12px; }
+.flow-link-chip:hover { border-color: color-mix(in oklab, var(--primary) 35%, var(--border)); box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+.flow-connector-layer { position: absolute; left: 0; right: 0; width: 100%; height: 0; pointer-events: none; }
+.doc-content { position: relative; }
 /* Sticky first column for wide tables */
 /* Sticky first column: direction-aware to work across RTL/LTR and mobile */
 .doc-content table.sticky-col th:first-child,
