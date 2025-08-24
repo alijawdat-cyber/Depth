@@ -55,6 +55,7 @@
         padding-right: 14px;
         max-width: 1320px;
         margin: 0 auto;
+        /* العمود الثاني مخصص للـ floating TOC ويبقى ثابت */
         grid-template-columns: minmax(0, 1fr) 300px;
     }
     
@@ -64,7 +65,7 @@
     }
     
     body.sidebar-open .main-content { 
-        margin-right: calc(var(--sidebar-width) + 8px); 
+        margin-right: 0; 
     }
     
     /* Desktop overlay should be click-catcher only (no dim) */
@@ -110,7 +111,7 @@
     }
     
     body.sidebar-open .main-content { 
-        margin-right: calc(var(--sidebar-width) + 8px); 
+        margin-right: 0; 
     }
 }
 

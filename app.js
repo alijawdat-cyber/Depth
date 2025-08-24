@@ -152,7 +152,8 @@ class DepthDocs {
             const ov = document.getElementById('sidebar-overlay');
             if (!sidebar) return;
             const isClickInside = sidebar.contains(e.target) || (ov && ov.contains(e.target));
-            if (!isClickInside && this.sidebarOpen && (this.isMobile || this.isTablet)) {
+            // أغلق السايدبار عند النقر خارج بأي مقاس شاشة
+            if (!isClickInside && this.sidebarOpen) {
                 this.closeSidebar();
             }
         };
@@ -274,10 +275,10 @@ class DepthDocs {
         if (this.isDesktop || this.isLargeDesktop) {
             if (contentWrapper) contentWrapper.classList.remove('sidebar-closed');
             if (mainContent) mainContent.classList.remove('sidebar-closed');
-            // Activate transparent overlay on desktop to catch outside clicks
-            if (overlay) overlay.classList.add('active');
+            // لا تفعّل الأوفرلاي على الديسكتوب حتى تبقى منطقة الفلوتنغ قابلة للتفاعل
+            if (overlay) overlay.classList.remove('active');
         } else {
-            if (overlay) overlay.classList.add('active'); // show dim overlay on phones
+            if (overlay) overlay.classList.add('active'); // أظهر تعتيم على الهواتف/التابلت
             if (mainContent) mainContent.classList.add('pushed');
         }
         this.updateBurgerButton();
