@@ -1727,3 +1727,49 @@ body.sidebar-open .screen-mockup .main-content {
 .shadow-md { box-shadow: var(--shadow-md); }
 .shadow-lg { box-shadow: var(--shadow-lg); }
 .shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* ========================================
+     MOBILE POLISH OVERRIDES (Client screens)
+     ======================================== */
+/* وسائط مرئية مرنة داخل شاشات العميل */
+.screen-mockup img,
+.screen-mockup svg,
+.screen-mockup video { max-width: 100%; height: auto; }
+
+/* أهداف لمس مناسبة للأزرار والمدخلات */
+.screen-mockup .btn { min-height: 44px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.screen-mockup .form-input,
+.screen-mockup .form-select,
+.screen-mockup .form-textarea { min-height: 44px; appearance: none; -webkit-appearance: none; background-clip: padding-box; }
+
+/* تحسين قراءة العناوين الكبيرة على الموبايل */
+.screen-mockup h1 { font-size: clamp(1.25rem, 5.5vw, 1.75rem); }
+.screen-mockup h2 { font-size: clamp(1.125rem, 5vw, 1.5rem); }
+.screen-mockup h3 { font-size: clamp(1rem, 4.5vw, 1.25rem); }
+
+@media (max-width: 480px) {
+    /* خط أساسي مرن لمنع التكبير التلقائي */
+    .screen-mockup { font-size: clamp(14px, 3.6vw, 16px); }
+    /* حشوات أهدأ */
+    .screen-mockup .screen-header { padding: var(--space-md); }
+    .screen-mockup .screen-content { padding: var(--space-md); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .screen-mockup .card { padding: var(--space-md); }
+    .screen-mockup .btn { font-size: 0.95rem; padding: 0.6rem var(--space-lg); min-height: 44px; }
+    .screen-mockup .btn-lg { padding: 0.75rem var(--space-xl); }
+    .screen-mockup .form-label { font-size: 0.85rem; }
+    .screen-mockup .form-input,
+    .screen-mockup .form-select,
+    .screen-mockup .form-textarea { font-size: 16px; } /* منع Zoom على iOS */
+    .screen-mockup .social-buttons { flex-direction: column; }
+    .screen-mockup .kpi-grid { grid-template-columns: 1fr; }
+    .screen-mockup .mini-kpi-scroll { gap: var(--space-md); }
+    .screen-mockup .kpi-value { font-size: 1.75rem; }
+    /* جداول: تمرير أفقي بدل انكسار */
+    .screen-mockup table { width: 100%; border-collapse: collapse; }
+    .screen-mockup .table-scroll, /* لو وُجدت حاوية */
+    .screen-mockup .screen-content { overflow-x: auto; }
+    .screen-mockup th, .screen-mockup td { padding: 0.5rem; }
+    /* auth */
+    .screen-mockup .auth-container { padding: var(--space-lg); margin: var(--space-md); }
+    .screen-mockup .logo-section img { height: 40px; }
+}
