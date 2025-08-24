@@ -207,13 +207,15 @@
 | clientId      | string       | نعم   | معرف العميل                | cl_123abc      | FK → Client  |
 | categoryId    | string       | نعم   | معرف الفئة الرئيسية        | cat_photo      | FK → Category |
 | subcategoryId | string       | نعم   | معرف الفئة الفرعية         | sub_flatlay    | FK → Subcategory |
-| description   | string       | نعم   | وصف المشروع               | تصوير منتجات  | ≤1000 حرف    |
+| description   | string       | لا    | وصف المشروع               | تصوير منتجات  | ≤1000 حرف    |
 | preferredLocation| enum      | نعم   | الموقع المفضل              | studio         | studio/client/outskirts/nearby/far |
 | budget        | object       | لا    | الميزانية المتوقعة         | {min, max}     |              |
 | deadline      | date         | لا    | الموعد النهائي المطلوب     | 2025-09-15     |              |
 | attachments   | array        | لا    | ملفات مرفقة                | [url1, url2]   |              |
 | priority      | enum         | نعم   | أولوية الطلب               | normal         | low/normal/high/urgent |
 | status        | enum         | نعم   | حالة الطلب                 | pending        | pending/reviewing/approved/rejected |
+| processingLevel | enum      | نعم   | مستوى المعالجة المطلوب     | basic          | raw/basic/color_correction/full_retouch/advanced_composite |
+| rush          | boolean      | لا    | استعجال التنفيذ            | false          | default: false |
 | estimatedPrice| int          | لا    | السعر المقدر               | 25000          | بالدينار     |
 | assignedTo    | string       | لا    | الأدمن المكلف بالمراجعة    | admin@depth-agency.com |            |
 | reviewNotes   | string       | لا    | ملاحظات المراجعة           | يحتاج توضيح   |              |

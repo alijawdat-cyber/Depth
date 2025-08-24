@@ -88,6 +88,7 @@ class UIComponents {
         if (has('database-schema') || has('schema') || has('مخطط')) return 'schema';
         if (has('indexes') || has('استعلام') || has('فهارس')) return 'indexes';
         if (has('authentication') || has('auth') || has('مصاد')) return 'auth';
+    if (has('api-conventions') || has('conventions') || has('اتفاقيات')) return 'conventions';
         if (has('rate-limiting') || has('المعدل')) return 'rate-limit';
         if (has('websockets')) return 'websocket';
         if (has('error-handling') || has('أخطاء') || has('خطأ')) return 'error';
@@ -116,7 +117,11 @@ class UIComponents {
         if (has('testing') || has('الاختبار')) return 'test';
 
         if (has('mobile') || has('الجوال')) return 'phone';
-        if (has('frontend') || has('الويب')) return 'monitor';
+    if (has('frontend') || has('الويب')) return 'monitor';
+    if (has('design-tokens')) return 'tokens';
+    if (has('design-system')) return 'design-system';
+    if (has('performance-and-a11y') || has('performance') || has('a11y')) return 'performance';
+    if (has('component-library')) return 'components';
 
         if (has('security-overview') || has('الأمان') || has('security')) return 'shield';
         if (has('threat-model')) return 'target';
@@ -160,6 +165,7 @@ class UIComponents {
             indexes: 'list-filter',
             database: 'database',
             auth: 'shield',
+            conventions: 'file-cog',
             'rate-limit': 'gauge',
             websocket: 'network',
             error: 'triangle-alert',
@@ -184,6 +190,10 @@ class UIComponents {
             test: 'beaker',
             phone: 'smartphone',
             monitor: 'monitor',
+            tokens: 'layers',
+            'design-system': 'shapes',
+            performance: 'gauge',
+            components: 'boxes',
             shield: 'shield',
             target: 'target',
             cogs: 'cog',
@@ -216,6 +226,7 @@ class UIComponents {
             integrations: 'plug',
             development: 'code-2',
             interfaces: 'monitor-smartphone',
+            frontend: 'monitor',
             security: 'shield',
             operations: 'settings-2',
             reference: 'book'
@@ -306,6 +317,7 @@ class UIComponents {
             // API Core
             '03-api': 'واجهات البرمجة',
             'core': 'الأساسيات',
+            '00-api-conventions': 'اتفاقيات API',
             '01-authentication': 'المصادقة',
             '02-rate-limiting': 'تحديد المعدل',
             '03-websockets': 'WebSockets',
@@ -347,6 +359,15 @@ class UIComponents {
             '00-mobile-overview': 'نظرة عامة - الجوال',
             '06-frontend': 'الواجهات',
             '00-frontend-overview': 'نظرة عامة - الويب',
+            '01-design-tokens': 'Design Tokens',
+            '02-design-system': 'Design System',
+            '02-performance-and-a11y': 'الأداء وقابلية الوصول',
+            '03-component-library': 'مكتبة المكونات',
+            '04-ux-flows': 'UX Flows',
+            '05-ui-screens-client': 'شاشات العميل',
+            '06-ui-screens-admin': 'شاشات المدير',
+            '07-ui-screens-creator': 'شاشات المبدع',
+            '08-ui-screens-salaried': 'شاشات الموظف',
             
             // Security
             '07-security': 'الأمان',
@@ -359,6 +380,9 @@ class UIComponents {
             '00-operations-overview': 'نظرة عامة - العمليات',
             '01-deployment': 'النشر',
             '02-incident-response': 'الاستجابة للحوادث',
+            '03-monitoring': 'المراقبة',
+            '04-backup-and-restore': 'النسخ الاحتياطي والاستعادة',
+            '05-disaster-recovery': 'التعافي من الكوارث',
             
             // Reference
             '99-reference': 'المراجع',

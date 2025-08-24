@@ -381,7 +381,7 @@
         },
         "flags": {
           "verified": true,
-          "premium": false,
+          "vip": false,
           "risk": "low"
         }
       },

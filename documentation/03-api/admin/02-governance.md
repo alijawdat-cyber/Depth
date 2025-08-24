@@ -1087,7 +1087,7 @@
   "data": {
     "backup": {
       "id": "backup_manual_20250902_001",
-      "status": "initiated",
+  "status": "pending",
       "estimatedDuration": "30-45 دقيقة",
       "estimatedSize": "2.1 GB",
       "estimatedCompletion": "2025-09-02T21:00:00.000Z",
@@ -1131,7 +1131,7 @@
   "data": {
     "restore": {
       "id": "restore_20250902_001",
-      "status": "initiated",
+  "status": "pending",
       "backupId": "backup_20250901_weekly",
       "estimatedDuration": "1-2 ساعة",
       "phases": [

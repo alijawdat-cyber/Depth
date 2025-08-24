@@ -89,7 +89,7 @@
       "id": "p_123abc",
       "title": "تصوير منتجات المطعم - الدفعة الأولى",
       "projectNumber": "DP-2025-0345",
-      "status": "initiated",
+  "status": "pending",
       "phase": "planning",
       "client": {
         "id": "cl_123abc",
@@ -123,6 +123,24 @@
   "message": "تم إنشاء المشروع بنجاح! سيتم التواصل مع جميع الأطراف لتأكيد التفاصيل."
 }
 ```
+
+---
+
+ملاحظة الحالة (SSOT): أي استخدام سابق لقيمة "initiated" يعتبر (تعارض). بعد: استعمل "pending" بدلها.
+
+## طلبات المشاريع (Project Requests)
+
+- الحقول الإلزامية: category, subcategory.
+- الحقول الاختيارية: description (≤1000 char), rush (default: off), attachments[].
+- بعد الإرسال: status = 'pending'، وعند فتح الأدمن للطلب تصبح 'reviewing'.
+- يحدد العميل processingLevel: raw|basic|color_correction|full_retouch|advanced_composite (يؤثر على التسعير والفلترة).
+
+ملاحظات:
+- لا تغيّر status SSOT عند الأرشفة؛ استخدم isArchived: boolean كفلاغ مستقل (انظر أدناه).
+
+اقتباسات مرجعية:
+- `documentation/02-database/01-database-schema.md` → status: 'pending' | 'reviewing' | 'approved' | 'rejected'
+- `documentation/99-reference/02-enums-standard.md` → مستويات المعالجة (Processing Levels)
 
 ---
 
@@ -343,6 +361,12 @@
   "message": "تم تعيين المبدع بنجاح! سيتم إرسال العقد للتوقيع."
 }
 ```
+
+### سياسات التعيين (بعد)
+
+- تحويل الطلب لمشروع لا يغيّر subcategory الأصلية.
+- فلترة المبدعين تتم عبر creatorSubcategories(subcategoryId) وcapabilities(processingLevel) المختار من العميل.
+- عند رفض المبدع: يُعاد الترشيح تلقائياً حسب التصفية، ويُخطر الأدمن.
 
 ---
 
@@ -565,7 +589,26 @@
 }
 ```
 
+### الأرشفة
+
+- isArchived: boolean (افتراضي false). الأرشفة لا تغيّر status (SSOT يبقى draft/pending/active/completed/cancelled).
+
 ---
+
+## Quote / عرض السعر
+
+- يظهر للعميل فقط: lineItemTotal (Subcategory × Quantity) والمجموع الكلي.
+- لا تُعرض تفاصيل CreatorPrice أو Margin أو اسم المبدع.
+- عرض السعر يُنشَر بعد موافقة الأدمن.
+
+ملاحظة: أثناء إنشاء الطلب ماكو أسعار؛ التسعير يظهر فقط بعد تجهيز العرض من الأدمن.
+
+---
+
+## Rush
+
+- Rush: يمكن تفعيله من العميل (بالطلب) أو من الأدمن لاحقاً.
+- أي تغيير في Rush يعيد احتساب السعر قبل نشر العرض النهائي.
 
 ## تسليم المشاريع
 

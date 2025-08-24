@@ -185,14 +185,11 @@ const corsOptions = {
 ```javascript
 // File validation
 const fileValidation = {
-  maxSize: 50 * 1024 * 1024, // 50MB
-  allowedTypes: [
-    'image/jpeg',
-    'image/png', 
-    'image/webp',
-    'video/mp4',
-    'video/quicktime'
-  ],
+  maxSize: 2 * 1024 * 1024 * 1024, // 2GB
+  allowedTypes: '*/*',
+  denylist: ['exe','js','sh','bat'],
+  chunked: true,
+  mimeSniffing: true,
   
   // Virus scanning
   scanFile: async (file) => {

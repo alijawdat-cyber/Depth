@@ -992,7 +992,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
         "enabled": true,
         "description": "التعاون في الوقت الفعلي على المشاريع",
         "rolloutPercentage": 25,
-        "targetAudience": "premium_clients",
+  "targetAudience": "vip_clients",
         "enabledAt": "2025-09-01T00:00:00.000Z"
       },
       {

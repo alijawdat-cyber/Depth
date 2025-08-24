@@ -27,6 +27,7 @@ const sidebarData = [
         title: 'الأساسيات',
         id: 'core',
         items: [
+            { name: 'اتفاقيات API', path: '/documentation/03-api/core/00-api-conventions' },
             { name: 'المصادقة', path: '/documentation/03-api/core/01-authentication' },
             { name: 'تحديد المعدل', path: '/documentation/03-api/core/02-rate-limiting' },
             { name: 'WebSockets', path: '/documentation/03-api/core/03-websockets' },
@@ -85,6 +86,21 @@ const sidebarData = [
         ]
     },
     {
+        title: 'Frontend',
+        id: 'frontend',
+        items: [
+            { name: 'Design Tokens', path: '/documentation/06-frontend/01-design-tokens' },
+            { name: 'Design System', path: '/documentation/06-frontend/02-design-system' },
+            { name: 'Performance & A11y', path: '/documentation/06-frontend/02-performance-and-a11y' },
+            { name: 'Component Library', path: '/documentation/06-frontend/03-component-library' },
+            { name: 'UX Flows', path: '/documentation/06-frontend/04-ux-flows' },
+            { name: 'Client Screens', path: '/documentation/06-frontend/05-ui-screens-client' },
+            { name: 'Admin Screens', path: '/documentation/06-frontend/06-ui-screens-admin' },
+            { name: 'Creator Screens', path: '/documentation/06-frontend/07-ui-screens-creator' },
+            { name: 'Salaried Screens', path: '/documentation/06-frontend/08-ui-screens-salaried' }
+        ]
+    },
+    {
         title: 'الأمان',
         id: 'security',
         items: [
@@ -99,7 +115,10 @@ const sidebarData = [
         items: [
             { name: 'نظرة عامة', path: '/documentation/08-operations/00-operations-overview' },
             { name: 'النشر', path: '/documentation/08-operations/01-deployment' },
-            { name: 'الاستجابة للحوادث', path: '/documentation/08-operations/02-incident-response' }
+            { name: 'الاستجابة للحوادث', path: '/documentation/08-operations/02-incident-response' },
+            { name: 'المراقبة', path: '/documentation/08-operations/03-monitoring' },
+            { name: 'النسخ الاحتياطي والاستعادة', path: '/documentation/08-operations/04-backup-and-restore' },
+            { name: 'التعافي من الكوارث', path: '/documentation/08-operations/05-disaster-recovery' }
         ]
     },
     {
@@ -111,7 +130,8 @@ const sidebarData = [
             { name: 'المعايير', path: '/documentation/99-reference/02-enums-standard' },
             { name: 'ربط الروابط', path: '/documentation/99-reference/03-link-alias-mapping' },
             { name: 'قواعد التسمية', path: '/documentation/99-reference/04-naming-conventions' },
-            { name: 'مصفوفة الأدوار', path: '/documentation/99-reference/05-roles-matrix' }
+            { name: 'مصفوفة الأدوار', path: '/documentation/99-reference/05-roles-matrix' },
+            { name: 'مصطلحات عربية', path: '/documentation/99-reference/06-terminology-glossary-ar' }
         ]
     }
 ];
@@ -230,6 +250,19 @@ const pageContent = {
             <li><strong>نظام التسعير:</strong> مرن وقابل للتخصيص</li>
             <li><strong>نظام الإشعارات:</strong> متعدد القنوات</li>
             <li><strong>نظام التقارير:</strong> تحليلات شاملة</li>
+        </ul>
+
+        <h3>واجهات Frontend — روابط سريعة</h3>
+        <ul>
+            <li><a href="#/documentation/06-frontend/01-design-tokens">Design Tokens</a></li>
+            <li><a href="#/documentation/06-frontend/02-design-system">Design System</a></li>
+            <li><a href="#/documentation/06-frontend/02-performance-and-a11y">Performance & A11y</a></li>
+            <li><a href="#/documentation/06-frontend/03-component-library">Component Library</a></li>
+            <li><a href="#/documentation/06-frontend/04-ux-flows">UX Flows</a></li>
+            <li><a href="#/documentation/06-frontend/05-ui-screens-client">Client Screens</a></li>
+            <li><a href="#/documentation/06-frontend/06-ui-screens-admin">Admin Screens</a></li>
+            <li><a href="#/documentation/06-frontend/07-ui-screens-creator">Creator Screens</a></li>
+            <li><a href="#/documentation/06-frontend/08-ui-screens-salaried">Salaried Screens</a></li>
         </ul>
     `,
     '/documentation/03-api/core/01-authentication': `
