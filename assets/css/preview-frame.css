@@ -68,7 +68,7 @@
   transform-origin: top left;
   transform: none;
   pointer-events: none;
-  z-index: 1; /* الإطار أسفل الشاشة */
+  z-index: 5; /* الإطار فوق الشاشة لإظهار النوتش */
 }
 
 .device-preview.rotated .iphone-shell{
