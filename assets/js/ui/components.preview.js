@@ -26,7 +26,7 @@
     return new URL(full, loc.origin).href;
       } catch (_) { return p; }
     };
-    // تأكد من تحميل CSS إطار الجهاز
+  // تأكد من تحميل CSS إطار الجهاز
     (function(){
       const id = 'preview-frame-css';
       if (!document.getElementById(id)){
@@ -35,57 +35,71 @@
       }
     })();
     const presets = { iphone14: { w: 390, h: 844 } };
+    // محوّل للمسارات المطلقة مثل /logo.svg إلى مسارات مناسبة ضمن GitHub Pages
+    const fixAbsoluteSrcs = (html, assetFn) => {
+      try {
+        return String(html).replace(/\s(src|href)=("|')\/(?!\/)([^"']+)(\2)/g, (m,attr,q,p1)=>` ${attr}=${q}${assetFn(p1)}${q}`);
+      } catch(_) { return html; }
+    };
     htmlBlocks.forEach(code => {
       const pre = code.parentElement; if (!pre) return; if (pre.closest('.html-preview-wrapper')) return;
-      const raw = code.textContent || '';
-      let safe = raw;
-      try { if (window.DOMPurify) { safe = window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['div','span','img','button','a','p','h1','h2','h3','h4','h5','h6','ul','ol','li','form','input','label','section','article','nav','main','aside','header','footer','strong','em','small','hr','br','details','summary'], ALLOWED_ATTR: ['class','id','href','src','alt','title','type','role','aria-label','aria-expanded','aria-controls','placeholder','value','maxlength','inputmode','dir','target','rel','data-otp-submit','data-otp-resend','data-otp-timer','data-seconds','data-theme-toggle'], KEEP_CONTENT: true }); } } catch(_){ }
+  const raw = code.textContent || '';
+  let safe = raw;
+  try { if (window.DOMPurify) { safe = window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['div','span','img','button','a','p','h1','h2','h3','h4','h5','h6','ul','ol','li','form','input','label','section','article','nav','main','aside','header','footer','strong','em','small','hr','br','details','summary'], ALLOWED_ATTR: ['class','id','href','src','alt','title','type','role','aria-label','aria-expanded','aria-controls','placeholder','value','maxlength','inputmode','dir','target','rel','data-otp-submit','data-otp-resend','data-otp-timer','data-seconds','data-theme-toggle'], KEEP_CONTENT: true }); } } catch(_){ }
+  // إذا التعقيم حذف هواي (أو ماكو تاغات)، رجّع للأصلي للمعاينة فقط
+  let htmlForPreview = safe;
+  if (!(/[<][a-z]/i.test(safe)) || safe.length < 20) htmlForPreview = raw;
+  // أصلح المسارات المطلقة
+  htmlForPreview = fixAbsoluteSrcs(htmlForPreview, asset);
       const wrapper = document.createElement('div'); wrapper.className = 'html-preview-wrapper';
   const bar = document.createElement('div');
   bar.className = 'html-preview-toolbar';
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
       const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone14" class="active">iPhone 14</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.33" class="active">×3</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
-      const stage = document.createElement('div'); stage.className = 'device-stage';
+  const stage = document.createElement('div'); stage.className = 'device-stage';
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
-      stage.appendChild(iframe); device.appendChild(dt); device.appendChild(stage);
+  // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
+  const fb = document.createElement('div'); fb.className = 'html-fallback'; fb.setAttribute('data-theme','light'); fb.setAttribute('dir','rtl');
+  fb.innerHTML = `<div class="screen-mockup">${htmlForPreview}</div>`;
+  // اخفِ الـiframe بالبداية
+  iframe.style.display = 'none';
+  stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); device.appendChild(stage);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
       let cur = { ...presets.iphone14 }; let rot = false; let scale = 0.33;
       const applyDims = ()=>{ device.style.setProperty('--dp-width', (rot?cur.h:cur.w)+'px'); device.style.setProperty('--dp-height', (rot?cur.w:cur.h)+'px'); device.style.setProperty('--dp-scale', String(scale)); const info = dt.querySelector('.dt-info'); if (info) info.textContent = `${rot?cur.h:cur.w}×${rot?cur.w:cur.h}`; };
       applyDims();
-  const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>html,body{height:100%;margin:0;overflow:auto;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style></head><body><div class="screen-mockup">${safe}</div><script src="${asset('assets/js/interactive-mockups.js')}"><\/script><script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script></body></html>`;
+  const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>html,body{height:100%;margin:0;overflow:auto;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style></head><body><div class="screen-mockup">${htmlForPreview}</div><script src="${asset('assets/js/interactive-mockups.js')}"><\/script><script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script></body></html>`;
       const loadFrame = (theme='light')=>{ iframe.srcdoc = buildSrcDoc(theme); };
       loadFrame('light');
-      // Fallback: إذا ما ظهر محتوى داخل الـiframe، نعرض HTML مباشر بنفس القياسات
-      const installFallbackCheck = () => {
-        try {
-          iframe.addEventListener('load', () => {
-            try {
-              const doc = iframe.contentDocument;
-              const hasSM = !!(doc && doc.body && doc.body.querySelector('.screen-mockup'));
-              const hasAny = !!(doc && doc.body && doc.body.children && doc.body.children.length > 0);
-              if (!hasSM && !hasAny) {
-                // أنشئ حاوية fallback داخل الـstage
-                const fb = document.createElement('div');
-                fb.className = 'html-fallback';
-                fb.innerHTML = `<div class="screen-mockup">${safe}</div>`;
-                // أخفي الـiframe وخلي البديل ظاهر
-                iframe.style.display = 'none';
-                stage.appendChild(fb);
-              }
-            } catch(_) {}
-          }, { once: false });
-        } catch(_) {}
-      };
-      installFallbackCheck();
+      // عند نجاح تحميل الـiframe وإثبات وجود محتوى، اخفِ fallback وأظهر الـiframe
+      try {
+        iframe.addEventListener('load', () => {
+          try {
+            const doc = iframe.contentDocument;
+            const body = doc && doc.body;
+            const ok = !!(body && (body.querySelector('.screen-mockup') || (body.innerHTML||'').trim().length > 10));
+            if (ok) { fb.style.display = 'none'; iframe.style.display = 'block'; }
+          } catch(_) {}
+        });
+      } catch(_) {}
       dt.addEventListener('click', (e)=>{
         const b = e.target.closest('button'); if (!b) return;
         if (b.hasAttribute('data-rotate')){ rot = !rot; applyDims(); return; }
         if (b.hasAttribute('data-device')){ dt.querySelectorAll('[data-device]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); cur = presets[b.dataset.device] || cur; applyDims(); return; }
         if (b.hasAttribute('data-zoom')){ dt.querySelectorAll('[data-zoom]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); scale = parseFloat(b.getAttribute('data-zoom'))||scale; applyDims(); return; }
-        if (b.hasAttribute('data-theme')){ try{ const doc=iframe.contentDocument; const html=doc && doc.documentElement; const curT=html?.getAttribute('data-theme')||'light'; const next= curT==='light'?'dark':'light'; html && html.setAttribute('data-theme', next); }catch(_){} return; }
-        if (b.hasAttribute('data-refresh')){ const doc = iframe.contentDocument; const theme = doc && doc.documentElement && doc.documentElement.getAttribute('data-theme') || 'light'; loadFrame(theme); return; }
+        if (b.hasAttribute('data-theme')){
+          try{
+            const doc=iframe.contentDocument; const html=doc && doc.documentElement; const curT=html?.getAttribute('data-theme')||'light'; const next= curT==='light'?'dark':'light';
+            // طبّق على الـiframe إذا ظاهر
+            html && html.setAttribute('data-theme', next);
+            // وطبّق على الـfallback إذا ظاهر
+            fb && fb.setAttribute('data-theme', next);
+          }catch(_){}
+          return;
+        }
+        if (b.hasAttribute('data-refresh')){ const doc = iframe.contentDocument; const theme = doc && doc.documentElement && doc.documentElement.getAttribute('data-theme') || fb.getAttribute('data-theme') || 'light'; loadFrame(theme); return; }
       });
       bar.addEventListener('click', (e)=>{
         const btn = e.target.closest('button'); if (!btn) return;

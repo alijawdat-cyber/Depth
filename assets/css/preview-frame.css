@@ -30,6 +30,7 @@
   cursor: pointer;
   font-size: .85rem;
 }
+.device-preview .device-toolbar .dt-info{ user-select:none; opacity:.8; }
 .device-preview .device-toolbar button.active{ background: var(--primary); color: var(--text-inverse); border-color: var(--primary); }
 
 /* الغلاف المرئي المصغّر بحجم فعلي × scale */
@@ -53,6 +54,8 @@
   transform: scale(var(--dp-scale));
   display: block;
   background: var(--bg-primary);
+  position: absolute;
+  top: 0; left: 0;
 }
 
 /* Fallback داخلي إذا الـiframe ما عبّى محتوى */
@@ -61,6 +64,15 @@
   height: var(--dp-height);
   transform-origin: top left;
   transform: scale(var(--dp-scale));
+  position: absolute;
+  top: 0; left: 0;
+}
+
+/* داخل الجهاز: خفّض الحافات وخلي التمرير داخلي */
+.device-preview .device-stage .screen-mockup{
+  margin: 0 !important;
+  min-height: 100%;
+  overflow: auto;
 }
 
 /* ملاحظة: أي حركـات أو AOS تبقى خارج الغلاف؛ ما نضيف أنيميشن على .device-stage */
