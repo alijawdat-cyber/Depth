@@ -101,10 +101,13 @@
   body{background:var(--bg-primary);} 
   .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;}
   .toast-container{position:fixed;inset:auto auto 12px 12px;}
-  /* شريط الحالة داخل الشاشة: ثابت أعلى، يسار/يمين بعيد عن النوتش */
-  .statusbar{position:fixed;inset-inline:12px;top:14px;height:20px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#fff;z-index:9999;pointer-events:none;font:600 14px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;text-shadow:0 0 2px rgba(0,0,0,.6)}
-  .statusbar .sb-left,.statusbar .sb-right{display:flex;align-items:center;gap:10px}
-  .statusbar svg{display:block;height:14px;width:auto;filter:drop-shadow(0 0 1px rgba(0,0,0,.4))}
+  /* شريط الحالة داخل الشاشة: محاذي لحواف النوتش (الجزيرة الديناميكية) */
+  :root{ --island-w: 118px; --island-gap: 6px; --sb-side: 12px; }
+  .statusbar{position:fixed;left:0;right:0;top:8px;height:20px;color:#fff;z-index:9999;pointer-events:none;font:600 14px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;text-shadow:0 0 2px rgba(0,0,0,.6)}
+  .statusbar .sb-left,.statusbar .sb-right{position:absolute;top:0;height:20px;display:flex;align-items:center;gap:8px}
+  .statusbar .sb-left{left:var(--sb-side); right:calc(50% + (var(--island-w)/2) + var(--island-gap)); justify-content:flex-start}
+  .statusbar .sb-right{right:var(--sb-side); left:calc(50% + (var(--island-w)/2) + var(--island-gap)); justify-content:flex-end}
+  .statusbar svg{display:block;height:13px;width:auto;filter:drop-shadow(0 0 1px rgba(0,0,0,.4))}
   @keyframes sb-blink{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}
   .statusbar .colon{animation:sb-blink 1s steps(1,end) infinite}
   </style></head><body>
@@ -112,6 +115,7 @@
     <div class="sb-left"><span class="sb-time">--<span class="colon">:</span>--</span></div>
     <div class="sb-right">
       <span class="sb-signal"><svg viewBox="0 0 24 14" width="24" height="14"><g fill="#fff"><rect x="0" y="8" width="3" height="6" rx="1" opacity=".7"/><rect x="5" y="6" width="3" height="8" rx="1" opacity=".85"/><rect x="10" y="4" width="3" height="10" rx="1" opacity=".95"/><rect x="15" y="2" width="3" height="12" rx="1"/><rect x="20" y="0" width="3" height="14" rx="1"/></g></svg></span>
+      <span class="sb-wifi"><svg viewBox="0 0 20 14" width="20" height="14"><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5C6 -0.5 14 -0.5 19 5.5" opacity=".9"/><path d="M4 8.5C7.5 5 12.5 5 16 8.5" opacity=".95"/><path d="M7 11.5C8.5 10 11.5 10 13 11.5"/></g></svg></span>
       <span class="sb-battery"><svg viewBox="0 0 28 14" width="28" height="14"><rect x="0.5" y="1.5" width="24" height="11" rx="2.5" stroke="#fff" fill="none"/><rect x="2.5" y="3.5" width="18" height="7" rx="1.5" fill="#fff"/><rect x="25.5" y="5" width="2" height="4" rx="1" fill="#fff"/></svg></span>
     </div>
   </div>
