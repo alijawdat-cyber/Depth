@@ -428,6 +428,8 @@ class DepthDocs {
         }
         UIComponents.injectPageTitleIcon(path);
         UIComponents.applyAutoDirection(docContent);
+    // Render HTML code fences as live previews (with toggle)
+    try { UIComponents.enhanceHtmlPreviews(docContent); } catch (_) {}
         // في iOS Safari: تجنب أي أنيميشن على الصفحة الرئيسية والصفحات الثقيلة لتفادي اختفاء المحتوى أو الثقل
         const ua = navigator.userAgent || '';
         const isiPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;

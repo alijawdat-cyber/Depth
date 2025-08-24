@@ -1211,6 +1211,110 @@ class UIComponents {
         });
     }
 
+    // =============== Render HTML code fences as live previews (with toggle) ===============
+    static enhanceHtmlPreviews(rootEl) {
+        const root = rootEl || document.getElementById('doc-content');
+        if (!root) return;
+
+        // Find code blocks that are HTML (```html)
+        const htmlBlocks = Array.from(root.querySelectorAll('pre > code')).filter(code => {
+            const cls = (code.className || '').toLowerCase();
+            return cls.includes('language-html') || cls.includes('lang-html');
+        });
+
+        if (!htmlBlocks.length) return;
+
+        // Ensure minimal styles (lightweight, inline) once
+        const STYLE_ID = 'html-preview-styles';
+        if (!document.getElementById(STYLE_ID)) {
+            const style = document.createElement('style');
+            style.id = STYLE_ID;
+            style.textContent = `
+                .html-preview-wrapper{margin:1rem 0}
+                .html-preview-toolbar{display:flex;gap:.5rem;margin:0 0 .5rem 0}
+                .html-preview-toolbar button{padding:.35rem .6rem;border:1px solid var(--border-primary);background:var(--bg-primary);color:var(--text-primary);border-radius:8px;cursor:pointer;font-size:.9rem}
+                .html-preview-toolbar button.active{background:var(--primary);color:var(--text-inverse);border-color:var(--primary)}
+                .html-preview-frame{padding:1rem;border:1px solid var(--border-primary);border-radius:12px;background:var(--bg-secondary)}
+            `;
+            document.head.appendChild(style);
+        }
+
+        htmlBlocks.forEach(code => {
+            const pre = code.parentElement;
+            if (!pre) return;
+            if (pre.closest('.html-preview-wrapper')) return; // already processed
+
+            const raw = code.textContent || '';
+            // Sanitize the raw HTML before injecting
+            let safe = raw;
+            try {
+                if (window.DOMPurify) {
+                    safe = window.DOMPurify.sanitize(raw, {
+                        ALLOWED_TAGS: [
+                            'div','span','img','button','a','p','h1','h2','h3','h4','h5','h6',
+                            'ul','ol','li','form','input','label','section','article','nav','main','aside','header','footer',
+                            'strong','em','small','hr','br','details','summary'
+                        ],
+                        ALLOWED_ATTR: [
+                            'class','id','href','src','alt','title','type','role','aria-label','aria-expanded','aria-controls',
+                            'placeholder','value','maxlength','inputmode','dir','target','rel','data-otp-submit','data-otp-resend','data-otp-timer','data-seconds','data-theme-toggle'
+                        ],
+                        KEEP_CONTENT: true
+                    });
+                }
+            } catch(_) {}
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'html-preview-wrapper';
+            const toolbar = document.createElement('div');
+            toolbar.className = 'html-preview-toolbar';
+            toolbar.innerHTML = `
+                <button type="button" data-view="preview" class="active">معاينة</button>
+                <button type="button" data-view="code">الكود</button>
+            `;
+            const preview = document.createElement('div');
+            preview.className = 'html-preview-frame';
+            preview.innerHTML = safe;
+
+            const codeView = pre.cloneNode(true);
+            codeView.style.display = 'none';
+
+            // Replace original pre with wrapper containing toolbar+preview+code
+            pre.replaceWith(wrapper);
+            wrapper.appendChild(toolbar);
+            wrapper.appendChild(preview);
+            wrapper.appendChild(codeView);
+
+            const showPreview = () => {
+                preview.style.display = 'block';
+                codeView.style.display = 'none';
+                // Initialize interactions inside the preview only
+                try {
+                    if (window.Mockups) {
+                        window.Mockups.initOtp && window.Mockups.initOtp(preview);
+                        window.Mockups.initGallery && window.Mockups.initGallery(preview);
+                    }
+                } catch(_) {}
+                try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch(_) {}
+            };
+            const showCode = () => {
+                preview.style.display = 'none';
+                codeView.style.display = 'block';
+            };
+
+            toolbar.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                toolbar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn.dataset.view === 'preview') showPreview(); else showCode();
+            });
+
+            // Default to preview mode
+            showPreview();
+        });
+    }
+
     // =============== Enhance JSON blocks into interactive viewer ===============
     static enhanceJSONBlocks(rootEl) {
         const root = rootEl || document.getElementById('doc-content');
