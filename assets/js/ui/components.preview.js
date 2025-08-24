@@ -34,7 +34,7 @@
         document.head.appendChild(l);
       }
     })();
-    const presets = { iphone14: { w: 390, h: 844 } };
+  const presets = { iphone14: { w: 390, h: 844, shellW: 470, shellH: 980, screenX: 40, screenY: 80 } };
     // محوّل للمسارات المطلقة مثل /logo.svg إلى مسارات مناسبة ضمن GitHub Pages
     const fixAbsoluteSrcs = (html, assetFn) => {
       try {
@@ -56,19 +56,40 @@
   bar.className = 'html-preview-toolbar';
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
-      const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone14" class="active">iPhone 14</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.33" class="active">×3</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
+      const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone14" class="active">iPhone 14</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
+  const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
+  // إطار آيفون SVG
+  const shell = document.createElement('img'); shell.className = 'iphone-shell'; shell.alt = 'iPhone frame'; shell.src = asset('assets/img/iphone-14-bezel.svg');
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
   // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
   const fb = document.createElement('div'); fb.className = 'html-fallback'; fb.setAttribute('data-theme','light'); fb.setAttribute('dir','rtl');
   fb.innerHTML = `<div class="screen-mockup">${htmlForPreview}</div>`;
   // اخفِ الـiframe بالبداية
   iframe.style.display = 'none';
-  stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); device.appendChild(stage);
+  stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
       let cur = { ...presets.iphone14 }; let rot = false; let scale = 0.33;
-      const applyDims = ()=>{ device.style.setProperty('--dp-width', (rot?cur.h:cur.w)+'px'); device.style.setProperty('--dp-height', (rot?cur.w:cur.h)+'px'); device.style.setProperty('--dp-scale', String(scale)); const info = dt.querySelector('.dt-info'); if (info) info.textContent = `${rot?cur.h:cur.w}×${rot?cur.w:cur.h}`; };
+      const applyDims = ()=>{
+        const screenW = (rot?cur.h:cur.w);
+        const screenH = (rot?cur.w:cur.h);
+        const shellW = (rot?cur.shellH:cur.shellW);
+        const shellH = (rot?cur.shellW:cur.shellH);
+        // ثبّت المتغيّرات للشاشة والإطار
+        device.style.setProperty('--dp-width', screenW+'px');
+        device.style.setProperty('--dp-height', screenH+'px');
+        device.style.setProperty('--dp-shell-w', shellW+'px');
+        device.style.setProperty('--dp-shell-h', shellH+'px');
+        // إزاحة موضع الشاشة داخل الإطار (نقلب الإحداثيات بالعرض/الارتفاع عند الدوران)
+        const offX = rot ? cur.screenY : cur.screenX;
+        const offY = rot ? cur.screenX : cur.screenY;
+        device.style.setProperty('--dp-screen-x', offX+'px');
+        device.style.setProperty('--dp-screen-y', offY+'px');
+        device.style.setProperty('--dp-scale', String(scale));
+        device.classList.toggle('rotated', !!rot);
+        const info = dt.querySelector('.dt-info'); if (info) info.textContent = `${screenW}×${screenH}`;
+      };
       applyDims();
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>html,body{height:100%;margin:0;overflow:auto;-webkit-overflow-scrolling:touch;} body{background:var(--bg-primary);} .toast-container{position:fixed;inset:auto auto 12px 12px;}</style></head><body><div class="screen-mockup">${htmlForPreview}</div><script src="${asset('assets/js/interactive-mockups.js')}"><\/script><script>window.addEventListener('DOMContentLoaded',()=>{ try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){} });<\/script></body></html>`;
       const loadFrame = (theme='light')=>{ iframe.srcdoc = buildSrcDoc(theme); };
