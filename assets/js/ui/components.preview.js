@@ -34,7 +34,7 @@
         document.head.appendChild(l);
       }
     })();
-  const presets = { iphone14: { w: 390, h: 844, shellW: 470, shellH: 980, screenX: 40, screenY: 80 } };
+  const presets = { iphone16pm: { w: 390, h: 844, shellW: 470, shellH: 980, screenX: 40, screenY: 80 } };
     // محوّل للمسارات المطلقة مثل /logo.svg إلى مسارات مناسبة ضمن GitHub Pages
     const fixAbsoluteSrcs = (html, assetFn) => {
       try {
@@ -56,11 +56,12 @@
   bar.className = 'html-preview-toolbar';
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
       const device = document.createElement('div'); device.className = 'device-preview';
-      const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone14" class="active">iPhone 14</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
+      const dt = document.createElement('div'); dt.className = 'device-toolbar'; dt.innerHTML = '<div class="dt-group"><button type="button" data-device="iphone16pm" class="active">iPhone 16 Pro Max</button><button type="button" data-rotate>↻ تدوير</button></div><div class="dt-group"><button type="button" data-zoom="0.25">25%</button><button type="button" data-zoom="0.33" class="active">33%</button><button type="button" data-zoom="0.5">50%</button><button type="button" data-zoom="0.67">67%</button><button type="button" data-zoom="0.75">75%</button><button type="button" data-zoom="1">100%</button><button type="button" data-zoom="1.25">125%</button><button type="button" data-theme>ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">390×844</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار آيفون SVG
-  const shell = document.createElement('img'); shell.className = 'iphone-shell'; shell.alt = 'iPhone frame'; shell.src = asset('assets/img/iphone-14-bezel.svg');
+  const shell = document.createElement('img'); shell.className = 'iphone-shell'; shell.alt = 'iPhone frame'; shell.src = asset('assets/img/iPhone 16 Pro Max White Titanium.svg');
+  shell.onerror = ()=>{ shell.style.display = 'none'; };
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
   // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
   const fb = document.createElement('div'); fb.className = 'html-fallback'; fb.setAttribute('data-theme','light'); fb.setAttribute('dir','rtl');
@@ -70,7 +71,7 @@
   stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
       pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
-      let cur = { ...presets.iphone14 }; let rot = false; let scale = 0.33;
+  let cur = { ...presets.iphone16pm }; let rot = false; let scale = 0.33;
       const applyDims = ()=>{
         const screenW = (rot?cur.h:cur.w);
         const screenH = (rot?cur.w:cur.h);
@@ -108,7 +109,7 @@
       dt.addEventListener('click', (e)=>{
         const b = e.target.closest('button'); if (!b) return;
         if (b.hasAttribute('data-rotate')){ rot = !rot; applyDims(); return; }
-        if (b.hasAttribute('data-device')){ dt.querySelectorAll('[data-device]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); cur = presets[b.dataset.device] || cur; applyDims(); return; }
+      if (b.hasAttribute('data-device')){ dt.querySelectorAll('[data-device]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); cur = presets[b.dataset.device] || cur; applyDims(); return; }
         if (b.hasAttribute('data-zoom')){ dt.querySelectorAll('[data-zoom]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); scale = parseFloat(b.getAttribute('data-zoom'))||scale; applyDims(); return; }
         if (b.hasAttribute('data-theme')){
           try{
