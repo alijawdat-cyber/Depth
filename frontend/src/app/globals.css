@@ -6,8 +6,14 @@
 /* 2) التوكنات: ألوان/نصوص/مسافات/ظل/بريك بوينتس */
 @import url('../styles/tokens.css');
 
+/* 2.5) التوكنات الدلالية: تربط المعاني بالألوان الأساسية */
+@import url('../styles/semantic-tokens.css');
+
 /* 3) نظام التجاوب: توثيق أمثلة وتجهيز قواعد أساسية */
 @import url('../styles/responsive.css');
+
+/* 4) Bidi helpers للنص المختلط داخل RTL */
+@import url('../styles/bidi.css');
 
 /* إعدادات عامة للجسم */
 html, body { height: 100%; }

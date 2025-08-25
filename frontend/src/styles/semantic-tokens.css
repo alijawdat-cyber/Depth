@@ -1,0 +1,66 @@
+/* =============================================
+   Semantic Tokens — توكنات دلالية مرتبطة بالأساس
+   الهدف: نسمي المعنى (سطح/نص/حدود/حالات/أفعال) بدل اللون نفسه
+   حتى نبدّل الثيم/التباين بدون لمس المكوّنات.
+   ============================================= */
+
+:root {
+  /* أسطح (Surfaces) */
+  --color-bg-surface: var(--bg);            /* سطح عام للشاشة */
+  --color-bg-elevated: var(--bg-secondary); /* بطاقات/طبقات مرتفعة شوي */
+  --color-bg-overlay: rgba(0,0,0,0.4);      /* غطاء نصف شفاف للنوافذ */
+
+  /* نصوص (Foregrounds) */
+  --color-fg-primary: var(--text);          /* نص أساسي واضح */
+  --color-fg-secondary: var(--text-secondary); /* نص ثانوي/وصف */
+  --color-fg-inverse: #ffffff;              /* نص عكسي فوق أزرار داكنة */
+
+  /* حدود (Borders) */
+  --color-bd-default: var(--border);        /* حدود افتراضية */
+  --color-bd-strong: #cbd5e1;               /* حدود أقوى للفصل */
+
+  /* أفعال (Actions) — Primary */
+  --color-action-primary-bg: var(--color-primary);      /* خلفية زر أساسي */
+  --color-action-primary-fg: #ffffff;                   /* نص زر أساسي */
+  --color-action-primary-hover: var(--color-primary-600); /* Hover للزر */
+  --color-action-primary-disabled: rgba(108,43,255,0.5);  /* معطل */
+
+  /* أفعال (Actions) — Secondary/Outline/Ghost (كمثال) */
+  --color-action-secondary-bg: var(--bg-secondary);
+  --color-action-secondary-fg: var(--text);
+  --color-action-outline-bd: var(--border);
+  --color-action-ghost-fg: var(--color-primary);
+
+  /* حالات (States) */
+  --color-success-bg: #ecfdf5;  --color-success-fg: #065f46;  --color-success-bd: #10b981;
+  --color-warning-bg: #fffbeb;  --color-warning-fg: #78350f;  --color-warning-bd: #f59e0b;
+  --color-danger-bg:  #fef2f2;  --color-danger-fg:  #7f1d1d;  --color-danger-bd:  #ef4444;
+}
+
+/* أوضاع داكنة: نقلب/نوازن بس الدلالات تبقى ثابتة للمكوّنات */
+[data-theme="dark"] {
+  --color-bg-surface: var(--bg);
+  --color-bg-elevated: var(--bg-secondary);
+  --color-bg-overlay: rgba(0,0,0,0.6);
+
+  --color-fg-primary: var(--text);
+  --color-fg-secondary: var(--text-secondary);
+  --color-fg-inverse: #0f172a; /* نص عكسي على أسطح فاتحة داخل الداكن */
+
+  --color-bd-default: var(--border);
+  --color-bd-strong: #475569;
+
+  --color-action-primary-bg: var(--color-primary);
+  --color-action-primary-fg: #ffffff;
+  --color-action-primary-hover: var(--color-primary-600);
+  --color-action-primary-disabled: rgba(108,43,255,0.4);
+
+  --color-action-secondary-bg: var(--bg-secondary);
+  --color-action-secondary-fg: var(--text);
+  --color-action-outline-bd: var(--border);
+  --color-action-ghost-fg: var(--color-primary);
+
+  --color-success-bg: #052e26;  --color-success-fg: #a7f3d0;  --color-success-bd: #10b981;
+  --color-warning-bg: #302009;  --color-warning-fg: #fde68a;  --color-warning-bd: #f59e0b;
+  --color-danger-bg:  #2e0b0b;  --color-danger-fg:  #fecaca;  --color-danger-bd:  #ef4444;
+}
