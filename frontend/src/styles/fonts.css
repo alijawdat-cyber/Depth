@@ -7,7 +7,7 @@
 
 /* وزن عادي 400 — للاستخدام بالنصوص العامة والفقرات */
 @font-face {
-  font-family: 'Dubai'; /* اسم العائلة: نستخدمه بالمتغير --font-ar */
+  font-family: Dubai; /* اسم العائلة: نستخدمه بالمتغير --font-ar */
   src: url('/fonts/Dubai-Regular.woff2') format('woff2'); /* مسار مطلق من public */
   font-weight: 400; /* وزن عادي */
   font-style: normal; /* بدون ميلان */
@@ -17,7 +17,7 @@
 
 /* وزن متوسط 500 — للعناوين المتوسطة والأزرار */
 @font-face {
-  font-family: 'Dubai';
+  font-family: Dubai;
   src: url('/fonts/Dubai-Medium.woff2') format('woff2');
   font-weight: 500; /* وسط */
   font-style: normal;
@@ -27,7 +27,7 @@
 
 /* وزن عريض 700 — للعناوين البارزة والتأكيدات */
 @font-face {
-  font-family: 'Dubai';
+  font-family: Dubai;
   src: url('/fonts/Dubai-Bold.woff2') format('woff2');
   font-weight: 700; /* ثقيل */
   font-style: normal;

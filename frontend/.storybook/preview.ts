@@ -1,8 +1,8 @@
-import type { Preview } from '@storybook/react';
+// لا تستخدم JSX بملف .ts حتى ما يتعارض ويا SWC
 import React from 'react';
 import '../src/app/globals.css';
 
-const preview: Preview = {
+const preview = {
   parameters: {
     controls: {
       matchers: {
@@ -16,11 +16,13 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => (
-      <div style={{ padding: '1rem' }}>
-        <Story />
-      </div>
-    ),
+    function Wrapper(Story) {
+      return React.createElement(
+        'div',
+        { style: { padding: '1rem' } },
+        React.createElement(Story, null)
+      );
+    },
   ],
 };
 

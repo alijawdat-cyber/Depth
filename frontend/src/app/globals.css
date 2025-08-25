@@ -1,4 +1,16 @@
-@import "tailwindcss"; /* استيراد أدوات Tailwind */
+/* storybook demo button */
+.depth-btn {
+  --btn-bg: var(--color-primary, #0ea5e9);
+  --btn-fg: var(--color-on-primary, #ffffff);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 600;
+  cursor: pointer;
+}
+@import url("tailwindcss"); /* استيراد أدوات Tailwind */
 
 /* 1) الخطوط: تعريف @font-face لدبي */
 @import url('../styles/fonts.css');
@@ -31,3 +43,6 @@ a:hover { color: var(--color-primary-600); }
 
 /* RTL helpers — ضبط مسافات/حروف حسب الحاجة */
 html[dir="rtl"] * { letter-spacing: 0; }
+
+/* أيقونات موحّدة: اللون يورّث من متغيّر --icon-color أو currentColor */
+.ui-icon { color: var(--icon-color, currentColor); }

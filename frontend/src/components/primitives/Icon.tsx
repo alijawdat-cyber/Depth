@@ -14,15 +14,20 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
 
 const SIZE_MAP = { sm: 16, md: 20, lg: 24 } as const;
 
-export function Icon({ icon, size = 'md', colorVar = '--color-fg-primary', style, ...rest }: IconProps){
+export function Icon({ icon, size = 'md', colorVar = '--color-fg-primary', style, className, ...rest }: IconProps){
   const Cmp = Icons[icon] as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
   const pixel = SIZE_MAP[size] ?? 20;
+  // تعريف نوع بسيط لمتغيّرات CSS المخصصة
+  type CSSVars = { [K in `--${string}`]?: string | number };
+  const mergedStyle = { ...(style || {}), ['--icon-color']: `var(${colorVar})` } as React.CSSProperties & CSSVars;
   return (
     <Cmp
       width={pixel}
       height={pixel}
       stroke="currentColor"
-      style={{ color: `var(${colorVar})`, ...(style||{}) }}
+      className={["ui-icon", className].filter(Boolean).join(' ')}
+      // نمرّر لون الأيقونة عبر CSS var محلية لتجنّب inline color المباشر
+      style={mergedStyle}
       {...rest}
     />
   );
