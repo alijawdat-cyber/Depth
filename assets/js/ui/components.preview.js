@@ -99,13 +99,19 @@
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار الجهاز SVG حسب الفئة
   const shell = document.createElement('img'); shell.className = 'device-shell'; shell.alt = 'Device frame';
-  const pickShellSrc = (category) => {
-    // ربط حسب الفئة: laptop/desktop → Laptop.svg، tablet → iPad.svg، mobile → iPhone.svg
-    if (category === 'laptop' || category === 'desktop') return asset('assets/img/frames/Laptop.svg');
+  const pickShellSrc = (device) => {
+    const category = String(device && device.category || 'mobile').toLowerCase();
+    const id = String(device && device.id || '').toLowerCase();
+    const label = String(device && device.label || '').toLowerCase();
+    if (category === 'desktop') return asset('assets/img/frames/iMacRetina.svg');
+    if (category === 'laptop') return asset('assets/img/frames/Laptop.svg');
     if (category === 'tablet') return asset('assets/img/frames/iPad.svg');
+    // mobile: ميّز Android (Pixel/Galaxy/Android) وإلا خلّيه iPhone
+    const isAndroid = /pixel|galaxy|android/.test(id) || /pixel|galaxy|android/.test(label);
+    if (isAndroid) return asset('assets/img/frames/Android.svg');
     return asset('assets/img/iPhone 16 Pro Max White Titanium.svg');
   };
-  shell.src = pickShellSrc('mobile');
+  shell.src = pickShellSrc({ category:'mobile', id:'iphone16pm', label:'iPhone 16 Pro Max' });
   shell.onerror = ()=>{ shell.style.display = 'none'; };
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
   // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
@@ -152,8 +158,8 @@
           nextScale = Math.max(0.25, Math.min(1.5, maxW / shellW));
         }
   device.style.setProperty('--dp-scale', String(nextScale));
-  // غيّر الإطار حسب فئة الجهاز
-  try { shell.src = pickShellSrc(String(cur.category||'mobile')); } catch(_){}
+  // غيّر الإطار حسب الجهاز الحالي (فئة + id/label)
+  try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){}
         const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${screenW}×${screenH} @ ${z}%`; }
       };
       let resizeTimer; const onResize = ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(applyDims, 150); }; window.addEventListener('resize', onResize);

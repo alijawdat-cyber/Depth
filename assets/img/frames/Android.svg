@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="980" viewBox="0 0 460 980" fill="none">
+  <!-- إطار Android مبسّط بحافة متساوية وفتحة كاميرا صغيرة -->
+  <defs>
+    <linearGradient id="bezA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f1f1f"/>
+      <stop offset="100%" stop-color="#0f0f0f"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="460" height="980" rx="36" fill="url(#bezA)"/>
+  <!-- فتحة الكاميرا الأمامية -->
+  <circle cx="230" cy="32" r="4" fill="#333"/>
+</svg>

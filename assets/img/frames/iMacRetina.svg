@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1600" viewBox="0 0 2560 1600" fill="none">
+  <!-- إطار iMac Retina مبسّط -->
+  <defs>
+    <linearGradient id="imacBezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#101010"/>
+    </linearGradient>
+    <linearGradient id="stand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfcfcf"/>
+      <stop offset="100%" stop-color="#bdbdbd"/>
+    </linearGradient>
+  </defs>
+  <!-- الشاشة مع حافة علوية وسفلية -->
+  <rect x="80" y="60" width="2400" height="1320" rx="20" fill="url(#imacBezel)"/>
+  <!-- الشعار السفلي (مربع بسيط كمكان رمزي) -->
+  <rect x="1240" y="1340" width="80" height="40" rx="8" fill="#999"/>
+  <!-- القاعدة (الحامل) -->
+  <rect x="1180" y="1380" width="200" height="120" rx="20" fill="url(#stand)"/>
+  <rect x="1000" y="1500" width="560" height="60" rx="20" fill="#d6d6d6"/>
+</svg>
