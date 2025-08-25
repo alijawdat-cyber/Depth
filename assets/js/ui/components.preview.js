@@ -149,7 +149,7 @@
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
     pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
   const userDevicePref = localStorage.getItem('depth.preview.device') || '';
-  const userZoomPref = localStorage.getItem('depth.preview.zoom') || 'fit';
+  const userZoomPref = localStorage.getItem('depth.preview.zoom') || '';
   const userThemePref = localStorage.getItem('depth.preview.theme') || 'sync';
   const meta = getMetaOptions(code) || {};
   let curDeviceId = (meta.device || userDevicePref || 'iphone16pm');
@@ -262,9 +262,9 @@
       } catch(_) { cur = { id:'iphone16pm', label:'iPhone 16 Pro Max', category:'mobile', screenWidth:430, screenHeight:932, shellWidth:470, shellHeight:980, screenX:null, screenY:24 }; }
 
       // تهيئة Fit/Zoom أولية
-  // تهيئة: إذا ماكو تفضيل، خلّي 50%، غير ذلك احترم المخزن
-  if (!scaleMode) { scaleMode = 'number'; scale = 0.5; localStorage.setItem('depth.preview.zoom', String(scale)); }
-  else if (String(scaleMode).toLowerCase()!=='fit') { const num=parseFloat(String(scaleMode)); if (!isNaN(num)&&isFinite(num)) scale=num; else scaleMode='fit'; }
+      // تهيئة: إذا ماكو تفضيل أو كانت Fit مخزونة، خلّي 50% افتراضياً
+      if (!scaleMode || String(scaleMode).toLowerCase()==='fit') { scaleMode = 'number'; scale = 0.5; localStorage.setItem('depth.preview.zoom', String(scale)); }
+      else if (String(scaleMode).toLowerCase()!=='fit') { const num=parseFloat(String(scaleMode)); if (!isNaN(num)&&isFinite(num)) scale=num; else { scaleMode='number'; scale=0.5; localStorage.setItem('depth.preview.zoom', String(scale)); } }
       applyDims();
 
       // ثيم fallback
@@ -308,7 +308,7 @@
         else { codeView.style.display='none'; device.style.display='block'; }
       });
   // بث الحالة المبدئية
-  try { BUS.publish('device', { id: curDeviceId }); if (String(scaleMode).toLowerCase()==='fit') BUS.publish('zoom', { mode:'fit' }); else BUS.publish('zoom', { mode:'number', scale }); BUS.publish('theme', { mode: themeMode, value: getDocTheme() }); } catch(_){}
+  try { BUS.publish('device', { id: curDeviceId }); BUS.publish('zoom', { mode:'number', scale }); BUS.publish('theme', { mode: themeMode, value: getDocTheme() }); } catch(_){}
   // تنظيف عند إزالة المعاينة
   try { const ro = new MutationObserver(()=>{ if (!document.body.contains(wrapper)) { window.removeEventListener('resize', onResize); } }); ro.observe(document.body, { childList:true, subtree:true }); } catch(_){}
       try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch(_) {}

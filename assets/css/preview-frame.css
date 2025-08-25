@@ -80,11 +80,10 @@
   height: var(--dp-height);
   border: 0;
   transform-origin: top left;
-  transform: none;
+  transform: scale(var(--dp-ratio));
   display: block;
   background: var(--bg-primary);
   position: absolute;
-  /* ضع الشاشة داخل الإطار حسب الإحداثيات (بدون ضرب بالـscale لأن الحاوية نفسها تتحجّم) */
   top: 0;
   left: 0;
   z-index: 2;
@@ -97,7 +96,7 @@
   width: var(--dp-width);
   height: var(--dp-height);
   transform-origin: top left;
-  transform: none;
+  transform: scale(var(--dp-ratio));
   position: absolute;
   top: 0;
   left: 0;
