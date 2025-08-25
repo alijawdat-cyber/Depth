@@ -130,10 +130,11 @@
     if (isAndroid) return asset('assets/img/frames/android.svg');
     return asset('assets/img/frames/iphone.svg');
   };
-  shell.src = pickShellSrc({ category:'mobile', id:'iphone16pm', label:'iPhone 16 Pro Max' });
-  shell.onerror = ()=>{ shell.style.display = 'none'; };
-  // عند تحميل صورة الإطار، أعد حساب الأبعاد (لاستعمال العرض/الارتفاع الأصليين)
-  try { shell.addEventListener('load', ()=>{ try{ applyDims(); }catch(_){} }); } catch(_){ }
+  // لا تحمل إطاراً مبدئياً غير موجود؛ سنحدده بعد اختيار الجهاز
+  shell.style.display = 'none';
+  shell.onerror = ()=>{ /* إبقِه مخفياً إذا فشل التحميل */ };
+  // عند تحميل صورة الإطار، أعد حساب الأبعاد وأظهر الصورة
+  try { shell.addEventListener('load', ()=>{ try{ shell.style.display = 'block'; applyDims(); }catch(_){} }); } catch(_){ }
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
   // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
   const fb = document.createElement('div'); fb.className = 'html-fallback'; fb.setAttribute('data-theme','light'); fb.setAttribute('dir','rtl');
@@ -194,39 +195,19 @@
       };
       let resizeTimer; const onResize = ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(applyDims, 150); }; window.addEventListener('resize', onResize);
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>
-  :root{ --ios-safe-top: 54px; }
+  :root{ --ios-safe-top: 0px; }
   html,body{height:100%;margin:0;padding:0;overflow:hidden;-webkit-overflow-scrolling:touch;}
   body{background:var(--bg-primary);} 
   /* محتوى الشاشة: نضيف بادينغ علوي يساوي ارتفاع شريط الحالة ليبقى التطبيق أسفله دائمًا */
   .screen-mockup{margin:0!important;width:100%!important;max-width:none!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:auto!important;padding-top:max(var(--ios-safe-top), env(safe-area-inset-top, 0px))!important;background-clip:padding-box;}
   .toast-container{position:fixed;inset:auto auto 12px 12px;}
-  /* حاوية شريط الحالة بخلفية بيضاء ثابتة */
-  .ios-statusbar-wrap{position:fixed;top:0;left:0;right:0;background:#fff;z-index:9999;pointer-events:none}
-  .ios-statusbar{display:block;width:100%;height:auto;pointer-events:none}
-  /* لا نستخدم عكس الألوان في الوضع الداكن — المنطقة العلوية تبقى بيضاء دومًا */
+  /* لا نستخدم صورة لشريط الحالة؛ الإطار يتكفّل بالحواف */
   </style></head><body>
-  <div class="ios-statusbar-wrap">
-    <img class="ios-statusbar" src="${asset('assets/img/Status Bar.svg')}" alt="iOS Status Bar"/>
-  </div>
   <div class="screen-mockup">${htmlForPreview}</div>
   <script src="${asset('assets/js/interactive-mockups.js')}"><\/script>
   <script>
-  // عيّن قيمة البادينغ العلوي حسب ارتفاع صورة شريط الحالة الفعلي
   window.addEventListener('DOMContentLoaded',()=>{
     try{ window.Mockups && window.Mockups.init && window.Mockups.init(); }catch(e){}
-    try{
-      const img = document.querySelector('.ios-statusbar');
-      const setSafe = ()=>{
-        if(!img) return;
-        const h = Math.round((img.getBoundingClientRect().height||img.naturalHeight||54));
-        document.documentElement.style.setProperty('--ios-safe-top', h+'px');
-      };
-      if (img){
-        if (img.complete) setSafe();
-        img.addEventListener('load', setSafe);
-        window.addEventListener('resize', setSafe);
-      }
-    }catch(_){ }
   });
   <\/script>
   </body></html>`;
