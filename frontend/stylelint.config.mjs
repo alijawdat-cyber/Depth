@@ -33,7 +33,7 @@ const config = {
           "/color$/": ["inherit", "transparent", "currentColor", "/^var\\(.*\\)$/"],
           "background": ["none", "/^var\\(.*\\)$/"],
           "background-color": ["transparent", "/^var\\(.*\\)$/"],
-          "/^border(-.*)?$/": ["none", "0", "/^var\\(.*\\)$/"],
+          "/^border(-.*)?$/": ["none", "0", "solid", "dashed", "dotted", "/^var\\(.*\\)$/"],
           "box-shadow": ["none", "/^var\\(.*\\)$/"],
           "fill": ["none", "currentColor", "/^var\\(.*\\)$/"],
           "stroke": ["none", "currentColor", "/^var\\(.*\\)$/"],
@@ -48,7 +48,7 @@ const config = {
     ],
 
     // تيسير قواعد نمطية حتى لا تعيقنا
-    "color-hex-length": null,
+  "color-hex-length": null,
     "color-named": "never",
     "color-function-notation": null,
     "alpha-value-notation": null,
@@ -60,8 +60,9 @@ const config = {
     "import-notation": "url",
     "font-family-name-quotes": null,
     "rule-empty-line-before": null,
+    "declaration-empty-line-before": null,
   },
-  ignoreFiles: ["**/node_modules/**", ".next/**"],
+  ignoreFiles: ["**/node_modules/**", ".next/**", "src/stories/**/*.css"],
 };
 
 export default config;

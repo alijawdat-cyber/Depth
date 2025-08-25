@@ -44,8 +44,13 @@ const eslintConfig = [
         {
           selector: "JSXAttribute[name.name='style'] ObjectExpression > Property[key.name=/^(color|background|backgroundColor|border|boxShadow)$/]",
           message: "ممنوع تعيين خصائص الألوان/الخلفيات/الحدود/الظلال inline — استخدم CSS vars والتوكنات.",
+        },
+        {
+          selector: "JSXAttribute[name.name='className'][value.value=/\\-\\[(?!var\\(--).+\\)\\]/]",
+          message: "ممنوع استخدام Tailwind arbitrary values (مثل bg-[#...]) إلا إذا كانت تستعمل var(--token) فقط.",
         }
       ],
+      // ملاحظات: أزلنا eslint-plugin-tailwindcss مؤقتاً لعدم توافقه مع Tailwind v4
     }
   }
 ];

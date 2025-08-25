@@ -47,7 +47,7 @@ Status: Final — aligned with Brand SSOT (2025-08-24)
 ## Tokens — Spacing & Radius
 ```css
 :root {
-  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
   --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
 }
 ```
@@ -62,10 +62,16 @@ Status: Final — aligned with Brand SSOT (2025-08-24)
 ```
 
 ## Tokens — Breakpoints
+اعتماد شاشات Tailwind بدل تعريف CSS vars داخل media queries.
+التغطية المعتمدة:
+- xs: 360px (Android compact)
+- sm: 390px (iPhone قياسي)
+- md: 768px (iPad Portrait)
+- lg: 1024px (iPad Landscape / لابتوب صغير)
+- xl: 1440px (لابتوب 15”)
+- 2xl: 1920px (ديسكتوب كبير)
 ```css
-:root {
-  --bp-sm: 480px; --bp-md: 768px; --bp-lg: 1024px; --bp-xl: 1400px;
-}
+/* تُضبط القيم داخل tailwind.config.ts — لا تستخدم var() داخل @media */
 ```
 
 ## Component States (hover/focus/disabled)

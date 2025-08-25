@@ -25,11 +25,11 @@
   gap: var(--space-4);
 }
 
-@media (min-width: var(--bp-sm)) { /* آيفون القياسي وأندرويد متوسط */
+@media (width >= 390px) { /* آيفون القياسي وأندرويد متوسط */
   .grid-responsive { grid-template-columns: 1fr 1fr; }
 }
 
-@media (min-width: var(--bp-lg)) { /* لابتوب صغير وآيباد Landscape */
+@media (width >= 1024px) { /* لابتوب صغير وآيباد Landscape */
   .grid-responsive { grid-template-columns: 1fr 1fr 1fr; }
 }
 
@@ -41,18 +41,18 @@
   padding-inline: var(--space-4);
 }
 
-@media (min-width: var(--bp-xl)) { /* شاشات 1440+ */
+@media (width >= 1440px) { /* شاشات 1440+ */
   .container-prose { max-width: 1200px; }
 }
 
 /* مثال: أحجام الخط تتدرج مع الشاشات */
 body { font-size: var(--fs-md); }
-@media (min-width: var(--bp-sm)) { body { font-size: 17px; } }
-@media (min-width: var(--bp-lg)) { body { font-size: 18px; } }
+@media (width >= 390px) { body { font-size: 17px; } }
+@media (width >= 1024px) { body { font-size: 18px; } }
 
 /* Utilities خفيفة قابلة لإعادة الاستخدام */
 .hidden-xs { display: none; }
-@media (min-width: var(--bp-sm)) { .hidden-xs { display: initial; } }
+@media (width >= 390px) { .hidden-xs { display: initial; } }
 
 .only-desktop { display: none; }
-@media (min-width: var(--bp-lg)) { .only-desktop { display: initial; } }
+@media (width >= 1024px) { .only-desktop { display: initial; } }
