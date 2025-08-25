@@ -78,7 +78,7 @@
       return out;
     };
 
-    htmlBlocks.forEach(async code => {
+  htmlBlocks.forEach(async code => {
       const pre = code.parentElement; if (!pre) return; if (pre.closest('.html-preview-wrapper')) return;
   const raw = code.textContent || '';
   let safe = raw;
@@ -86,6 +86,22 @@
   // إذا التعقيم حذف هواي (أو ماكو تاغات)، رجّع للأصلي للمعاينة فقط
   let htmlForPreview = safe;
   if (!(/[<][a-z]/i.test(safe)) || safe.length < 20) htmlForPreview = raw;
+  // include: إذا الكود يحتوي توجيه <!-- include: path --> نحمّل الملف ونستبدل المحتوى
+  let includePath = '';
+  try {
+    const inc = (raw.match(/<!--\s*include:\s*([^\s]+)\s*-->/i) || [])[1] || '';
+    if (inc) includePath = inc.trim();
+  } catch(_){ }
+  if (includePath){
+    try {
+      const url = asset(includePath.replace(/^\//,''));
+      const res = await fetch(url, { cache:'no-store' });
+      if (res.ok) {
+        const txt = await res.text();
+        htmlForPreview = txt;
+      }
+    } catch(_){ }
+  }
   // أصلح المسارات المطلقة
   htmlForPreview = fixAbsoluteSrcs(htmlForPreview, asset);
     const wrapper = document.createElement('div'); wrapper.className = 'html-preview-wrapper';

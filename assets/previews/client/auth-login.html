@@ -1,0 +1,78 @@
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn">
+            <span class="icon">🌐</span> AR
+        </button>
+        <h3>منصة Depth</h3>
+        <button class="header-btn" data-theme-toggle>
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+    <div class="screen-content">
+        <div class="auth-container">
+            <div class="logo-section">
+                <img src="/logo.svg" alt="Depth" class="logo">
+                <h2>مرحباً بك في منصة Depth</h2>
+                <p class="subtitle">منصة الإبداع الرقمي الأولى في العراق</p>
+            </div>
+            
+            <form class="auth-form" data-validate>
+                <div class="form-tabs">
+                    <button type="button" class="tab active" data-tab="login">
+                        تسجيل دخول
+                    </button>
+                    <button type="button" class="tab" data-tab="register">
+                        حساب جديد
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف أو البريد الإلكتروني</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📱</span>
+                        <input type="text" 
+                               class="form-input" 
+                               placeholder="750XXXXXXX أو email@example.com"
+                               data-validate="required,phone|email">
+                    </div>
+                </div>
+                
+                <div class="form-group" data-tab-content="register">
+                    <label class="form-label">اسم الشركة</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏢</span>
+                        <input type="text" 
+                               class="form-input" 
+                               placeholder="اسم شركتك أو مؤسستك"
+                               data-validate="required,minLength:3">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-full">
+                    <span class="btn-text">إرسال رمز التحقق</span>
+                    <span class="btn-icon">←</span>
+                </button>
+                
+                <div class="divider">
+                    <span>أو</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="btn btn-secondary social-btn">
+                        <img src="/google.svg" alt="Google">
+                        تسجيل بواسطة Google
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <p class="text-sm text-muted">
+                        بالمتابعة، أنت توافق على 
+                        <a href="#terms">الشروط والأحكام</a>
+                        و
+                        <a href="#privacy">سياسة الخصوصية</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -25,149 +25,13 @@
 ### شاشة تسجيل الدخول الأولية
 
 ```html
-<div class="screen-mockup">
-    <div class="screen-header">
-        <button class="header-btn">
-            <span class="icon">🌐</span> AR
-        </button>
-        <h3>منصة Depth</h3>
-        <button class="header-btn" data-theme-toggle>
-            <span class="theme-icon">🌙</span>
-        </button>
-    </div>
-    <div class="screen-content">
-        <div class="auth-container">
-            <div class="logo-section">
-                <img src="/logo.svg" alt="Depth" class="logo">
-                <h2>مرحباً بك في منصة Depth</h2>
-                <p class="subtitle">منصة الإبداع الرقمي الأولى في العراق</p>
-            </div>
-            
-            <form class="auth-form" data-validate>
-                <div class="form-tabs">
-                    <button type="button" class="tab active" data-tab="login">
-                        تسجيل دخول
-                    </button>
-                    <button type="button" class="tab" data-tab="register">
-                        حساب جديد
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">رقم الهاتف أو البريد الإلكتروني</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon">📱</span>
-                        <input type="text" 
-                               class="form-input" 
-                               placeholder="750XXXXXXX أو email@example.com"
-                               data-validate="required,phone|email">
-                    </div>
-                </div>
-                
-                <div class="form-group" data-tab-content="register">
-                    <label class="form-label">اسم الشركة</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon">🏢</span>
-                        <input type="text" 
-                               class="form-input" 
-                               placeholder="اسم شركتك أو مؤسستك"
-                               data-validate="required,minLength:3">
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-lg w-full">
-                    <span class="btn-text">إرسال رمز التحقق</span>
-                    <span class="btn-icon">←</span>
-                </button>
-                
-                <div class="divider">
-                    <span>أو</span>
-                </div>
-                
-                <div class="social-login">
-                    <button type="button" class="btn btn-secondary social-btn">
-                        <img src="/google.svg" alt="Google">
-                        تسجيل بواسطة Google
-                    </button>
-                </div>
-                
-                <div class="form-footer">
-                    <p class="text-sm text-muted">
-                        بالمتابعة، أنت توافق على 
-                        <a href="#terms">الشروط والأحكام</a>
-                        و
-                        <a href="#privacy">سياسة الخصوصية</a>
-                    </p>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- include: assets/previews/client/auth-login.html -->
 ```
 
 ### شاشة التحقق OTP المطورة
 
 ```html
-<div class="screen-mockup">
-    <div class="screen-header">
-        <button class="header-btn back-btn">⬅ رجوع</button>
-        <h3>تأكيد رقم الهاتف</h3>
-        <button class="header-btn close-btn">❌</button>
-    </div>
-    <div class="screen-content">
-        <div class="otp-container">
-            <div class="otp-icon animate-bounce">🔐</div>
-            <h2>أدخل رمز التحقق</h2>
-            <p class="otp-description">
-                أرسلنا رمز التحقق المكوّن من 6 أرقام إلى
-                <strong class="phone-number">+964 750 123 4567</strong>
-            </p>
-            
-            <div class="otp-inputs" data-otp-container>
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="0">
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="1">
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="2">
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="3">
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="4">
-                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="5">
-            </div>
-            
-            <div class="otp-timer">
-                <span class="timer-icon">⏰</span>
-                <span class="timer-text">باقي <span data-otp-timer data-seconds="300">5:00</span> دقيقة</span>
-            </div>
-            
-            <button class="btn btn-primary btn-lg w-full" data-otp-submit disabled>
-                <span class="btn-text">تأكيد وإكمال التسجيل</span>
-                <span class="spinner spinner-sm hidden"></span>
-            </button>
-            
-            <div class="otp-resend">
-                <p>لم تستلم الرمز؟</p>
-                <button class="btn btn-ghost" data-otp-resend disabled>
-                    🔄 إعادة الإرسال
-                </button>
-            </div>
-            
-            <div class="otp-help">
-                <details class="help-accordion">
-                    <summary>تحتاج مساعدة؟</summary>
-                    <div class="help-content">
-                        <p>تأكد من:</p>
-                        <ul>
-                            <li>رقمك صحيح ومن شبكة عراقية</li>
-                            <li>لديك تغطية شبكة جيدة</li>
-                            <li>تحقق من رسائل SMS المحظورة</li>
-                        </ul>
-                        <button class="btn btn-sm btn-secondary">
-                            💬 تواصل مع الدعم
-                        </button>
-                    </div>
-                </details>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- include: assets/previews/client/auth-otp.html -->
 ```
 
 ---

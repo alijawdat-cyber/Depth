@@ -1,0 +1,60 @@
+<div class="screen-mockup">
+    <div class="screen-header">
+        <button class="header-btn back-btn">⬅ رجوع</button>
+        <h3>تأكيد رقم الهاتف</h3>
+        <button class="header-btn close-btn">❌</button>
+    </div>
+    <div class="screen-content">
+        <div class="otp-container">
+            <div class="otp-icon animate-bounce">🔐</div>
+            <h2>أدخل رمز التحقق</h2>
+            <p class="otp-description">
+                أرسلنا رمز التحقق المكوّن من 6 أرقام إلى
+                <strong class="phone-number">+964 750 123 4567</strong>
+            </p>
+            
+            <div class="otp-inputs" data-otp-container>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="0">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="1">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="2">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="3">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="4">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" data-index="5">
+            </div>
+            
+            <div class="otp-timer">
+                <span class="timer-icon">⏰</span>
+                <span class="timer-text">باقي <span data-otp-timer data-seconds="300">5:00</span> دقيقة</span>
+            </div>
+            
+            <button class="btn btn-primary btn-lg w-full" data-otp-submit disabled>
+                <span class="btn-text">تأكيد وإكمال التسجيل</span>
+                <span class="spinner spinner-sm hidden"></span>
+            </button>
+            
+            <div class="otp-resend">
+                <p>لم تستلم الرمز؟</p>
+                <button class="btn btn-ghost" data-otp-resend disabled>
+                    🔄 إعادة الإرسال
+                </button>
+            </div>
+            
+            <div class="otp-help">
+                <details class="help-accordion">
+                    <summary>تحتاج مساعدة؟</summary>
+                    <div class="help-content">
+                        <p>تأكد من:</p>
+                        <ul>
+                            <li>رقمك صحيح ومن شبكة عراقية</li>
+                            <li>لديك تغطية شبكة جيدة</li>
+                            <li>تحقق من رسائل SMS المحظورة</li>
+                        </ul>
+                        <button class="btn btn-sm btn-secondary">
+                            💬 تواصل مع الدعم
+                        </button>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
