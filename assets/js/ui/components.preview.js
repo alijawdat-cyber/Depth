@@ -100,9 +100,9 @@
   // إطار الجهاز SVG حسب الفئة
   const shell = document.createElement('img'); shell.className = 'device-shell'; shell.alt = 'Device frame';
   const pickShellSrc = (category) => {
-    // مبدئيًا: mobile يبقى iPhone، tablet نستخدم iPhone كـfallback لحين وصول iPad.svg، laptop/desktop: Laptop.svg
+    // ربط حسب الفئة: laptop/desktop → Laptop.svg، tablet → iPad.svg، mobile → iPhone.svg
     if (category === 'laptop' || category === 'desktop') return asset('assets/img/frames/Laptop.svg');
-    if (category === 'tablet') return asset('assets/img/iPhone 16 Pro Max White Titanium.svg');
+    if (category === 'tablet') return asset('assets/img/frames/iPad.svg');
     return asset('assets/img/iPhone 16 Pro Max White Titanium.svg');
   };
   shell.src = pickShellSrc('mobile');
