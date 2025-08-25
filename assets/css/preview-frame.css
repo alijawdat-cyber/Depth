@@ -4,6 +4,7 @@
   --dp-width: 430px;   /* عرض الشاشة الداخلية (iPhone 16 Pro Max) */
   --dp-height: 932px;  /* ارتفاع الشاشة الداخلية */
   --dp-scale: 0.33;    /* مقياس التصغير الافتراضي */
+  --dp-ratio: 2;       /* نسبة تكبير الشاشة داخل الفريم لمحاذاة الفتحة */
   --dp-bg: var(--bg-secondary);
   --dp-border: var(--border-primary);
   --dp-radius: 28px;
@@ -84,8 +85,8 @@
   background: var(--bg-primary);
   position: absolute;
   /* ضع الشاشة داخل الإطار حسب الإحداثيات (بدون ضرب بالـscale لأن الحاوية نفسها تتحجّم) */
-  top: var(--dp-screen-y);
-  left: var(--dp-screen-x);
+  top: 0;
+  left: 0;
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
@@ -98,8 +99,22 @@
   transform-origin: top left;
   transform: none;
   position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  border-radius: var(--dp-corner);
+  overflow: hidden;
+}
+
+/* غلاف واجهة العرض: يضاعف حجم الشاشة الداخلية حسب --dp-ratio ثم يوضَع داخل الإطار */
+.device-preview .device-viewport-wrap{
+  position: absolute;
+  width: calc(var(--dp-width) * var(--dp-ratio));
+  height: calc(var(--dp-height) * var(--dp-ratio));
   top: var(--dp-screen-y);
   left: var(--dp-screen-x);
+  transform-origin: top left;
+  transform: none;
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;

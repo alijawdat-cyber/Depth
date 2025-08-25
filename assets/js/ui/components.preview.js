@@ -110,7 +110,7 @@
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
     const device = document.createElement('div'); device.className = 'device-preview';
   const dt = document.createElement('div'); dt.className = 'device-toolbar';
-  dt.innerHTML = '<div class="dt-group"><input type="text" class="dt-search" placeholder="بحث جهاز" style="min-width:120px"><select class="dt-device" aria-label="الجهاز"></select><button type="button" data-fit class="active">Fit</button></div><div class="dt-group"><button type="button" data-zoom-dec>-</button><button type="button" data-zoom-100>100%</button><button type="button" data-zoom-inc>+</button><button type="button" data-theme-mode title="ثيم">ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">--×--</div>';
+  dt.innerHTML = '<div class="dt-group"><input type="text" class="dt-search" placeholder="بحث جهاز" style="min-width:120px"><select class="dt-device" aria-label="الجهاز"></select><button type="button" data-fit>Fit</button></div><div class="dt-group"><button type="button" data-zoom-dec>-</button><button type="button" data-zoom-100>100%</button><button type="button" data-zoom-inc>+</button><button type="button" data-theme-mode title="ثيم">ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">--×--</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار الجهاز SVG
@@ -122,13 +122,13 @@
     const category = String(d.category || 'mobile').toLowerCase();
     const id = String(d.id || '').toLowerCase();
     const label = String(d.label || '').toLowerCase();
-    if (category === 'desktop') return asset('assets/img/frames/desktop.svg');
-    if (category === 'laptop') return asset('assets/img/frames/laptop.svg');
-    if (category === 'tablet') return asset('assets/img/frames/ipad.svg');
-    // mobile: Android إذا الاسم/id فيه Pixel أو Galaxy أو Android، وإلا iPhone
-    const isAndroid = /pixel|galaxy|android/.test(id) || /pixel|galaxy|android/.test(label);
-    if (isAndroid) return asset('assets/img/frames/android.svg');
-    return asset('assets/img/frames/iphone.svg');
+  if (category === 'desktop') return asset('assets/img/Device Mockups Library/Apple iMac.svg');
+  if (category === 'laptop') return asset('assets/img/Device Mockups Library/Apple Macbook Pro 15_ Silver.svg');
+  if (category === 'tablet') return asset('assets/img/Device Mockups Library/Apple iPad Pro 11_ Space Gray - Portrait.svg');
+  // mobile: Android إذا الاسم/id فيه Pixel أو Galaxy أو Android، وإلا iPhone
+  const isAndroid = /pixel|galaxy|android|nexus/.test(id) || /pixel|galaxy|android|nexus/.test(label);
+  if (isAndroid) return asset('assets/img/Device Mockups Library/Google Pixel 3 - Clearly White.svg');
+  return asset('assets/img/Device Mockups Library/Apple iPhone X Silver.svg');
   };
   // لا تحمل إطاراً مبدئياً غير موجود؛ سنحدده بعد اختيار الجهاز
   shell.style.display = 'none';
@@ -141,7 +141,11 @@
   fb.innerHTML = `<div class="screen-mockup">${htmlForPreview}</div>`;
   // اخفِ الـiframe بالبداية
   iframe.style.display = 'none';
-  stage.appendChild(shell); stage.appendChild(iframe); stage.appendChild(fb); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
+  // غلاف لواجهة الشاشة حتى نقدر نكبّرها داخليًا بنسبة pixelRatio
+  const viewportWrap = document.createElement('div'); viewportWrap.className = 'device-viewport-wrap';
+  viewportWrap.appendChild(iframe);
+  viewportWrap.appendChild(fb);
+  stage.appendChild(shell); stage.appendChild(viewportWrap); device.appendChild(dt); stageWrap.appendChild(stage); device.appendChild(stageWrap);
       const codeView = pre.cloneNode(true); codeView.style.display = 'none';
     pre.replaceWith(wrapper); wrapper.appendChild(bar); wrapper.appendChild(device); wrapper.appendChild(codeView);
   const userDevicePref = localStorage.getItem('depth.preview.device') || '';
@@ -150,13 +154,17 @@
   const meta = getMetaOptions(code) || {};
   let curDeviceId = (meta.device || userDevicePref || 'iphone16pm');
   let cur = null;
-  let scaleMode = (meta.zoom || userZoomPref || 'fit');
-  let scale = 1;
+  let scaleMode = (meta.zoom || userZoomPref || '');
+  let scale = 0.5; // افتراضي 50%
   let themeMode = userThemePref; // sync|light|dark
   // لا حاجة لطبقة نوتش/شريط حالة: نعتمد على إطار الـSVG الأصلي بعد رفع z-index
   const applyDims = ()=>{
-        const screenW = cur.screenWidth;
-        const screenH = cur.screenHeight;
+  const screenW = cur.screenWidth;
+  const screenH = cur.screenHeight;
+  const cat = String(cur.category||'mobile').toLowerCase();
+  // نسبة عرض الشاشة داخل الفريم (كثافة بكسلات)
+  const defaultRatios = { mobile: 3, tablet: 2, laptop: 2, desktop: 2 };
+  const ratio = Number(cur.pixelRatio||defaultRatios[cat]||2);
         // استخدم أبعاد الإطار من الـpreset إن وجدت، وإلا من أبعاد صورة الـSVG الفعلية، وإلا افتراضياً نسبة إلى الشاشة
         let shellW = cur.shellWidth || 0;
         let shellH = cur.shellHeight || 0;
@@ -169,13 +177,16 @@
         } catch(_){}
         if (!shellW || !shellH) { shellW = (screenW + 40); shellH = (screenH + 80); }
         // ثبّت المتغيّرات للشاشة والإطار
-        device.style.setProperty('--dp-width', screenW+'px');
-        device.style.setProperty('--dp-height', screenH+'px');
+  device.style.setProperty('--dp-width', screenW+'px');
+  device.style.setProperty('--dp-height', screenH+'px');
+  device.style.setProperty('--dp-ratio', String(ratio));
         device.style.setProperty('--dp-shell-w', shellW+'px');
         device.style.setProperty('--dp-shell-h', shellH+'px');
         // إزاحة موضع الشاشة داخل الإطار
-  const baseX = (cur.screenX==null ? (shellW - screenW)/2 : cur.screenX);
-  const baseY = (cur.screenY==null ? ((shellH - screenH)/2) : cur.screenY);
+  const displayW = screenW * ratio;
+  const displayH = screenH * ratio;
+  const baseX = (cur.screenX==null ? (shellW - displayW)/2 : cur.screenX);
+  const baseY = (cur.screenY==null ? ((shellH - displayH)/2) : cur.screenY);
   const offX = baseX;
   const offY = baseY;
         device.style.setProperty('--dp-screen-x', offX+'px');
@@ -197,7 +208,7 @@
   } catch(_) {}
   // غيّر الإطار حسب الجهاز الحالي (فئة + id/label)
   try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){ }
-        const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${screenW}×${screenH} @ ${z}%`; }
+  const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${z}% @ ${screenW}×${screenH}`; }
       };
       let resizeTimer; const onResize = ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(applyDims, 150); }; window.addEventListener('resize', onResize);
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>
@@ -251,7 +262,9 @@
       } catch(_) { cur = { id:'iphone16pm', label:'iPhone 16 Pro Max', category:'mobile', screenWidth:430, screenHeight:932, shellWidth:470, shellHeight:980, screenX:null, screenY:24 }; }
 
       // تهيئة Fit/Zoom أولية
-      if (String(scaleMode).toLowerCase()!=='fit') { const num=parseFloat(String(scaleMode)); if (!isNaN(num)&&isFinite(num)) scale=num; else scaleMode='fit'; }
+  // تهيئة: إذا ماكو تفضيل، خلّي 50%، غير ذلك احترم المخزن
+  if (!scaleMode) { scaleMode = 'number'; scale = 0.5; localStorage.setItem('depth.preview.zoom', String(scale)); }
+  else if (String(scaleMode).toLowerCase()!=='fit') { const num=parseFloat(String(scaleMode)); if (!isNaN(num)&&isFinite(num)) scale=num; else scaleMode='fit'; }
       applyDims();
 
       // ثيم fallback
@@ -268,8 +281,8 @@
 
       dt.addEventListener('click', (e)=>{
         const b = e.target.closest('button'); if (!b) return;
-        if (b.hasAttribute('data-fit')){ setZoomMode('fit'); return; }
-        if (b.hasAttribute('data-zoom-100')){ setZoomMode(1); return; }
+  if (b.hasAttribute('data-fit')){ setZoomMode('fit'); return; }
+  if (b.hasAttribute('data-zoom-100')){ setZoomMode(1); return; }
         if (b.hasAttribute('data-zoom-inc')){ if (String(scaleMode).toLowerCase()==='fit'){ scale=1; scaleMode='number'; } scale = Math.min(1.5, (Math.round((scale+0.1)*100)/100)); applyDims(); localStorage.setItem('depth.preview.zoom', String(scale)); BUS.publish('zoom', { mode:'number', scale }); return; }
         if (b.hasAttribute('data-zoom-dec')){ if (String(scaleMode).toLowerCase()==='fit'){ scale=1; scaleMode='number'; } scale = Math.max(0.25, (Math.round((scale-0.1)*100)/100)); applyDims(); localStorage.setItem('depth.preview.zoom', String(scale)); BUS.publish('zoom', { mode:'number', scale }); return; }
         if (b.hasAttribute('data-theme-mode')){ themeMode = (themeMode==='sync') ? 'light' : (themeMode==='light' ? 'dark' : 'sync'); setThemeMode(themeMode); return; }
