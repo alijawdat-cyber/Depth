@@ -119,13 +119,13 @@
     const category = String(device && device.category || 'mobile').toLowerCase();
     const id = String(device && device.id || '').toLowerCase();
     const label = String(device && device.label || '').toLowerCase();
-    if (category === 'desktop') return asset('assets/img/Apple iMac Retina.svg');
-    if (category === 'laptop') return asset('assets/img/Laptop.svg');
-    if (category === 'tablet') return asset('assets/img/ipad.svg');
+    if (category === 'desktop') return asset('assets/img/frames/desktop.svg');
+    if (category === 'laptop') return asset('assets/img/frames/laptop.svg');
+    if (category === 'tablet') return asset('assets/img/frames/ipad.svg');
     // mobile: Android إذا الاسم/id فيه Pixel أو Galaxy أو Android، وإلا iPhone
     const isAndroid = /pixel|galaxy|android/.test(id) || /pixel|galaxy|android/.test(label);
-    if (isAndroid) return asset('assets/img/Samsung Galaxy S9 Sunrise Gold.svg');
-    return asset('assets/img/iPhone 16 Pro Max White Titanium.svg');
+    if (isAndroid) return asset('assets/img/frames/android.svg');
+    return asset('assets/img/frames/iphone.svg');
   };
   shell.src = pickShellSrc({ category:'mobile', id:'iphone16pm', label:'iPhone 16 Pro Max' });
   shell.onerror = ()=>{ shell.style.display = 'none'; };
