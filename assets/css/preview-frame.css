@@ -72,6 +72,7 @@
   transform: none;
   pointer-events: none;
   z-index: 5; /* الإطار فوق الشاشة لإظهار النوتش */
+  opacity: var(--dp-shell-opacity, 1);
 }
 
 /* الـiframe يحتفظ بقياس الجهاز الحقيقي ويتحوّل بمقياس */
@@ -117,6 +118,15 @@
   z-index: 2;
   border-radius: var(--dp-corner);
   overflow: hidden;
+}
+
+/* وضع المعايرة: أبرز حدود الشاشة للمحاذاة */
+.device-preview[data-calib="on"] .device-viewport-wrap{
+  outline: 2px dashed var(--primary);
+  outline-offset: 0;
+}
+.device-preview[data-calib="on"] .device-shell{
+  --dp-shell-opacity: 0.9;
 }
 
 /* داخل الجهاز: خفّض الحافات وخلي التمرير داخلي */

@@ -110,7 +110,7 @@
   bar.innerHTML = '<button type="button" data-view="preview" class="active">معاينة</button><button type="button" data-view="code">الكود</button><button type="button" data-copy title="نسخ الكود">نسخ</button>';
     const device = document.createElement('div'); device.className = 'device-preview';
   const dt = document.createElement('div'); dt.className = 'device-toolbar';
-  dt.innerHTML = '<div class="dt-group"><input type="text" class="dt-search" placeholder="بحث جهاز" style="min-width:120px"><select class="dt-device" aria-label="الجهاز"></select><button type="button" data-fit>Fit</button></div><div class="dt-group"><button type="button" data-zoom-dec>-</button><button type="button" data-zoom-100>100%</button><button type="button" data-zoom-inc>+</button><button type="button" data-theme-mode title="ثيم">ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">--×--</div>';
+  dt.innerHTML = '<div class="dt-group"><input type="text" class="dt-search" placeholder="بحث جهاز" style="min-width:120px"><select class="dt-device" aria-label="الجهاز"></select><button type="button" data-fit>Fit</button></div><div class="dt-group"><button type="button" data-zoom-dec>-</button><button type="button" data-zoom-100>100%</button><button type="button" data-zoom-inc>+</button><button type="button" data-theme-mode title="ثيم">ثيم</button><button type="button" data-refresh>إعادة</button><button type="button" data-calib title="معايرة">معايرة</button></div><div class="dt-info" aria-hidden="true">--×--</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
   // إطار الجهاز SVG
@@ -157,6 +157,9 @@
   let scaleMode = (meta.zoom || userZoomPref || '');
   let scale = 0.5; // افتراضي 50%
   let themeMode = userThemePref; // sync|light|dark
+  let calibrate = false; // وضع المعايرة البصري
+  // مخزن تعديلات المعايرة لكل جهاز (محلي فقط داخل الصفحة)
+  const CAL_STORE = new Map(); // key: deviceId -> { screenX, screenY, pixelRatio }
   // لا حاجة لطبقة نوتش/شريط حالة: نعتمد على إطار الـSVG الأصلي بعد رفع z-index
   const applyDims = ()=>{
   const screenW = cur.screenWidth;
@@ -164,7 +167,9 @@
   const cat = String(cur.category||'mobile').toLowerCase();
   // نسبة عرض الشاشة داخل الفريم (كثافة بكسلات)
   const defaultRatios = { mobile: 3, tablet: 2, laptop: 2, desktop: 2 };
-  const ratio = Number(cur.pixelRatio||defaultRatios[cat]||2);
+  // دمج أي تعديلات معايرة محلية محفوظة
+  const localAdj = CAL_STORE.get(curDeviceId) || {};
+  const ratio = Number((localAdj.pixelRatio!=null? localAdj.pixelRatio : cur.pixelRatio)||defaultRatios[cat]||2);
         // استخدم أبعاد الإطار من الـpreset إن وجدت، وإلا من أبعاد صورة الـSVG الفعلية، وإلا افتراضياً نسبة إلى الشاشة
         let shellW = cur.shellWidth || 0;
         let shellH = cur.shellHeight || 0;
@@ -185,8 +190,8 @@
         // إزاحة موضع الشاشة داخل الإطار
   const displayW = screenW * ratio;
   const displayH = screenH * ratio;
-  const baseX = (cur.screenX==null ? (shellW - displayW)/2 : cur.screenX);
-  const baseY = (cur.screenY==null ? ((shellH - displayH)/2) : cur.screenY);
+  const baseX = ((localAdj.screenX!=null? localAdj.screenX : cur.screenX)==null ? (shellW - displayW)/2 : (localAdj.screenX!=null? localAdj.screenX : cur.screenX));
+  const baseY = ((localAdj.screenY!=null? localAdj.screenY : cur.screenY)==null ? ((shellH - displayH)/2) : (localAdj.screenY!=null? localAdj.screenY : cur.screenY));
   const offX = baseX;
   const offY = baseY;
         device.style.setProperty('--dp-screen-x', offX+'px');
@@ -208,7 +213,7 @@
   } catch(_) {}
   // غيّر الإطار حسب الجهاز الحالي (فئة + id/label)
   try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){ }
-  const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${z}% @ ${screenW}×${screenH}`; }
+  const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${z}% @ ${screenW}×${screenH} | x:${Math.round(offX)} y:${Math.round(offY)} r:${ratio}`; }
       };
       let resizeTimer; const onResize = ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(applyDims, 150); }; window.addEventListener('resize', onResize);
   const buildSrcDoc = (theme='light') => `<!doctype html><html lang="ar" dir="rtl" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${asset('assets/css/custom-screens.css')}"><style>
@@ -272,6 +277,37 @@
 
       // أدوات التفاعل + مزامنة عبر Bus
       const setDeviceById = (id, broadcast=true)=>{ if (!id) return; curDeviceId=id; localStorage.setItem('depth.preview.device', curDeviceId); try{ const all=DEVICE_PRESETS && DEVICE_PRESETS.devices?DEVICE_PRESETS.devices:[]; const d=all.find(x=>x.id===id); if (d) cur=d; }catch(_){} applyDims(); if (broadcast) BUS.publish('device',{id:curDeviceId}); };
+      // أدوات معايرة: تحريك وإسناد نسبة البكسل
+      const nudge = (dx=0, dy=0)=>{
+        const curAdj = CAL_STORE.get(curDeviceId) || {};
+        const x = Math.round((curAdj.screenX!=null? curAdj.screenX : (cur.screenX!=null? cur.screenX : 0)) + dx);
+        const y = Math.round((curAdj.screenY!=null? curAdj.screenY : (cur.screenY!=null? cur.screenY : 0)) + dy);
+        CAL_STORE.set(curDeviceId, { ...curAdj, screenX: x, screenY: y });
+        applyDims();
+      };
+      const setRatio = (delta)=>{
+        const curAdj = CAL_STORE.get(curDeviceId) || {};
+        const cat = String(cur.category||'mobile').toLowerCase();
+        const defaultRatios = { mobile: 3, tablet: 2, laptop: 2, desktop: 2 };
+        const current = Number((curAdj.pixelRatio!=null? curAdj.pixelRatio : cur.pixelRatio)||defaultRatios[cat]||2);
+        const next = Math.max(0.5, Math.min(6, Math.round((current + delta)*100)/100));
+        CAL_STORE.set(curDeviceId, { ...curAdj, pixelRatio: next });
+        applyDims();
+      };
+      const exportCalJson = ()=>{
+        try{
+          const curAdj = CAL_STORE.get(curDeviceId) || {};
+          const out = {
+            id: curDeviceId,
+            screenX: (curAdj.screenX!=null? curAdj.screenX : cur.screenX),
+            screenY: (curAdj.screenY!=null? curAdj.screenY : cur.screenY),
+            pixelRatio: (curAdj.pixelRatio!=null? curAdj.pixelRatio : cur.pixelRatio)
+          };
+          const txt = JSON.stringify(out, null, 2);
+          navigator.clipboard && navigator.clipboard.writeText(txt);
+          alert('تم نسخ JSON للمعايرة. الصقه في device-presets.json');
+        }catch(_){}
+      };
       const setZoomMode = (modeOrNumber, broadcast=true)=>{ const s=String(modeOrNumber).toLowerCase(); if (s==='fit'){ scaleMode='fit'; localStorage.setItem('depth.preview.zoom','fit'); } else { let num=parseFloat(s); if (!isNaN(num)&&isFinite(num)){ scaleMode='number'; scale=num; localStorage.setItem('depth.preview.zoom', String(num)); } else { scaleMode='fit'; localStorage.setItem('depth.preview.zoom','fit'); } } applyDims(); if (broadcast) BUS.publish('zoom', { mode: scaleMode, scale }); };
       const setThemeMode = (mode, broadcast=true)=>{ themeMode=mode; localStorage.setItem('depth.preview.theme', themeMode); try{ const doc=iframe.contentDocument; const html=doc&&doc.documentElement; if (html) html.setAttribute('data-theme', getDocTheme()); }catch(_){} try{ fb && fb.setAttribute('data-theme', getDocTheme()); }catch(_){} if (broadcast) BUS.publish('theme', { mode: themeMode, value: getDocTheme() }); };
 
@@ -287,6 +323,55 @@
         if (b.hasAttribute('data-zoom-dec')){ if (String(scaleMode).toLowerCase()==='fit'){ scale=1; scaleMode='number'; } scale = Math.max(0.25, (Math.round((scale-0.1)*100)/100)); applyDims(); localStorage.setItem('depth.preview.zoom', String(scale)); BUS.publish('zoom', { mode:'number', scale }); return; }
         if (b.hasAttribute('data-theme-mode')){ themeMode = (themeMode==='sync') ? 'light' : (themeMode==='light' ? 'dark' : 'sync'); setThemeMode(themeMode); return; }
         if (b.hasAttribute('data-refresh')){ const theme = getDocTheme(); loadFrame(theme); return; }
+        if (b.hasAttribute('data-calib')){
+          calibrate = !calibrate; device.toggleAttribute('data-calib', calibrate ? 'on' : 'off');
+          // أول ضغط، أظهر تعليمات صغيرة وأزرار معايرة عائمة
+          if (calibrate && !device.querySelector('.calib-pad')){
+            const pad = document.createElement('div'); pad.className='calib-pad'; pad.style.cssText='position:absolute;inset:auto 8px 8px auto;z-index:50;display:flex;flex-direction:column;gap:6px;background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:8px;padding:6px;box-shadow:var(--shadow-sm);';
+            pad.innerHTML = '\
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">\
+                <button type="button" data-cmd="up">↑</button>\
+                <button type="button" data-cmd="down">↓</button>\
+                <button type="button" data-cmd="left">←</button>\
+                <button type="button" data-cmd="right">→</button>\
+                <button type="button" data-cmd="rdec">r-</button>\
+                <button type="button" data-cmd="rinc">r+</button>\
+                <button type="button" data-cmd="copy">نسخ JSON</button>\
+              </div>\
+              <small style="opacity:.7">حرك الشاشة داخل الفريم، وعدل r حتى تكبس الفتحة</small>';
+            device.appendChild(pad);
+            pad.addEventListener('click', (ev)=>{
+              const bb = ev.target.closest('button'); if (!bb) return;
+              const cmd = bb.getAttribute('data-cmd');
+              if (cmd==='up') return nudge(0,-1);
+              if (cmd==='down') return nudge(0,1);
+              if (cmd==='left') return nudge(-1,0);
+              if (cmd==='right') return nudge(1,0);
+              if (cmd==='rdec') return setRatio(-0.01);
+              if (cmd==='rinc') return setRatio(0.01);
+              if (cmd==='copy') return exportCalJson();
+            });
+            // أسهم الكيبورد للراحة
+            const keyHandler = (kev)=>{
+              if (!calibrate) return;
+              const step = kev.shiftKey ? 5 : 1;
+              if (kev.key==='ArrowUp'){ nudge(0,-step); kev.preventDefault(); }
+              else if (kev.key==='ArrowDown'){ nudge(0,step); kev.preventDefault(); }
+              else if (kev.key==='ArrowLeft'){ nudge(-step,0); kev.preventDefault(); }
+              else if (kev.key==='ArrowRight'){ nudge(step,0); kev.preventDefault(); }
+              else if (kev.key==='+'){ setRatio(0.01*step); kev.preventDefault(); }
+              else if (kev.key==='-'){ setRatio(-0.01*step); kev.preventDefault(); }
+            };
+            pad._keyHandler = keyHandler;
+            window.addEventListener('keydown', keyHandler);
+          } else if (!calibrate){
+            const pad = device.querySelector('.calib-pad'); if (pad){
+              try { window.removeEventListener('keydown', pad._keyHandler); } catch(_) {}
+              pad.remove();
+            }
+          }
+          return;
+        }
       });
       if (deviceSelect) deviceSelect.addEventListener('change', (e)=>{ const id = e.target && e.target.value; setDeviceById(id); });
       bar.addEventListener('click', (e)=>{
