@@ -189,6 +189,12 @@
           nextScale = Math.max(0.25, Math.min(1.5, maxW / shellW));
         }
   device.style.setProperty('--dp-scale', String(nextScale));
+  // ثبّت ارتفاع الحاوية ليطابق الارتفاع المصغّر للإطار حتى لا يحدث قفز في التخطيط
+  try {
+    const scaledH = Math.round(shellH * nextScale);
+    stageWrap.style.height = scaledH + 'px';
+    stageWrap.style.minHeight = scaledH + 'px';
+  } catch(_) {}
   // غيّر الإطار حسب الجهاز الحالي (فئة + id/label)
   try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){ }
         const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${screenW}×${screenH} @ ${z}%`; }
