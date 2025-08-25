@@ -1,0 +1,58 @@
+/* =============================================
+   Responsive System — نظام التجاوب المركزي
+   الهدف: شرح وتثبيت البريك بوينتس واستخدامها بسلاسة
+   المبدأ: Mobile-first — نكتب القاعدة للموبايل وبعدين نوسع
+   الأجهزة:
+     - آيفون: عادة 390px (bp-sm) عرض فعلي منطقياً
+     - أندرويد: يتراوح 360-412px (bp-xs إلى bp-sm)
+     - آيباد: 768px (bp-md) Portrait، و>=1024px Landscape (bp-lg)
+     - لابتوب صغير: 1280-1366 ضمن (>=1024 و<1440)
+     - لابتوب/ديسكتوب متوسط: 1440px (bp-xl)
+     - شاشات كبيرة: 1920px (bp-2xl)
+   ============================================= */
+
+/* ملاحظة تقنية: ما نستخدم @custom-media حتى نتجنب أخطاء الأدوات.
+  نعتمد مباشرة على var(--bp-*) داخل @media القياسية. */
+
+/* ملاحظات:
+  - ممكن نستخدم Tailwind breakpoints مباشرة، لكن نوثق هنا للعناصر الخام
+  - الأمثلة تحت توضح كيف نكتب Media Queries يدوياً لو نحتاج */
+
+/* مثال: شبكة 3 أعمدة تتحول حسب الحجم */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr; /* موبايل: عمود واحد */
+  gap: var(--space-4);
+}
+
+@media (min-width: var(--bp-sm)) { /* آيفون القياسي وأندرويد متوسط */
+  .grid-responsive { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: var(--bp-lg)) { /* لابتوب صغير وآيباد Landscape */
+  .grid-responsive { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* مثال: حاوية تقييد عرض النصوص بالشاشات العريضة */
+.container-prose {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+@media (min-width: var(--bp-xl)) { /* شاشات 1440+ */
+  .container-prose { max-width: 1200px; }
+}
+
+/* مثال: أحجام الخط تتدرج مع الشاشات */
+body { font-size: var(--fs-md); }
+@media (min-width: var(--bp-sm)) { body { font-size: 17px; } }
+@media (min-width: var(--bp-lg)) { body { font-size: 18px; } }
+
+/* Utilities خفيفة قابلة لإعادة الاستخدام */
+.hidden-xs { display: none; }
+@media (min-width: var(--bp-sm)) { .hidden-xs { display: initial; } }
+
+.only-desktop { display: none; }
+@media (min-width: var(--bp-lg)) { .only-desktop { display: initial; } }

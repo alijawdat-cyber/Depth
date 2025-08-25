@@ -1,50 +1,27 @@
-@import "tailwindcss";
+@import "tailwindcss"; /* استيراد أدوات Tailwind */
 
-/* Design Tokens — مقتبسة من documentation/06-frontend/01-design-tokens.md */
-:root {
-  /* Brand */
-  --color-primary: #6C2BFF;
-  --color-primary-600: #4A1FC9;
-  --color-alternate: #3E5BFF;
+/* 1) الخطوط: تعريف @font-face لدبي */
+@import url('../styles/fonts.css');
 
-  /* Base */
-  --bg: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text: #1f2937;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
-  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+/* 2) التوكنات: ألوان/نصوص/مسافات/ظل/بريك بوينتس */
+@import url('../styles/tokens.css');
 
-  /* Typography */
-  --font-ar: var(--font-geist-sans), system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  --font-en: var(--font-geist-sans), system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+/* 3) نظام التجاوب: توثيق أمثلة وتجهيز قواعد أساسية */
+@import url('../styles/responsive.css');
 
-  /* Spacing & Radius */
-  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
-  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
-
-  /* Breakpoints */
-  --bp-sm: 480px; --bp-md: 768px; --bp-lg: 1024px; --bp-xl: 1400px;
-}
-
-[data-theme="dark"] {
-  --bg: #0f172a;
-  --bg-secondary: #1e293b;
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* Tailwind theme hooks: يمكن لاحقًا استخدام @theme لو احتجنا، حالياً نعتمد CSS vars مباشرة */
-
+/* إعدادات عامة للجسم */
 html, body { height: 100%; }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-ar);
+  background: var(--bg);             /* يعتمد على الفاتح/الداكن */
+  color: var(--text);                 /* نص مناسب للثيم */
+  font-family: var(--font-ar);        /* خط دبي افتراضي */
+  -webkit-font-smoothing: antialiased; /* تنعيم النص */
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* RTL helpers (نضيف لاحقًا Utilities حسب الحاجة) */
+/* روابط تعتمد على الألوان الموحدة */
+a { color: var(--color-primary); }
+a:hover { color: var(--color-primary-600); }
+
+/* RTL helpers — ضبط مسافات/حروف حسب الحاجة */
 html[dir="rtl"] * { letter-spacing: 0; }
