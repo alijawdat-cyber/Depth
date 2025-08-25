@@ -165,6 +165,11 @@
   const screenW = cur.screenWidth;
   const screenH = cur.screenHeight;
   const cat = String(cur.category||'mobile').toLowerCase();
+  // زوايا الشاشة: موبايل فقط منحنية؛ تابلت/لابتوب/ديسكتوب زوايا حادة
+  try {
+    const corner = (cat==='mobile') ? (Number(cur.cornerRadius||46)) : 0;
+    device.style.setProperty('--dp-corner', corner + 'px');
+  } catch(_) {}
   // نسبة عرض الشاشة داخل الفريم (كثافة بكسلات)
   const defaultRatios = { mobile: 3, tablet: 2, laptop: 2, desktop: 2 };
   // دمج أي تعديلات معايرة محلية محفوظة
@@ -197,7 +202,8 @@
         device.style.setProperty('--dp-screen-x', offX+'px');
         device.style.setProperty('--dp-screen-y', offY+'px');
         // Fit أو رقم
-        const wrap = stageWrap.getBoundingClientRect();
+  // قياس عرض الحاوية لخيار Fit: استخدم عرض عنصر الجهاز نفسه كمرجع أكثر استقراراً
+  const wrap = device.getBoundingClientRect && device.getBoundingClientRect() || { width: stageWrap.clientWidth || 0 };
         let nextScale = scale;
         if (String(scaleMode).toLowerCase() === 'fit') {
           const margin = 24;
