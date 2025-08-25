@@ -113,12 +113,15 @@
   dt.innerHTML = '<div class="dt-group"><input type="text" class="dt-search" placeholder="بحث جهاز" style="min-width:120px"><select class="dt-device" aria-label="الجهاز"></select><button type="button" data-fit class="active">Fit</button></div><div class="dt-group"><button type="button" data-zoom-dec>-</button><button type="button" data-zoom-100>100%</button><button type="button" data-zoom-inc>+</button><button type="button" data-theme-mode title="ثيم">ثيم</button><button type="button" data-refresh>إعادة</button></div><div class="dt-info" aria-hidden="true">--×--</div>';
   const stageWrap = document.createElement('div'); stageWrap.className = 'device-stage-wrap';
   const stage = document.createElement('div'); stage.className = 'device-stage';
-  // إطار الجهاز SVG حسب الفئة
+  // إطار الجهاز SVG
   const shell = document.createElement('img'); shell.className = 'device-shell'; shell.alt = 'Device frame';
+  // اختيار مصدر الإطار: أولاً من preset.frameSrc إن توفر، وإلا اختر إطاراً عاماً حسب الفئة
   const pickShellSrc = (device) => {
-    const category = String(device && device.category || 'mobile').toLowerCase();
-    const id = String(device && device.id || '').toLowerCase();
-    const label = String(device && device.label || '').toLowerCase();
+    const d = device || {};
+    if (d.frameSrc) return asset(String(d.frameSrc).replace(/^\//,''));
+    const category = String(d.category || 'mobile').toLowerCase();
+    const id = String(d.id || '').toLowerCase();
+    const label = String(d.label || '').toLowerCase();
     if (category === 'desktop') return asset('assets/img/frames/desktop.svg');
     if (category === 'laptop') return asset('assets/img/frames/laptop.svg');
     if (category === 'tablet') return asset('assets/img/frames/ipad.svg');
@@ -129,6 +132,8 @@
   };
   shell.src = pickShellSrc({ category:'mobile', id:'iphone16pm', label:'iPhone 16 Pro Max' });
   shell.onerror = ()=>{ shell.style.display = 'none'; };
+  // عند تحميل صورة الإطار، أعد حساب الأبعاد (لاستعمال العرض/الارتفاع الأصليين)
+  try { shell.addEventListener('load', ()=>{ try{ applyDims(); }catch(_){} }); } catch(_){ }
   const iframe = document.createElement('iframe'); iframe.className = 'device-viewport'; iframe.setAttribute('sandbox','allow-scripts allow-forms allow-same-origin');
   // fallback يظهر مباشرة إلى أن نتأكد أن الـiframe اشتغل
   const fb = document.createElement('div'); fb.className = 'html-fallback'; fb.setAttribute('data-theme','light'); fb.setAttribute('dir','rtl');
@@ -151,8 +156,17 @@
   const applyDims = ()=>{
         const screenW = cur.screenWidth;
         const screenH = cur.screenHeight;
-        const shellW = cur.shellWidth || (screenW + 40);
-        const shellH = cur.shellHeight || (screenH + 80);
+        // استخدم أبعاد الإطار من الـpreset إن وجدت، وإلا من أبعاد صورة الـSVG الفعلية، وإلا افتراضياً نسبة إلى الشاشة
+        let shellW = cur.shellWidth || 0;
+        let shellH = cur.shellHeight || 0;
+        try {
+          if (!shellW || !shellH) {
+            const nw = shell.naturalWidth || 0;
+            const nh = shell.naturalHeight || 0;
+            if (nw && nh) { shellW = nw; shellH = nh; }
+          }
+        } catch(_){}
+        if (!shellW || !shellH) { shellW = (screenW + 40); shellH = (screenH + 80); }
         // ثبّت المتغيّرات للشاشة والإطار
         device.style.setProperty('--dp-width', screenW+'px');
         device.style.setProperty('--dp-height', screenH+'px');
@@ -160,7 +174,7 @@
         device.style.setProperty('--dp-shell-h', shellH+'px');
         // إزاحة موضع الشاشة داخل الإطار
   const baseX = (cur.screenX==null ? (shellW - screenW)/2 : cur.screenX);
-  const baseY = (cur.screenY==null ? 0 : cur.screenY);
+  const baseY = (cur.screenY==null ? ((shellH - screenH)/2) : cur.screenY);
   const offX = baseX;
   const offY = baseY;
         device.style.setProperty('--dp-screen-x', offX+'px');
@@ -175,7 +189,7 @@
         }
   device.style.setProperty('--dp-scale', String(nextScale));
   // غيّر الإطار حسب الجهاز الحالي (فئة + id/label)
-  try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){}
+  try { shell.src = pickShellSrc(cur || { category:'mobile' }); } catch(_){ }
         const info = dt.querySelector('.dt-info'); if (info) { const z = Math.round(nextScale*100); info.textContent = `${screenW}×${screenH} @ ${z}%`; }
       };
       let resizeTimer; const onResize = ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(applyDims, 150); }; window.addEventListener('resize', onResize);
