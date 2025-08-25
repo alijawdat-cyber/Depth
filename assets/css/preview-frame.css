@@ -29,6 +29,8 @@
 }
 .device-preview .device-toolbar .dt-group{ display:flex; gap:.4rem; align-items:center; }
 .device-preview .device-toolbar button,
+.device-preview .device-toolbar select,
+.device-preview .device-toolbar input[type="text"],
 .device-preview .device-toolbar .dt-info{
   padding: .35rem .6rem;
   border: 1px solid var(--dp-border);
@@ -60,7 +62,7 @@
 }
 
 /* الإطار الخارجي (SVG) */
-.device-preview .iphone-shell{
+.device-preview .device-shell{
   width: var(--dp-shell-w);
   height: var(--dp-shell-h);
   position: absolute;
@@ -69,11 +71,6 @@
   transform: none;
   pointer-events: none;
   z-index: 5; /* الإطار فوق الشاشة لإظهار النوتش */
-}
-
-.device-preview.rotated .iphone-shell{
-  /* مؤقتاً: نخفي الإطار عند الوضع الأفقي إلى أن نضيف SVG موازي */
-  opacity: 0;
 }
 
 /* الـiframe يحتفظ بقياس الجهاز الحقيقي ويتحوّل بمقياس */

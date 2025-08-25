@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" fill="none">
+  <!-- إطار Laptop مبسّط: غطاء + حافة + لوحة مفاتيح كظل -->
+  <defs>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#222"/>
+      <stop offset="100%" stop-color="#111"/>
+    </linearGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c9c9c9"/>
+      <stop offset="100%" stop-color="#b3b3b3"/>
+    </linearGradient>
+  </defs>
+  <!-- الغطاء (الشاشة) مع حافة سميكة -->
+  <rect x="50" y="50" width="1500" height="880" rx="24" fill="url(#bezel)"/>
+  <!-- فتحة الشاشة الفعلية (فارغة لتجلس تحتها viewport) -->
+  <!-- ملاحظة: الشاشة الحقيقية تكون عنصر iframe موضوعة أعلى هذه الفتحة عبر CSS variables -->
+  <!-- القاعدة (لوحة المفاتيح) -->
+  <rect x="0" y="930" width="1600" height="50" rx="8" fill="url(#base)"/>
+  <!-- ظل أمامي بسيط -->
+  <ellipse cx="800" cy="995" rx="700" ry="20" fill="#000" opacity="0.1"/>
+</svg>

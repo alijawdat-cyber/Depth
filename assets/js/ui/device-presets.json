@@ -1,0 +1,26 @@
+{
+  "devices": [
+    { "id": "iphone-se-2022", "label": "iPhone SE (2022)", "category": "mobile", "screenWidth": 375, "screenHeight": 667, "shellWidth": 405, "shellHeight": 715, "screenX": null, "screenY": 16 },
+    { "id": "iphone-14-pro", "label": "iPhone 14 Pro", "category": "mobile", "screenWidth": 393, "screenHeight": 852, "shellWidth": 433, "shellHeight": 900, "screenX": null, "screenY": 22 },
+    { "id": "iphone-16-pro", "label": "iPhone 16 Pro", "category": "mobile", "screenWidth": 402, "screenHeight": 874, "shellWidth": 442, "shellHeight": 922, "screenX": null, "screenY": 22 },
+    { "id": "iphone-16-pro-max", "label": "iPhone 16 Pro Max", "category": "mobile", "screenWidth": 430, "screenHeight": 932, "shellWidth": 470, "shellHeight": 980, "screenX": null, "screenY": 24 },
+
+    { "id": "pixel-8", "label": "Pixel 8", "category": "mobile", "screenWidth": 412, "screenHeight": 915, "shellWidth": 452, "shellHeight": 963, "screenX": null, "screenY": 16 },
+    { "id": "pixel-8-pro", "label": "Pixel 8 Pro", "category": "mobile", "screenWidth": 412, "screenHeight": 915, "shellWidth": 452, "shellHeight": 963, "screenX": null, "screenY": 16 },
+    { "id": "galaxy-s24", "label": "Galaxy S24", "category": "mobile", "screenWidth": 412, "screenHeight": 915, "shellWidth": 452, "shellHeight": 963, "screenX": null, "screenY": 16 },
+    { "id": "galaxy-s24-ultra", "label": "Galaxy S24 Ultra", "category": "mobile", "screenWidth": 480, "screenHeight": 1060, "shellWidth": 520, "shellHeight": 1108, "screenX": null, "screenY": 18 },
+
+    { "id": "ipad-mini", "label": "iPad Mini (8.3)", "category": "tablet", "screenWidth": 744, "screenHeight": 1133, "shellWidth": 784, "shellHeight": 1181, "screenX": null, "screenY": 18 },
+    { "id": "ipad-pro-11", "label": "iPad Pro 11", "category": "tablet", "screenWidth": 834, "screenHeight": 1194, "shellWidth": 874, "shellHeight": 1242, "screenX": null, "screenY": 18 },
+    { "id": "ipad-pro-12-9", "label": "iPad Pro 12.9", "category": "tablet", "screenWidth": 1024, "screenHeight": 1366, "shellWidth": 1064, "shellHeight": 1414, "screenX": null, "screenY": 18 },
+
+    { "id": "laptop-1280x800", "label": "Laptop 1280×800", "category": "laptop", "screenWidth": 1280, "screenHeight": 800, "shellWidth": 1320, "shellHeight": 860, "screenX": null, "screenY": 30 },
+    { "id": "laptop-1366x768", "label": "Laptop 1366×768", "category": "laptop", "screenWidth": 1366, "screenHeight": 768, "shellWidth": 1406, "shellHeight": 828, "screenX": null, "screenY": 30 },
+    { "id": "laptop-1440x900", "label": "Laptop 1440×900", "category": "laptop", "screenWidth": 1440, "screenHeight": 900, "shellWidth": 1480, "shellHeight": 960, "screenX": null, "screenY": 30 },
+    { "id": "laptop-1536x864", "label": "Laptop 1536×864", "category": "laptop", "screenWidth": 1536, "screenHeight": 864, "shellWidth": 1576, "shellHeight": 924, "screenX": null, "screenY": 30 },
+    { "id": "laptop-1600x900", "label": "Laptop 1600×900", "category": "laptop", "screenWidth": 1600, "screenHeight": 900, "shellWidth": 1640, "shellHeight": 960, "screenX": null, "screenY": 30 },
+    { "id": "laptop-1680x1050", "label": "Laptop 1680×1050", "category": "laptop", "screenWidth": 1680, "screenHeight": 1050, "shellWidth": 1720, "shellHeight": 1110, "screenX": null, "screenY": 30 },
+    { "id": "desktop-1920x1080", "label": "Desktop 1920×1080", "category": "desktop", "screenWidth": 1920, "screenHeight": 1080, "shellWidth": 1960, "shellHeight": 1140, "screenX": null, "screenY": 30 },
+    { "id": "desktop-2560x1440", "label": "Desktop 2560×1440", "category": "desktop", "screenWidth": 2560, "screenHeight": 1440, "shellWidth": 2600, "shellHeight": 1500, "screenX": null, "screenY": 30 }
+  ]
+}
