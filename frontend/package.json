@@ -6,7 +6,14 @@
     "dev": "next dev -p 3030 --turbopack",
     "build": "next build --turbopack",
     "start": "next start -p 3030",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test:visual": "playwright test",
+    "precommit": "npm run lint && npm run lint:css && npm run -s typecheck || true",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "lucide-react": "^0.541.0",
@@ -16,12 +23,24 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@storybook/addon-a11y": "^8",
+    "@storybook/addon-essentials": "^8",
+    "@storybook/addon-themes": "^8",
+    "@storybook/addon-viewport": "^8",
+    "@storybook/nextjs": "^8",
+    "@storybook/react": "^8",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@playwright/test": "^1.47.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^9",
+    "stylelint": "^16",
+    "stylelint-config-standard": "^36",
+    "stylelint-declaration-strict-value": "^1.10.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
