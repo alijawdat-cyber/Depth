@@ -26,7 +26,7 @@ projectId: p_123abc (optional)
 category: portfolio|project_delivery|reference|logo|attachment
 description: صورة المنتج النهائية
 tags: food,photography,final
-visibility: public|private|client_only
+visibility: public|private|client_only|team_only
 autoProcess: true
 ```
 
@@ -71,7 +71,7 @@ autoProcess: true
       "uploadedAt": "2025-09-01T14:30:00.000Z",
       "uploadedBy": "c_789ghi",
       "processingStatus": "completed",
-      "visibility": "client_only",
+  "visibility": "client_only",
       "downloadCount": 0
     },
     "processing": {
@@ -87,7 +87,10 @@ autoProcess: true
 
 ### سياسة الرفع (V2.0)
 
-- maxSize: 2GB (2147483648 bytes) مع رفع مجزأ chunked.
+- حدود الحجم:
+  - صورة البروفايل: <= 2MB.
+  - ملفات المشروع (تسليمات/معرض/مرفقات): <= 50MB للملف الواحد.
+- الملفات الأكبر من الحدود أعلاه: مؤجلة لدعم الرفع المجزأ (chunked) في إصدار لاحق.
 - allowedTypes: "*/*" مع denylist للامتدادات التنفيذية (exe/js/sh/bat ...).
 - MIME Sniffing مفعّل + Virus Scanning للملفات غير الإعلامية.
 - quotaPerProject: قابلة للضبط حسب الخطة/اليوم.
@@ -788,7 +791,11 @@ autoProcess: true
 {
   "fileIds": ["file_123abc", "file_456def"],
   "permissions": {
-    "visibility": "private", // public | private | client_only | team_only
+  "visibility": "private", // public | private | client_only | team_only
+
+> تعريف visibility=team_only:
+> - للاستخدام الداخلي لفريق الوكالة فقط: super_admin + admin + salariedEmployee.
+> - لا يرى هذه الملفات أي عميل أو مبدع.
     "downloadable": true,
     "shareable": false,
     "expiration": "2025-12-31T23:59:59.000Z"

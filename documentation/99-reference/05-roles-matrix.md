@@ -44,7 +44,7 @@ CRUD مبسطة:
 | users.read | ✔ | ✔ | ✖ | ✖ | ✖ |
 | users.update (self) | ✔ | ✔ | ✔ (ذاتياً) | ✔ (ذاتياً) | ✔ (ذاتياً) |
 | admins.create | ✔ | ✖ | ✖ | ✖ | ✖ |
-| admins.read | ✔ | ✔ | ✖ | ✖ | ✖ |
+| admins.read | ✔ | ✖ | ✖ | ✖ | ✖ |
 | creators.read | ✔ | ✔ | ✔ (ذاتياً/معلنة) | ✖ | ✖ |
 | creators.update | ✔ | ✔ | ✔ (ذاتياً) | ✖ | ✖ |
 | clients.read | ✔ | ✔ | ✖ | ✔ (ذاتياً) | ✖ |
@@ -53,7 +53,7 @@ CRUD مبسطة:
 | projects.read | ✔ | ✔ | ✔ (مُسندة) | ✔ (مملوكة) | ✔ (مُسندة) |
 | projects.update | ✔ | ✔ (نطاق التنفيذ) | محدود (تعليقات) | ✔ (نطاق التنفيذ) |
 | projects.approve | ✔ | ✖ | ✖ | ✖ |
-| pricing.read | ✔ | ✔ (بعد الموافقة) | ✔ (فقط ClientPrice) | ✖ |
+| pricing.read | ✔ | ✔ (بعد الموافقة) | ✔ (creatorPrice بعد الاعتماد فقط؛ لا يرى clientPrice إطلاقاً) | ✔ (ClientPrice فقط) | ✖ |
 | pricing.update | ✔ | ✖ | ✖ | ✖ |
 | seeds.apply (script) | ✔ (super_admin/ops خارج الواجهة) | ✖ | ✖ | ✖ |
 | notifications.read | ✔ | ✔ (مُخصّصة) | ✔ (مُخصّصة) | ✔ (مُخصّصة) |
@@ -62,8 +62,10 @@ CRUD مبسطة:
 | files.upload | ✔ | ✔ (حسب السياق) | ✔ (مخرجات/مرفقات) | ✔ (حسب الدور) |
 | system.monitor | ✔ | ✖ | ✖ | ✖ |
 
+| users.impersonate | ✔ | ✖ | ✖ | ✖ | ✖ |
+
 ## 5. قواعد خاصة
-1. المبدع لا يرى `creatorPrice` حتى اعتماد المشروع.
+1. المبدع لا يرى `creatorPrice` حتى اعتماد المشروع، ولا يرى `clientPrice` إطلاقاً.
 2. الموظف براتب ثابت لا يرى أي أسعار (`creatorPrice`, `clientPrice`).
 3. العميل لا يرى `agencyMarginPercent` بل فقط السعر النهائي.
 4. حذف (delete) = أرشفة منطقية (soft delete) إن أمكن.
@@ -87,7 +89,7 @@ CRUD مبسطة:
     "profile:update:self",
     "projects:read:assigned",
     "projects:update:assigned:limited",
-    "pricing:read:after-approval",
+  "pricing:read:after-approval:creatorPrice-only",
     "files:upload:scoped",
     "messages:read:participant",
     "messages:create:participant"

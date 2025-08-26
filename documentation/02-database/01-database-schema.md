@@ -153,7 +153,7 @@
     postalCode: string
   },
   preferredLanguage: 'ar' | 'en',
-  paymentTerms: 'advance_50' | 'advance_100' | 'net_30',
+    paymentTerms: 'advance_50' | 'advance_100' | 'net_15' | 'net_30',
   
   // الإحصائيات
   totalSpent: number,             // بالدينار العراقي
@@ -605,47 +605,51 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Creators - قراءة عامة، كتابة للمبدع والأدمن
+  // Creators - قراءة عامة، كتابة للمبدع والأدمن/السوبر أدمن
     match /creators/{creatorId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && 
-                      (request.auth.uid == resource.data.userId || 
-                       isAdmin(request.auth.uid));
+            (request.auth.uid == resource.data.userId || 
+             isAdminOrSuperAdmin(request.auth.uid));
     }
     
-    // Clients - الوصول للعميل والأدمن فقط
+  // Clients - الوصول للعميل والأدمن/السوبر أدمن فقط
     match /clients/{clientId} {
       allow read, write: if request.auth != null && 
-                            (request.auth.uid == resource.data.userId || 
-                             isAdmin(request.auth.uid));
+              (request.auth.uid == resource.data.userId || 
+               isAdminOrSuperAdmin(request.auth.uid));
     }
     
-    // Projects - الوصول للأطراف المعنية فقط
+    // Projects - الوصول للأطراف المعنية فقط (عميل/مبدع/أدمن/سوبر أدمن/موظف مُسند)
     match /projects/{projectId} {
       allow read: if request.auth != null && 
                      (request.auth.uid == resource.data.clientId ||
                       request.auth.uid == resource.data.creatorId ||
-                      isAdmin(request.auth.uid));
+                      isAdminOrSuperAdmin(request.auth.uid) ||
+                      isAssignedSalariedEmployee(request.auth.uid, resource.data.assignments));
       
       allow create: if request.auth != null;
       
       allow update: if request.auth != null && 
                        (request.auth.uid == resource.data.clientId ||
                         request.auth.uid == resource.data.creatorId ||
-                        isAdmin(request.auth.uid));
+                        isAdminOrSuperAdmin(request.auth.uid) ||
+                        // الموظف المُسند: تحديثات محدودة (تعليقات/مرفقات/حالة مهمة)
+                        (isSalariedEmployee(request.auth.uid) && isAssignedSalariedEmployee(request.auth.uid, resource.data.assignments)));
     }
     
     // Admin-only collections
     match /{adminCollection}/{docId} {
-      allow read, write: if request.auth != null && isAdmin(request.auth.uid);
+      allow read, write: if request.auth != null && isAdminOrSuperAdmin(request.auth.uid);
       
       // Collections: categories, subcategories, processingModifiers, 
       // experienceModifiers, equipmentModifiers, rushModifiers, locationAdditions
     }
     
     // Helper functions
-    function isAdmin(userId) {
-      return get(/databases/$(database)/documents/users/$(userId)).data.role == 'admin';
+    function isAdminOrSuperAdmin(userId) {
+      let role = get(/databases/$(database)/documents/users/$(userId)).data.role;
+      return role == 'admin' || role == 'super_admin';
     }
     
     function isCreator(userId) {
@@ -654,6 +658,15 @@ service cloud.firestore {
     
     function isClient(userId) {
       return get(/databases/$(database)/documents/users/$(userId)).data.role == 'client';
+    }
+
+    function isSalariedEmployee(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role == 'salariedEmployee';
+    }
+
+    // يفترض أن المشروع يحتوي على حقل assignments: [{ userId: string, role: 'salariedEmployee'|'creator'|'admin' }]
+    function isAssignedSalariedEmployee(userId, assignments) {
+      return assignments != null && assignments.hasAny(a => a.userId == userId && a.role == 'salariedEmployee');
     }
   }
 }

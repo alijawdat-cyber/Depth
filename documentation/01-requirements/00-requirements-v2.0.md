@@ -182,12 +182,13 @@ CreatorPrice = (BasePrice × 0.9) × ProcessingMod × ExperienceMod × RushMod +
 CreatorPrice = 0 (محسوب ضمن الراتب)
 ```
 
-#### سعر العميل النهائي:
+#### سعر العميل النهائي (موحّد):
 ```
-ClientPrice = CreatorPrice + AgencyMargin
-أو
 ClientPrice = CreatorPrice × (1 + AgencyMarginPercent)
-\n> **ملاحظة:** نطاق هامش الوكالة الرسمي هو **10% إلى 50%** حسب سياسة التسعير. يجب الالتزام بهذا النطاق في جميع العمليات.
+
+// AgencyMargin قيمة مشتقة = CreatorPrice × AgencyMarginPercent (ليست حقل مخزّن)
+
+> **ملاحظة:** هامش الوكالة كنسبة موحّدة من إعداد واحد للنظام (10%–50%). يجب الالتزام بهذا النطاق في جميع العمليات.
 ```
 
 ### جداول المعاملات النهائية (Modifiers):

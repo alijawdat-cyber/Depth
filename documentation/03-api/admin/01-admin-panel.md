@@ -14,6 +14,7 @@
 - [إدارة المستخدمين](#إدارة-المستخدمين)
 - [مراقبة النظام](#مراقبة-النظام)
 - [التقارير والتحليلات](#التقارير-والتحليلات)
+- [العقود (Contracts PDF)](#العقود-contracts-pdf)
 - [إعدادات النظام](#إعدادات-النظام)
 
 ---
@@ -221,12 +222,12 @@
 
 ---
 
-## إدارة الأدمنز
+## إدارة الأدمنز (Super Admin فقط)
 
 ### `GET /admin/admins`
 جلب قائمة جميع الأدمنز في النظام.
 
-**المصادقة:** Super Admin role required
+**المصادقة:** Super Admin role required — ملاحظة: هذه العمليات لا تظهر ولا تتاح لحسابات admin العادية.
 
 **الاستجابة الناجحة (200):**
 ```json
@@ -576,7 +577,7 @@
 ```
 
 ### `POST /admin/users/{userId}/impersonate`
-تسجيل الدخول نيابة عن المستخدم.
+تسجيل الدخول نيابة عن المستخدم — Super Admin فقط. جميع الجلسات تُسجَّل في Audit Log وتكون مؤقتة.
 
 **الطلب:**
 ```json
@@ -1057,6 +1058,59 @@
   }
 }
 ```
+
+---
+
+## العقود (Contracts PDF)
+> توليد عقود PDF من تفاصيل المشروع والتسعير النهائي (clientPrice) وشروط الدفع (PaymentTerms). في V2.0: توليد الملف وإرساله يدويًا عبر البريد؛ التوقيع الإلكتروني مؤجل.
+
+### `POST /admin/contracts/generate`
+إنشاء ملف عقد PDF لمشروع.
+
+**الطلب:**
+```json
+{
+  "projectId": "p_123abc",
+  "template": "standard_ar", // standard_ar | standard_en
+  "include": { "pricing": true, "paymentTerms": true, "deliveryDate": true, "scope": true },
+  "notes": "بنود إضافية اختيارية"
+}
+```
+
+**الاستجابة (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "contract": {
+      "id": "ctr_2025_0001",
+      "projectId": "p_123abc",
+      "url": "https://cdn.depth-agency.com/contracts/ctr_2025_0001.pdf",
+      "pages": 3,
+      "generatedAt": "2025-09-02T12:00:00.000Z"
+    }
+  },
+  "message": "تم توليد عقد PDF بنجاح"
+}
+```
+
+### `POST /admin/contracts/{contractId}/send`
+إرسال العقد للعميل عبر البريد الإلكتروني.
+
+**الطلب:**
+```json
+{ "recipients": ["contact@client.com"], "subject": "عقد مشروعكم", "message": "مرفق العقد للمراجعة." }
+```
+
+**الاستجابة (200):**
+```json
+{ "success": true, "message": "تم إرسال العقد بنجاح" }
+```
+
+> ملاحظات:
+> - المصدر المالي للحساب: projects.clientPrice، ونسبة الوكالة من إعداد واحد.
+> - الضرائب خارج النطاق في V2.0 (0 دائمًا).
+> - التوقيع الإلكتروني والدفع عبر بوابات: Deferred لإصدار لاحق.
 
 ---
 

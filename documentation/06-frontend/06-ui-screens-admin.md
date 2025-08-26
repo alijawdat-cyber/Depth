@@ -11,6 +11,7 @@
 - [لوحة المشاريع](#admin-projects)
 - [التقارير](#admin-reports)
 - [إدارة النظام](#admin-system)
+ - [إدارة الأدمنز (Super Admin)](#admin-manage-admins)
 
 ---
 
@@ -219,6 +220,30 @@
 </div>
 
 ---
+
+<a id="admin-manage-admins"></a>
+## 🧑‍💼 إدارة الأدمنز (Super Admin)
+
+<div class="screen-mockup">
+  <div class="screen-header">
+    <button class="back-btn">⬅</button>
+    <h3>إدارة الأدمنز</h3>
+    <button class="close-btn">➕</button>
+  </div>
+  <div class="screen-content">
+    <div class="banner warning">هذه الشاشة متاحة فقط لحساب Super Admin</div>
+    <table class="invoice-table">
+      <thead><tr><th>الاسم</th><th>البريد</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+      <tbody>
+        <tr><td>علي الربيعي</td><td>admin@depth-agency.com</td><td>نشط</td><td><button class="secondary-btn">تعطيل</button> <button class="secondary-btn">إعادة تعيين كلمة مرور</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="screen-footer">
+    <div class="banner info">إذا دخل Admin عادي هنا يظهر له: "هذه الشاشة متاحة فقط لسوبر أدمن"</div>
+  </div>
+ </div>
+
 
 ### توافق المتطلبات
 - OTP: إلزامي — 6 أرقام — 5 دقائق — 3 محاولات — Audit Log

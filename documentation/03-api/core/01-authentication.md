@@ -40,9 +40,14 @@ X-Device-ID: unique_device_identifier
 
 ```javascript
 const roles = {
+  super_admin: {
+    permissions: ["*"], // وصول شامل + إدارة الأدمنز + impersonate
+    access: ["admin/*", "creator/*", "client/*", "salariedEmployee/*"],
+    description: "سوبر أدمن — إدارة أدمنز، تدقيق كامل، ودخول نيابة (impersonate)"
+  },
   admin: {
-    permissions: ["*"], // جميع الصلاحيات
-    access: ["admin/*", "creator/*", "client/*", "employee/*"]
+    permissions: ["*"], // صلاحيات إدارية عامة (بدون إدارة الأدمنز وبدون impersonate)
+    access: ["admin/*", "creator/*", "client/*", "salariedEmployee/*"]
   },
   creator: {
     permissions: ["profile:write", "projects:read", "deliverables:upload"],
@@ -59,6 +64,10 @@ const roles = {
   }
 };
 ```
+
+> ملاحظة مهمة:
+> - users.impersonate = Super Admin فقط، وكل جلسة تسجّل في Audit Log وتتقيد بزمن صلاحية.
+> - لا يوجد عندنا دور project_manager كنظام RBAC؛ إدارة المشاريع تتم عبر admin/super_admin فقط.
 
 ### التحقق من الهوية عبر OTP
 
