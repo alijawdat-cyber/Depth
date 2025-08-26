@@ -601,6 +601,55 @@
 | sessionId     | string       | لا    | معرف الجلسة                | session_abc    |              |
 | createdAt     | timestamp    | نعم   | تاريخ الإنشاء              | 2025-08-20     |              |
 
+### 6.7 الفواتير (Invoices)
+> تعريف الحقول القياسية لجدول الفواتير
+
+| الحقل | النوع | مطلوب | وصف | مثال | قيود |
+|---|---|---|---|---|---|
+| id | string | نعم | معرف الفاتورة | INV-2025-0001 | فريد |
+| projectId | string | نعم | معرف المشروع | p_123abc | FK → Project |
+| clientId | string | نعم | معرف العميل | cl_123abc | FK → Client |
+| number | string | نعم | رقم تسلسلي قابل للبحث | INV-2025-0001 | مفهرس |
+| status | enum | نعم | حالة الفاتورة | issued | draft/issued/partially_paid/paid/overdue/cancelled |
+| currency | enum | نعم | العملة | IQD | IQD فقط |
+| amount.subtotal | int | نعم | الإجمالي قبل الخصم | 500000 | ≥0 |
+| amount.discount | int | لا | خصم | 20000 | ≥0 |
+| amount.tax | int | نعم | ضريبة | 0 | V2.0=0 دائمًا |
+| amount.total | int | نعم | النهائي بعد الخصم | 480000 | ≥0 |
+| dueDate | date | لا | تاريخ الاستحقاق | 2025-09-15 | |
+| issuedAt | timestamp | لا | تاريخ الإصدار | 2025-09-01T10:00Z | |
+| paymentTerms | enum | لا | شروط الدفع | net_15 | advance_50/advance_100/net_15/net_30 |
+| relatedPaymentsCount | int | نعم | عدد الدفعات المرتبطة | 1 | ≥0 |
+| notes | string | لا | ملاحظات | دفعة مقدمة 50% | |
+| createdAt | timestamp | نعم | تاريخ الإنشاء | | |
+| updatedAt | timestamp | نعم | آخر تحديث | | |
+
+> عناصر البنود (lineItems) داخل كل فاتورة:
+| الحقل | النوع | مطلوب | وصف | مثال | قيود |
+|---|---|---|---|---|---|
+| description | string | نعم | وصف البند | تصوير منتجات | ≤200 حرف |
+| quantity | int | نعم | العدد | 2 | >0 |
+| unitPrice | int | نعم | سعر الوحدة | 240000 | ≥0 |
+| total | int | نعم | المجموع | 480000 | ≥0 |
+
+### 6.8 المدفوعات (Payments)
+> الدفعات اليدوية المرتبطة بالفواتير
+
+| الحقل | النوع | مطلوب | وصف | مثال | قيود |
+|---|---|---|---|---|---|
+| id | string | نعم | معرف الدفعة | pay_abc123 | فريد |
+| invoiceId | string | نعم | معرف الفاتورة | INV-2025-0001 | FK → Invoice |
+| clientId | string | نعم | معرف العميل | cl_123abc | FK → Client |
+| amount | int | نعم | قيمة الدفعة | 308000 | >0 |
+| method | enum | نعم | طريقة الدفع | manual | manual فقط |
+| reference | string | لا | رقم إيصال/مرجع | REC-001 | |
+| receivedAt | timestamp | نعم | تاريخ الاستلام | 2025-08-25T10:30Z | |
+| verifiedBy | string | لا | المدقق | admin@depth-agency.com | |
+| verifiedAt | timestamp | لا | وقت التدقيق | 2025-08-25T11:00Z | |
+| notes | string | لا | ملاحظات | دفعة مقدمة | |
+| createdAt | timestamp | نعم | تاريخ الإنشاء | | |
+| updatedAt | timestamp | نعم | آخر تحديث | | |
+
 ---
 
 ## 7. الكيانات المرجعية والمساعدة
