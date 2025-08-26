@@ -1,0 +1,120 @@
+/* تحسينات خاصة لـ Autocomplete مع دعم LTR للبحث */
+
+/* إصلاح اتجاه البحث ليكون LTR */
+.mantine-Autocomplete-input {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: 'Dubai', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+/* إصلاح خلفية القائمة المنسدلة */
+.mantine-Autocomplete-dropdown {
+  background-color: white !important;
+  border: 1px solid var(--color-neutral-200) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  direction: ltr !important;
+  z-index: 1000 !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* تحسين شكل عناصر القائمة */
+.mantine-Autocomplete-item {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: 'Dubai', sans-serif !important;
+  padding: 8px 12px !important;
+  border-radius: var(--radius-sm) !important;
+  margin: 2px 4px !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+}
+
+/* حالة التحديد والتمرير */
+.mantine-Autocomplete-item[data-selected="true"],
+.mantine-Autocomplete-item:hover {
+  background-color: var(--color-primary-500) !important;
+  color: white !important;
+}
+
+.mantine-Autocomplete-item[data-selected="false"]:hover {
+  background-color: var(--color-primary-50) !important;
+  color: var(--color-primary-700) !important;
+}
+
+/* نص فارغ عندما لا توجد نتائج */
+.mantine-Autocomplete-empty {
+  direction: rtl !important;
+  text-align: center !important;
+  font-family: 'Dubai', sans-serif !important;
+  color: var(--color-neutral-500) !important;
+  padding: 16px !important;
+  font-size: 14px !important;
+}
+
+/* تحسين حالة التركيز */
+.mantine-Autocomplete-input:focus {
+  outline: none !important;
+  border-color: var(--color-primary-500) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* تحسين العنصر النائب (placeholder) */
+.mantine-Autocomplete-input::placeholder {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: 'Dubai', sans-serif !important;
+  color: var(--color-neutral-400) !important;
+}
+
+/* إصلاح الأسهم */
+.mantine-Autocomplete-rightSection {
+  direction: ltr !important;
+}
+
+/* تحسين scrollbar للقائمة المنسدلة */
+.mantine-Autocomplete-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mantine-Autocomplete-dropdown::-webkit-scrollbar-track {
+  background: var(--color-neutral-100);
+  border-radius: 3px;
+}
+
+.mantine-Autocomplete-dropdown::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300);
+  border-radius: 3px;
+}
+
+.mantine-Autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-400);
+}
+
+/* تحسين الأيقونات */
+.mantine-Autocomplete-input + .mantine-Input-rightSection {
+  color: var(--color-neutral-500) !important;
+}
+
+/* حالة الخطأ */
+.mantine-Autocomplete-input[data-invalid="true"] {
+  border-color: var(--color-error-500) !important;
+}
+
+.mantine-Autocomplete-input[data-invalid="true"]:focus {
+  border-color: var(--color-error-500) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* حالة التعطيل */
+.mantine-Autocomplete-input:disabled {
+  background-color: var(--color-neutral-50) !important;
+  color: var(--color-neutral-400) !important;
+  cursor: not-allowed !important;
+}

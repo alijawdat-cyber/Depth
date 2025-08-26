@@ -1,0 +1,61 @@
+/* Menu RTL Support Styles */
+.mantine-Menu-dropdown {
+  direction: rtl !important;
+}
+
+.mantine-Menu-item {
+  direction: rtl !important;
+  text-align: right !important;
+  justify-content: flex-start !important;
+}
+
+.mantine-Menu-itemSection {
+  direction: rtl !important;
+}
+
+.mantine-Menu-itemSection[data-position="left"] {
+  margin-right: var(--space-2) !important;
+  margin-left: 0 !important;
+}
+
+.mantine-Menu-itemSection[data-position="right"] {
+  margin-left: var(--space-2) !important;
+  margin-right: 0 !important;
+}
+
+.mantine-Menu-label {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Menu trigger RTL styles */
+.menu-trigger {
+  direction: rtl !important;
+  flex-direction: row-reverse !important;
+}
+
+.menu-trigger svg {
+  transform: scaleX(-1); /* Flip chevron for RTL */
+}
+
+/* Menu positioning fixes for RTL */
+[data-floating-ui-portal] {
+  direction: rtl;
+}
+
+/* Override Mantine's default positioning for RTL */
+.mantine-Menu-dropdown[data-side="bottom"][data-alignment="start"] {
+  transform-origin: right top !important;
+}
+
+.mantine-Menu-dropdown[data-side="bottom"][data-alignment="end"] {
+  transform-origin: left top !important;
+}
+
+.mantine-Menu-dropdown[data-side="top"][data-alignment="start"] {
+  transform-origin: right bottom !important;
+}
+
+.mantine-Menu-dropdown[data-side="top"][data-alignment="end"] {
+  transform-origin: left bottom !important;
+}

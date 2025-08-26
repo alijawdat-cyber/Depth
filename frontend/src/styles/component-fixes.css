@@ -1,0 +1,212 @@
+/* إصلاحات شاملة لمكونات Storybook */
+
+/* عرض قيمة السلايدر */
+.slider-value-display {
+  margin-top: var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+  font-family: 'Dubai', sans-serif;
+  font-weight: 500;
+}
+
+/* تحسينات السلايدر */
+.mantine-Slider-root {
+  font-family: 'Dubai', sans-serif;
+}
+
+.mantine-Slider-thumb {
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.mantine-Slider-thumb:hover {
+  transform: scale(1.1) !important;
+}
+
+.mantine-Slider-track {
+  cursor: pointer !important;
+}
+
+.mantine-Slider-bar {
+  cursor: pointer !important;
+}
+
+/* إصلاح التقييم RTL */
+.mantine-Rating-root {
+  direction: ltr !important;
+  display: inline-flex !important;
+}
+
+.mantine-Rating-symbolGroup {
+  direction: ltr !important;
+  display: inline-flex !important;
+}
+
+.mantine-Rating-symbol {
+  order: initial !important;
+}
+
+/* إصلاح ترتيب النجوم في RTL */
+.mantine-Rating-root[dir="rtl"] .mantine-Rating-symbolGroup {
+  flex-direction: row-reverse !important;
+}
+
+/* تأكيد اتجاه LTR للتقييم */
+.rating-container {
+  direction: ltr !important;
+  display: inline-block !important;
+}
+
+/* تحسينات الـ Radio */
+.mantine-Radio-body {
+  align-items: center !important;
+}
+
+.mantine-Radio-radio {
+  cursor: pointer !important;
+  position: relative !important;
+}
+
+.mantine-Radio-inner {
+  cursor: pointer !important;
+}
+
+/* تحسينات الـ Progress */
+.mantine-Progress-root {
+  position: relative;
+  overflow: visible !important;
+  min-height: 20px !important;
+}
+
+.mantine-Progress-bar {
+  position: relative !important;
+  min-height: inherit !important;
+}
+
+.mantine-Progress-label {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: var(--fs-xs) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  z-index: 10 !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  line-height: 1 !important;
+}
+
+.mantine-Progress-section {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* إصلاح التداخل في RTL */
+.mantine-Progress-root[dir="rtl"] .mantine-Progress-label {
+  direction: rtl !important;
+  text-align: center !important;
+}
+
+/* تحسين الرؤية للنص */
+.mantine-Progress-label[data-striped="true"] {
+  background: rgba(0, 0, 0, 0.1) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+}
+
+/* تحسينات الـ Popover */
+.mantine-Popover-dropdown {
+  direction: rtl !important;
+  font-family: 'Dubai', sans-serif !important;
+  z-index: 1000 !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+}
+
+.mantine-Popover-arrow {
+  direction: rtl !important;
+}
+
+/* تحسينات الـ MultiSelect */
+.mantine-MultiSelect-input {
+  cursor: pointer !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.mantine-MultiSelect-dropdown {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: 'Dubai', sans-serif !important;
+}
+
+.mantine-MultiSelect-item {
+  direction: rtl !important;
+  text-align: right !important;
+  cursor: pointer !important;
+}
+
+.mantine-MultiSelect-value {
+  direction: rtl !important;
+}
+
+/* تحسينات الـ Skeleton */
+.mantine-Skeleton-root {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  background: linear-gradient(90deg, 
+    var(--color-neutral-200) 25%, 
+    var(--color-neutral-100) 50%, 
+    var(--color-neutral-200) 75%) !important;
+  background-size: 200% 100% !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.mantine-Skeleton-root[data-animate="true"] {
+  animation: skeleton-loading 1.5s ease-in-out infinite !important;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* حالات hover عامة */
+.interactive-component:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* تحسين النصوص العربية */
+.arabic-text {
+  font-family: 'Dubai', sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* مساعدات RTL */
+.rtl-container {
+  direction: rtl;
+  font-family: 'Dubai', sans-serif;
+}
+
+.ltr-container {
+  direction: ltr;
+  font-family: 'Dubai', sans-serif;
+}

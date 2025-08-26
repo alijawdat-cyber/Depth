@@ -34,6 +34,43 @@
   --fs-2xl: 24px; /* عنوان قسم */
   --fs-3xl: 30px; /* هيدر شاشة */
 
+  /* ========== Button Tokens (سائلة) ========== */
+  /* أحجام الخط للأزرار — تكبر شوي مع عرض الشاشة */
+  --fs-btn-sm: clamp(12px, 0.90vw, 14px);
+  --fs-btn-md: clamp(14px, 1.10vw, 16px);
+  --fs-btn-lg: clamp(16px, 1.25vw, 18px);
+
+  /* ارتفاعات الأزرار — تضمن Tap Target ≥ 40/44/48 وتزيد قليلاً على الشاشات الكبيرة */
+  --btn-h-sm: clamp(40px, 4.2vw, 46px);
+  --btn-h-md: clamp(44px, 4.8vw, 52px);
+  --btn-h-lg: clamp(48px, 5.4vw, 56px);
+
+  /* الحشوة الأفقية — تزيد بشكل بسيط مع كِبر الشاشة */
+  --btn-px-sm: clamp(12px, 1.8vw, 16px);
+  --btn-px-md: clamp(16px, 2.2vw, 20px);
+  --btn-px-lg: clamp(20px, 2.6vw, 24px);
+
+  /* ========== Field Tokens (حقول الإدخال) ========== */
+  /* أحجام الخط للحقول — قريبة من النص الأساسي مع تدرّج بسيط */
+  --fs-field-sm: clamp(14px, 1.00vw, 16px);
+  --fs-field-md: clamp(15px, 1.10vw, 17px);
+  --fs-field-lg: clamp(16px, 1.20vw, 18px);
+
+  /* ارتفاعات الحقول — تضمن Tap Target كافية */
+  --field-h-sm: clamp(40px, 4.2vw, 46px);
+  --field-h-md: clamp(44px, 4.8vw, 52px);
+  --field-h-lg: clamp(48px, 5.4vw, 56px);
+
+  /* الحشوة الأفقية */
+  --field-px-sm: clamp(12px, 1.8vw, 16px);
+  --field-px-md: clamp(14px, 2.0vw, 18px);
+  --field-px-lg: clamp(16px, 2.2vw, 20px);
+
+  /* أحجام أيقونات الحقول — تتدرّج مع العرض */
+  --field-icon-sm: clamp(16px, 1.6vw, 20px);
+  --field-icon-md: clamp(18px, 1.8vw, 22px);
+  --field-icon-lg: clamp(20px, 2.0vw, 24px);
+
   /* ========== Spacing (المسافات) ========== */
   --space-1: 4px;  /* تباعد صغير جداً بين أيقونة/نص */
   --space-2: 8px;  /* تباعد صغير */
@@ -69,8 +106,8 @@
 
 /* ========== وضع داكن: نقلب الخلفيات والنصوص ونوازن التباين ========== */
 [data-theme="dark"] {
-  --bg: #0f172a;           /* خلفية داكنة للمحتوى */
-  --bg-secondary: #1e293b; /* أقسام/بطاقات داكنة أفتح شوي */
+  --bg: #181818;           /* خلفية داكنة للمحتوى */
+  --bg-secondary: #282729; /* أقسام/بطاقات داكنة أفتح شوي */
   --text: #f1f5f9;         /* نص واضح على الداكن */
   --text-secondary: #94a3b8; /* نص ثانوي للشرح */
   --border: #334155;       /* حدود بعتمة منخفضة */

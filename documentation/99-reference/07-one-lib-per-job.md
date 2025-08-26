@@ -4,7 +4,8 @@
 
 المعتمد حالياً:
 - Icons: lucide-react عبر `src/components/primitives/Icon.tsx` فقط.
-- UI primitives: Radix UI (Dialog/DropdownMenu/Tabs) — بدون بدائل.
+- UI library (موحدة): Mantine (@mantine/core) — افتراضيًا لكل المكونات.
+- Primitives: يجوز استخدام Radix UI مؤقتًا فقط للحالات الانتقالية قبل النقل الكامل إلى Mantine.
 - Animations: framer-motion.
 - Forms: react-hook-form + zod للتحقق.
 - Data fetching: swr.
