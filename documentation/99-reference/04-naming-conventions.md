@@ -18,7 +18,7 @@
 | المعيار | مثال | ملاحظة |
 |---------|-------|--------|
 | بادئة عامة للواجهة | NEXT_PUBLIC_ | NEXT_PUBLIC_API_URL | فقط ما يحتاج المتصفح |
-| تكامل خارجي | SERVICE_IDENTIFIER | STRIPE_PUBLIC_KEY | وضوح الخدمة |
+| تكامل خارجي | SERVICE_IDENTIFIER | EXTERNAL_SERVICE_KEY | وضوح الخدمة |
 | حساسة | بدون NEXT_PUBLIC_ | JWT_SECRET | لا تُرفع علناً |
 
 ## 4. فروع Git
@@ -48,7 +48,7 @@
 | Sessions | sessions | |
 | Notifications | notifications | |
 | Messages | messages | |
-| Seeds (التعدادات) | seeds | يمكن تفصيلها لاحقاً |
+| Seeds (البيانات الأساسية) | seeds | تُزرع عبر سكربت خارجي |
 
 ## 7. مفاتيح الحقول المشتركة
 | الحقل | الوصف | ملاحظات |

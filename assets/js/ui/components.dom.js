@@ -84,7 +84,7 @@
       '02-database':'قاعدة البيانات','00-data-dictionary':'قاموس البيانات','01-database-schema':'مخطط قاعدة البيانات','02-indexes-and-queries':'الفهارس والاستعلامات',
       '03-api':'واجهات البرمجة','core':'الأساسيات','00-api-conventions':'اتفاقيات API','01-authentication':'المصادقة','02-rate-limiting':'تحديد المعدل','03-websockets':'WebSockets','04-error-handling':'معالجة الأخطاء',
       'features':'المميزات','01-creators':'المبدعون','02-clients':'العملاء','03-projects':'المشاريع','04-pricing':'التسعير','05-storage':'التخزين','06-notifications':'الإشعارات','07-messaging':'المراسلة','08-salaried-employees':'الموظفون',
-      'admin':'الإدارة','01-admin-panel':'لوحة المدير','02-governance':'الحوكمة','03-seeds-management':'إدارة البيانات',
+  'admin':'الإدارة','01-admin-panel':'لوحة المدير','02-governance':'الحوكمة','03-seeds-management':'زرع البيانات',
       'integrations':'التكاملات','01-external-services':'الخدمات الخارجية','02-webhooks':'Webhooks','03-advanced-technical':'التقنيات المتقدمة',
       '04-development':'التطوير','00-getting-started':'دليل المطورين','01-local-setup':'الإعداد المحلي','02-environment-variables':'متغيرات البيئة','03-development-workflow':'سير العمل','04-testing-strategy':'استراتيجية الاختبار',
       '05-mobile':'الجوال','00-mobile-overview':'نظرة عامة - الجوال','06-frontend':'الواجهات','00-frontend-overview':'نظرة عامة - الويب','01-design-tokens':'Design Tokens','02-design-system':'Design System','02-performance-and-a11y':'الأداء وقابلية الوصول','03-component-library':'مكتبة المكونات','04-ux-flows':'UX Flows','05-ui-screens-client':'شاشات العميل','06-ui-screens-admin':'شاشات المدير','07-ui-screens-creator':'شاشات المبدع','08-ui-screens-salaried':'شاشات الموظف',

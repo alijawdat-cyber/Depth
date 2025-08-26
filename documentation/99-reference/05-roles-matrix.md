@@ -55,8 +55,7 @@ CRUD مبسطة:
 | projects.approve | ✔ | ✖ | ✖ | ✖ |
 | pricing.read | ✔ | ✔ (بعد الموافقة) | ✔ (فقط ClientPrice) | ✖ |
 | pricing.update | ✔ | ✖ | ✖ | ✖ |
-| seeds.read | ✔ | ✖ | ✖ | ✖ |
-| seeds.update | ✔ | ✖ | ✖ | ✖ |
+| seeds.apply (script) | ✔ (super_admin/ops خارج الواجهة) | ✖ | ✖ | ✖ |
 | notifications.read | ✔ | ✔ (مُخصّصة) | ✔ (مُخصّصة) | ✔ (مُخصّصة) |
 | messages.read | ✔ | ✔ (محادثات مشارك) | ✔ (محادثات مشارك) | ✔ (محادثات مشارك) |
 | messages.create | ✔ | ✔ | ✔ | ✔ |
@@ -78,7 +77,7 @@ CRUD مبسطة:
 | CREATOR_APPROVED | admin | اعتماد مبدع جديد |
 | CLIENT_APPROVED | admin | اعتماد عميل |
 | ROLE_CHANGED | admin | تغيير دور مستخدم |
-| SEED_MODIFIED | admin | تعديل فئة/سعر أساسي |
+| SEEDS_APPLIED | super_admin/ops | تم تطبيق بذور عبر سكربت خارجي |
 
 ## 7. نموذج JSON للصلاحيات (مثال)
 ```json

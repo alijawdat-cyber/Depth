@@ -405,7 +405,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
     "project": {
       "id": "project_123",
       "title": "تصوير منتجات المطعم الشامي",
-      "status": "IN_PROGRESS",
+  "status": "ACTIVE",
       "budget": {
         "amount": 620000,
         "currency": "IQD"

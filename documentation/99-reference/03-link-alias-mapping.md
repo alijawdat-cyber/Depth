@@ -13,7 +13,7 @@
 | 02b-salaried-employees-api.md | 03-api/features/08-salaried-employees.md | لاحقة b أزيلت |
 | 04-projects-api.md | 03-api/features/03-projects.md | توحيد رقم التسلسل |
 | 05-pricing-api.md | 03-api/features/04-pricing.md | تسعير ضمن features |
-| 14-seeds-management-api.md | 03-api/admin/03-seeds-management.md | نقل إلى admin |
+| 14-seeds-seeding-script.md | 03-api/admin/03-seeds-management.md | سكربت زرع خارجي |
 | data-dictionary-and-domain-model.md | 02-database/00-data-dictionary.md | تم الدمج في ملف موحد |
 
 ## توصيات تطبيق

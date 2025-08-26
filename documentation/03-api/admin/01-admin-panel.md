@@ -243,7 +243,6 @@
           "email": "admin@depth-agency.com",
           "phone": "07719956000"
         },
-        "isSeeded": true,
         "isActive": true,
         "permissions": {
           "canManageUsers": true,
@@ -265,7 +264,6 @@
           "email": "sara@depth-agency.com",
           "phone": "07801234567"
         },
-        "isSeeded": false,
         "isActive": true,
         "addedBy": "sa_001",
         "permissions": {
@@ -524,7 +522,7 @@
         {
           "id": "pay_456def",
           "amount": 312000,
-          "method": "bank_transfer",
+          "method": "manual",
           "date": "2025-08-25T10:30:00.000Z"
         }
       ],
@@ -967,6 +965,19 @@
 }
 ```
 
+### `GET /admin/reports/export`
+توليد وتحميل تقرير بصيغة PDF/Excel.
+
+**المعاملات:**
+- `type`: pdf|excel
+- `report`: projects-summary|business|creators|clients
+- `startDate`, `endDate`: نطاق زمني اختياري
+
+**الاستجابة (200):**
+```json
+{ "success": true, "url": "https://api.depth-agency.com/reports/export/xyz.pdf" }
+```
+
 ### `GET /admin/reports/creators`
 تقرير أداء المبدعين.
 
@@ -1069,7 +1080,7 @@
       "currency": "IQD"
     },
     "business": {
-      "agencyCommission": 20, // نسبة مئوية
+      "agencyMarginPercent": 20, // نسبة موحّدة تؤثر على كل الحسابات
       "minimumProject": 100000,
       "maximumProject": 50000000,
       "paymentTerms": "net_15",
@@ -1099,11 +1110,7 @@
         "enabled": true,
         "status": "connected"
       },
-      "payment": {
-        "providers": ["stripe", "local_banks"],
-        "enabled": true,
-        "status": "connected"
-      }
+  "payment": { "mode": "manual" }
     },
     "security": {
       "twoFactorAuth": true,
@@ -1135,13 +1142,53 @@
 }
 ```
 
+---
+
+## إدارة المشاريع (Endpoints مكملة للشاشات)
+
+### `PUT /admin/projects/{id}/status`
+تغيير حالة المشروع وفق انتقالات معتمدة وRBAC.
+
+**الطلب:**
+```json
+{ "status": "active", "reason": "تمت الموافقة من العميل" }
+```
+
+**استجابات:** 200 عند النجاح؛ 409 إذا انتقال حالة غير مسموح.
+
+### `GET /admin/requests`
+قائمة طلبات المشاريع مع فلاتر.
+
+**المعاملات:** `status`, `page`, `limit`, `search`
+
+**الاستجابة (200):**
+```json
+{ "success": true, "data": { "items": [], "total": 0 }, "pagination": { "page": 1, "limit": 20 } }
+```
+
+---
+
+## المالية (Invoices & Payments)
+> الدفع V2.0 يدوي فقط؛ لا تكامل بوابات.
+
+### `GET /admin/invoices`
+قائمة الفواتير مع فلاتر: `status`, `clientId`, `due=overdue|soon`, `page`, `limit`.
+
+### `POST /admin/invoices`
+إنشاء فاتورة لمشروع.
+
+### `POST /admin/payments/manual-entry`
+إدخال دفعة يدوية مرتبطة بفاتورة.
+
+> تعتمد على مجموعات `invoices` و`payments` المضافة في مخطط قاعدة البيانات.
+
 ### `PUT /admin/settings/business`
 تحديث إعدادات الأعمال.
 
 **الطلب:**
 ```json
 {
-  "agencyCommission": 18,
+  "agencyMarginPercent": 18,
   "minimumProject": 150000,
   "maximumProject": 75000000,
   "paymentTerms": "net_30",
@@ -1157,7 +1204,7 @@
   "success": true,
   "data": {
     "updated": {
-      "agencyCommission": {
+      "agencyMarginPercent": {
         "old": 20,
         "new": 18,
         "effectiveFrom": "2025-10-01T00:00:00.000Z"
@@ -1170,7 +1217,7 @@
     },
     "impactAnalysis": {
       "affectedProjects": 0,
-      "revenueImpact": "-2% commission rate",
+  "revenueImpact": "-2% margin rate",
       "marketCompetitiveness": "+15%"
     }
   },

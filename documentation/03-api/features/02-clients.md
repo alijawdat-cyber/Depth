@@ -338,11 +338,10 @@
         "dueDate": "2025-09-06T10:00:00.000Z",
         "breakdown": {
           "subtotal": 620000,
-          "tax": 0,
           "total": 620000
         },
         "paymentTerms": "صافي 15 يوم",
-        "paymentMethods": ["bank_transfer", "cash"],
+        "paymentMethods": ["manual"],
         "downloadUrl": "https://api.depth-agency.com/invoices/inv_123abc/download"
       }
     ],
@@ -378,7 +377,7 @@ Content-Disposition: attachment; filename="invoice-INV-2025-001234.pdf"
   "invoiceId": "inv_123abc",
   "amount": 620000,
   "currency": "IQD",
-  "paymentMethod": "bank_transfer", // bank_transfer | cash | mobile_wallet
+  "paymentMethod": "manual",
   "reference": "TXN20250826001",
   "notes": "دفع كامل للفاتورة INV-2025-001234",
   "attachments": ["receipt_001.jpg"]
@@ -395,7 +394,7 @@ Content-Disposition: attachment; filename="invoice-INV-2025-001234.pdf"
       "invoiceId": "inv_123abc",
       "amount": 620000,
       "currency": "IQD",
-      "paymentMethod": "bank_transfer",
+  "paymentMethod": "manual",
       "reference": "TXN20250826001",
       "status": "confirmed",
       "processedAt": "2025-08-26T16:30:00.000Z"

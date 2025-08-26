@@ -1,5 +1,5 @@
 const config = {
-  testDir: './tests/visual',
+  testDir: './tests',
   use: {
     baseURL: 'http://localhost:3030',
     viewport: { width: 1280, height: 800 },

@@ -28,6 +28,9 @@
 | sessions | userId ASC, createdAt DESC | تاريخ جلسات المستخدم |
 | reviews | projectId ASC, createdAt DESC | تقييمات المشروع |
 | reviews | revieweeId ASC, rating DESC | تقييمات المبدع/العميل |
+| invoices | status ASC, dueDate DESC | متابعة الاستحقاقات والمتأخر |
+| invoices | clientId ASC, createdAt DESC | فواتير عميل حسب الأحدث |
+| payments | invoiceId ASC, receivedAt DESC | كشف مدفوعات الفاتورة |
 
 > تُضبط عبر Firebase Console أو firestore.indexes.json لاحقاً.
 

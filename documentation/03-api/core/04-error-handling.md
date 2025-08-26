@@ -314,7 +314,7 @@ POST /api/projects/project_123/assign
         {
           "id": "project_789",
           "title": "تصوير حفل زفاف",
-          "status": "in_progress",
+          "status": "active",
           "deadline": "2025-09-05T18:00:00.000Z"
         },
         {

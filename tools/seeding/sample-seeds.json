@@ -1,0 +1,11 @@
+{
+  "categories": [
+    { "id": "photo", "nameAr": "تصوير", "nameEn": "Photo", "code": "photo", "displayOrder": 1, "isActive": true },
+    { "id": "video", "nameAr": "فيديو", "nameEn": "Video", "code": "video", "displayOrder": 2, "isActive": true }
+  ],
+  "subcategories": [
+    { "id": "food", "categoryId": "photo", "nameAr": "طعام", "nameEn": "Food", "code": "food", "basePrice": 380000, "isActive": true },
+    { "id": "portrait", "categoryId": "photo", "nameAr": "بورتريه", "nameEn": "Portrait", "code": "portrait", "basePrice": 120000, "isActive": true },
+    { "id": "reels_30s", "categoryId": "video", "nameAr": "ريلز 30 ثانية", "nameEn": "Reels 30s", "code": "reels_30s", "basePrice": 350000, "isActive": true }
+  ]
+}

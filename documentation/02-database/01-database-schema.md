@@ -34,7 +34,7 @@
   adminLevel: 'super_admin' | 'admin',
   fullName: string,
   phone: string,
-  addedBy: string,                // userId of super_admin who added them (null for seeded admin)
+  addedBy: string,                // userId of super_admin who added them
   addedAt: timestamp,
   permissions: {
     canManageUsers: boolean,      // إدارة المستخدمين
@@ -50,7 +50,7 @@
     verified: boolean,
     verifiedAt: timestamp
   },
-  isSeeded: boolean,              // true للأدمن المزروع
+  // isSeeded: boolean,           // مُلغى في V2.0 — لا نستخدم seeded admins
   isActive: boolean,
   lastLoginAt: timestamp,
   createdAt: timestamp,
@@ -109,7 +109,7 @@
   hasOwnEquipment: boolean,       // true = يملك معدات، false = يستخدم معدات الوكالة
   
   // حالة الانضمام
-  onboardingStatus: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected',
+  onboardingStatus: 'pending' | 'active' | 'completed' | 'approved' | 'rejected',
   onboardingStep: number,         // 1-5
   
   // الإحصائيات
@@ -123,7 +123,6 @@
   responseTimeHours: number,
   
   // المالية (أساسية فقط - التفاصيل في جدول منفصل)
-  taxId: string,
   
   // التواريخ
   createdAt: timestamp,
@@ -153,7 +152,6 @@
     city: string,
     postalCode: string
   },
-  taxId: string,
   preferredLanguage: 'ar' | 'en',
   paymentTerms: 'advance_50' | 'advance_100' | 'net_30',
   
@@ -476,6 +474,54 @@
 ```
 
 ### 21. مجموعة أكواد التحقق (otpCodes)
+### 22. مجموعة الفواتير (invoices)
+```javascript
+{
+  id: string,                   // معرف الفاتورة (PK) INV-2025-0001
+  projectId: string,            // FK → projects
+  clientId: string,             // FK → clients
+  number: string,               // رقم تسلسلي قابل للبحث
+  status: 'draft'|'issued'|'partially_paid'|'paid'|'overdue'|'cancelled',
+  currency: 'IQD',
+  amount: {
+    subtotal: number,
+    tax: 0,                     // V2.0: ضرائب خارج النطاق → صفر دائماً
+    discount: number,           // خصم اختياري بالقيمة
+    total: number
+  },
+  dueDate: date,
+  issuedAt: timestamp,
+  notes: string,
+  lineItems: [{
+    description: string,
+    quantity: number,
+    unitPrice: number,
+    total: number
+  }],
+  paymentTerms: 'advance_50'|'advance_100'|'net_15'|'net_30',
+  relatedPaymentsCount: number,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 23. مجموعة المدفوعات (payments)
+```javascript
+{
+  id: string,                   // معرف الدفعة (PK) pay_abc123
+  invoiceId: string,            // FK → invoices
+  clientId: string,             // FK → clients
+  amount: number,
+  method: 'manual',             // V2.0 يدوي فقط
+  reference: string,            // رقم إيصال/ملاحظة
+  receivedAt: timestamp,        // تاريخ الاستلام الفعلي
+  verifiedBy: string,           // admin email
+  verifiedAt: timestamp,
+  notes: string,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
 ```javascript
 {
   id: string,                     // معرف الكود (PK)

@@ -48,14 +48,14 @@
   <div class="screen-header"><button class="back-btn">☰</button><h3>مشاريعي</h3><button class="close-btn">⚙️</button></div>
   <div class="screen-content dashboard">
     <div class="kpis">
-      <div class="kpi"><div class="title">قيد التنفيذ</div><div class="value">2</div></div>
+  <div class="kpi"><div class="title">نشط</div><div class="value">2</div></div>
       <div class="kpi"><div class="title">بانتظار</div><div class="value">1</div></div>
       <div class="kpi"><div class="title">مكتمل</div><div class="value">8</div></div>
       <div class="kpi"><div class="title">تقييم</div><div class="value">4.8/5</div></div>
     </div>
     <h4 style="margin:14px 0 8px">المشاريع</h4>
     <div class="project-list">
-      <div class="project-card"><div><strong>#p_123</strong> — 🔄 قيد التنفيذ</div><div>📷 تصوير منتجات — التسليم: 2/سبتمبر</div><div class="progress" style="--p:68%"><div class="bar"></div></div></div>
+  <div class="project-card"><div><strong>#p_123</strong> — 🔄 نشط</div><div>📷 تصوير منتجات — التسليم: 2/سبتمبر</div><div class="progress" style="--p:68%"><div class="bar"></div></div></div>
       <div class="project-card"><div><strong>#p_122</strong> — ⏳ بانتظار</div><div>🎬 فيديو دعائي — ينتظر المصادر</div><div class="progress" style="--p:20%"><div class="bar"></div></div></div>
     </div>
   </div>

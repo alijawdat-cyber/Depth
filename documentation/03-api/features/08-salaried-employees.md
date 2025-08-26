@@ -167,7 +167,7 @@
 جلب مهام الموظف.
 
 **معاملات الاستعلام:**
-- `status`: pending|in_progress|completed|overdue
+- `status`: pending|active|completed|overdue
 - `priority`: low|medium|high|urgent
 - `date_from`: تاريخ البداية
 - `date_to`: تاريخ النهاية
@@ -186,7 +186,7 @@
         "category": "photography",
         "subcategory": "food",
         "priority": "high",
-        "status": "in_progress",
+  "status": "active",
         "assignedBy": "admin@depth-agency.com",
         "assignedAt": "2025-08-20T10:00:00.000Z",
         "dueDate": "2025-08-23T17:00:00.000Z",
@@ -212,7 +212,7 @@
     "summary": {
       "total": 12,
       "pending": 3,
-      "in_progress": 4,
+  "active": 4,
       "completed": 4,
       "overdue": 1
     }

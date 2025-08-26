@@ -99,9 +99,7 @@ const roles = {
 const piiFields = [
   'phoneNumber',
   'nationalId', 
-  'bankAccountNumber',
-  'iban',
-  'taxId',
+  // الحقول المالية/الضريبية خارج النطاق الحالي
   'passportNumber'
 ];
 
@@ -119,7 +117,7 @@ class PIIEncryption {
 
 ### Data Retention Policy
 - **User Data**: Retained until account deletion + 30 days
-- **Project Data**: 7 years for tax compliance
+// الاحتفاظ الضريبي غير مطبق ضمن النطاق الحالي
 - **Logs**: 90 days for security logs, 30 days for application logs
 - **Backups**: 1 year retention with quarterly rotation
 
@@ -314,11 +312,6 @@ const securityLogger = {
 - **Data Portability**: Export user data in machine-readable format
 - **Consent Management**: Clear opt-in/opt-out mechanisms
 
-### PCI DSS (Payment Card Industry)
-- **Secure Payment Processing**: Never store card details
-- **Stripe Integration**: PCI-compliant payment processing
-- **Tokenization**: Use tokens instead of sensitive data
-- **Network Segmentation**: Isolate payment processing
 
 ### SOC 2 Type II
 - **Security**: Logical and physical access controls

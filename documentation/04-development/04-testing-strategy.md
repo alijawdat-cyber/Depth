@@ -74,8 +74,8 @@ describe('calculateCreatorPrice', () => {
 | حساب تسعير مشروع وتصعيد هامش | create project → compute price → set margin |
 
 ## 8. بيانات الاختبار (Test Data)
-- توليد بيانات مؤقتة باستخدام Seeds مخصصة.
-- تنظيف بعد الاختبار (teardown) أو استخدام Emulators.
+- استخدم سكربت الزرع الخارجي مع ملفات JSON لتهيئة البيانات الأساسية (idempotent) بدون المرور عبر الواجهة.
+- لبيانات مؤقتة داخل الاختبارات، أنشئها برمجياً ضد الـ Emulator ثم نظّفها في teardown.
 
 ## 9. منع التداخل (Test Isolation)
 - لكل Suite قاعدة بيانات Emulator جديدة إن أمكن.

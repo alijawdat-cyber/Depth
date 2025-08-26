@@ -79,13 +79,10 @@ npm run test:coverage
 ```bash
 # Start Firebase emulators
 npm run firebase:emulators
-
-# Seed initial data
-npm run db:seed
-
-# Reset database
-npm run db:reset
 ```
+
+- بيانات البداية: شغّل سكربت الزرع الخارجي على بيئة التطوير (Firestore Emulator أو مشروع الاختبار) باستخدام ملف JSON للبذور.
+- إذا تحتاج إعادة تهيئة، امسح بيانات Firestore Emulator ثم أعد تشغيل سكربت الزرع (idempotent، ما يكرر).
 
 ## إعداد بيئة التطوير المتكاملة (IDE Setup) - VS Code
 

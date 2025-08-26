@@ -16,7 +16,11 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className="antialiased">
         <ThemeProvider defaultTheme="system">
-          {children}
+          <div className="min-h-dvh bg-[var(--color-bg-surface)] text-[var(--color-fg-primary)]">
+            <main className="mx-auto max-w-screen-xl px-[var(--space-4)] py-[var(--space-6)]">
+              {children}
+            </main>
+          </div>
         </ThemeProvider>
       </body>
     </html>

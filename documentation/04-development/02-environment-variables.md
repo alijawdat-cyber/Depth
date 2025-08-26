@@ -45,10 +45,7 @@ TWILIO_ACCOUNT_SID=ACyour_twilio_sid
 TWILIO_AUTH_TOKEN=your_twilio_token
 TWILIO_PHONE_NUMBER=+1234567890
 
-# بوابة الدفع (Payment Gateway)
-STRIPE_PUBLIC_KEY=pk_test_your_stripe_key
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+# الدفع داخل النظام يدوي حالياً (Manual). لا توجد مفاتيح لبوابات دفع في V2.0.
 ```
 
 ### Database & Cache
@@ -143,7 +140,6 @@ cp .env.example .env.local
 - **Google Maps**: Enable Maps & Places APIs
 - **Resend**: Sign up for email service
 - **Twilio**: Setup SMS service
-- **Stripe**: Create payment account
 
 ## Validation
 

@@ -25,7 +25,7 @@
     if (has('salaried') || has('الموظ')) return 'employees';
     if (has('admin-panel') || has('لوحة')) return 'dashboard';
     if (has('governance') || has('الحوكمة')) return 'governance';
-    if (has('seeds') || has('إدارة البيانات')) return 'seeds';
+  if (has('seeds') || has('زرع البيانات') || has('إدارة البيانات')) return 'seeds';
     if (has('external-services')) return 'plug';
     if (has('webhooks')) return 'webhook';
     if (has('advanced')) return 'flask';

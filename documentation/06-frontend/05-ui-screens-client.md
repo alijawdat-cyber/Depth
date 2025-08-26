@@ -151,7 +151,7 @@
                     </div>
                     <div class="kpi-content">
                         <div class="kpi-value">2</div>
-                        <div class="kpi-label">قيد التنفيذ</div>
+                        <div class="kpi-label">نشط</div>
                         <div class="kpi-change">
                             <span>← مستقر</span>
                         </div>
@@ -197,7 +197,7 @@
                     <div class="project-card interactive">
                         <div class="project-header">
                             <span class="project-id">#DP2025-0142</span>
-                            <span class="project-status status-active">🔄 قيد التنفيذ</span>
+                            <span class="project-status status-active">🔄 نشط</span>
                         </div>
                         <div class="project-body">
                             <h3 class="project-title">📷 تصوير حفل زفاف</h3>
@@ -318,7 +318,7 @@
         <div class="mini-kpi-scroll">
             <div class="mini-kpi">
                 <div class="mini-kpi-value">2</div>
-                <div class="mini-kpi-label">قيد التنفيذ</div>
+                <div class="mini-kpi-label">نشط</div>
             </div>
             <div class="mini-kpi">
                 <div class="mini-kpi-value">12</div>
@@ -1083,7 +1083,7 @@
                 </div>
                 <div class="status-content">
                     <div class="status-label">الحالة الحالية</div>
-                    <div class="status-value">قيد التنفيذ</div>
+                    <div class="status-value">نشط</div>
                 </div>
             </div>
             
@@ -1413,7 +1413,7 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">طريقة الدفع:</span>
-                            <span class="detail-value">تحويل بنكي</span>
+                            <span class="detail-value">دفع يدوي</span>
                         </div>
                     </div>
                     <div class="invoice-amount paid">

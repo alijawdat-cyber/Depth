@@ -383,7 +383,7 @@
     "project": {
       "id": "p_123abc",
       "title": "تصوير منتجات المطعم - الدفعة الأولى",
-      "status": "in_progress",
+  "status": "active",
       "phase": "production",
       "progress": {
         "percentage": 65,
@@ -416,13 +416,13 @@
         {
           "id": "ms_2",
           "name": "المعالجة والتعديل",
-          "status": "in_progress",
+          "status": "active",
           "scheduledDate": "2025-08-30T12:00:00.000Z",
           "progress": 70,
           "deliverables": [
             {
               "name": "صور معدلة",
-              "status": "in_progress",
+              "status": "active",
               "completed": 14,
               "total": 20
             }

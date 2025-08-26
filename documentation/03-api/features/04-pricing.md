@@ -34,17 +34,17 @@
 {
   "creatorExperienceLevels": {
     "fresh": {
-      "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "description": "مبدعون جدد (أقل من 10 مشاريع)",
       "incentive": "هامش منخفض لتشجيع البدء"
     },
     "experienced": {
-      "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "description": "مبدعون متوسطون (10-50 مشروع)",
       "factors": ["جودة العمل", "تقييم العملاء", "الالتزام بالمواعيد"]
     },
     "expert": {
-      "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "description": "خبراء معتمدون (50+ مشروع)",
       "benefits": ["أولوية في المشاريع", "دعم تسويقي"]
     }
@@ -88,22 +88,22 @@
   "projectValueTiers": {
     "micro": {
       "range": "0-500,000 IQD",
-  "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "rationale": "مشاريع صغيرة، هامش منخفض لتعزيز الحجم"
     },
     "small": {
       "range": "500,000-1,500,000 IQD", 
-  "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "rationale": "المجال الأساسي للعمل"
     },
     "medium": {
       "range": "1,500,000-5,000,000 IQD",
-  "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "rationale": "مشاريع متوسطة تتطلب إدارة أكثر"
     },
     "large": {
       "range": "5,000,000+ IQD",
-  "agencyFeeRange": "10-50%",
+  "agencyMarginPercentRange": "10-50%",
       "rationale": "مشاريع كبيرة بدعم شامل ومخاطر أعلى"
     }
   }
@@ -143,7 +143,7 @@
     "baseProjectValue": 1000000,
     "creator": {
       "level": "expert",
-      "baseAgencyFee": "25%"
+  "baseAgencyMarginPercent": "25%"
     },
     "projectModifiers": {
       "complexity": "complex (+10%)",
@@ -153,13 +153,13 @@
     "calculation": {
       "basePercentage": 25,
       "modifiers": 20,
-      "finalAgencyFee": 45,
-      "cappedAt": 50,
-      "appliedFee": "45%"
+  "finalAgencyMarginPercent": 45,
+  "cappedAt": 50,
+  "appliedMarginPercent": "45%"
     },
     "breakdown": {
       "creatorEarnings": 550000,
-      "agencyFee": 450000,
+  "agencyMarginAmount": 450000,
       "totalProjectValue": 1000000
     }
   }
@@ -611,7 +611,7 @@
           "included": 2,
           "additional": 35000
         },
-        "agencyFee": {
+  "agencyMargin": {
           "type": "variable",
           "range": "10-50%",
           "minimum": 0.10, // 10% أقل قيمة
@@ -800,7 +800,7 @@
         }
       },
       "subtotal": 682450,
-      "agencyFee": {
+  "agencyMargin": {
         "basePercentage": 20,
         "modifiers": {
           "creatorLevel": "expert (+5%)",
@@ -939,7 +939,7 @@
       "locationFee": 50000,
       "addons": 120000,
       "subtotal": 550000,
-      "agencyFee": {
+  "agencyMargin": {
         "calculation": {
           "basePercentage": 20,
           "modifiers": {
@@ -1068,7 +1068,7 @@
 {
   "clientSignature": "محمد أحمد السوري",
   "acceptanceDate": "2025-08-27T14:00:00.000Z",
-  "paymentMethod": "bank_transfer", // bank_transfer | cash | installments
+  "paymentMethod": "manual", // manual فقط في هذه النسخة
   "depositAmount": 308000, // 50% مقدم
   "specialRequests": "يرجى التنسيق مع مدير المطعم قبل الوصول",
   "contactPreference": "whatsapp",
@@ -1168,7 +1168,7 @@
       "amount": 34425
     }
   ],
-  "tax": 0,
+  // tax: — خارج النطاق
   "total": 654075,
   "paidDeposit": 327038,
   "amountDue": 327037,
@@ -1191,24 +1191,7 @@
       "currency": "IQD",
       "issuedAt": "2025-09-03T15:00:00.000Z",
       "dueDate": "2025-09-15T23:59:59.000Z",
-      "paymentMethods": [
-        {
-          "type": "bank_transfer",
-          "details": {
-            "bankName": "بنك بغداد",
-            "accountNumber": "****1234",
-            "accountName": "Depth Creative Agency",
-            "iban": "IQ98BBAG****"
-          }
-        },
-        {
-          "type": "mobile_wallet",
-          "details": {
-            "provider": "FastPay",
-            "number": "07901234567"
-          }
-        }
-      ],
+  "paymentMethods": ["manual"],
       "downloadUrl": "https://api.depth-agency.com/invoices/inv_123abc/download",
       "clientPortalUrl": "https://client.depth-agency.com/invoices/inv_123abc"
     }
@@ -1238,7 +1221,7 @@
         {
           "id": "payment_123",
           "amount": 308000,
-          "method": "bank_transfer",
+          "method": "manual",
           "reference": "TXN20250905001",
           "processedAt": "2025-09-05T11:30:00.000Z",
           "status": "confirmed",
@@ -1271,16 +1254,16 @@
   "invoiceId": "inv_123abc",
   "amount": 308000,
   "currency": "IQD",
-  "paymentMethod": "bank_transfer",
+  "paymentMethod": "manual",
   "transactionReference": "TXN20250905001",
   "paidAt": "2025-09-05T11:30:00.000Z",
   "verificationDocuments": [
     {
-      "type": "bank_receipt",
+  "type": "receipt",
       "url": "https://api.depth-agency.com/uploads/receipt_001.jpg"
     }
   ],
-  "notes": "دفع كامل للفاتورة عبر التحويل البنكي",
+  "notes": "دفع يدوي خارج النظام (فاتورة/عقد/كاش)",
   "verifiedBy": "finance@depth-agency.com"
 }
 ```
@@ -1372,9 +1355,9 @@
           "name": "فاطمة الزهراء",
           "revenue": 3280000,
           "projects": 7,
-          "commission": 2542400, // 77.5% للمبدع (متوسط)
-          "agencyFee": 737600, // 22.5% متوسط هامش الوكالة المتغير
-          "agencyFeeRange": "10-50%",
+          "creatorEarnings": 2542400,
+          "agencyMargin": 737600,
+          "agencyMarginPercentRange": "10-50%",
           "averageAgencyRate": "22.5%"
         },
         {
@@ -1382,9 +1365,9 @@
           "name": "أحمد محمد الربيعي", 
           "revenue": 2940000,
           "projects": 6,
-          "commission": 2205000, // 75% للمبدع
-          "agencyFee": 735000, // 25% متوسط هامش الوكالة
-          "agencyFeeRange": "10-50%",
+          "creatorEarnings": 2205000,
+          "agencyMargin": 735000,
+          "agencyMarginPercentRange": "10-50%",
           "averageAgencyRate": "25%"
         }
       ],
@@ -1429,7 +1412,7 @@
     },
     "profitability": {
       "grossRevenue": 15680000,
-      "creatorCommissions": 12544000, // 80%
+  "creatorPayouts": 12544000, // 80%
       "operatingExpenses": 850000,
       "netProfit": 2286000,
       "profitMargin": "14.6%"
@@ -1463,7 +1446,7 @@
           "totalRevenue": 3280000,
           "projects": 7,
           "averageProjectValue": 468571,
-          "commission": 2624000,
+          "creatorPayout": 2624000,
           "rating": 4.9,
           "repeatClientRate": "71%",
           "onTimeDelivery": "100%"
@@ -1484,7 +1467,7 @@
           "totalRevenue": 2940000,
           "projects": 6,
           "averageProjectValue": 490000,
-          "commission": 2352000,
+          "creatorPayout": 2352000,
           "rating": 4.7,
           "repeatClientRate": "67%",
           "onTimeDelivery": "96%"
@@ -1495,13 +1478,13 @@
       "photo": {
         "activeCreators": 8,
         "totalRevenue": 9840000,
-        "averageCommission": 410000,
+  "averageCreatorPayout": 410000,
         "competitionLevel": "high"
       },
       "video": {
         "activeCreators": 4,
         "totalRevenue": 4200000,
-        "averageCommission": 840000,
+  "averageCreatorPayout": 840000,
         "competitionLevel": "medium"
       }
     },

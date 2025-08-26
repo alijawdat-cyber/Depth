@@ -130,7 +130,7 @@ socket.emit('project:join', { projectId });
 // تحديث حالة المشروع
 socket.emit('project:statusUpdate', {
   projectId,
-  status: 'in_progress',
+  status: 'active',
   updatedBy: userId,
 });
 

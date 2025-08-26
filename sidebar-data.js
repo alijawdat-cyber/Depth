@@ -54,7 +54,7 @@ const sidebarData = [
         items: [
             { name: 'لوحة المدير', path: '/documentation/03-api/admin/01-admin-panel' },
             { name: 'الحوكمة', path: '/documentation/03-api/admin/02-governance' },
-            { name: 'إدارة البيانات', path: '/documentation/03-api/admin/03-seeds-management' }
+            { name: 'زرع البيانات', path: '/documentation/03-api/admin/03-seeds-management' }
         ]
     },
     {

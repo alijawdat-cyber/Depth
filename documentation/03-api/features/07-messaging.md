@@ -339,7 +339,7 @@
     "project": {
       "id": "p_123abc",
       "title": "تصوير منتجات المطعم - الدفعة الأولى",
-      "status": "in_progress"
+  "status": "active"
     },
     "timeline": [
       {

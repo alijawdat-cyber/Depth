@@ -193,7 +193,6 @@ chore: مهام صيانة
 ## 📦 مكتبات ومراجع إضافية (Placeholder)
 
 ### مكتبات الدفع (Payment Libraries)
-- **Stripe**: [stripe.com/docs](https://stripe.com/docs) — *محدد للسوق الدولي*
 - **PayPal**: [developer.paypal.com](https://developer.paypal.com) — *تحت المراجعة*
 - **مكتبة الدفع المحلية**: TBD — *للسوق العراقي*
 

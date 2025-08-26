@@ -555,7 +555,7 @@
           "role": "creator"
         },
         "details": {
-          "previousStatus": "in_progress",
+          "previousStatus": "active",
           "newStatus": "completed",
           "deliverables": 45,
           "clientNotified": true,
@@ -1000,7 +1000,7 @@
       {
         "id": "backup_20250902_manual",
         "type": "manual",
-        "status": "in_progress",
+  "status": "active",
         "createdAt": "2025-09-02T20:00:00.000Z",
         "estimatedCompletion": "2025-09-02T20:30:00.000Z",
         "progress": 67,

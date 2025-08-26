@@ -42,7 +42,8 @@ const config = {
   },
 
   docs: {
-    autodocs: 'tag'
+    autodocs: 'tag',
+    defaultName: 'Docs',
   }
 };
 
