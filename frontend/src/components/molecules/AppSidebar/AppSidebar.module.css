@@ -1,16 +1,17 @@
 /* الشريط الجانبي الأساسي */
 .sidebar {
   position: fixed;
-  top: 0;
-  right: 0; /* RTL - الشريط الجانبي على اليمين */
-  height: 100vh;
+  top: 60px; /* تحت الهدر */
+  inset-inline-start: 0; /* RTL - على اليمين */
+  height: calc(100vh - 60px);
   width: var(--sidebar-width, 280px);
   background: var(--color-surface-container);
-  border-left: 1px solid var(--color-outline-variant);
+  border-inline-end: 1px solid var(--color-outline-variant); /* RTL - حد من جهة النهاية */
   box-shadow: var(--shadow-lg);
+  /* يبدأ خارج الشاشة يمين (استخدم translateX(100%) ليتحرك من جهة البداية RTL) */
   transform: translateX(100%);
   transition: transform 0.3s ease-in-out;
-  z-index: var(--z-sidebar, 1000);
+  z-index: var(--z-sidebar, 1200);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -53,8 +54,8 @@
 }
 
 .groupChildren {
-  padding-right: var(--space-lg); /* RTL - مسافة من اليمين */
-  border-right: 2px solid var(--color-outline-variant); /* RTL - خط من اليمين */
+  padding-inline-end: var(--space-lg); /* RTL - مسافة من جهة النهاية */
+  border-inline-end: 2px solid var(--color-outline-variant); /* RTL - خط من جهة النهاية */
 }
 
 /* عناصر القائمة */
@@ -81,18 +82,18 @@
   background-color: var(--color-primary-container) !important;
   color: var(--color-on-primary-container) !important;
   font-weight: 600 !important;
-  border-right: 3px solid var(--color-primary) !important; /* RTL - خط من اليمين */
+  border-inline-end: 3px solid var(--color-primary) !important; /* RTL - خط من جهة النهاية */
 }
 
 .menuItem.childItem {
-  padding-right: var(--space-xl) !important; /* RTL - مسافة أكبر من اليمين */
+  padding-inline-end: var(--space-xl) !important; /* RTL - مسافة أكبر من جهة النهاية */
   font-size: var(--font-size-sm);
 }
 
 /* شارات العدد والحالة */
 .badge {
   background: var(--color-primary);
-  color: var(--color-on-primary);
+  color: var(--color-white); /* لون فاتح دائماً للوضوح */
   font-size: var(--font-size-xs);
   font-weight: 600;
   padding: 2px 8px;
@@ -101,7 +102,7 @@
   min-width: 18px;
   text-align: center;
   position: absolute;
-  left: 8px; /* RTL - من اليسار */
+  inset-inline-end: 8px; /* RTL - من جهة النهاية (اليمين في العربي) */
   top: 50%;
   transform: translateY(-50%);
   box-shadow: var(--shadow-sm);
@@ -109,29 +110,21 @@
 
 .badge.badgeNew {
   background: var(--color-tertiary);
-  color: var(--color-on-tertiary);
+  color: var(--color-white); /* لون فاتح للوضوح في جميع الأحوال */
   animation: pulse 2s infinite;
 }
 
 /* الغطاء للجوال */
-.overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: var(--z-overlay, 999);
-}
+/* overlay محذوف: صار موجود ضمن AdminLayout كـ .mobileOverlay */
 
 /* تحريك الصفحة عند فتح الشريط الجانبي */
 @media (min-width: 768px) {
   .sidebar {
-    position: relative;
-    transform: none;
-    border-left: none;
-    box-shadow: none;
+  position: fixed; /* يبقى ثابت يمين ويدفع المحتوى */
+  transform: none;
+  inset-inline-start: 0;
+  border-inline-end: 1px solid var(--color-outline-variant);
+  box-shadow: none;
   }
 
   .sidebar.open {
@@ -142,13 +135,13 @@
 /* التصميم المتجاوب */
 @media (max-width: 767px) {
   .sidebar {
-    width: 100%;
-    max-width: 320px;
+  width: 100%;
+  max-width: 320px;
+  top: 0; /* يغطي الهدر */
+  height: 100vh; /* يغطي الصفحة كاملة */
   }
 
-  .overlay {
-    display: block;
-  }
+  /* overlay محذوف */
 
   .menuItem {
     min-height: 48px; /* أزرار أكبر للجوال */
@@ -189,11 +182,13 @@
 @media (prefers-color-scheme: dark) {
   .sidebar {
     background: var(--color-surface-dim);
-    border-left-color: var(--color-outline);
+    border-inline-start-color: var(--color-outline);
   }
   
   .badge {
     box-shadow: 0 0 0 1px var(--color-outline);
+    /* التأكد من اللون الفاتح في الوضع الليلي أيضاً */
+    color: var(--color-white) !important;
   }
 }
 

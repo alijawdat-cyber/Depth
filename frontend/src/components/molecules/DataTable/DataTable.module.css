@@ -140,11 +140,11 @@
 }
 
 .cell:first-child {
-  border-right: none;
+  border-inline-end: none;
 }
 
 .cell:last-child {
-  border-left: none;
+  border-inline-start: none;
 }
 
 /* ===== PAGINATION SECTION ===== */

@@ -1,0 +1,71 @@
+/* AdminLayout Styles */
+.adminShell {
+  font-family: var(--font-ar);
+  direction: rtl;
+}
+
+.mainContent {
+  background-color: var(--bg);
+  min-height: calc(100vh - 60px);
+  padding: var(--space-6);
+}
+
+/* دفع المحتوى بالديسكتوب بعرض السايدبار (يُستخدم فقط على >=768px من خلال JSX) */
+.mainContentDesktopPushed {
+  padding-inline-start: calc(var(--sidebar-width, 280px) + var(--space-6));
+}
+
+/* تخصيصات للتجاوب */
+@media (max-width: 767px) {
+  .mainContent {
+    padding: var(--space-4);
+  }
+}
+
+/* تخصيصات للوضع الليلي */
+[data-theme="dark"] .adminShell {
+  background-color: var(--bg);
+}
+
+/* تحسينات إضافية */
+.adminShell .mantine-AppShell-main {
+  background-color: var(--bg);
+}
+
+.adminShell .mantine-AppShell-navbar {
+  background-color: var(--color-surface-container);
+  border-inline-end: 1px solid var(--color-outline-variant);
+}
+
+.adminShell .mantine-AppShell-header {
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+/* Mobile overlay for sidebar */
+.mobileOverlay {
+  position: fixed;
+  top: 0; /* يغطي الهدر */
+  left: 0;
+  width: 100vw;
+  height: 100vh; /* يغطي الصفحة كاملة */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1150; /* فوق الهدر وتحت السايدبار */
+  cursor: pointer;
+}
+
+/* قفل السكرول لما السايدبار مفتوح على الموبايل */
+.isSidebarOpen {
+  overflow: hidden;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+  .adminShell .mantine-AppShell-main {
+    position: relative;
+  }
+  
+  .adminShell .mantine-AppShell-navbar {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+}

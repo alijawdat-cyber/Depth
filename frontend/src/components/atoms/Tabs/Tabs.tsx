@@ -101,7 +101,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
             borderColor: variant !== 'pills' ? 'var(--color-primary)' : 'transparent',
           },
 
-          '&[data-disabled]': {
+          '&:disabled': {
             color: 'var(--color-fg-secondary)',
             opacity: 0.5,
             cursor: 'not-allowed',

@@ -11,6 +11,37 @@
   --color-primary-600: #4A1FC9; /* درجة أغمق: hover/focus للأزرار الأساسية */
   --color-alternate: #3E5BFF; /* بديل ثانوي: وسائل إبراز ثانوية، Badges */
 
+  /* ========== Extended Colors (ألوان إضافية) ========== */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-success: #16a34a;
+  --color-success-subtle: #dcfce7;
+  --color-warning: #ea580c;
+  --color-warning-subtle: #fed7aa;
+  --color-error: #dc2626;
+  --color-error-subtle: #fee2e2;
+  --color-info: #0891b2;
+  --color-info-subtle: #cffafe;
+  
+  /* ========== Additional Semantic Colors (ألوان دلالية إضافية) ========== */
+  --color-bg-subtle: #f8fafc;
+  --color-border-subtle: #e2e8f0;
+  --color-fg-tertiary: #94a3b8;
+  
+  /* ========== Depth System Colors (للتوافق مع المكونات القديمة) ========== */
+  --depth-primary: var(--color-primary);
+  --depth-text-primary: var(--text);
+  --depth-border: var(--border);
+  --depth-surface-hover: var(--bg-secondary);
+  --depth-success: var(--color-success);
+  --depth-success-subtle: var(--color-success-subtle);
+  --depth-warning: var(--color-warning);
+  --depth-warning-subtle: var(--color-warning-subtle);
+  --depth-error: var(--color-error);
+  --depth-error-subtle: var(--color-error-subtle);
+  --depth-info: var(--color-info);
+  --depth-info-subtle: var(--color-info-subtle);
+
   /* ========== Base (خلفيات/نصوص/حدود) — وضع فاتح ========== */
   --bg: #ffffff; /* خلفية الصفحة الرئيسية */
   --bg-secondary: #f8f9fa; /* خلفية مساحات ثانوية: بطاقات، أقسام */

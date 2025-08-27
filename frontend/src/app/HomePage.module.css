@@ -1,0 +1,88 @@
+/* Home Page Styles */
+.homeContainer {
+  min-height: 100vh;
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+}
+
+.titleGradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.roleCard {
+  height: 100%;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.roleCard:hover {
+  box-shadow: var(--shadow-xl);
+  transform: scale(1.02);
+}
+
+.iconBox {
+  color: var(--color-danger);
+}
+
+.iconBox.blue {
+  color: var(--color-primary);
+}
+
+.iconBox.green {
+  color: var(--color-success);
+}
+
+.iconBox.orange {
+  color: var(--color-warning);
+}
+
+.iconBox.red {
+  color: var(--color-danger);
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-danger);
+}
+
+.featureDot.blue {
+  background-color: var(--color-primary);
+}
+
+.featureDot.green {
+  background-color: var(--color-success);
+}
+
+.featureDot.orange {
+  background-color: var(--color-warning);
+}
+
+.featureDot.red {
+  background-color: var(--color-danger);
+}
+
+/* تجاوب للجوال */
+@media (max-width: 768px) {
+  .titleGradient {
+    font-size: 2.5rem;
+  }
+}
+
+/* الوضع الليلي */
+[data-theme="dark"] .roleCard {
+  background: var(--color-bg-card);
+  border-color: var(--color-border-subtle);
+}
+
+[data-theme="dark"] .homeContainer {
+  background: var(--color-bg-surface);
+  color: var(--color-fg-primary);
+}

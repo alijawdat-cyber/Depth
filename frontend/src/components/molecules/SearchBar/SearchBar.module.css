@@ -51,7 +51,7 @@
 .filterBadge {
   position: absolute;
   top: -6px;
-  left: -6px; /* RTL - من اليسار */
+  inset-inline-start: -6px; /* RTL - من جهة البداية */
   background: var(--color-error);
   color: var(--color-on-error);
   font-size: 10px;

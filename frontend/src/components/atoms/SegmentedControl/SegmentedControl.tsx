@@ -97,11 +97,11 @@ export const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedContro
             fontWeight: 'var(--fw-semibold)',
           },
           
-          '&:hover:not([data-active]):not([data-disabled])': {
+          '&:hover:not([data-active]):not(:disabled)': {
             backgroundColor: 'var(--color-neutral-50)',
           },
           
-          '&[data-disabled]': {
+          '&:disabled': {
             opacity: 0.5,
             cursor: 'not-allowed',
           },

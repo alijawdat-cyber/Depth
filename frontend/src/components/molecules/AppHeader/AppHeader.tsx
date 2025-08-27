@@ -32,8 +32,8 @@ export interface AppHeaderProps {
   actions?: React.ReactNode;
   /** إخفاء زر القائمة */
   hideBurger?: boolean;
-  /** Loading state */
-  loading?: boolean;
+  /** حالة فتح السايدبار لعرض حالة البورغر */
+  burgerOpened?: boolean;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -49,7 +49,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onLogout,
   actions,
   hideBurger = false,
-  loading = false,
+  burgerOpened = false,
 }) => {
   return (
     <div className={styles.appHeader}>
@@ -57,7 +57,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <Group gap="md">
         {!hideBurger && (
           <Burger
-            opened={false}
+            opened={burgerOpened}
             onClick={onMenuClick}
             size="sm"
             className={styles.appHeaderBurger}

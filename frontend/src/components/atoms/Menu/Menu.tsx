@@ -119,7 +119,8 @@ export const Menu = React.forwardRef<HTMLDivElement, MenuProps>(function Menu(
     onClose,
     onOpen,
     ...props
-  }
+  },
+  ref
 ) {
   // RTL position mapping - flip horizontal positions for Arabic
   const getRTLPosition = (pos: MenuPosition): MenuPosition => {
@@ -162,58 +163,60 @@ export const Menu = React.forwardRef<HTMLDivElement, MenuProps>(function Menu(
   );
 
   return (
-    <MantineMenu
-      position={rtlPosition}
-      opened={opened}
-      defaultOpened={defaultOpened}
-      disabled={disabled}
-      closeOnItemClick={closeOnItemClick}
-      closeOnClickOutside={closeOnClickOutside}
-      closeOnEscape={closeOnEscape}
-      width={width}
-      zIndex={zIndex}
-      withArrow={withArrow}
-      arrowSize={arrowSize}
-      arrowPosition={arrowPosition}
-      arrowOffset={arrowOffset}
-      radius={radius}
-      shadow={shadow}
-      onChange={onChange}
-      onClose={onClose}
-      onOpen={onOpen}
-      styles={{
-        dropdown: {
-          // Use our design tokens for consistent styling
-          borderRadius: {
-            xs: 'var(--radius-sm)',
-            sm: 'var(--radius-sm)',
-            md: 'var(--radius-md)',
-            lg: 'var(--radius-lg)',
-            xl: 'var(--radius-lg)'
-          }[radius] || 'var(--radius-md)',
-          boxShadow: {
-            xs: 'var(--elevation-1)',
-            sm: 'var(--elevation-1)',
-            md: 'var(--elevation-2)',
-            lg: 'var(--elevation-2)',
-            xl: 'var(--elevation-3)'
-          }[shadow] || 'var(--elevation-2)',
-          padding: 'var(--space-1)',
-          direction: 'rtl', // RTL support for dropdown
-          textAlign: 'right', // Align text to right for Arabic
-          ...style,
-        },
-      }}
-      {...props}
-    >
-      <MenuTarget>
-        {trigger || defaultTrigger}
-      </MenuTarget>
-      
-      <MenuDropdown>
-        {children}
-      </MenuDropdown>
-    </MantineMenu>
+    <div ref={ref}>
+      <MantineMenu
+        position={rtlPosition}
+        opened={opened}
+        defaultOpened={defaultOpened}
+        disabled={disabled}
+        closeOnItemClick={closeOnItemClick}
+        closeOnClickOutside={closeOnClickOutside}
+        closeOnEscape={closeOnEscape}
+        width={width}
+        zIndex={zIndex}
+        withArrow={withArrow}
+        arrowSize={arrowSize}
+        arrowPosition={arrowPosition}
+        arrowOffset={arrowOffset}
+        radius={radius}
+        shadow={shadow}
+        onChange={onChange}
+        onClose={onClose}
+        onOpen={onOpen}
+        styles={{
+          dropdown: {
+            // Use our design tokens for consistent styling
+            borderRadius: {
+              xs: 'var(--radius-sm)',
+              sm: 'var(--radius-sm)',
+              md: 'var(--radius-md)',
+              lg: 'var(--radius-lg)',
+              xl: 'var(--radius-lg)'
+            }[radius] || 'var(--radius-md)',
+            boxShadow: {
+              xs: 'var(--elevation-1)',
+              sm: 'var(--elevation-1)',
+              md: 'var(--elevation-2)',
+              lg: 'var(--elevation-2)',
+              xl: 'var(--elevation-3)'
+            }[shadow] || 'var(--elevation-2)',
+            padding: 'var(--space-1)',
+            direction: 'rtl', // RTL support for dropdown
+            textAlign: 'right', // Align text to right for Arabic
+            ...style,
+          },
+        }}
+        {...props}
+      >
+        <MenuTarget>
+          {trigger || defaultTrigger}
+        </MenuTarget>
+        
+        <MenuDropdown>
+          {children}
+        </MenuDropdown>
+      </MantineMenu>
+    </div>
   );
 });
 
@@ -257,7 +260,7 @@ export const MenuItemComponent = React.forwardRef<HTMLButtonElement, MenuItemPro
           '&:hover': {
             backgroundColor: 'var(--color-bg-secondary)',
           },
-          '&[data-disabled]': {
+          '&:disabled': {
             color: 'var(--color-fg-disabled)',
             cursor: 'not-allowed',
           },

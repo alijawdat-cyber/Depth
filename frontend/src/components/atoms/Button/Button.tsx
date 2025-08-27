@@ -196,14 +196,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       styles={{
         root: {
           ...s,
-          '&:hover:not([data-disabled])': v.hoverBg ? { backgroundColor: v.hoverBg } : undefined,
-          '&[data-disabled], &:disabled': {
+          // Use Mantine's supported pseudo-class approach
+          '&:hover:not(:disabled)': v.hoverBg ? { backgroundColor: v.hoverBg } : undefined,
+          '&:disabled': {
             backgroundColor: v.disabledBg || 'var(--color-bg-disabled)',
             color: 'var(--color-fg-disabled)',
             opacity: v.disabledBg ? 1 : 0.6,
             cursor: 'not-allowed',
           },
-          '&:focus-visible': {
+          '&:focus': {
             outline: '2px solid var(--color-primary)',
             outlineOffset: '2px',
           },

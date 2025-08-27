@@ -203,7 +203,7 @@ export const ColorVariations: Story = {
     <div style={{ direction: 'rtl' }} className="space-y-8">
       <div>
         <div className="text-sm font-medium mb-3 text-right">اللون الأساسي</div>
-        <Stepper active={1} color="#2563eb">
+        <Stepper active={1} color="var(--color-primary)">
           <Step label="الأول" description="إنشاء حساب" />
           <Step label="الثاني" description="تأكيد البريد" />
           <Step label="الأخير" description="الوصول الكامل" />
@@ -212,7 +212,7 @@ export const ColorVariations: Story = {
       
       <div>
         <div className="text-sm font-medium mb-3 text-right">اللون الأخضر</div>
-        <Stepper active={1} color="#16a34a">
+        <Stepper active={1} color="var(--color-success)">
           <Step label="الأول" description="معلومات أساسية" />
           <Step label="الثاني" description="التحقق" />
           <Step label="الأخير" description="اكتمال" />
@@ -221,7 +221,7 @@ export const ColorVariations: Story = {
       
       <div>
         <div className="text-sm font-medium mb-3 text-right">اللون البنفسجي</div>
-        <Stepper active={2} color="#7c3aed">
+        <Stepper active={2} color="var(--color-alternate)">
           <Step label="البداية" description="إعداد أولي" />
           <Step label="المتابعة" description="التكوين" />
           <Step label="النهاية" description="الانتهاء" />
@@ -230,7 +230,7 @@ export const ColorVariations: Story = {
       
       <div>
         <div className="text-sm font-medium mb-3 text-right">اللون البرتقالي</div>
-        <Stepper active={0} color="#ea580c">
+        <Stepper active={0} color="var(--color-warning)">
           <Step label="الخطوة 1" description="البدء" />
           <Step label="الخطوة 2" description="المعالجة" />
           <Step label="الخطوة 3" description="الإنجاز" />

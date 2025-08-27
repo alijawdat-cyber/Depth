@@ -389,15 +389,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           ))}
         </Stack>
       </ScrollArea>
-
-      {/* زر الإغلاق للجوال */}
-      {isOpen && (
-        <div 
-          className={styles.overlay} 
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
     </div>
   );
 };

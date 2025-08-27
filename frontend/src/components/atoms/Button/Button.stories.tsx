@@ -33,9 +33,9 @@ const meta: Meta<typeof Button> = {
     backgrounds: {
       default: 'light',
       values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#1a1a1a' },
-        { name: 'grey', value: '#f5f5f5' },
+        { name: 'light', value: 'var(--color-white)' },
+        { name: 'dark', value: 'var(--color-black)' },
+        { name: 'grey', value: 'var(--color-bg-subtle)' },
       ],
     },
     docs: {
@@ -196,7 +196,7 @@ export const GradientVariant: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-3">
       <Button {...args} variant="gradient">متدرج افتراضي</Button>
-      <Button {...args} variant="gradient" gradient={{ from: '#667eea', to: '#764ba2', deg: 135 }}>
+      <Button {...args} variant="gradient" gradient={{ from: 'var(--color-primary)', to: 'var(--color-alternate)', deg: 135 }}>
         متدرج مخصص
       </Button>
     </div>

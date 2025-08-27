@@ -7,9 +7,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
   box-shadow: var(--elevation-1);
 }
 
@@ -27,7 +24,7 @@
 .appHeaderNotificationBadge {
   position: absolute;
   top: -4px;
-  right: -4px;
+  inset-inline-end: -4px;
   background-color: var(--color-danger-bg);
   color: var(--color-danger-fg);
   border-radius: 50%;
