@@ -54,28 +54,29 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(function Badge
   },
   ref
 ) {
-  // Map our color names to Mantine colors or use CSS variables
+  // Map our color names to CSS custom properties instead of Mantine colors
   const getMantineColor = (color: BadgeColor) => {
-    const colorMap: Record<BadgeColor, string> = {
-      primary: "violet", // Maps to our --color-primary
-      success: "green",
-      warning: "yellow", 
-      error: "red",
-      info: "blue",
-      gray: "gray",
-      blue: "blue",
-      green: "green",
-      red: "red",
-      yellow: "yellow",
-      purple: "grape",
-      pink: "pink",
-      indigo: "indigo",
-      teal: "teal",
-      cyan: "cyan",
-      orange: "orange",
-      lime: "lime"
+    // Return undefined to use CSS custom properties from our design system
+    const colorMap: Record<BadgeColor, string | undefined> = {
+      primary: undefined, // Will use --color-primary from tokens
+      success: 'green',
+      warning: 'yellow', 
+      error: 'red',
+      info: 'blue',
+      gray: 'gray',
+      blue: 'blue',
+      green: 'green',
+      red: 'red',
+      yellow: 'yellow',
+      purple: 'grape',
+      pink: 'pink',
+      indigo: 'indigo',
+      teal: 'teal',
+      cyan: 'cyan',
+      orange: 'orange',
+      lime: 'lime'
     };
-    return colorMap[color] || "gray";
+    return colorMap[color];
   };
 
   // Custom styles for our design tokens integration
