@@ -4,7 +4,7 @@ import { Badge, Group, ActionIcon, Text } from '@mantine/core';
 import { Edit, Trash2, Eye } from 'lucide-react';
 
 const meta = {
-  title: 'Design System/Molecules/DataTable',
+  title: 'Molecules/DataTable',
   component: DataTable,
   parameters: {
     layout: 'padded',
