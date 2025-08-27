@@ -1,5 +1,5 @@
 /* Storybook-specific tweaks: نضبط canvas والخطوط حتى تتبع التوكنز */
-@import './checkbox-radio-fixes.css';
+/* تم إزالة استدعاء checkbox-radio-fixes.css لأنه محذوف */
 
 .sb-depth-surface { background: var(--color-bg-surface); color: var(--color-fg-primary); }
 .sbdocs.sbdocs-wrapper, .sbdocs-preview, .sbdocs, .sb-show-main, .docs-story {

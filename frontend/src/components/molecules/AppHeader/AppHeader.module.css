@@ -1,0 +1,91 @@
+/* AppHeader Styles */
+.appHeader {
+  height: 60px;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-bd-default);
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--elevation-1);
+}
+
+.appHeaderLogo {
+  height: 32px;
+  width: auto;
+}
+
+.appHeaderTitle {
+  font-family: var(--font-ar);
+  white-space: nowrap;
+  color: var(--color-fg-primary);
+}
+
+.appHeaderNotificationBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border: 1px solid var(--color-bg-surface);
+}
+
+.appHeaderNotificationsButton {
+  position: relative;
+  color: var(--color-fg-secondary);
+}
+
+.appHeaderUserMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: all 120ms ease;
+}
+
+.appHeaderUserMenu:hover {
+  background-color: var(--color-bg-elevated);
+}
+
+.appHeaderUserInfo {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-bd-default);
+  margin-bottom: var(--space-1);
+}
+
+.appHeaderUserText {
+  font-family: var(--font-ar);
+  line-height: 1.2;
+}
+
+.appHeaderBurger {
+  display: block;
+  color: var(--color-fg-primary);
+}
+
+.appHeaderUserDetails {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .appHeaderBurger {
+    display: none;
+  }
+  
+  .appHeaderUserDetails {
+    display: block;
+  }
+}

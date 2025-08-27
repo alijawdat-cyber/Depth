@@ -1,0 +1,95 @@
+/* الحاوي الأساسي */
+.container {
+  width: 100%;
+  max-width: 500px;
+}
+
+/* حقل البحث */
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* زر المسح */
+.clearButton {
+  color: var(--color-on-surface-variant) !important;
+}
+
+.clearButton:hover {
+  color: var(--color-on-surface) !important;
+  background-color: var(--color-surface-variant) !important;
+}
+
+/* زر الفلتر */
+.filterButton {
+  position: relative;
+  border-color: var(--color-outline-variant) !important;
+  color: var(--color-on-surface-variant) !important;
+  min-width: 44px;
+  height: 36px;
+}
+
+.filterButton:hover {
+  background-color: var(--color-surface-variant) !important;
+  color: var(--color-on-surface) !important;
+  border-color: var(--color-outline) !important;
+}
+
+/* زر الفلتر مع فلاتر نشطة */
+.hasActiveFilters {
+  background-color: var(--color-primary-container) !important;
+  color: var(--color-on-primary-container) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.hasActiveFilters:hover {
+  background-color: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+}
+
+/* شارة عدد الفلاتر */
+.filterBadge {
+  position: absolute;
+  top: -6px;
+  left: -6px; /* RTL - من اليسار */
+  background: var(--color-error);
+  color: var(--color-on-error);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  min-width: 16px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  z-index: 1;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 767px) {
+  .container {
+    max-width: none;
+  }
+  
+  .searchInput {
+    min-width: 150px;
+  }
+}
+
+/* حالات الإعاقة */
+.searchInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.filterButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* للأنظمة الليلية */
+@media (prefers-color-scheme: dark) {
+  .filterBadge {
+    box-shadow: 0 0 0 1px var(--color-outline);
+  }
+}

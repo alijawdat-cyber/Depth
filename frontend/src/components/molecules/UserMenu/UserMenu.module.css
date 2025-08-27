@@ -1,0 +1,196 @@
+/* زر فتح القائمة */
+.trigger {
+  padding: var(--space-xs) var(--space-sm) !important;
+  height: auto !important;
+  min-height: 44px;
+  border-radius: var(--radius-md) !important;
+  transition: all 0.2s ease-in-out;
+  color: var(--color-on-surface) !important;
+}
+
+.trigger:hover {
+  background-color: var(--color-surface-variant) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* صورة المستخدم */
+.avatar {
+  border: 2px solid var(--color-primary-container);
+}
+
+.headerAvatar {
+  border: 2px solid var(--color-outline-variant);
+}
+
+/* معلومات المستخدم في الزر */
+.userInfo {
+  text-align: right; /* RTL */
+  min-width: 0;
+  flex: 1;
+}
+
+/* القائمة المنسدلة */
+.dropdown {
+  background: var(--color-surface-container) !important;
+  border: 1px solid var(--color-outline-variant) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  padding: 0 !important;
+  min-width: 280px;
+  max-width: 320px;
+  overflow: hidden;
+}
+
+/* رأس القائمة */
+.dropdownHeader {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-outline-variant);
+  position: relative;
+}
+
+/* مؤشر الحالة أونلاين */
+.onlineIndicator {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm); /* RTL - من اليسار */
+  width: 12px;
+  height: 12px;
+  background: var(--color-success);
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+/* عناصر القائمة */
+.menuItem {
+  padding: var(--space-sm) var(--space-md) !important;
+  color: var(--color-on-surface) !important;
+  border-radius: 0 !important;
+  transition: all 0.2s ease-in-out;
+  font-size: var(--font-size-sm);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.menuItem:hover {
+  background-color: var(--color-surface-variant) !important;
+  color: var(--color-on-surface) !important;
+  transform: translateX(-2px); /* RTL - تحريك نحو اليسار */
+}
+
+.menuItem:active {
+  transform: translateX(-2px) scale(0.98);
+}
+
+/* عنصر الخطر (تسجيل الخروج) */
+.dangerItem {
+  color: var(--color-error) !important;
+}
+
+.dangerItem:hover {
+  background-color: var(--color-error-container) !important;
+  color: var(--color-on-error-container) !important;
+}
+
+/* الفواصل */
+.dropdown [data-menu-divider] {
+  border-color: var(--color-outline-variant);
+  margin: var(--space-xs) 0;
+}
+
+/* تخصيص الشارات */
+.menuItem [data-badge] {
+  margin-right: auto; /* RTL */
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 767px) {
+  .dropdown {
+    min-width: 260px;
+    max-width: calc(100vw - 32px);
+  }
+  
+  .userInfo {
+    display: none; /* إخفاء النص على الجوال */
+  }
+  
+  .trigger {
+    padding: var(--space-xs) !important;
+    min-width: 44px;
+  }
+}
+
+/* للمستخدمين الذين يفضلون تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .menuItem {
+    transition: none;
+  }
+  
+  .trigger:hover,
+  .menuItem:hover {
+    transform: none;
+  }
+  
+  .menuItem:active {
+    transform: none;
+  }
+}
+
+/* التخصيص حسب النظام الملون */
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    border-color: var(--color-outline);
+  }
+  
+  .headerAvatar {
+    border-color: var(--color-outline);
+  }
+  
+  .onlineIndicator {
+    box-shadow: 0 0 0 2px var(--color-surface-dim);
+  }
+}
+
+/* حالات التفاعل المتقدمة */
+@media (hover: hover) {
+  .menuItem:hover {
+    box-shadow: inset 3px 0 0 var(--color-primary); /* RTL - خط من اليمين */
+  }
+  
+  .dangerItem:hover {
+    box-shadow: inset 3px 0 0 var(--color-error);
+  }
+}
+
+/* تحسين الوصولية */
+.trigger:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.menuItem:focus {
+  background-color: var(--color-surface-variant) !important;
+  outline: none;
+}
+
+/* الرسوم المتحركة للفتح/الإغلاق */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown {
+  animation: slideDown 0.2s ease-out;
+}

@@ -15,11 +15,7 @@
 /* 4) Bidi helpers للنص المختلط داخل RTL */
 @import url('../styles/bidi.css');
 
-/* 5) تحسينات للمكونات */
-@import url('../styles/checkbox-radio-fixes.css');
-@import url('../styles/autocomplete-fixes.css');
-@import url('../styles/component-fixes.css');
-@import url('../styles/rtl-enhancements.css');
+/* 5) تحسينات للمكونات — الملفات المحذوفة تم إزالة استدعاءها */
 
 /* إعدادات عامة للجسم */
 html, body { height: 100%; }

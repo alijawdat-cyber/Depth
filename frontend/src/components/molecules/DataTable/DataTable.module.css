@@ -1,0 +1,220 @@
+/* ===== DATA TABLE STYLES ===== */
+.dataTable {
+  --data-table-bg: var(--color-surface-primary);
+  --data-table-border: var(--color-border-subtle);
+  --data-table-hover: var(--color-surface-hover);
+  --data-table-selected: var(--color-accent-subtle);
+  --header-bg: var(--color-surface-secondary);
+  --header-text: var(--color-text-secondary);
+  --cell-text: var(--color-text-primary);
+  --divider-color: var(--color-border-subtle);
+  
+  width: 100%;
+  background: var(--data-table-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== SEARCH SECTION ===== */
+.searchSection {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--data-table-border);
+  background: var(--header-bg);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.searchInput {
+  max-width: 300px;
+  min-width: 200px;
+}
+
+.searchInput input {
+  font-size: var(--font-size-sm);
+  background: var(--color-surface-primary);
+  border-color: var(--data-table-border);
+}
+
+.searchInput input:focus {
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+}
+
+/* ===== TABLE WRAPPER ===== */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+
+/* ===== TABLE STYLES ===== */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--data-table-bg);
+}
+
+/* ===== HEADER STYLES ===== */
+.headerCell {
+  background: var(--header-bg);
+  color: var(--header-text);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-md);
+  text-align: right;
+  border-bottom: 2px solid var(--data-table-border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.headerCell:first-child {
+  border-top-right-radius: var(--radius-md);
+}
+
+.headerCell:last-child {
+  border-top-left-radius: var(--radius-md);
+}
+
+.headerCell.sortable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.headerCell.sortable:hover {
+  background: var(--data-table-hover);
+  color: var(--color-accent-primary);
+}
+
+.checkboxColumn {
+  width: 40px;
+  text-align: center;
+}
+
+/* ===== SORT ICONS ===== */
+.sortIcon {
+  color: var(--color-text-disabled);
+  transition: all var(--transition-fast);
+  opacity: 0.5;
+}
+
+.sortIcon.active {
+  color: var(--color-accent-primary);
+  opacity: 1;
+}
+
+.headerCell.sortable:hover .sortIcon {
+  opacity: 1;
+  color: var(--color-accent-primary);
+}
+
+/* ===== ROW STYLES ===== */
+.tableRow {
+  transition: all var(--transition-fast);
+}
+
+.tableRow:nth-of-type(even) {
+  background: var(--color-surface-subtle);
+}
+
+.tableRow:hover {
+  background: var(--data-table-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.tableRow.clickable {
+  cursor: pointer;
+}
+
+.tableRow.clickable:hover {
+  background: var(--color-accent-subtle);
+}
+
+/* ===== CELL STYLES ===== */
+.cell {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--data-table-border);
+  color: var(--cell-text);
+  font-size: var(--font-size-sm);
+  text-align: right;
+  vertical-align: middle;
+}
+
+.cell:first-child {
+  border-right: none;
+}
+
+.cell:last-child {
+  border-left: none;
+}
+
+/* ===== PAGINATION SECTION ===== */
+.paginationSection {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--data-table-border);
+  background: var(--header-bg);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+@media (max-width: 768px) {
+  .searchSection {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+  
+  .searchInput {
+    max-width: none;
+    min-width: auto;
+  }
+  
+  .headerCell,
+  .cell {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .tableWrapper {
+    border-radius: 0;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerCell,
+  .cell {
+    padding: var(--spacing-xs);
+  }
+  
+  .searchSection {
+    padding: var(--spacing-sm);
+  }
+  
+  .paginationSection {
+    padding: var(--spacing-sm);
+  }
+}
+
+/* ===== RTL SUPPORT ===== */
+[dir="rtl"] .headerCell,
+[dir="rtl"] .cell {
+  text-align: right;
+}
+
+[dir="ltr"] .headerCell,
+[dir="ltr"] .cell {
+  text-align: left;
+}
+
+/* ===== DARK MODE ADJUSTMENTS ===== */
+@media (prefers-color-scheme: dark) {
+  .dataTable {
+    --data-table-bg: var(--color-surface-primary);
+    --data-table-border: var(--color-border-subtle);
+    --data-table-hover: var(--color-surface-hover);
+    --header-bg: var(--color-surface-secondary);
+  }
+}

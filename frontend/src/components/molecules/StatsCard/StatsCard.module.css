@@ -1,0 +1,203 @@
+/* StatsCard Styles */
+.statsCard {
+  transition: all 180ms ease;
+  position: relative;
+  min-height: 120px;
+}
+
+.statsCardClickable {
+  cursor: pointer;
+}
+
+.statsCardClickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+.statsCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+/* Header */
+.statsCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.statsCardTitle {
+  font-family: var(--font-ar);
+  color: var(--color-fg-secondary);
+  font-weight: 500;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.statsCardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  margin-right: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* Main Value */
+.statsCardValue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statsCardNumber {
+  font-family: var(--font-ar);
+  color: var(--color-fg-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Trend */
+.statsCardTrend {
+  margin-top: auto;
+}
+
+.statsCardTrendGroup {
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.statsCardTrendIcon {
+  display: flex;
+  align-items: center;
+}
+
+.statsCardTrendValue {
+  font-family: var(--font-ar);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.statsCardTrendLabel {
+  font-family: var(--font-ar);
+  color: var(--color-fg-secondary);
+  opacity: 0.8;
+}
+
+/* Description */
+.statsCardDescription {
+  font-family: var(--font-ar);
+  color: var(--color-fg-secondary);
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+/* Color Variants */
+.statsCard--primary {
+  border: 1px solid var(--color-primary);
+}
+
+.statsCard--primary .statsCardIcon {
+  color: var(--color-primary);
+}
+
+.statsCard--primary .statsCardNumber {
+  color: var(--color-primary);
+}
+
+.statsCard--success {
+  border: 1px solid var(--color-success-bd);
+}
+
+.statsCard--success .statsCardIcon {
+  color: var(--color-success-fg);
+}
+
+.statsCard--success .statsCardNumber {
+  color: var(--color-success-fg);
+}
+
+.statsCard--warning {
+  border: 1px solid var(--color-warning-bd);
+}
+
+.statsCard--warning .statsCardIcon {
+  color: var(--color-warning-fg);
+}
+
+.statsCard--warning .statsCardNumber {
+  color: var(--color-warning-fg);
+}
+
+.statsCard--danger {
+  border: 1px solid var(--color-danger-bd);
+}
+
+.statsCard--danger .statsCardIcon {
+  color: var(--color-danger-fg);
+}
+
+.statsCard--danger .statsCardNumber {
+  color: var(--color-danger-fg);
+}
+
+.statsCard--info {
+  border: 1px solid var(--color-primary);
+}
+
+.statsCard--info .statsCardIcon {
+  color: var(--color-primary);
+}
+
+.statsCard--info .statsCardNumber {
+  color: var(--color-primary);
+}
+
+.statsCard--neutral {
+  border: 1px solid var(--color-bd-default);
+}
+
+.statsCard--neutral .statsCardIcon {
+  color: var(--color-fg-secondary);
+}
+
+.statsCard--neutral .statsCardNumber {
+  color: var(--color-fg-primary);
+}
+
+/* Size Variants */
+.statsCard--sm {
+  min-height: 100px;
+}
+
+.statsCard--sm .statsCardContent {
+  gap: var(--space-2);
+}
+
+.statsCard--md {
+  min-height: 120px;
+}
+
+.statsCard--lg {
+  min-height: 140px;
+}
+
+.statsCard--lg .statsCardContent {
+  gap: var(--space-4);
+}
+
+/* Trend Colors */
+.statsCardTrendUp {
+  color: var(--color-success-fg);
+}
+
+.statsCardTrendDown {
+  color: var(--color-danger-fg);
+}
+
+.statsCardTrendNeutral {
+  color: var(--color-fg-secondary);
+}

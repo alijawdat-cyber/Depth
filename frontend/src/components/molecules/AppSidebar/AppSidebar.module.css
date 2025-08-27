@@ -1,0 +1,208 @@
+/* الشريط الجانبي الأساسي */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0; /* RTL - الشريط الجانبي على اليمين */
+  height: 100vh;
+  width: var(--sidebar-width, 280px);
+  background: var(--color-surface-container);
+  border-left: 1px solid var(--color-outline-variant);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: var(--z-sidebar, 1000);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* منطقة التمرير */
+.scrollArea {
+  flex: 1;
+  height: 100%;
+}
+
+/* الأقسام في القائمة */
+.divider {
+  margin: var(--space-md) var(--space-lg);
+  border-color: var(--color-outline-variant);
+}
+
+/* مجموعة العناصر */
+.menuGroup {
+  margin-bottom: var(--space-xs);
+}
+
+.groupButton {
+  color: var(--color-on-surface-variant) !important;
+  font-weight: 600 !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  height: auto !important;
+  min-height: 44px;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: var(--space-xs);
+}
+
+.groupButton:hover {
+  background-color: var(--color-surface-variant) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.groupChildren {
+  padding-right: var(--space-lg); /* RTL - مسافة من اليمين */
+  border-right: 2px solid var(--color-outline-variant); /* RTL - خط من اليمين */
+}
+
+/* عناصر القائمة */
+.menuItem {
+  color: var(--color-on-surface-variant) !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  height: auto !important;
+  min-height: 44px;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: var(--space-xs);
+  font-weight: 400 !important;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: visible;
+}
+
+.menuItem:hover {
+  background-color: var(--color-surface-variant) !important;
+  color: var(--color-on-surface) !important;
+  transform: translateX(-2px); /* RTL - تحريك نحو اليسار عند hover */
+}
+
+.menuItem.activeItem {
+  background-color: var(--color-primary-container) !important;
+  color: var(--color-on-primary-container) !important;
+  font-weight: 600 !important;
+  border-right: 3px solid var(--color-primary) !important; /* RTL - خط من اليمين */
+}
+
+.menuItem.childItem {
+  padding-right: var(--space-xl) !important; /* RTL - مسافة أكبر من اليمين */
+  font-size: var(--font-size-sm);
+}
+
+/* شارات العدد والحالة */
+.badge {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  min-width: 18px;
+  text-align: center;
+  position: absolute;
+  left: 8px; /* RTL - من اليسار */
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge.badgeNew {
+  background: var(--color-tertiary);
+  color: var(--color-on-tertiary);
+  animation: pulse 2s infinite;
+}
+
+/* الغطاء للجوال */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay, 999);
+}
+
+/* تحريك الصفحة عند فتح الشريط الجانبي */
+@media (min-width: 768px) {
+  .sidebar {
+    position: relative;
+    transform: none;
+    border-left: none;
+    box-shadow: none;
+  }
+
+  .sidebar.open {
+    transform: none;
+  }
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 767px) {
+  .sidebar {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  .menuItem {
+    min-height: 48px; /* أزرار أكبر للجوال */
+  }
+  
+  .groupButton {
+    min-height: 48px;
+  }
+}
+
+/* الحالات التفاعلية */
+@media (hover: hover) {
+  .menuItem:hover {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* للمستخدمين الذين يفضلون تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+  
+  .menuItem {
+    transition: none;
+  }
+  
+  .menuItem:hover {
+    transform: none;
+  }
+  
+  .badge.badgeNew {
+    animation: none;
+  }
+}
+
+/* التخصيص حسب النظام الملون */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background: var(--color-surface-dim);
+    border-left-color: var(--color-outline);
+  }
+  
+  .badge {
+    box-shadow: 0 0 0 1px var(--color-outline);
+  }
+}
+
+/* الرسوم المتحركة */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

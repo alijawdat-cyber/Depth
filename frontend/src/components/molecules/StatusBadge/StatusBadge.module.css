@@ -1,0 +1,138 @@
+/* الشارة الأساسية */
+.badge {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  border-radius: var(--radius-full) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--space-xs) !important;
+}
+
+/* الأيقونة */
+.icon {
+  opacity: 0.8;
+}
+
+/* حالات مخصصة */
+.active {
+  animation: pulse-green 2s infinite;
+}
+
+.processing {
+  animation: pulse-blue 2s infinite;
+}
+
+.warning {
+  animation: pulse-orange 2s infinite;
+}
+
+/* الرسوم المتحركة */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-blue {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-orange {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* إيقاف الرسوم المتحركة للمستخدمين الذين يفضلون تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .active,
+  .processing,
+  .warning {
+    animation: none;
+  }
+}
+
+/* تخصيصات الحجم */
+.badge[data-size="xs"] {
+  font-size: 10px !important;
+  height: 18px !important;
+  padding: 0 6px !important;
+}
+
+.badge[data-size="sm"] {
+  font-size: 12px !important;
+  height: 22px !important;
+  padding: 0 8px !important;
+}
+
+.badge[data-size="md"] {
+  font-size: 13px !important;
+  height: 26px !important;
+  padding: 0 10px !important;
+}
+
+.badge[data-size="lg"] {
+  font-size: 14px !important;
+  height: 30px !important;
+  padding: 0 12px !important;
+}
+
+.badge[data-size="xl"] {
+  font-size: 16px !important;
+  height: 34px !important;
+  padding: 0 14px !important;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 767px) {
+  .badge {
+    font-size: 11px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+  }
+  
+  .icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* الألوان المخصصة للحالات */
+.active[data-variant="light"] {
+  background-color: var(--color-success-container) !important;
+  color: var(--color-on-success-container) !important;
+}
+
+.failed[data-variant="light"] {
+  background-color: var(--color-error-container) !important;
+  color: var(--color-on-error-container) !important;
+}
+
+.warning[data-variant="light"] {
+  background-color: var(--color-warning-container) !important;
+  color: var(--color-on-warning-container) !important;
+}
+
+.pending[data-variant="light"],
+.processing[data-variant="light"] {
+  background-color: var(--color-primary-container) !important;
+  color: var(--color-on-primary-container) !important;
+}
+
+.inactive[data-variant="light"],
+.draft[data-variant="light"],
+.archived[data-variant="light"] {
+  background-color: var(--color-surface-variant) !important;
+  color: var(--color-on-surface-variant) !important;
+}
