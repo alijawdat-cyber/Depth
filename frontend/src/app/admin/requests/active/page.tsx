@@ -878,13 +878,13 @@ const ActiveRequestsPage: React.FC = () => {
   return (
     <Container size="xl" className={styles.container}>
       {/* Header */}
-      <div className={styles.header}>
+      <div className={styles.pageHeader}>
         <Group justify="apart">
           <div>
-            <Title order={1} className={styles.title}>
+            <Title order={1} className={styles.pageTitle}>
               إدارة الطلبات النشطة
             </Title>
-            <Text c="dimmed" size="sm">
+            <Text className={styles.pageDescription}>
               متابعة وإدارة المشاريع قيد التنفيذ مع أدوات تعيين المبدعين ومراقبة التقدم
             </Text>
           </div>

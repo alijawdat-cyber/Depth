@@ -498,11 +498,11 @@ export default function CreatorAssignmentPage() {
   return (
     <Container size="xl" className={styles.container}>
       {/* العنوان الرئيسي */}
-      <div className={styles.header}>
-        <Title order={1} className={styles.title}>
+      <div className={styles.pageHeader}>
+        <Title order={1} className={styles.pageTitle}>
           تعيين المبدعين
         </Title>
-        <Text className={styles.subtitle}>
+        <Text className={styles.pageDescription}>
           اختر أفضل المبدعين للمشاريع المعلقة باستخدام نظام المطابقة الذكي
         </Text>
       </div>
