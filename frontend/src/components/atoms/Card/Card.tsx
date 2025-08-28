@@ -68,11 +68,11 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
 
   const paddingValue = {
     none: 0,
-    xs: 'var(--space-3)',
-    sm: 'var(--space-4)',
-    md: 'var(--space-6)',
-    lg: 'var(--space-8)',
-    xl: 'var(--space-10)',
+    xs: 'var(--space-xs)',                                        /* 4px - مسافة صغيرة جداً من tokens.css */
+    sm: 'var(--space-sm)',                                        /* 8px - مسافة صغيرة من tokens.css */
+    md: 'var(--space-md)',                                        /* 12px - مسافة متوسطة من tokens.css */
+    lg: 'var(--space-lg)',                                        /* 16px - مسافة كبيرة من tokens.css */
+    xl: 'var(--space-xl)',                                        /* 24px - مسافة كبيرة جداً من tokens.css */
   }[padding];
 
   if (loading) {
@@ -83,9 +83,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
         padding={paddingValue}
         styles={{
           root: {
-            backgroundColor: 'var(--color-bg-elevated)',
-            border: '1px solid var(--color-bd-default)',
-            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-bg-secondary)',         /* خلفية ثانوية من tokens.css */
+            border: '1px solid var(--color-border-primary)',      /* حدود من tokens.css */
+            borderRadius: 'var(--radius-md)',                     /* زوايا متوسطة من tokens.css */
             minHeight: '120px',
             display: 'flex',
             alignItems: 'center',
@@ -109,19 +109,19 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
     switch (variant) {
       case 'elevated':
         return {
-          backgroundColor: 'var(--color-bg-elevated)',
-          border: withBorder ? '1px solid var(--color-bd-default)' : 'none',
-          boxShadow: shadow !== 'none' ? `var(--elevation-${shadow === 'sm' ? '1' : shadow === 'md' ? '2' : '3'})` : 'none',
+          backgroundColor: 'var(--color-bg-secondary)',           /* خلفية ثانوية واضحة من tokens.css */
+          border: withBorder ? '1px solid var(--color-border-primary)' : 'none',
+          boxShadow: shadow !== 'none' ? `var(--shadow-${shadow === 'lg' ? 'lg' : shadow === 'md' ? 'md' : 'sm'})` : 'none',
         };
       case 'outline':
         return {
-          backgroundColor: 'var(--color-bg-surface)',
-          border: '1px solid var(--color-bd-default)',
+          backgroundColor: 'var(--color-bg-primary)',             /* خلفية رئيسية من tokens.css */
+          border: '1px solid var(--color-border-primary)',        /* حدود من tokens.css */
           boxShadow: 'none',
         };
       case 'filled':
         return {
-          backgroundColor: 'var(--color-bg-elevated)',
+          backgroundColor: 'var(--color-bg-secondary)',           /* خلفية ثانوية من tokens.css */
           border: 'none',
           boxShadow: 'none',
         };
@@ -138,7 +138,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
       onClick={clickable ? onClick : undefined}
       styles={{
         root: {
-          borderRadius: 'var(--radius-lg)',
+          borderRadius: 'var(--radius-md)',                       /* زوايا متوسطة من tokens.css */
           transition: 'all 0.2s ease',
           position: 'relative',
           overflow: 'hidden',
@@ -147,7 +147,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
             cursor: 'pointer',
             '&:hover': {
               transform: 'translateY(-2px)',
-              boxShadow: 'var(--elevation-2)',
+              boxShadow: 'var(--shadow-md)',                      /* ظل متوسط من tokens.css */
             },
             '&:active': {
               transform: 'translateY(0)',

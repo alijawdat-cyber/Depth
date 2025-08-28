@@ -5,22 +5,21 @@
   min-height: 44px;
   border-radius: var(--radius-md) !important;
   transition: all 0.2s ease-in-out;
-  color: var(--color-on-surface) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .trigger:hover {
-  background-color: var(--color-surface-variant) !important;
+  background-color: var(--color-bg-tertiary) !important;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
 
-/* صورة المستخدم */
 .avatar {
-  border: 2px solid var(--color-primary-container);
+  border: 2px solid var(--color-primary);
 }
 
 .headerAvatar {
-  border: 2px solid var(--color-outline-variant);
+  border: 2px solid var(--color-border-secondary);
 }
 
 /* معلومات المستخدم في الزر */
@@ -32,7 +31,7 @@
 
 /* القائمة المنسدلة */
 .dropdown {
-  background: var(--color-surface-container) !important;
+  background: var(--color-bg-secondary) !important;
   border: 1px solid var(--color-outline-variant) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-xl) !important;
@@ -78,7 +77,7 @@
 }
 
 .menuItem:hover {
-  background-color: var(--color-surface-variant) !important;
+  background-color: var(--color-bg-secondary) !important;
   color: var(--color-on-surface) !important;
   transform: translateX(-2px); /* RTL - تحريك نحو اليسار */
 }
@@ -153,7 +152,7 @@
   }
   
   .onlineIndicator {
-    box-shadow: 0 0 0 2px var(--color-surface-dim);
+    box-shadow: 0 0 0 2px var(--color-bg-secondary);
   }
 }
 
@@ -175,7 +174,7 @@
 }
 
 .menuItem:focus {
-  background-color: var(--color-surface-variant) !important;
+  background-color: var(--color-bg-secondary) !important;
   outline: none;
 }
 

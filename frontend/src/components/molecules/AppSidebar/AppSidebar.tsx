@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Stack, ScrollArea, Divider, Text, Collapse } from '@mantine/core';
+import { Stack, ScrollArea, Divider, Text, Collapse, Box } from '@mantine/core';
 import { 
   Home, 
   Users, 
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Button } from '../../atoms/Button/Button';
+import { ThemeToggle } from '../../atoms/ThemeToggle';
 import styles from './AppSidebar.module.css';
 
 // أنواع عناصر القائمة
@@ -380,6 +381,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     <div className={`${styles.sidebar} ${isOpen ? styles.open : ''} ${className || ''}`}>
       <ScrollArea className={styles.scrollArea}>
         <Stack gap="xs" p="md">
+          {/* مكون تبديل الثيم */}
+          <Box className={styles.themeToggleContainer}>
+            <ThemeToggle size="sm" withLabels={false} />
+          </Box>
+          
+          {/* فاصل */}
+          <Divider className={styles.divider} />
+          
           {filteredItems.map((item) => (
             <MenuItemComponent
               key={item.id}

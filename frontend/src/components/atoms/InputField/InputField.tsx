@@ -70,11 +70,11 @@ export interface InputFieldProps {
 
 function sizeVars(size: InputFieldSize) {
   const sizeMap = {
-    xs: { height: 'var(--field-h-xs)', fontSize: 'var(--fs-field-xs)', px: 'var(--field-px-xs)' },
-    sm: { height: 'var(--field-h-sm)', fontSize: 'var(--fs-field-sm)', px: 'var(--field-px-sm)' },
-    md: { height: 'var(--field-h-md)', fontSize: 'var(--fs-field-md)', px: 'var(--field-px-md)' },
-    lg: { height: 'var(--field-h-lg)', fontSize: 'var(--fs-field-lg)', px: 'var(--field-px-lg)' },
-    xl: { height: 'var(--field-h-xl)', fontSize: 'var(--fs-field-xl)', px: 'var(--field-px-xl)' },
+    xs: { height: 'var(--height-input-sm)', fontSize: 'var(--fs-xs)', px: 'var(--space-sm)' },      /* صغير جداً - من tokens.css */
+    sm: { height: 'var(--height-input-sm)', fontSize: 'var(--fs-sm)', px: 'var(--space-md)' },      /* صغير - من tokens.css */
+    md: { height: 'var(--height-input-md)', fontSize: 'var(--fs-md)', px: 'var(--space-lg)' },      /* متوسط - من tokens.css */
+    lg: { height: 'var(--height-input-lg)', fontSize: 'var(--fs-lg)', px: 'var(--space-xl)' },      /* كبير - من tokens.css */
+    xl: { height: 'var(--height-input-lg)', fontSize: 'var(--fs-xl)', px: 'var(--space-2xl)' },     /* كبير جداً - من tokens.css */
   };
   
   return {
@@ -288,18 +288,18 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(fu
         },
         label: { 
           fontWeight: 600, 
-          marginBottom: '0.25rem',
+          marginBottom: 'var(--space-xs)',                       /* 4px - مسافة صغيرة جداً من tokens.css */
           color: 'var(--color-fg-primary)',
         },
         description: { 
           color: 'var(--color-fg-secondary)',
           fontSize: 'var(--fs-sm)',
-          marginTop: '0.25rem',
+          marginTop: 'var(--space-xs)',                          /* 4px - مسافة صغيرة جداً من tokens.css */
         },
         error: { 
           color: 'var(--color-danger)',
           fontSize: 'var(--fs-sm)',
-          marginTop: '0.25rem',
+          marginTop: 'var(--space-xs)',                        /* 4px - مسافة صغيرة جداً من tokens.css */
         }
       }}
       variant={variant}

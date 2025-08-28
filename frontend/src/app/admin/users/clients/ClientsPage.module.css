@@ -1,0 +1,261 @@
+/* صفحة عملاء الإدارة - موحدة بالكامل مع tokens.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Header موحد */
+.header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.title {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.statsGrid {
+  margin-bottom: var(--space-xl);
+}
+
+.filters {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.filtersHeader {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: var(--space-lg); /* مسافة كبيرة من tokens.css */
+}
+
+.searchInput {
+  min-width: 280px;
+  flex: 1;
+}
+
+.filterSelect {
+  min-width: 140px;
+}
+
+.tableContainer {
+  background: var(--color-bg-secondary); /* خلفية ثانوية من tokens.css */
+  border: 1px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  border-radius: var(--radius-lg); /* زوايا كبيرة من tokens.css */
+  overflow: hidden;
+}
+
+.tableHeader {
+  background: var(--color-bg-tertiary); /* خلفية ثلاثية من tokens.css */
+  border-bottom: 1px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  padding: var(--space-md) var(--space-lg); /* مسافات من tokens.css */
+}
+
+.tableHeaderCell {
+  font-weight: 600;
+  color: var(--color-text-secondary); /* نص ثانوي من tokens.css */
+  font-family: var(--font-ar); /* خط عربي من tokens.css */
+  font-size: var(--fs-sm); /* حجم خط صغير من tokens.css */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-md) var(--space-sm); /* مسافات من tokens.css */
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  transition: background-color 0.2s ease;
+  padding: var(--space-md) var(--space-sm); /* مسافات من tokens.css */
+}
+
+.dataTable {
+  --table-border-color: var(--border-light);
+  --table-header-bg: var(--background-secondary);
+  --table-row-hover: var(--background-secondary);
+}
+
+.dataTable :global(.mantine-Table-table) {
+  background: var(--background-primary);
+}
+
+.dataTable :global(.mantine-Table-th) {
+  background: var(--color-bg-tertiary); /* خلفية ثلاثية من tokens.css */
+  color: var(--color-text-primary); /* نص أساسي من tokens.css */
+  font-weight: 600;
+  font-size: var(--fs-sm); /* حجم خط صغير من tokens.css */
+  padding: var(--space-lg) var(--space-md); /* مسافات من tokens.css */
+  border-bottom: 2px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  text-align: right;
+}
+
+.dataTable :global(.mantine-Table-td) {
+  padding: var(--space-lg) var(--space-md); /* مسافات من tokens.css */
+  border-bottom: 1px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  vertical-align: top;
+}
+
+.dataTable :global(.mantine-Table-tr:hover) {
+  background: var(--color-bg-tertiary); /* خلفية ثلاثية عند التمرير من tokens.css */
+  cursor: pointer;
+}
+
+.dataTable :global(.mantine-Table-tr:hover td) {
+  border-color: var(--color-border-primary); /* حدود أساسية من tokens.css */
+}
+
+.categoryItem {
+  padding: var(--space-md); /* مسافة متوسطة من tokens.css */
+  border: 1px solid var(--color-border-primary); /* حدود أساسية من tokens.css */
+  border-radius: var(--radius-md); /* زوايا متوسطة من tokens.css */
+  background: var(--color-bg-secondary); /* خلفية ثانوية من tokens.css */
+}
+
+/* VIP Badge Animation */
+.container :global(.mantine-Badge[data-color="yellow"]) {
+  animation: vipGlow 2s infinite alternate;
+}
+
+@keyframes vipGlow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+  }
+}
+
+/* High Risk Client Indicator */
+.container :global(.mantine-Badge[data-color="red"]) {
+  animation: riskPulse 3s infinite;
+}
+
+@keyframes riskPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Component Enhancements */
+.container :global(.mantine-Badge) {
+  font-weight: 500;
+  font-size: var(--fs-xs); /* حجم خط صغير جداً من tokens.css */
+}
+
+.container :global(.mantine-Card-root) {
+  transition: all 0.2s ease;
+}
+
+.container :global(.mantine-Card-root:hover) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.container :global(.mantine-Rating-root) {
+  gap: 2px;
+}
+
+.container :global(.mantine-Progress-bar) {
+  transition: width 0.6s ease;
+}
+
+.container :global(.mantine-Avatar-placeholder) {
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+/* Financial Indicators */
+.container :global(.financial-positive) {
+  color: var(--green-6);
+  font-weight: 600;
+}
+
+.container :global(.financial-negative) {
+  color: var(--red-6);
+  font-weight: 600;
+}
+
+.container :global(.financial-warning) {
+  color: var(--orange-6);
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: var(--page-max-width)) {
+  .container {
+    padding: var(--space-lg);
+  }
+  
+  .filtersHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchInput,
+  .filterSelect {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: var(--page-max-width)) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dataTable :global(.mantine-Table-th),
+  .dataTable :global(.mantine-Table-td) {
+    padding: var(--space-lg) 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .searchInput :global(.mantine-TextInput-section) {
+  left: auto;
+  right: 0.75rem;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .filters {
+    background: var(--dark-6);
+    border-color: var(--dark-4);
+  }
+  
+  .tableContainer {
+    background: var(--dark-7);
+    border-color: var(--dark-4);
+  }
+  
+  .dataTable :global(.mantine-Table-th) {
+    background: var(--dark-6);
+    color: var(--dark-0);
+  }
+  
+  .dataTable :global(.mantine-Table-tr:hover) {
+    background: var(--dark-6);
+  }
+  
+  .categoryItem {
+    background: var(--dark-6);
+    border-color: var(--dark-4);
+  }
+}

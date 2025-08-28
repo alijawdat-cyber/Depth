@@ -1,0 +1,554 @@
+/* صفحة الفواتير - موحدة بالكامل مع tokens.css */
+
+.container {
+  max-width: 100%;
+  padding: 0;
+  background: var(--color-bg-primary);
+  min-height: 100vh;
+}
+
+/* Page Header */
+.header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.title {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.titleIcon {
+  color: var(--color-text-secondary);
+}
+
+.createButton {
+  background: var(--color-primary);
+  border: none;
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.createButton:hover {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Stats Cards */
+.statsCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.statsCard:hover {
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.amount {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.label {
+  font-size: var(--fs-md);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.change {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  margin-top: var(--space-xs);
+}
+
+.changePositive {
+  color: var(--color-success);
+}
+
+.changeNegative {
+  color: var(--color-error);
+}
+
+/* Filters Card */
+.filtersCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+/* Tabs */
+.tabs {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+}
+
+.tabs :global(.mantine-Tabs-list) {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.tabs :global(.mantine-Tabs-tab) {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border: none;
+  padding: var(--space-lg);
+  transition: all 0.2s ease;
+}
+
+.tabs :global(.mantine-Tabs-tab:hover) {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.tabs :global(.mantine-Tabs-tab[data-active="true"]) {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+}
+
+/* Table Card */
+.tableCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tableCard :global(.mantine-Table-thead) {
+  background: var(--color-bg-tertiary);
+}
+
+.tableCard :global(.mantine-Table-th) {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border-primary);
+  padding: var(--space-lg);
+  text-align: right;
+}
+
+.tableCard :global(.mantine-Table-td) {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+.tableCard :global(.mantine-Table-tr:hover) {
+  background: var(--color-bg-tertiary);
+}
+
+/* Invoice Status */
+.statusPending {
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statusPaid {
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statusOverdue {
+  color: var(--color-error);
+  background: var(--color-error-light);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statusDraft {
+  color: var(--color-text-muted);
+  background: var(--color-bg-tertiary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statusCanceled {
+  color: var(--color-text-muted);
+  background: var(--color-bg-tertiary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statusRefunded {
+  color: var(--color-info);
+  background: var(--color-info-light);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (width >= 390px) {
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+@media (width >= 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-bg-secondary);
+}
+
+/* Filters Card */
+.filtersCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+  padding: var(--space-lg);
+}
+
+.filtersCard :global(.mantine-TextInput-root),
+.filtersCard :global(.mantine-Select-root) {
+  min-width: 200px;
+}
+
+/* Tabs */
+.tabs {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabs :global(.mantine-Tabs-list) {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-bg-secondary);
+}
+
+.tabs :global(.mantine-Tabs-tab) {
+  font-weight: 500;
+  color: var(--color-bg-secondary);
+  border: none;
+  padding: var(--space-lg) 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.tabs :global(.mantine-Tabs-tab:hover) {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.tabs :global(.mantine-Tabs-tab[data-active="true"]) {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+  border-bottom: 2px solid var(--color-bg-secondary);
+  font-weight: 600;
+}
+
+.tabs :global(.mantine-Tabs-panel) {
+  padding: 0;
+}
+
+/* Table Card */
+.tableCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tableCard :global(.mantine-Table-table) {
+  margin: 0;
+}
+
+.tableCard :global(.mantine-Table-thead) {
+  background: var(--color-bg-secondary);
+}
+
+.tableCard :global(.mantine-Table-th) {
+  font-weight: 600;
+  color: var(--color-bg-secondary);
+  border-bottom: 2px solid var(--color-bg-secondary);
+  padding: var(--space-lg);
+  text-align: right;
+}
+
+.tableCard :global(.mantine-Table-td) {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-bg-secondary);
+  vertical-align: middle;
+}
+
+.tableCard :global(.mantine-Table-tr:hover) {
+  background: var(--color-bg-secondary);
+}
+
+/* Modal Styles */
+.modal :global(.mantine-Modal-header) {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-bg-secondary);
+  padding: var(--space-lg);
+}
+
+.modal :global(.mantine-Modal-title) {
+  font-weight: 700;
+  color: var(--color-bg-secondary);
+  font-size: var(--fs-xl);
+}
+
+.modal :global(.mantine-Modal-body) {
+  padding: var(--space-lg);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Line Item Card */
+.lineItemCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+}
+
+.lineItemCard:hover {
+  border-color: var(--color-bg-secondary);
+}
+
+/* Total Summary */
+.totalSummary {
+  text-align: left;
+  padding: var(--space-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-bg-secondary);
+}
+
+/* Drawer Styles */
+.drawer :global(.mantine-Drawer-header) {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-bg-secondary);
+}
+
+.drawer :global(.mantine-Drawer-title) {
+  font-weight: 700;
+  color: var(--color-bg-secondary);
+}
+
+.drawer :global(.mantine-Drawer-body) {
+  padding: var(--space-lg);
+  background: var(--color-bg-secondary);
+}
+
+/* Line Item in Details */
+.lineItem {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+}
+
+.lineItem:hover {
+  border-color: var(--color-bg-secondary);
+}
+
+/* Payment Item in Details */
+.paymentItem {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+}
+
+.paymentItem:hover {
+  border-color: var(--color-bg-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: var(--page-max-width)) {
+  .container {
+    padding: var(--space-lg);
+  }
+  
+  .header {
+    padding: var(--space-lg);
+    margin-bottom: 1rem;
+  }
+  
+  .title {
+    font-size: var(--fs-xl);
+  }
+  
+  .filtersCard {
+    padding: var(--space-lg);
+  }
+  
+  .filtersCard :global(.mantine-Group-root) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filtersCard :global(.mantine-TextInput-root),
+  .filtersCard :global(.mantine-Select-root) {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .tabs :global(.mantine-Tabs-tab) {
+    padding: var(--space-lg) 1rem;
+    font-size: var(--fs-sm);
+  }
+  
+  .tableCard :global(.mantine-Table-th),
+  .tableCard :global(.mantine-Table-td) {
+    padding: var(--space-lg) 0.5rem;
+    font-size: var(--fs-sm);
+  }
+  
+  .modal :global(.mantine-Modal-body) {
+    padding: var(--space-lg);
+  }
+  
+  .drawer :global(.mantine-Drawer-body) {
+    padding: var(--space-lg);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .container {
+    background: var(--color-bg-secondary);
+    box-shadow: none;
+  }
+  
+  .header {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .createButton {
+    display: none;
+  }
+  
+  .filtersCard {
+    display: none;
+  }
+  
+  .tabs :global(.mantine-Tabs-list) {
+    display: none;
+  }
+}
+
+/* Loading States */
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Status Colors */
+.statusDraft {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.statusIssued {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.statusPartiallyPaid {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.statusPaid {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.statusOverdue {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+.statusCancelled {
+  background: var(--color-bg-secondary);
+  color: var(--color-bg-secondary);
+}
+
+/* Animation Classes */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Focus States */
+.filtersCard :global(.mantine-TextInput-input:focus),
+.filtersCard :global(.mantine-Select-input:focus) {
+  border-color: var(--color-bg-secondary);
+  box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.2);
+}
+
+.modal :global(.mantine-TextInput-input:focus),
+.modal :global(.mantine-Select-input:focus),
+.modal :global(.mantine-NumberInput-input:focus),
+.modal :global(.mantine-Textarea-input:focus) {
+  border-color: var(--color-bg-secondary);
+  box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.2);
+}

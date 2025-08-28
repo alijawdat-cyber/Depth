@@ -17,7 +17,7 @@
 
 .clearButton:hover {
   color: var(--color-on-surface) !important;
-  background-color: var(--color-surface-variant) !important;
+  background-color: var(--color-bg-secondary) !important;
 }
 
 /* زر الفلتر */
@@ -30,7 +30,7 @@
 }
 
 .filterButton:hover {
-  background-color: var(--color-surface-variant) !important;
+  background-color: var(--color-bg-secondary) !important;
   color: var(--color-on-surface) !important;
   border-color: var(--color-outline) !important;
 }
@@ -53,15 +53,15 @@
   top: -6px;
   inset-inline-start: -6px; /* RTL - من جهة البداية */
   background: var(--color-error);
-  color: var(--color-on-error);
-  font-size: 10px;
+  color: var(--color-white);
+  font-size: var(--fs-xs);
   font-weight: 600;
   padding: 2px 6px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   line-height: 1;
   min-width: 16px;
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
   z-index: 1;
 }
 

@@ -93,19 +93,19 @@ export const MultiSelect = React.forwardRef<HTMLInputElement, MultiSelectProps>(
           fontSize: 'var(--fs-sm)',
           fontWeight: 'var(--fw-medium)',
           color: 'var(--color-foreground)',
-          marginBottom: 'var(--space-2)',
+          marginBottom: 'var(--space-sm)',                     /* 8px - مسافة صغيرة من tokens.css */
         },
         description: {
           fontFamily: 'var(--font-family)',
           fontSize: 'var(--fs-xs)',
-          color: 'var(--color-neutral-600)',
-          marginTop: 'var(--space-1)',
+          color: 'var(--color-text-muted)',                   /* نص خافت من tokens.css */
+          marginTop: 'var(--space-xs)',                        /* 4px - مسافة صغيرة جداً من tokens.css */
         },
         error: {
           fontFamily: 'var(--font-family)',
           fontSize: 'var(--fs-xs)',
-          color: 'var(--color-error-600)',
-          marginTop: 'var(--space-1)',
+          color: 'var(--color-error)',                        /* لون خطأ من tokens.css */
+          marginTop: 'var(--space-xs)',                        /* 4px - مسافة صغيرة جداً من tokens.css */
         },
         input: {
           fontFamily: 'var(--font-family)',
@@ -113,62 +113,62 @@ export const MultiSelect = React.forwardRef<HTMLInputElement, MultiSelectProps>(
                    size === 'sm' ? 'var(--fs-sm)' : 
                    size === 'md' ? 'var(--fs-md)' : 
                    size === 'lg' ? 'var(--fs-lg)' : 'var(--fs-xl)',
-          minHeight: size === 'xs' ? '32px' : 
-                    size === 'sm' ? '36px' : 
-                    size === 'md' ? '42px' : 
-                    size === 'lg' ? '50px' : '60px',
-          padding: size === 'xs' ? 'var(--space-1) var(--space-3)' : 
-                  size === 'sm' ? 'var(--space-2) var(--space-4)' : 
-                  size === 'md' ? 'var(--space-3) var(--space-5)' : 
-                  size === 'lg' ? 'var(--space-4) var(--space-6)' : 'var(--space-5) var(--space-7)',
-          border: `var(--border-width-1) solid ${error ? 'var(--color-error-500)' : 'var(--color-neutral-300)'}`,
-          borderRadius: `var(--radius-${radius})`,
-          backgroundColor: disabled ? 'var(--color-neutral-100)' : 'var(--color-background)',
-          color: disabled ? 'var(--color-neutral-500)' : 'var(--color-foreground)',
+          minHeight: size === 'xs' ? 'var(--height-input-sm)' :     /* الحد الأدنى للارتفاع من tokens.css */
+                    size === 'sm' ? 'var(--height-input-sm)' : 
+                    size === 'md' ? 'var(--height-input-md)' : 
+                    size === 'lg' ? 'var(--height-input-lg)' : 'var(--height-input-lg)', /* أحجام موحدة من tokens.css */
+          padding: size === 'xs' ? 'var(--space-xs) var(--space-md)' :     /* مسافات من tokens.css */
+                  size === 'sm' ? 'var(--space-sm) var(--space-lg)' : 
+                  size === 'md' ? 'var(--space-md) var(--space-xl)' : 
+                  size === 'lg' ? 'var(--space-lg) var(--space-xl)' : 'var(--space-xl) var(--space-2xl)',
+          border: `1px solid ${error ? 'var(--color-error)' : 'var(--color-border-primary)'}`, /* حدود من tokens.css */
+          borderRadius: `var(--radius-md)`,                     /* زوايا متوسطة من tokens.css */
+          backgroundColor: disabled ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)', /* خلفيات من tokens.css */
+          color: disabled ? 'var(--color-text-muted)' : 'var(--color-text-primary)', /* ألوان نص من tokens.css */
           transition: 'all 0.2s ease',
           
           '&:focus': {
-            borderColor: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+            borderColor: error ? 'var(--color-error)' : 'var(--color-primary)', /* ألوان من tokens.css */
             boxShadow: error 
-              ? '0 0 0 3px var(--color-error-100)' 
-              : '0 0 0 3px var(--color-primary-100)',
+              ? '0 0 0 3px var(--color-error-light)'           /* لون خطأ فاتح من tokens.css */
+              : '0 0 0 3px var(--color-primary-light)',        /* لون أساسي فاتح من tokens.css */
             outline: 'none',
           },
         } as React.CSSProperties,
         pill: {
-          backgroundColor: 'var(--color-primary-100)',
-          color: 'var(--color-primary-800)',
-          fontSize: 'var(--fs-xs)',
-          fontWeight: 'var(--fw-medium)',
-          border: '1px solid var(--color-primary-200)',
-          borderRadius: `var(--radius-${radius === 'xs' ? 'xs' : 'sm'})`,
-          padding: 'var(--space-1) var(--space-2)',
-          margin: 'var(--space-1)',
+          backgroundColor: 'var(--color-primary)',             /* لون أساسي من tokens.css */
+          color: 'var(--color-text-inverse)',                  /* نص أبيض من tokens.css */
+          fontSize: 'var(--fs-xs)',                            /* حجم خط صغير من tokens.css */
+          fontWeight: 600,                                     /* وزن خط ثابت */
+          border: '1px solid var(--color-primary-hover)',     /* حدود بلون أساسي داكن من tokens.css */
+          borderRadius: 'var(--radius-sm)',                   /* زوايا صغيرة من tokens.css */
+          padding: 'var(--space-xs) var(--space-sm)',         /* مسافات من tokens.css */
+          margin: 'var(--space-xs)',                          /* هامش صغير من tokens.css */
         },
         dropdown: {
-          backgroundColor: 'var(--color-background)',
-          border: '1px solid var(--color-neutral-200)',
-          borderRadius: `var(--radius-${radius})`,
-          boxShadow: 'var(--shadow-lg)',
-          padding: 'var(--space-2)',
-          marginTop: 'var(--space-1)',
+          backgroundColor: 'var(--color-bg-secondary)',       /* خلفية ثانوية من tokens.css */
+          border: '1px solid var(--color-border-primary)',    /* حدود من tokens.css */
+          borderRadius: 'var(--radius-md)',                   /* زوايا متوسطة من tokens.css */
+          boxShadow: 'var(--shadow-lg)',                      /* ظل كبير من tokens.css */
+          padding: 'var(--space-sm)',                         /* مسافة صغيرة من tokens.css */
+          marginTop: 'var(--space-xs)',                       /* مسافة صغيرة جداً من tokens.css */
         },
         item: {
           fontFamily: 'var(--font-family)',
           fontSize: 'var(--fs-sm)',
-          padding: 'var(--space-2) var(--space-3)',
-          borderRadius: `var(--radius-${radius === 'xs' ? 'xs' : 'sm'})`,
+          padding: 'var(--space-sm) var(--space-md)',         /* مسافات من tokens.css */
+          borderRadius: 'var(--radius-sm)',                   /* زوايا صغيرة من tokens.css */
           cursor: 'pointer',
           transition: 'all 0.15s ease',
           
           '&[data-selected]': {
-            backgroundColor: 'var(--color-primary-50)',
-            color: 'var(--color-primary-700)',
+            backgroundColor: 'var(--color-primary-light)',     /* لون أساسي فاتح من tokens.css */
+            color: 'var(--color-primary)',                  /* لون أساسي من tokens.css */
             fontWeight: 'var(--fw-medium)',
           },
           
           '&:hover:not([data-selected])': {
-            backgroundColor: 'var(--color-neutral-100)',
+            backgroundColor: 'var(--color-bg-secondary)',       /* خلفية ثانوية من tokens.css */
           },
         } as React.CSSProperties,
       };

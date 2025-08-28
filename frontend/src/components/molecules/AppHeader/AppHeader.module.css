@@ -1,76 +1,77 @@
 /* AppHeader Styles */
 .appHeader {
-  height: 60px;
-  background-color: var(--color-bg-surface);
-  border-bottom: 1px solid var(--color-bd-default);
-  padding: 0 var(--space-4);
+  height: var(--header-height) !important;
+  background-color: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border-primary);
+  padding: 0 var(--space-lg);
+  position: relative;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--elevation-1);
+  box-shadow: var(--shadow-sm);
 }
 
 .appHeaderLogo {
-  height: 32px;
+  height: 20px;
   width: auto;
 }
 
 .appHeaderTitle {
-  font-family: var(--font-ar);
   white-space: nowrap;
-  color: var(--color-fg-primary);
+  color: var(--color-text-primary);
 }
 
 .appHeaderNotificationBadge {
   position: absolute;
   top: -4px;
   inset-inline-end: -4px;
-  background-color: var(--color-danger-bg);
-  color: var(--color-danger-fg);
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);                         /* نص أبيض من tokens.css */
   border-radius: 50%;
   min-width: 16px;
   height: 16px;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  border: 1px solid var(--color-bg-surface);
+  border: 1px solid var(--color-bg-primary);               /* حدود بلون الخلفية من tokens.css */
 }
 
 .appHeaderNotificationsButton {
   position: relative;
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);                       /* لون نص ثانوي من tokens.css */
 }
 
 .appHeaderUserMenu {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-sm);                                     /* مسافة صغيرة من tokens.css */
   cursor: pointer;
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-  transition: all 120ms ease;
+  padding: var(--space-sm);                                 /* مسافة صغيرة من tokens.css */
+  border-radius: var(--radius-sm);                          /* زوايا صغيرة من tokens.css */
+  transition: background-color 0.2s ease;                  /* انتقال سلس مثل tokens.css */
 }
 
 .appHeaderUserMenu:hover {
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-bg-secondary);             /* خلفية ثانوية عند التمرير من tokens.css */
 }
 
 .appHeaderUserInfo {
-  padding: var(--space-3);
-  border-bottom: 1px solid var(--color-bd-default);
-  margin-bottom: var(--space-1);
+  padding: var(--space-md);                                 /* مسافة متوسطة من tokens.css */
+  border-bottom: 1px solid var(--color-border-primary);    /* حدود من tokens.css */
+  margin-bottom: var(--space-xs);                          /* مسافة صغيرة جداً من tokens.css */
 }
 
 .appHeaderUserText {
-  font-family: var(--font-ar);
+  font-family: var(--font-ar);                              /* خط عربي من tokens.css */
   line-height: 1.2;
 }
 
 .appHeaderBurger {
   display: block;
-  color: var(--color-fg-primary);
+  color: var(--color-text-primary);                        /* لون نص أساسي من tokens.css */
 }
 
 .appHeaderUserDetails {

@@ -1,0 +1,293 @@
+/* صفحة التقارير - موحدة بالكامل مع tokens.css */
+
+.reportsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Header موحد */
+.pageHeader {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.pageTitle {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+/* التابات الرئيسية موحدة */
+.mainTabs {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.mainTabs [data-tabs-list] {
+  background: var(--color-bg-tertiary);
+  border-bottom: 2px solid var(--color-border-primary);
+  padding: var(--space-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.mainTabs [data-tabs-tab] {
+  font-weight: 500;
+  padding: var(--space-sm) var(--space-lg);
+  transition: all 0.2s ease;
+}
+
+.mainTabs [data-tabs-tab]:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.mainTabs [data-tabs-tab][data-active="true"] {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.mainTabs [data-tabs-panel] {
+  padding: var(--space-lg);
+}
+
+/* بطاقات الـ KPI */
+.kpiCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+}
+
+.kpiCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-secondary);
+}
+
+.kpiValue {
+  color: var(--color-text-primary);
+  font-size: var(--fs-2xl);
+  line-height: 1.2;
+  margin: var(--space-xs) 0;
+}
+
+/* بطاقات الرسوم البيانية */
+.chartCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  transition: box-shadow 0.2s ease;
+}
+
+.chartCard:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* البطاقة المالية */
+.financialCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+/* بطاقة الجداول */
+.tableCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+.tableCard table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tableCard thead tr th {
+  background-color: var(--color-bg-tertiary);
+  border-bottom: 2px solid var(--color-border-primary);
+  font-weight: 600;
+  padding: var(--space-md);
+  text-align: right;
+}
+
+.tableCard tbody tr td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.tableCard tbody tr:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.tableCard tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* بطاقات التخصصات */
+.categoryCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.categoryCard:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-secondary);
+}
+
+/* بطاقة التصدير */
+.exportCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+.exportOption {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.exportOption:hover {
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* بطاقة الأرشيف */
+.archiveCard {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+/* بطاقة قريباً */
+.comingSoonCard {
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-secondary) 100%);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* أيقونات النجوم */
+.starIcon {
+  color: var(--color-text-secondary);
+}
+
+/* التصميم المتجاوب */
+@media (max-width: var(--page-max-width)) {
+  .reportsContainer {
+    padding: var(--space-md);
+  }
+
+  .kpiCard {
+    height: 100px;
+  }
+
+  .kpiValue {
+    font-size: var(--fs-2xl);
+  }
+
+  .mainTabs [data-tabs-tab] {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--fs-sm);
+  }
+
+  .mainTabs [data-tabs-panel] {
+    padding: var(--space-md);
+  }
+
+  .tableCard {
+    overflow-x: auto;
+  }
+
+  .exportOption {
+    margin-bottom: var(--space-sm);
+  }
+}
+
+@media (max-width: var(--page-max-width)) {
+  .pageTitle {
+    font-size: var(--fs-2xl);
+  }
+
+  .kpiCard {
+    height: 90px;
+  }
+
+  .kpiValue {
+    font-size: var(--fs-xl);
+  }
+
+  .chartCard,
+  .financialCard,
+  .tableCard {
+    padding: var(--space-sm) !important;
+  }
+}
+
+/* تحسينات الأداء */
+.reportsContainer * {
+  box-sizing: border-box;
+}
+
+/* تأثيرات الانتقال */
+.kpiCard,
+.chartCard,
+.categoryCard,
+.exportOption {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* تحسين التباين للنصوص */
+.kpiValue,
+.pageTitle {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* تحسين الوضوحية للرسوم البيانية */
+.chartCard canvas {
+  border-radius: var(--radius-md);
+}
+
+/* تنسيق خاص للطباعة */
+@media print {
+  .reportsContainer {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .kpiCard,
+  .chartCard,
+  .tableCard {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .mainTabs [data-tabs-list] {
+    display: none;
+  }
+}

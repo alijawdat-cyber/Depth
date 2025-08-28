@@ -1,14 +1,18 @@
-/* Storybook-specific tweaks: نضبط canvas والخطوط حتى تتبع التوكنز */
-/* تم إزالة استدعاء checkbox-radio-fixes.css لأنه محذوف */
+/* Storybook-specific tweaks: نضبط canvas والخطوط حتى تتبع tokens.css المقفل */
 
-.sb-depth-surface { background: var(--color-bg-surface); color: var(--color-fg-primary); }
-.sbdocs.sbdocs-wrapper, .sbdocs-preview, .sbdocs, .sb-show-main, .docs-story {
-  background: var(--color-bg-surface) !important;
-  color: var(--color-fg-primary) !important;
+.sb-depth-surface { 
+  background: var(--color-bg-secondary); 
+  color: var(--color-text-primary); 
 }
+
+.sbdocs.sbdocs-wrapper, .sbdocs-preview, .sbdocs, .sb-show-main, .docs-story {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
 /* تأكيد ألوان البورد/العناوين بالـ Docs */
 .sbdocs-wrapper .sbdocs-h1, .sbdocs-wrapper .sbdocs-h2, .sbdocs-wrapper .sbdocs-h3 {
-  color: var(--color-fg-primary) !important;
+  color: var(--color-text-primary) !important;
 }
 
 /* أوضاع الـ Canvas */

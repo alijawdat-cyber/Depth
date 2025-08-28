@@ -1,8 +1,16 @@
-/* StatsCard Styles */
+/* بطاقة الإحصائيات - موحدة بالكامل مع tokens.css */
 .statsCard {
-  transition: all 180ms ease;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
   position: relative;
   min-height: 120px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: var(--space-lg);
 }
 
 .statsCardClickable {
@@ -11,14 +19,17 @@
 
 .statsCardClickable:hover {
   transform: translateY(-2px);
-  box-shadow: var(--elevation-2);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-secondary);
 }
 
 .statsCardContent {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-sm);
   height: 100%;
+  flex: 1;
+  justify-content: space-between;
 }
 
 /* Header */
@@ -26,15 +37,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-sm);
 }
 
 .statsCardTitle {
-  font-family: var(--font-ar);
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 1.4;
   flex: 1;
+  font-size: var(--fs-sm);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .statsCardIcon {
@@ -42,7 +58,7 @@
   align-items: center;
   justify-content: center;
   opacity: 0.7;
-  margin-inline-end: var(--space-1);
+  margin-inline-end: var(--space-xs);                     /* 4px - مسافة صغيرة جداً من tokens.css */
   flex-shrink: 0;
 }
 
@@ -50,14 +66,17 @@
 .statsCardValue {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-sm);                                   /* 8px - مسافة صغيرة من tokens.css */
 }
 
 .statsCardNumber {
   font-family: var(--font-ar);
-  color: var(--color-fg-primary);
-  line-height: 1;
+  color: var(--color-text-primary);                       /* نص أساسي من tokens.css */
+  line-height: 1.2; /* تحسين للأرقام */
   font-variant-numeric: tabular-nums;
+  font-size: var(--fs-2xl);                               /* 24px - حجم خط كبير جداً من tokens.css */
+  font-weight: 700;
+  margin: var(--space-xs) 0;                              /* 4px عمودي - مسافة صغيرة جداً من tokens.css */
 }
 
 /* Trend */
@@ -67,7 +86,7 @@
 
 .statsCardTrendGroup {
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-xs);                                   /* 4px - مسافة صغيرة جداً من tokens.css */
 }
 
 .statsCardTrendIcon {
@@ -83,14 +102,21 @@
 
 .statsCardTrendLabel {
   font-family: var(--font-ar);
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
   opacity: 0.8;
+  font-size: var(--fs-xs);                                /* 12px - حجم خط صغير جداً من tokens.css */
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* سطر واحد فقط */
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 /* Description */
 .statsCardDescription {
   font-family: var(--font-ar);
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
   line-height: 1.4;
   margin-top: auto;
 }
@@ -109,39 +135,39 @@
 }
 
 .statsCard--success {
-  border: 1px solid var(--color-success-bd);
+  border: 1px solid var(--color-success);                 /* حدود نجاح من tokens.css */
 }
 
 .statsCard--success .statsCardIcon {
-  color: var(--color-success-fg);
+  color: var(--color-success);                            /* لون نجاح من tokens.css */
 }
 
 .statsCard--success .statsCardNumber {
-  color: var(--color-success-fg);
+  color: var(--color-success);                            /* لون نجاح من tokens.css */
 }
 
 .statsCard--warning {
-  border: 1px solid var(--color-warning-bd);
+  border: 1px solid var(--color-warning);                 /* حدود تحذير من tokens.css */
 }
 
 .statsCard--warning .statsCardIcon {
-  color: var(--color-warning-fg);
+  color: var(--color-warning);                            /* لون تحذير من tokens.css */
 }
 
 .statsCard--warning .statsCardNumber {
-  color: var(--color-warning-fg);
+  color: var(--color-warning);                            /* لون تحذير من tokens.css */
 }
 
 .statsCard--danger {
-  border: 1px solid var(--color-danger-bd);
+  border: 1px solid var(--color-error);                   /* حدود خطأ من tokens.css */
 }
 
 .statsCard--danger .statsCardIcon {
-  color: var(--color-danger-fg);
+  color: var(--color-error);                              /* لون خطأ من tokens.css */
 }
 
 .statsCard--danger .statsCardNumber {
-  color: var(--color-danger-fg);
+  color: var(--color-error);                              /* لون خطأ من tokens.css */
 }
 
 .statsCard--info {
@@ -157,47 +183,122 @@
 }
 
 .statsCard--neutral {
-  border: 1px solid var(--color-bd-default);
+  border: 1px solid var(--color-border-primary);          /* حدود أساسية من tokens.css */
 }
 
 .statsCard--neutral .statsCardIcon {
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
 }
 
 .statsCard--neutral .statsCardNumber {
-  color: var(--color-fg-primary);
+  color: var(--color-text-primary);                       /* نص أساسي من tokens.css */
 }
 
-/* Size Variants */
+/* Size Variants - محسن للتجاوب */
 .statsCard--sm {
-  min-height: 100px;
+  min-height: 100px;                                      /* ارتفاع أصغر للبطاقات الصغيرة */
+  padding: var(--space-sm);                               /* 8px - مسافة صغيرة من tokens.css */
 }
 
 .statsCard--sm .statsCardContent {
-  gap: var(--space-2);
+  gap: var(--space-xs);                                   /* 4px - مسافة صغيرة جداً من tokens.css */
+}
+
+.statsCard--sm .statsCardTitle {
+  font-size: var(--fs-xs);                                /* 12px - حجم خط صغير جداً من tokens.css */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.statsCard--sm .statsCardNumber {
+  font-size: var(--fs-lg);                                /* 18px - حجم خط كبير من tokens.css */
 }
 
 .statsCard--md {
-  min-height: 120px;
+  min-height: 120px;                                      /* الارتفاع الافتراضي المحسن */
+  padding: var(--space-md);                               /* 12px - مسافة متوسطة من tokens.css */
 }
 
 .statsCard--lg {
-  min-height: 140px;
+  min-height: 140px;                                      /* ارتفاع أكبر للبطاقات الكبيرة */
+  padding: var(--space-lg);                               /* 16px - مسافة كبيرة من tokens.css */
 }
 
-.statsCard--lg .statsCardContent {
-  gap: var(--space-4);
+.statsCard--lg .statsCardTitle {
+  font-size: var(--fs-md);                                /* 16px - حجم خط متوسط من tokens.css */
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.statsCard--lg .statsCardNumber {
+  font-size: var(--fs-3xl);                               /* 30px - حجم خط كبير جداً من tokens.css */
+}
+
+/* تجاوب للشاشات الصغيرة */
+@media (max-width: 767px) {
+  .statsCard {
+    min-height: 100px;                                    /* ارتفاع أصغر للموبايل */
+    padding: var(--space-sm);                             /* 8px - مسافة صغيرة من tokens.css */
+  }
+
+  .statsCardTitle {
+    font-size: var(--fs-xs);                              /* 12px - حجم خط صغير جداً من tokens.css */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .statsCardNumber {
+    font-size: var(--fs-lg);                              /* 18px - حجم خط كبير من tokens.css */
+  }
+
+  .statsCardTrendLabel {
+    font-size: var(--fs-xs);                              /* 12px - حجم خط صغير جداً من tokens.css */
+  }
+}
+
+/* تجاوب للشاشات المتوسطة */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .statsCard {
+    min-height: 110px;                                    /* ارتفاع متوسط للتابلت */
+    padding: var(--space-md);                             /* 12px - مسافة متوسطة من tokens.css */
+  }
+
+  .statsCardTitle {
+    font-size: var(--fs-sm);                              /* 14px - حجم خط صغير من tokens.css */
+  }
+
+  .statsCardNumber {
+    font-size: var(--fs-xl);                              /* 20px - حجم خط كبير جداً من tokens.css */
+  }
+}
+
+/* تجاوب للشاشات الكبيرة */
+@media (min-width: 1025px) {
+  .statsCard {
+    min-height: 120px;                                    /* ارتفاع مثالي للديسكتوب */
+    padding: var(--space-md);                             /* 12px - مسافة متوسطة من tokens.css */
+  }
+
+  .statsCardTitle {
+    font-size: var(--fs-sm);                              /* 14px - حجم خط صغير من tokens.css */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .statsCardNumber {
+    font-size: var(--fs-2xl);                             /* 24px - حجم خط كبير جداً من tokens.css */
+  }
 }
 
 /* Trend Colors */
 .statsCardTrendUp {
-  color: var(--color-success-fg);
+  color: var(--color-success);                            /* لون نجاح من tokens.css */
 }
 
 .statsCardTrendDown {
-  color: var(--color-danger-fg);
+  color: var(--color-error);                              /* لون خطأ من tokens.css */
 }
 
 .statsCardTrendNeutral {
-  color: var(--color-fg-secondary);
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
 }

@@ -1,0 +1,155 @@
+/* =============================================
+   Grid System للبطاقات - موحد عبر المشروع
+   ============================================= */
+
+/* Container للبطاقات */
+.cardsContainer {
+  display: grid;
+  gap: var(--space-md);                                   /* 12px - مسافة متوسطة من tokens.css */
+  margin-bottom: var(--space-xl);                         /* 24px - مسافة كبيرة جداً من tokens.css */
+}
+
+/* Grid تجاوبي للبطاقات */
+.cardsGrid {
+  display: grid;
+  gap: var(--space-md);                                   /* 12px - مسافة متوسطة من tokens.css */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* الحد الأدنى 250px للبطاقة */
+}
+
+/* Grid للإحصائيات */
+.statsGrid {
+  display: grid;
+  gap: var(--space-md);                                   /* 12px - مسافة متوسطة من tokens.css */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* الحد الأدنى 200px لبطاقات الإحصائيات */
+}
+
+/* تجاوب للشاشات الصغيرة - الموبايل */
+@media (max-width: 576px) {
+  .cardsContainer {
+    gap: var(--space-sm);                                 /* 8px - مسافة صغيرة من tokens.css */
+    margin-bottom: var(--space-lg);                       /* 16px - مسافة كبيرة من tokens.css */
+  }
+
+  .cardsGrid {
+    gap: var(--space-sm);                                 /* 8px - مسافة صغيرة من tokens.css */
+    grid-template-columns: 1fr;                           /* عمود واحد للموبايل */
+  }
+
+  .statsGrid {
+    gap: var(--space-sm);                                 /* 8px - مسافة صغيرة من tokens.css */
+    grid-template-columns: 1fr;                           /* عمود واحد للموبايل */
+  }
+}
+
+/* تجاوب للشاشات المتوسطة - التابلت */
+@media (min-width: 577px) and (max-width: 768px) {
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* حد أدنى أصغر للتابلت */
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* حد أدنى أصغر للتابلت */
+  }
+}
+
+/* تجاوب للشاشات الكبيرة - الديسكتوب */
+@media (min-width: 769px) and (max-width: var(--page-max-width-narrow)) {
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* حد أدنى متوسط للديسكتوب الصغير */
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); /* حد أدنى متوسط للديسكتوب الصغير */
+  }
+}
+
+/* تجاوب للشاشات الكبيرة جداً */
+@media (min-width: 1201px) {
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* حد أدنى أكبر للشاشات الكبيرة */
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* حد أدنى أكبر للشاشات الكبيرة */
+    max-width: var(--page-max-width-narrow);                                    /* حد أقصى للعرض */
+    margin: 0 auto;                                       /* توسيط */
+  }
+}
+
+/* =============================================
+   أنماط البطاقات الخاصة
+   ============================================= */
+
+/* بطاقة مع خلفية واضحة */
+.cardElevated {
+  background: var(--color-bg-secondary) !important;        /* خلفية ثانوية واضحة من tokens.css */
+  border: 1px solid var(--color-border-primary) !important; /* حدود من tokens.css */
+  border-radius: var(--radius-md) !important;              /* زوايا متوسطة من tokens.css */
+  box-shadow: var(--shadow-sm) !important;                 /* ظل خفيف من tokens.css */
+  transition: all 0.2s ease;
+}
+
+.cardElevated:hover {
+  box-shadow: var(--shadow-md) !important;                 /* ظل متوسط عند الهوفر من tokens.css */
+  transform: translateY(-1px);
+}
+
+/* بطاقة مع حدود فقط */
+.cardOutlined {
+  background: var(--color-bg-primary) !important;          /* خلفية رئيسية من tokens.css */
+  border: 2px solid var(--color-border-primary) !important; /* حدود قوية من tokens.css */
+  border-radius: var(--radius-md) !important;              /* زوايا متوسطة من tokens.css */
+  box-shadow: none !important;
+}
+
+/* بطاقة متجاوبة */
+.cardResponsive {
+  width: 100%;
+  height: auto;
+  min-height: 120px;                                      /* حد أدنى للارتفاع */
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================
+   مساعدات Layout للبطاقات
+   ============================================= */
+
+/* محاذاة البطاقات */
+.cardAlignStretch {
+  align-items: stretch;
+}
+
+/* مسافات داخلية موحدة */
+.cardPaddingStandard {
+  padding: var(--space-md) !important;                     /* 12px - مسافة متوسطة من tokens.css */
+}
+
+.cardPaddingCompact {
+  padding: var(--space-sm) !important;                     /* 8px - مسافة صغيرة من tokens.css */
+}
+
+.cardPaddingComfortable {
+  padding: var(--space-lg) !important;                     /* 16px - مسافة كبيرة من tokens.css */
+}
+
+/* =============================================
+   أنماط خاصة للإحصائيات
+   ============================================= */
+
+/* مؤشر الحالة للبطاقات */
+.cardStatusSuccess {
+  border-left: 4px solid var(--color-success) !important; /* مؤشر أخضر للنجاح */
+}
+
+.cardStatusWarning {
+  border-left: 4px solid var(--color-warning) !important; /* مؤشر برتقالي للتحذير */
+}
+
+.cardStatusError {
+  border-left: 4px solid var(--color-error) !important;   /* مؤشر أحمر للخطأ */
+}
+
+.cardStatusPrimary {
+  border-left: 4px solid var(--color-primary) !important; /* مؤشر بنفسجي للأساسي */
+}

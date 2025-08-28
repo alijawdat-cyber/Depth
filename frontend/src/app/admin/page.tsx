@@ -1,15 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Grid, Title, Text, Group } from '@mantine/core';
+import { Grid } from '@mantine/core';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
 import { DataTable } from '@/components/molecules/DataTable/DataTable';
 import { 
   Users, 
   FileText, 
   Briefcase, 
-  DollarSign,
-  Activity
+  DollarSign
 } from 'lucide-react';
 import styles from './AdminDashboard.module.css';
 
@@ -116,26 +115,6 @@ const tableConfig = {
 export default function AdminDashboard() {
   return (
     <div className={styles.dashboard}>
-      {/* Header */}
-      <div className={styles.header}>
-        <Group justify="space-between" align="center">
-          <div>
-            <Title order={1} className={styles.title}>
-              لوحة التحكم الرئيسية
-            </Title>
-            <Text c="dimmed" className={styles.subtitle}>
-              نظرة عامة على نشاطات منصة Depth
-            </Text>
-          </div>
-          <Group>
-            <Text size="sm" c="dimmed">
-              آخر تحديث: منذ 5 دقائق
-            </Text>
-            <Activity size={16} />
-          </Group>
-        </Group>
-      </div>
-
       {/* Stats Cards */}
       <div className={styles.statsSection}>
         <Grid>
@@ -157,9 +136,9 @@ export default function AdminDashboard() {
 
       {/* Recent Activities Table */}
       <div className={styles.activitiesSection}>
-        <Title order={2} mb="md" className={styles.sectionTitle}>
+        <h2 className={styles.sectionTitle}>
           آخر الأنشطة
-        </Title>
+        </h2>
         <DataTable
           {...tableConfig}
         />

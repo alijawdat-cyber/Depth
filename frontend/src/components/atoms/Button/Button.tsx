@@ -48,18 +48,22 @@ function sizeVars(size: ButtonSize) {
   const actualSize = isCompact ? size.replace('compact-', '') : size;
   
   return {
-    height: isCompact ? `var(--btn-h-${actualSize}-compact)` : `var(--btn-h-${actualSize})`,
-    paddingInline: `var(--btn-px-${actualSize})`,
-    fontSize: `var(--fs-btn-${actualSize})`,
-    minHeight: isCompact ? `var(--btn-h-${actualSize}-compact)` : undefined,
-    gap: {
-      xs: '0.375rem',
-      sm: '0.5rem',
-      md: '0.625rem',
-      lg: '0.75rem',
-      xl: '0.875rem'
-    }[actualSize] || '0.625rem',
-    borderRadius: 'var(--radius-md)'
+    height: isCompact ? 'var(--height-button-sm)' : 
+            actualSize === 'xs' ? 'var(--height-button-sm)' :
+            actualSize === 'sm' ? 'var(--height-button-sm)' :
+            actualSize === 'md' ? 'var(--height-button-md)' :
+            actualSize === 'lg' ? 'var(--height-button-lg)' : 'var(--height-button-lg)', /* أحجام موحدة من tokens.css */
+    paddingInline: actualSize === 'xs' ? 'var(--space-sm)' :
+                   actualSize === 'sm' ? 'var(--space-md)' :
+                   actualSize === 'md' ? 'var(--space-lg)' :
+                   actualSize === 'lg' ? 'var(--space-xl)' : 'var(--space-2xl)', /* مسافات من tokens.css */
+    fontSize: actualSize === 'xs' ? 'var(--fs-xs)' :
+              actualSize === 'sm' ? 'var(--fs-sm)' :
+              actualSize === 'md' ? 'var(--fs-md)' :
+              actualSize === 'lg' ? 'var(--fs-lg)' : 'var(--fs-xl)',  /* أحجام خط من tokens.css */
+    minHeight: isCompact ? 'var(--height-button-sm)' : undefined, /* الحد الأدنى للارتفاع من tokens.css */
+    gap: 'var(--space-sm)',                                      /* مسافة ثابتة بين العناصر من tokens.css */
+    borderRadius: 'var(--radius-md)'                             /* زوايا متوسطة من tokens.css */
   } as React.CSSProperties;
 }
 

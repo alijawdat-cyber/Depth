@@ -22,7 +22,7 @@
 .grid-responsive {
   display: grid;
   grid-template-columns: 1fr; /* موبايل: عمود واحد */
-  gap: var(--space-4);
+  gap: var(--space-lg);        /* مسافة من tokens.css المقفل */
 }
 
 @media (width >= 390px) { /* آيفون القياسي وأندرويد متوسط */
@@ -38,17 +38,17 @@
   width: 100%;
   max-width: 100%;
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding-inline: var(--space-lg);    /* مسافة من tokens.css المقفل */
 }
 
 @media (width >= 1440px) { /* شاشات 1440+ */
-  .container-prose { max-width: 1200px; }
+  .container-prose { max-width: var(--page-max-width-narrow); }
 }
 
 /* مثال: أحجام الخط تتدرج مع الشاشات */
 body { font-size: var(--fs-md); }
-@media (width >= 390px) { body { font-size: 17px; } }
-@media (width >= 1024px) { body { font-size: 18px; } }
+@media (width >= 390px) { body { font-size: var(--fs-lg); } }
+@media (width >= 1024px) { body { font-size: var(--fs-lg); } }
 
 /* Utilities خفيفة قابلة لإعادة الاستخدام */
 .hidden-xs { display: none; }

@@ -1,13 +1,13 @@
 /* ===== DATA TABLE STYLES ===== */
 .dataTable {
-  --data-table-bg: var(--color-surface-primary);
-  --data-table-border: var(--color-border-subtle);
-  --data-table-hover: var(--color-surface-hover);
-  --data-table-selected: var(--color-accent-subtle);
-  --header-bg: var(--color-surface-secondary);
+  --data-table-bg: var(--color-bg-secondary);
+  --data-table-border: var(--color-border-primary);
+  --data-table-hover: var(--color-bg-tertiary);
+  --data-table-selected: var(--color-bg-tertiary);
+  --header-bg: var(--color-bg-secondary);
   --header-text: var(--color-text-secondary);
   --cell-text: var(--color-text-primary);
-  --divider-color: var(--color-border-subtle);
+  --divider-color: var(--color-border-primary);
   
   width: 100%;
   background: var(--data-table-bg);
@@ -17,7 +17,7 @@
 
 /* ===== SEARCH SECTION ===== */
 .searchSection {
-  padding: var(--spacing-md);
+  padding: var(--space-md);
   border-bottom: 1px solid var(--data-table-border);
   background: var(--header-bg);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
@@ -26,17 +26,18 @@
 .searchInput {
   max-width: 300px;
   min-width: 200px;
+  width: 100%; /* تجاوب كامل */
 }
 
 .searchInput input {
   font-size: var(--font-size-sm);
-  background: var(--color-surface-primary);
+  background: var(--color-bg-secondary);
   border-color: var(--data-table-border);
 }
 
 .searchInput input:focus {
-  border-color: var(--color-accent-primary);
-  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 /* ===== TABLE WRAPPER ===== */
@@ -59,7 +60,7 @@
   color: var(--header-text);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
-  padding: var(--spacing-md);
+  padding: var(--space-md);
   text-align: right;
   border-bottom: 2px solid var(--data-table-border);
   white-space: nowrap;
@@ -81,7 +82,7 @@
 
 .headerCell.sortable:hover {
   background: var(--data-table-hover);
-  color: var(--color-accent-primary);
+  color: var(--color-primary);
 }
 
 .checkboxColumn {
@@ -97,13 +98,13 @@
 }
 
 .sortIcon.active {
-  color: var(--color-accent-primary);
+  color: var(--color-primary);
   opacity: 1;
 }
 
 .headerCell.sortable:hover .sortIcon {
   opacity: 1;
-  color: var(--color-accent-primary);
+  color: var(--color-primary);
 }
 
 /* ===== ROW STYLES ===== */
@@ -112,7 +113,7 @@
 }
 
 .tableRow:nth-of-type(even) {
-  background: var(--color-surface-subtle);
+  background: var(--color-bg-secondary);
 }
 
 .tableRow:hover {
@@ -126,12 +127,12 @@
 }
 
 .tableRow.clickable:hover {
-  background: var(--color-accent-subtle);
+  background: var(--color-primary);
 }
 
 /* ===== CELL STYLES ===== */
 .cell {
-  padding: var(--spacing-md);
+  padding: var(--space-md);
   border-bottom: 1px solid var(--data-table-border);
   color: var(--cell-text);
   font-size: var(--font-size-sm);
@@ -149,17 +150,17 @@
 
 /* ===== PAGINATION SECTION ===== */
 .paginationSection {
-  padding: var(--spacing-md);
+  padding: var(--space-md);
   border-top: 1px solid var(--data-table-border);
   background: var(--header-bg);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
 }
 
 /* ===== RESPONSIVE STYLES ===== */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .searchSection {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--space-sm);
     align-items: stretch;
   }
   
@@ -170,7 +171,7 @@
   
   .headerCell,
   .cell {
-    padding: var(--spacing-sm);
+    padding: var(--space-sm);
     font-size: var(--font-size-xs);
   }
   
@@ -186,15 +187,15 @@
 @media (max-width: 480px) {
   .headerCell,
   .cell {
-    padding: var(--spacing-xs);
+    padding: var(--space-xs);
   }
   
   .searchSection {
-    padding: var(--spacing-sm);
+    padding: var(--space-sm);
   }
   
   .paginationSection {
-    padding: var(--spacing-sm);
+    padding: var(--space-sm);
   }
 }
 
@@ -212,9 +213,9 @@
 /* ===== DARK MODE ADJUSTMENTS ===== */
 @media (prefers-color-scheme: dark) {
   .dataTable {
-    --data-table-bg: var(--color-surface-primary);
-    --data-table-border: var(--color-border-subtle);
-    --data-table-hover: var(--color-surface-hover);
-    --header-bg: var(--color-surface-secondary);
+    --data-table-bg: var(--color-bg-secondary);
+    --data-table-border: var(--color-border-primary);
+    --data-table-hover: var(--color-bg-secondary);
+    --header-bg: var(--color-bg-secondary);
   }
 }

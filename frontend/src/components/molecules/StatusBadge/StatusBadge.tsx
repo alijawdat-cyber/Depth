@@ -24,7 +24,10 @@ export type StatusType =
   | 'draft'
   | 'published'
   | 'archived'
-  | 'processing';
+  | 'processing'
+  | 'reviewing'
+  | 'approved'
+  | 'rejected';
 
 // خصائص المكون
 export interface StatusBadgeProps {
@@ -97,6 +100,21 @@ const statusConfig: Record<StatusType, {
     label: 'قيد المعالجة',
     color: 'blue',
     icon: Clock
+  },
+  reviewing: {
+    label: 'مراجعة',
+    color: 'orange',
+    icon: AlertCircle
+  },
+  approved: {
+    label: 'معتمد',
+    color: 'green', 
+    icon: CheckCircle
+  },
+  rejected: {
+    label: 'مرفوض',
+    color: 'red',
+    icon: XCircle
   }
 };
 

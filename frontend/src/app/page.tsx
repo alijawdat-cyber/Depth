@@ -78,7 +78,7 @@ export default function Home() {
         <Stack align="center" mb={60}>
           <Title 
             order={1} 
-            size="3.5rem" 
+            size="var(--fs-3xl)"                               /* 30px - حجم خط كبير جداً من tokens.css */ 
             fw={800} 
             ta="center"
             className={styles.titleGradient}
@@ -128,7 +128,7 @@ export default function Home() {
 
                   {/* Card Content */}
                   <Stack gap="sm">
-                    <Title order={3} size="1.5rem" fw={600}>
+                    <Title order={3} size="var(--fs-xl)" fw={600}>  {/* 20px - حجم خط كبير جداً من tokens.css */}
                       {role.title}
                     </Title>
                     

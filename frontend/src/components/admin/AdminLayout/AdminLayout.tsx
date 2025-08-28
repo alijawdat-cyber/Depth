@@ -3,6 +3,7 @@
 import React from 'react';
 import { AppShell } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useRouter, usePathname } from 'next/navigation';
 import { AppHeader } from '../../molecules/AppHeader/AppHeader';
 import { AppSidebar } from '../../molecules/AppSidebar/AppSidebar';
 import { adminMenuData } from '../AdminMenuData';
@@ -16,6 +17,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpened, { toggle: toggleSidebar, close: closeSidebar }] = useDisclosure(false);
   // توحيد البريك-بوينت: موبايل < 768px (متوافق ويا md=768)
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const router = useRouter();
+  const pathname = usePathname();
 
   // بيانات المستخدم الحالي (mock data - سيتم استبداله بـ context/store)
   const currentUser = {
@@ -31,22 +34,49 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     console.log('تسجيل خروج');
   };
 
+  // تحديث حالة النشاط للقائمة حسب المسار الحالي
+  const updatedMenuData = adminMenuData.map(item => {
+    if (item.type === 'link') {
+      return {
+        ...item,
+        isActive: pathname === item.path
+      };
+    } else if (item.type === 'group' && item.children) {
+      return {
+        ...item,
+        children: item.children.map(child => ({
+          ...child,
+          isActive: pathname === child.path
+        }))
+      };
+    }
+    return item;
+  });
+
+  const handleMenuItemClick = (item: { path?: string; title: string }) => {
+    if (item.path) {
+      router.push(item.path);
+    }
+    console.log('تم النقر على:', item.title);
+    if (isMobile) closeSidebar();
+  };
+
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 50 }}                                /* ارتفاع ثابت - Mantine ما يدعم CSS variables */
       className={`${styles.adminShell} ${isMobile && sidebarOpened ? styles.isSidebarOpen : ''}`}
       styles={{
         main: {
-          backgroundColor: 'var(--bg)',
           minHeight: '100vh',
+          paddingTop: 'var(--header-height)',                /* إضافة مسافة من الأعلى لتجنب تداخل الهيدر */
           // إلغاء تحريك المحتوى على الموبايل؛ السايدبار يغطي كأوفرلاي
           transition: 'none',
         },
         header: {
-          backgroundColor: 'var(--bg)',
-          borderBottom: '1px solid var(--color-outline-variant)',
+          backgroundColor: 'var(--color-bg-primary)',        /* خلفية رئيسية من tokens.css */
+          borderBottom: '1px solid var(--color-border-primary)', /* حدود من tokens.css */
           padding: 0,
-          zIndex: 1100,
+          zIndex: isMobile && sidebarOpened ? 1200 : 1100, // تقليل z-index عند فتح السايدبار
         },
       }}
     >
@@ -68,14 +98,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <AppShell.Main className={`${styles.mainContent} ${!isMobile ? styles.mainContentDesktopPushed : ''}`}>
         {/* سايدبار: ديسكتوب ثابت دائمًا، وموبايل حسب الحالة */}
         <AppSidebar
-          items={adminMenuData}
+          items={updatedMenuData}
           userRole="admin"
           isOpen={!isMobile || sidebarOpened}
           onClose={closeSidebar}
-          onItemClick={(item) => {
-            console.log('تم النقر على:', item.title);
-            if (isMobile) closeSidebar();
-          }}
+          onItemClick={handleMenuItemClick}
         />
         {isMobile && sidebarOpened && (
           <div

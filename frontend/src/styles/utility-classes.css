@@ -1,0 +1,45 @@
+/* كلاسات مساعدة موحدة للنصوص والألوان - تستخدم في TSX */
+
+.text-primary {
+  color: var(--color-text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+.text-success {
+  color: var(--color-success) !important;
+}
+
+.text-warning {
+  color: var(--color-warning) !important;
+}
+
+.text-error {
+  color: var(--color-error) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--color-bg-secondary) !important;
+}
+
+.bg-success-light {
+  background-color: var(--color-success-light) !important;
+}
+
+.bg-warning-light {
+  background-color: var(--color-warning-light) !important;
+}
+
+.bg-error-light {
+  background-color: var(--color-error-light) !important;
+}

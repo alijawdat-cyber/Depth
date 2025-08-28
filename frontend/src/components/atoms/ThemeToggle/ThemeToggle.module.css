@@ -1,0 +1,228 @@
+/* ThemeToggle.module.css */
+
+.themeToggle {
+  display: inline-block;
+  position: relative;
+}
+
+.segmentedControl {
+  background-color: var(--color-bg-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+  padding: 2px;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.segmentedControl:hover {
+  border-color: var(--color-border-secondary) !important;
+  box-shadow: var(--shadow-md);
+}
+
+.icon {
+  color: var(--color-text-secondary);                    /* نص ثانوي للافتراضي */
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.label {
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  line-height: 1.2;
+}
+
+.iconOnly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease;
+}
+
+/* تعيين لون مميز لكل أيقونة عبر متغير محلي */
+.iconLight,
+.iconOnly.iconLight {
+  --icon-accent: var(--color-primary);     /* بنفسجي لآيقونة الشمس (Light) */
+}
+
+.iconDark,
+.iconOnly.iconDark {
+  --icon-accent: var(--color-info);        /* أزرق معلومات للقمر (Dark) */
+}
+
+.iconAuto,
+.iconOnly.iconAuto {
+  --icon-accent: var(--color-success);     /* أخضر للوضع التلقائي (Auto) */
+}
+
+/* تخصيصات الوضع النشط */
+/* الأيقونات تكتسب لونها المميز عند التفعيل */
+.segmentedControl [data-active="true"] .icon,
+.segmentedControl [data-active="true"] .iconOnly {
+  color: var(--icon-accent, var(--color-text-primary));   /* اللون المميز يظهر فقط عند التفعيل */
+}
+
+/* تخصيصات الأحجام */
+.themeToggle[data-size="xs"] .segmentedControl {
+  font-size: var(--fs-xs);                               /* 12px - حجم خط صغير من tokens.css */
+}
+
+.themeToggle[data-size="sm"] .segmentedControl {
+  font-size: var(--fs-sm);                                /* 14px - حجم خط صغير من tokens.css */
+}
+
+.themeToggle[data-size="md"] .segmentedControl {
+  font-size: var(--fs-md);                                /* 16px - حجم خط متوسط من tokens.css */
+}
+
+.themeToggle[data-size="lg"] .segmentedControl {
+  font-size: var(--fs-lg);                                /* 18px - حجم خط كبير من tokens.css */
+}
+
+.themeToggle[data-size="xl"] .segmentedControl {
+  font-size: var(--fs-xl);                                /* 20px - حجم خط كبير جداً من tokens.css */
+}
+
+/* تخصيصات الوضع الداكن */
+[data-mantine-color-scheme="dark"] .segmentedControl {
+  background-color: var(--color-bg-primary) !important; /* عكس السايدبار (السايدبار ثانوي) */
+  border-color: var(--color-border-primary) !important;
+}
+
+[data-mantine-color-scheme="dark"] .segmentedControl:hover {
+  border-color: var(--color-border-secondary) !important;
+}
+
+/* لا حاجة لتغييرات ألوان خاصة بالداكن للأيقونات/النصوص؛ التوكنز تغيّر تلقائياً */
+
+/* تأثيرات التفاعل */
+.segmentedControl button {
+  transition: all 0.2s ease;
+  position: relative; /* لتموضع الدفايدر */
+}
+
+.segmentedControl button:hover .icon,
+.segmentedControl button:hover .iconOnly {
+  color: var(--color-text-secondary);                     /* بدون تلوين على hover */
+}
+
+/* الحفاظ على اللون المميز في حالة التفعيل حتى مع hover */
+.segmentedControl [data-active="true"]:hover .icon,
+.segmentedControl [data-active="true"]:hover .iconOnly {
+  color: var(--icon-accent, var(--color-text-primary));
+}
+
+[data-mantine-color-scheme="dark"] .segmentedControl button:hover .icon,
+[data-mantine-color-scheme="dark"] .segmentedControl button:hover .iconOnly {
+  color: var(--color-text-secondary);
+}
+
+[data-mantine-color-scheme="dark"] .segmentedControl [data-active="true"]:hover .icon,
+[data-mantine-color-scheme="dark"] .segmentedControl [data-active="true"]:hover .iconOnly {
+  color: var(--icon-accent, var(--color-text-primary));
+}
+
+/* انيميشنز للتبديل */
+.segmentedControl [data-mantine-segmented-control="indicator"] {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: transparent;                          /* لا خلفية للمؤشر */
+  box-shadow: none;                                       /* بدون ظل */
+}
+
+[data-mantine-color-scheme="dark"] .segmentedControl [data-mantine-segmented-control="indicator"] {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* تحسينات الوصول */
+.segmentedControl:focus-within {
+  outline: none; /* نلغي الإطار القديم نهائياً */
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 480px) {
+  .themeToggle {
+    width: 100%;
+  }
+  
+  .segmentedControl {
+    width: 100%;
+  }
+  
+  .label {
+    font-size: var(--fs-sm);                              /* 14px - حجم خط صغير من tokens.css */
+  }
+}
+
+/* تحسين للطباعة */
+@media print {
+  .themeToggle {
+    display: none;
+  }
+}
+
+/* إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .segmentedControl,
+  .segmentedControl button,
+  .segmentedControl [data-mantine-segmented-control="indicator"],
+  .icon,
+  .label,
+  .iconOnly {
+    transition: none;
+  }
+}
+
+/* تحسين للشاشات عالية الدقة */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .segmentedControl {
+    border-width: 0.5px;
+  }
+}
+
+/* دفايدرات عمودية بين الأقسام (يظهر بين الأزرار) */
+.segmentedControl button:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  background-color: var(--color-border-secondary); /* خط أول أغمق قليلاً */
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1; /* فوق محتوى الزر والمؤشر */
+}
+
+/* خط رفيع ثاني ملاصق يمنح إحساس خطّين */
+.segmentedControl button:not(:first-child)::after {
+  content: '';
+  position: absolute;
+  left: 3px; /* مسافة واضحة بين الخطين */
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  background-color: var(--color-border-primary); /* خط ثاني أفتح (واضح بالفاتح والداكن) */
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* إبراز بنفسجي مؤقت للإطار الخارجي بعد النقر */
+.highlight {
+  position: relative;
+}
+
+.highlight .segmentedControl {
+  border-color: var(--color-border-primary) !important; /* خلّي الحدود عادية لتجنب إطارين */
+  box-shadow: 0 0 0 2px var(--color-primary);          /* حلقة بنفسجية واحدة خارجية */
+}
+
+/* أثناء الهايلايت لا نعرض outline التركيز حتى لا يصير إطارين */
+.highlight .segmentedControl:focus-within {
+  outline: none;
+}

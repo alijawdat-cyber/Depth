@@ -84,12 +84,12 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(function Badge
     const baseStyles: React.CSSProperties = {
       fontWeight: 500,
       fontSize: {
-        xs: '0.625rem',
-        sm: '0.75rem',
-        md: '0.875rem',
-        lg: '1rem',
-        xl: '1.125rem'
-      }[size] || '0.75rem',
+        xs: 'var(--fs-xs)',                                 /* 12px - حجم خط صغير جداً من tokens.css */
+        sm: 'var(--fs-sm)',                                 /* 14px - حجم خط صغير من tokens.css */
+        md: 'var(--fs-md)',                                 /* 16px - حجم خط متوسط من tokens.css */
+        lg: 'var(--fs-lg)',                                 /* 18px - حجم خط كبير من tokens.css */
+        xl: 'var(--fs-xl)'                                  /* 20px - حجم خط كبير جداً من tokens.css */
+      }[size] || 'var(--fs-sm)',
       ...(style || {})
     };
 
@@ -99,21 +99,21 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(function Badge
         case "filled":
           return {
             ...baseStyles,
-            backgroundColor: 'var(--color-primary)',
-            color: 'white',
+            backgroundColor: 'var(--color-primary)',         /* لون أساسي من tokens.css */
+            color: 'var(--color-text-inverse)',              /* نص أبيض من tokens.css */
           };
         case "light":
           return {
             ...baseStyles,
-            backgroundColor: 'color-mix(in oklab, var(--color-primary) 15%, transparent)',
-            color: 'var(--color-primary)',
+            backgroundColor: 'rgba(108, 43, 255, 0.15)',     /* لون أساسي شفاف */
+            color: 'var(--color-primary)',                   /* لون أساسي من tokens.css */
           };
         case "outline":
           return {
             ...baseStyles,
             backgroundColor: 'transparent',
-            color: 'var(--color-primary)',
-            border: '1px solid var(--color-primary)',
+            color: 'var(--color-primary)',                   /* لون أساسي من tokens.css */
+            border: '1px solid var(--color-primary)',        /* حدود بلون أساسي من tokens.css */
           };
         default:
           return baseStyles;
@@ -141,28 +141,28 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(function Badge
         root: {
           // Use our design tokens for consistent spacing and colors
           '--badge-height': {
-            xs: 'var(--space-4)',
-            sm: 'var(--space-5)',
-            md: 'var(--space-6)',
-            lg: 'var(--space-8)',
-            xl: 'var(--space-10)'
-          }[size] || 'var(--space-5)',
+            xs: 'var(--space-sm)',                            /* 8px - مسافة صغيرة من tokens.css */
+            sm: 'var(--space-md)',                            /* 12px - مسافة متوسطة من tokens.css */
+            md: 'var(--space-lg)',                            /* 16px - مسافة كبيرة من tokens.css */
+            lg: 'var(--space-xl)',                            /* 24px - مسافة كبيرة جداً من tokens.css */
+            xl: 'var(--space-2xl)'                            /* 32px - مسافة كبيرة جداً من tokens.css */
+          }[size] || 'var(--space-md)',
           borderRadius: {
-            xs: 'var(--radius-sm)',
-            sm: 'var(--radius-sm)',
-            md: 'var(--radius-md)',
-            lg: 'var(--radius-lg)',
-            xl: '9999px' // Full rounded
-          }[radius] || '9999px',
+            xs: 'var(--radius-sm)',                           /* 6px - زوايا صغيرة من tokens.css */
+            sm: 'var(--radius-sm)',                           /* 6px - زوايا صغيرة من tokens.css */
+            md: 'var(--radius-md)',                           /* 8px - زوايا متوسطة من tokens.css */
+            lg: 'var(--radius-lg)',                           /* 12px - زوايا كبيرة من tokens.css */
+            xl: '9999px'                                      /* دائرية كاملة - استثناء مقبول */
+          }[radius] || 'var(--radius-md)',                    /* قيمة افتراضية من tokens.css */
           ...getCustomStyles(),
         },
         label: {
-          fontWeight: 500,
+          fontWeight: 500,                                    /* استثناء - وزن ثابت للنص */
         },
         section: {
           '& svg': {
-            width: '0.875em',
-            height: '0.875em',
+            width: '14px',                                    /* حجم أيقونة ثابت - مناسب للبادج */
+            height: '14px',
           },
         },
       }}

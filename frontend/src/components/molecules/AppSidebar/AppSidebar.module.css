@@ -1,17 +1,16 @@
-/* الشريط الجانبي الأساسي */
+/* الشريط الجانبي - موحد بالكامل مع tokens.css */
 .sidebar {
   position: fixed;
-  top: 60px; /* تحت الهدر */
-  inset-inline-start: 0; /* RTL - على اليمين */
-  height: calc(100vh - 60px);
-  width: var(--sidebar-width, 280px);
-  background: var(--color-surface-container);
-  border-inline-end: 1px solid var(--color-outline-variant); /* RTL - حد من جهة النهاية */
-  box-shadow: var(--shadow-lg);
-  /* يبدأ خارج الشاشة يمين (استخدم translateX(100%) ليتحرك من جهة البداية RTL) */
+  top: var(--header-height);
+  inset-inline-start: 0;
+  height: calc(100vh - var(--header-height));
+  width: var(--sidebar-width);
+  background-color: var(--color-bg-secondary) !important;
+  border-inline-end: 1px solid var(--color-border-primary);
+  box-shadow: var(--shadow-sm);
   transform: translateX(100%);
   transition: transform 0.3s ease-in-out;
-  z-index: var(--z-sidebar, 1200);
+  z-index: 1300;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -19,6 +18,13 @@
 
 .sidebar.open {
   transform: translateX(0);
+}
+
+.themeToggleContainer {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-xs) 0;
+  margin-bottom: var(--space-xs);
 }
 
 /* منطقة التمرير */
@@ -29,43 +35,43 @@
 
 /* الأقسام في القائمة */
 .divider {
-  margin: var(--space-md) var(--space-lg);
-  border-color: var(--color-outline-variant);
+  margin: var(--space-md) var(--space-lg);                 /* مسافات متوسطة وكبيرة من tokens.css */
+  border-color: var(--color-border-primary);               /* لون حدود من tokens.css */
 }
 
 /* مجموعة العناصر */
 .menuGroup {
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-xs);                           /* مسافة صغيرة جداً من tokens.css */
 }
 
 .groupButton {
-  color: var(--color-on-surface-variant) !important;
+  color: var(--color-text-secondary) !important;           /* لون نص ثانوي من tokens.css */
   font-weight: 600 !important;
-  padding: var(--space-sm) var(--space-md) !important;
+  padding: var(--space-sm) var(--space-md) !important;     /* مسافات من tokens.css */
   height: auto !important;
-  min-height: 44px;
-  border-radius: var(--radius-md) !important;
-  margin-bottom: var(--space-xs);
+  min-height: var(--height-button-md);                     /* ارتفاع موحد من tokens.css */
+  border-radius: var(--radius-md) !important;              /* زوايا متوسطة من tokens.css */
+  margin-bottom: var(--space-xs);                          /* مسافة صغيرة جداً من tokens.css */
 }
 
 .groupButton:hover {
-  background-color: var(--color-surface-variant) !important;
-  color: var(--color-on-surface) !important;
+  background-color: var(--color-bg-tertiary) !important;   /* خلفية ثلاثية عند التمرير من tokens.css */
+  color: var(--color-text-primary) !important;             /* لون نص أساسي من tokens.css */
 }
 
 .groupChildren {
-  padding-inline-end: var(--space-lg); /* RTL - مسافة من جهة النهاية */
-  border-inline-end: 2px solid var(--color-outline-variant); /* RTL - خط من جهة النهاية */
+  padding-inline-end: var(--space-lg); /* RTL - مسافة من جهة النهاية من tokens.css */
+  border-inline-end: 2px solid var(--color-border-primary); /* خط من جهة النهاية من tokens.css */
 }
 
 /* عناصر القائمة */
 .menuItem {
-  color: var(--color-on-surface-variant) !important;
-  padding: var(--space-sm) var(--space-md) !important;
+  color: var(--color-text-secondary) !important;           /* لون نص ثانوي من tokens.css */
+  padding: var(--space-sm) var(--space-md) !important;     /* مسافات من tokens.css */
   height: auto !important;
-  min-height: 44px;
-  border-radius: var(--radius-md) !important;
-  margin-bottom: var(--space-xs);
+  min-height: var(--height-button-md);                     /* ارتفاع موحد من tokens.css */
+  border-radius: var(--radius-md) !important;              /* زوايا متوسطة من tokens.css */
+  margin-bottom: var(--space-xs);                          /* مسافة صغيرة جداً من tokens.css */
   font-weight: 400 !important;
   transition: all 0.2s ease-in-out;
   position: relative;
@@ -73,31 +79,31 @@
 }
 
 .menuItem:hover {
-  background-color: var(--color-surface-variant) !important;
-  color: var(--color-on-surface) !important;
+  background-color: var(--color-bg-tertiary) !important;   /* خلفية ثلاثية عند التمرير من tokens.css */
+  color: var(--color-text-primary) !important;             /* لون نص أساسي من tokens.css */
   transform: translateX(-2px); /* RTL - تحريك نحو اليسار عند hover */
 }
 
 .menuItem.activeItem {
-  background-color: var(--color-primary-container) !important;
-  color: var(--color-on-primary-container) !important;
+  background-color: var(--color-primary) !important;       /* لون أساسي من tokens.css */
+  color: var(--color-text-inverse) !important;             /* نص أبيض من tokens.css */
   font-weight: 600 !important;
-  border-inline-end: 3px solid var(--color-primary) !important; /* RTL - خط من جهة النهاية */
+  border-inline-end: 3px solid var(--color-primary-hover) !important; /* خط من جهة النهاية من tokens.css */
 }
 
 .menuItem.childItem {
-  padding-inline-end: var(--space-xl) !important; /* RTL - مسافة أكبر من جهة النهاية */
-  font-size: var(--font-size-sm);
+  padding-inline-end: var(--space-xl) !important; /* RTL - مسافة أكبر من جهة النهاية من tokens.css */
+  font-size: var(--fs-sm);                                  /* حجم خط صغير من tokens.css */
 }
 
 /* شارات العدد والحالة */
 .badge {
-  background: var(--color-primary);
-  color: var(--color-white); /* لون فاتح دائماً للوضوح */
-  font-size: var(--font-size-xs);
+  background: var(--color-info);                           /* لون معلومات من tokens.css */
+  color: var(--color-text-inverse);                        /* نص أبيض من tokens.css */
+  font-size: var(--fs-xs);
   font-weight: 600;
   padding: 2px 8px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);                         /* زوايا متوسطة من tokens.css */
   line-height: 1;
   min-width: 18px;
   text-align: center;
@@ -105,12 +111,12 @@
   inset-inline-end: 8px; /* RTL - من جهة النهاية (اليمين في العربي) */
   top: 50%;
   transform: translateY(-50%);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm);                            /* ظل خفيف من tokens.css */
 }
 
 .badge.badgeNew {
-  background: var(--color-tertiary);
-  color: var(--color-white); /* لون فاتح للوضوح في جميع الأحوال */
+  background: var(--color-warning);                        /* لون تحذير من tokens.css */
+  color: var(--color-text-inverse);                        /* نص أبيض من tokens.css */
   animation: pulse 2s infinite;
 }
 
@@ -123,7 +129,7 @@
   position: fixed; /* يبقى ثابت يمين ويدفع المحتوى */
   transform: none;
   inset-inline-start: 0;
-  border-inline-end: 1px solid var(--color-outline-variant);
+  border-inline-end: 1px solid var(--color-border-primary); /* حدود من tokens.css */
   box-shadow: none;
   }
 
@@ -136,26 +142,28 @@
 @media (max-width: 767px) {
   .sidebar {
   width: 100%;
-  max-width: 320px;
-  top: 0; /* يغطي الهدر */
-  height: 100vh; /* يغطي الصفحة كاملة */
+  max-width: var(--sidebar-width-mobile);                   /* عرض موحد للموبايل من tokens.css */
+  top: var(--header-height); /* يبدأ تحت الهيدر على الموبايل أيضاً */
+  height: calc(100vh - var(--header-height)); /* ارتفاع صحيح للموبايل */
+  background-color: var(--color-bg-secondary) !important; /* خلفية ثانوية للموبايل من tokens.css */
+  box-shadow: var(--shadow-lg);                           /* ظل كبير من tokens.css */
   }
 
   /* overlay محذوف */
 
   .menuItem {
-    min-height: 48px; /* أزرار أكبر للجوال */
+    min-height: var(--height-button-lg); /* أزرار أكبر للجوال من tokens.css */
   }
   
   .groupButton {
-    min-height: 48px;
+    min-height: var(--height-button-lg); /* ارتفاع موحد للجوال من tokens.css */
   }
 }
 
 /* الحالات التفاعلية */
 @media (hover: hover) {
   .menuItem:hover {
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm);                         /* ظل خفيف عند التمرير من tokens.css */
   }
 }
 
@@ -163,6 +171,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sidebar {
     transition: none;
+    background-color: var(--color-bg-secondary) !important; /* خلفية ثانوية من tokens.css */
   }
   
   .menuItem {
@@ -178,19 +187,7 @@
   }
 }
 
-/* التخصيص حسب النظام الملون */
-@media (prefers-color-scheme: dark) {
-  .sidebar {
-    background: var(--color-surface-dim);
-    border-inline-start-color: var(--color-outline);
-  }
-  
-  .badge {
-    box-shadow: 0 0 0 1px var(--color-outline);
-    /* التأكد من اللون الفاتح في الوضع الليلي أيضاً */
-    color: var(--color-white) !important;
-  }
-}
+/* التخصيص محذوف لأن tokens.css يتولى الوضع الداكن */
 
 /* الرسوم المتحركة */
 @keyframes pulse {

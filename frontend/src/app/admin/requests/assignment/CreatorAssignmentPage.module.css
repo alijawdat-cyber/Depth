@@ -1,0 +1,545 @@
+/* صفحة تكليف المبدعين - موحدة بالكامل مع tokens.css */
+.assignmentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+/* Header موحد */
+.pageHeader {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.pageTitle {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.pageDescription {
+  font-size: var(--fs-md);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 600px;
+}
+
+/* Stats Grid */
+.statsGrid {
+  margin-bottom: var(--space-xl);
+}
+
+/* Filters Section */
+.filtersSection {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.filtersTitle {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.filtersActions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+/* Projects Section */
+.projectsSection {
+  margin-bottom: var(--space-xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-ar);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.projectCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  transition: all 0.2s ease;
+}
+
+.projectCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.projectCard.selected {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.projectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.projectInfo h4 {
+  font-family: var(--font-ar);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.projectInfo p {
+  font-family: var(--font-ar);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.projectMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin: var(--space-lg) 0;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-ar);
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Candidates Section */
+.candidatesSection {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.candidatesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.candidatesTitle {
+  font-family: var(--font-ar);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.searchBox {
+  max-width: 300px;
+}
+
+/* Table Styles */
+.candidatesTable {
+  background: var(--color-bg-default);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.candidatesTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.candidatesTable th {
+  background: var(--color-bg-subtle);
+  padding: var(--space-lg);
+  text-align: right;
+  font-family: var(--font-ar);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.candidatesTable td {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-bd-muted);
+  font-family: var(--font-ar);
+  font-size: var(--fs-sm);
+}
+
+.candidatesTable tr:hover {
+  background: var(--color-bg-subtle);
+}
+
+/* Candidate Cell Styles */
+.candidateInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.candidateAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.candidateName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.candidateRating {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+  margin: 0;
+  margin-top: var(--space-1);
+}
+
+.specializations {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.specializationTag {
+  background: var(--color-bg-subtle);
+  padding: var(--space-1) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.availabilityCell {
+  text-align: center;
+}
+
+.availabilityDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  margin-left: var(--space-1);
+}
+
+.availabilityDot.available {
+  background: var(--color-success-solid);
+}
+
+.availabilityDot.partial {
+  background: var(--color-warning-solid);
+}
+
+.availabilityDot.busy {
+  background: var(--color-danger-solid);
+}
+
+.equipmentTier {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--fs-xs);
+}
+
+.tierPlatinum {
+  color: #9333ea;
+}
+
+.tierGold {
+  color: #ea580c;
+}
+
+.tierSilver {
+  color: #6b7280;
+}
+
+.matchScore {
+  text-align: center;
+}
+
+.priceCell {
+  text-align: left;
+}
+
+.finalPrice {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.basePrice {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+  font-size: var(--fs-xs);
+  margin-top: var(--space-1);
+}
+
+.actionButtons {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+}
+
+/* Modal Styles */
+.modalContent {
+  direction: rtl;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.modalBody {
+  font-family: var(--font-ar);
+  line-height: 1.6;
+}
+
+.confirmationActions {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: flex-end;
+  margin-top: var(--space-lg);
+}
+
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin: var(--space-lg) 0;
+}
+
+.portfolioImage {
+  aspect-ratio: 4/3;
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.messageForm {
+  margin-top: var(--space-lg);
+}
+
+.messageTextarea {
+  margin-bottom: var(--space-lg);
+}
+
+/* Status Badges */
+.statusBadge {
+  padding: var(--space-1) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  text-align: center;
+}
+
+.statusPending {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-fg);
+  border: 1px solid var(--color-warning-bd);
+}
+
+.statusActive {
+  background: var(--color-success-bg);
+  color: var(--color-success-fg);
+  border: 1px solid var(--color-success-bd);
+}
+
+.statusUrgent {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+  border: 1px solid var(--color-danger-bd);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Empty States */
+.emptyState {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--color-text-secondary);
+}
+
+.emptyState h3 {
+  font-family: var(--font-ar);
+  margin-bottom: var(--space-lg);
+}
+
+.emptyState p {
+  font-family: var(--font-ar);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .assignmentContainer {
+    padding: var(--space-lg);
+  }
+  
+  .pageTitle {
+    font-size: var(--fs-2xl);
+  }
+  
+  .filtersGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtersActions {
+    justify-content: stretch;
+  }
+  
+  .filtersActions button {
+    flex: 1;
+  }
+  
+  .projectMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+  
+  .candidatesHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchBox {
+    max-width: none;
+  }
+  
+  .candidatesTable {
+    overflow-x: auto;
+  }
+  
+  .candidatesTable table {
+    min-width: 800px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: var(--fs-xl);
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .projectCard {
+    padding: var(--space-lg);
+  }
+  
+  .candidatesTable td,
+  .candidatesTable th {
+    padding: var(--space-lg);
+  }
+  
+  .portfolioGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .assignmentContainer {
+    padding: 0;
+    max-width: none;
+  }
+  
+  .filtersSection,
+  .actionButtons {
+    display: none;
+  }
+  
+  .candidatesTable {
+    break-inside: avoid;
+  }
+  
+  .projectCard {
+    break-inside: avoid;
+    margin-bottom: var(--space-lg);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .assignmentContainer {
+    background: var(--color-bg-default-dark, #0a0a0a);
+  }
+  
+  .projectCard:hover {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  }
+  
+  .candidatesTable tr:hover {
+    background: var(--color-bg-subtle-dark, #1a1a1a);
+  }
+}

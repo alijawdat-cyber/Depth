@@ -167,7 +167,7 @@ export const DataTable: React.FC<DataTableProps> = ({
             }
             className={styles.searchInput}
           />
-          <Text size="sm" c="dimmed">
+          <Text size="sm" className="text-secondary">
             {sortedData.length} من النتائج
           </Text>
         </Flex>

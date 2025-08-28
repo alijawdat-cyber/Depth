@@ -102,22 +102,22 @@ export const Select = React.forwardRef<HTMLInputElement, SelectProps>(function S
       styles={{
         root: { width: '100%' },
         input: {
-          backgroundColor: 'var(--color-bg-elevated)',
-          color: 'var(--color-fg-primary)',
-          border: '1px solid var(--color-bd-default)',
-          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'var(--color-bg-secondary)',      /* خلفية ثانوية من tokens.css */
+          color: 'var(--color-text-primary)',                /* لون نص أساسي من tokens.css */
+          border: '1px solid var(--color-border-primary)',   /* حدود من tokens.css */
+          borderRadius: 'var(--radius-md)',                  /* زوايا من tokens.css */
           direction: 'rtl',
           textAlign: 'right',
           ...sizeVars(fieldSize),
           paddingInlineStart: hasLeftSection ? `calc(${basePadding} + ${sectionWidth}px)` : basePadding,
           paddingInlineEnd: `calc(${basePadding} + ${sectionWidth}px)`,
           '&::placeholder': { 
-            color: 'var(--color-fg-secondary)' 
+            color: 'var(--color-text-secondary)'             /* لون نص ثانوي من tokens.css */
           },
           '&:focus': {
-            outline: '2px solid var(--color-primary)',
+            outline: '2px solid var(--color-primary)',       /* لون أساسي من tokens.css */
             outlineOffset: '0px',
-            borderColor: 'var(--color-primary)'
+            borderColor: 'var(--color-primary)'              /* لون أساسي من tokens.css */
           },
           ...(style || {}),
         },
@@ -125,7 +125,7 @@ export const Select = React.forwardRef<HTMLInputElement, SelectProps>(function S
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'var(--color-fg-secondary)',
+          color: 'var(--color-text-secondary)',              /* لون نص ثانوي من tokens.css */
           width: `${sectionWidth}px`,
           '& svg': {
             width: `var(--field-icon-${fieldSize})`,
@@ -133,22 +133,22 @@ export const Select = React.forwardRef<HTMLInputElement, SelectProps>(function S
           },
         },
         dropdown: {
-          backgroundColor: 'var(--color-bg-elevated)',
-          border: '1px solid var(--color-bd-default)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--elevation-2)',
+          backgroundColor: 'var(--color-bg-secondary)',      /* خلفية ثانوية من tokens.css */
+          border: '1px solid var(--color-border-primary)',   /* حدود من tokens.css */
+          borderRadius: 'var(--radius-md)',                  /* زوايا من tokens.css */
+          boxShadow: 'var(--shadow-md)',                     /* ظل متوسط من tokens.css */
         },
         option: {
           backgroundColor: 'transparent',
-          color: 'var(--color-fg-primary)',
+          color: 'var(--color-text-primary)',                /* لون نص أساسي من tokens.css */
           direction: 'rtl',
           textAlign: 'right',
           '&[data-selected]': {
-            backgroundColor: 'var(--color-action-primary-bg)',
-            color: 'var(--color-action-primary-fg)',
+            backgroundColor: 'var(--color-primary)',         /* لون أساسي من tokens.css */
+            color: 'var(--color-text-inverse)',              /* نص أبيض من tokens.css */
           },
           '&:hover:not([data-selected])': {
-            backgroundColor: 'var(--color-action-ghost-hover)',
+            backgroundColor: 'var(--color-bg-tertiary)',     /* خلفية ثلاثية عند التمرير من tokens.css */
           }
         },
         label: { 
@@ -158,7 +158,7 @@ export const Select = React.forwardRef<HTMLInputElement, SelectProps>(function S
           textAlign: 'right'
         },
         description: { 
-          color: 'var(--color-fg-secondary)',
+          color: 'var(--color-text-secondary)',              /* لون نص ثانوي من tokens.css */
           direction: 'rtl',
           textAlign: 'right'
         },

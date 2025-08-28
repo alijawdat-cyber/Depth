@@ -44,11 +44,11 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
   }, ref) {
 
   const paddingValue = {
-    xs: 'var(--space-3)',
-    sm: 'var(--space-4)',
-    md: 'var(--space-6)',
-    lg: 'var(--space-8)',
-    xl: 'var(--space-10)',
+    xs: 'var(--space-md)',                                  /* مسافة متوسطة من tokens.css */
+    sm: 'var(--space-lg)',                                  /* مسافة كبيرة من tokens.css */
+    md: 'var(--space-xl)',                                  /* مسافة كبيرة جداً من tokens.css */
+    lg: 'var(--space-2xl)',                                 /* مسافة كبيرة جداً من tokens.css */
+    xl: 'var(--space-2xl)',                                 /* مسافة كبيرة جداً من tokens.css */
   }[padding];
 
   return (
@@ -69,7 +69,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
         blur: overlayBlur,
         backgroundOpacity: overlayOpacity,
         style: {
-          backgroundColor: 'var(--color-bg-overlay)',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',            /* أوفرلاي شبه شفاف ثابت */
         }
       }}
       closeButtonProps={{
@@ -81,34 +81,34 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
           direction: 'rtl',
         },
         content: {
-          backgroundColor: 'var(--color-bg-elevated)',
-          border: withBorder ? '1px solid var(--color-bd-default)' : 'none',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--elevation-3)',
+          backgroundColor: 'var(--color-bg-secondary)',      /* خلفية ثانوية من tokens.css */
+          border: withBorder ? '1px solid var(--color-border-primary)' : 'none', /* حدود من tokens.css */
+          borderRadius: 'var(--radius-lg)',                  /* زوايا كبيرة من tokens.css */
+          boxShadow: 'var(--shadow-lg)',                     /* ظل كبير من tokens.css */
         },
         header: {
           backgroundColor: 'transparent',
-          borderBottom: '1px solid var(--color-bd-default)',
-          paddingBottom: 'calc(var(--space-3) / 2)',
+          borderBottom: '1px solid var(--color-border-primary)', /* حدود من tokens.css */
+          paddingBottom: 'calc(var(--space-md) / 2)',        /* مسافة متوسطة من tokens.css */
         },
         title: {
-          color: 'var(--color-fg-primary)',
+          color: 'var(--color-text-primary)',                /* لون نص أساسي من tokens.css */
           fontWeight: 600,
-          fontSize: 'var(--fs-lg)',
+          fontSize: 'var(--fs-lg)',                          /* حجم خط كبير من tokens.css */
           direction: 'rtl',
           textAlign: 'right',
           margin: 0,
         },
         body: {
-          color: 'var(--color-fg-primary)',
+          color: 'var(--color-text-primary)',                /* لون نص أساسي من tokens.css */
           direction: 'rtl',
-          paddingTop: 'calc(var(--space-3) / 2)',
+          paddingTop: 'calc(var(--space-md) / 2)',          /* مسافة متوسطة من tokens.css */
         },
         close: {
-          color: 'var(--color-fg-secondary)',
+          color: 'var(--color-text-secondary)',              /* لون نص ثانوي من tokens.css */
           '&:hover': {
-            backgroundColor: 'var(--color-action-ghost-hover)',
-            color: 'var(--color-fg-primary)',
+            backgroundColor: 'var(--color-bg-tertiary)',     /* خلفية ثلاثية عند التمرير من tokens.css */
+            color: 'var(--color-text-primary)',              /* لون نص أساسي من tokens.css */
           }
         }
       }}

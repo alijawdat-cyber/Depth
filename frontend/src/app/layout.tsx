@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/shared/theme";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import "@mantine/core/styles.css";
 
@@ -17,17 +16,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+      </head>
       <body className="antialiased">
         <ErrorBoundary>
-          <ThemeProvider defaultTheme="system">
-            <MantineProvider defaultColorScheme="light" forceColorScheme={undefined}>
-              <div className="min-h-dvh bg-[var(--color-bg-surface)] text-[var(--color-fg-primary)]">
-                <main className="mx-auto max-w-screen-xl px-[var(--space-4)] py-[var(--space-6)]">
-                  {children}
-                </main>
-              </div>
-            </MantineProvider>
-          </ThemeProvider>
+          <MantineProvider defaultColorScheme="auto">
+            <div className="min-h-dvh">
+              <main className="mx-auto max-w-screen-xl appMain">
+                {children}
+              </main>
+            </div>
+          </MantineProvider>
         </ErrorBoundary>
       </body>
     </html>

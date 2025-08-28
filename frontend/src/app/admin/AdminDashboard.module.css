@@ -1,42 +1,72 @@
-/* Admin Dashboard Styles */
+/* لوحة تحكم الإدارة - موحدة بالكامل مع tokens.css */
 .dashboard {
-  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
   margin: 0 auto;
 }
 
+/* Header موحد */
 .header {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 .title {
-  color: var(--text);
   font-size: var(--fs-3xl);
   font-weight: 700;
-  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
 }
 
 .subtitle {
-  font-size: var(--fs-lg);
-  color: var(--text-secondary);
+  font-size: var(--fs-md);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
 }
 
 .statsSection {
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-xl);
+}
+
+/* تحسين Grid للبطاقات */
+.statsSection :global(.mantine-Grid-root) {
+  align-items: stretch; /* تمديد البطاقات لنفس الارتفاع */
+}
+
+.statsSection :global(.mantine-Grid-col) {
+  display: flex;
+  flex-direction: column;
+}
+
+.statsSection :global(.mantine-Grid-col > *) {
+  flex: 1; /* البطاقة تأخذ كامل المساحة المتاحة */
+  height: 100%;
 }
 
 .activitiesSection {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-xl);                         /* 24px - مسافة كبيرة جداً من tokens.css */
 }
 
 .sectionTitle {
-  color: var(--text);
   font-size: var(--fs-2xl);
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+  margin-top: 0;
 }
 
-/* تجاوب للجوال */
-@media (max-width: 768px) {
+/* تجاوب للجوال - توحيد البريك‑بوينت */
+@media (width < 390px) {
+  .dashboard {
+    padding: var(--space-md);
+  }
+
   .title {
     font-size: var(--fs-2xl);
   }
@@ -47,6 +77,14 @@
   
   .sectionTitle {
     font-size: var(--fs-xl);
+  }
+
+  .header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .statsSection {
+    margin-bottom: var(--space-xl);
   }
 }
 

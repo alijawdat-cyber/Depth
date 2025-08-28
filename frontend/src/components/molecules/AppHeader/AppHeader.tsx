@@ -68,8 +68,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <Image
             src={logoSrc}
             alt="Logo"
-            width={32}
-            height={32}
+            width={24}
+            height={24}
             className={styles.appHeaderLogo}
           />
           <Text

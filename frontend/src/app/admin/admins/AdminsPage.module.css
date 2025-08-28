@@ -1,0 +1,251 @@
+/* صفحة المديرين - موحدة بالكامل مع tokens.css */
+
+.adminsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+/* Header موحد */
+.pageHeader {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.pageTitle {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.securityAlert {
+  margin-top: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.statsSection {
+  margin-bottom: var(--space-xl);
+}
+
+.tableSection {
+  margin-bottom: var(--space-xl);
+}
+
+.tableContainer {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+  overflow: hidden;
+}
+
+/* استايلات متجاوبة */
+@media (max-width: 768px) {
+  .adminsContainer {
+    padding: var(--space-lg);
+  }
+  
+  .pageHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .statsSection {
+    margin-bottom: 1.5rem;
+  }
+  
+  .tableSection {
+    margin-bottom: 1.5rem;
+  }
+  
+  .pageTitle {
+    font-size: var(--fs-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .adminsContainer {
+    padding: var(--space-lg);
+  }
+  
+  .pageHeader {
+    margin-bottom: 1rem;
+  }
+  
+  .statsSection {
+    margin-bottom: 1rem;
+  }
+  
+  .tableSection {
+    margin-bottom: 1rem;
+  }
+  
+  .pageTitle {
+    font-size: var(--fs-xl);
+  }
+  
+  .tableContainer {
+    padding: var(--space-lg);
+  }
+}
+
+/* تحسينات للنماذج والنوافذ */
+.modalContent {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.formSection {
+  border-top: 1px solid var(--color-bg-secondary);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.permissionsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.adminCard {
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-secondary);
+}
+
+.adminProfile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.adminInfo {
+  flex: 1;
+}
+
+.adminName {
+  font-weight: 600;
+  font-size: var(--fs-lg);
+  margin-bottom: 0.25rem;
+  color: var(--color-bg-secondary);
+}
+
+.adminContact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-bg-secondary);
+  font-size: var(--fs-sm);
+  margin-bottom: 0.25rem;
+}
+
+.permissionsGrid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: var(--space-lg) 0;
+}
+
+.permissionsGrid:not(:last-child) {
+  border-bottom: 1px solid var(--color-bg-secondary);
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actionsGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* استايلات خاصة للجدول */
+.tableRow {
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.avatar {
+  flex-shrink: 0;
+}
+
+.adminDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.adminMetadata {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: var(--space-lg) 0;
+}
+
+.metadataCard {
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+/* انيميشنز */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* تحسينات الأداء */
+.lazyContent {
+  contain: layout style;
+}
+
+/* إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .fadeIn {
+    animation: none;
+  }
+  
+  .tableRow {
+    transition: none;
+  }
+}
+
+/* Dark mode support (إذا كان متوفر) */
+@media (prefers-color-scheme: dark) {
+  .adminsContainer {
+    background: var(--color-bg-secondary);
+  }
+  
+  .tableContainer {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-bg-secondary);
+  }
+  
+  .adminCard {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-bg-secondary);
+  }
+}

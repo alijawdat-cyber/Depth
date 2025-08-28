@@ -1,0 +1,148 @@
+/* صفحة المبدعين - موحدة بالكامل مع tokens.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Header موحد */
+.header {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+  text-align: right;
+}
+
+.title {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.statsGrid {
+  margin-bottom: var(--space-xl);
+}
+
+.filters {
+  margin-bottom: var(--space-xl);
+  background: var(--color-bg-secondary);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-primary);
+}
+
+.filtersHeader {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: var(--space-lg);                                   /* 16px - مسافة كبيرة من tokens.css */
+}
+
+.searchInput {
+  min-width: 300px;
+}
+
+.filterSelect {
+  min-width: 150px;
+}
+
+.tableContainer {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);                        /* 12px - زوايا كبيرة من tokens.css */
+  overflow: hidden;
+  border: 1px solid var(--color-border-primary);          /* حدود من tokens.css */
+}
+
+.specialtyBadge {
+  background: var(--color-info-light);                    /* خلفية معلوماتية فاتحة من tokens.css */
+  color: var(--color-info);                               /* لون معلوماتي من tokens.css */
+  font-size: var(--fs-xs);                               /* 12px - حجم خط صغير من tokens.css */
+}
+
+.bio {
+  line-height: 1.6;
+  color: var(--color-text-secondary);                     /* نص ثانوي من tokens.css */
+}
+
+.skillItem {
+  padding: var(--space-md);                               /* 12px - مسافة متوسطة من tokens.css */
+  background: var(--color-bg-tertiary);                   /* خلفية ثالثية من tokens.css */
+  border-radius: var(--radius-md);                        /* 8px - زوايا متوسطة من tokens.css */
+  border: 1px solid var(--color-border-secondary);        /* حدود ثانوية من tokens.css */
+}
+
+.portfolioImage {
+  width: 120px;                                           /* عرض ثابت للصور */
+  height: 90px;                                           /* ارتفاع ثابت للصور */
+  border-radius: var(--radius-md);                        /* 8px - زوايا متوسطة من tokens.css */
+  overflow: hidden;
+  border: 1px solid var(--color-border-primary);          /* حدود من tokens.css */
+  position: relative;
+}
+
+.portfolioImg {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.viewAllLink {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.viewAllLink:hover {
+  color: var(--color-primary);                            /* لون أساسي من tokens.css */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-lg) 0;                           /* 16px عمودي - مسافة كبيرة من tokens.css */
+  }
+  
+  .filtersHeader {
+    flex-direction: column;
+  }
+  
+  .searchInput {
+    min-width: 100%;
+  }
+  
+  .filterSelect {
+    min-width: 100%;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .container {
+  text-align: right;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .filters {
+    background: var(--color-bg-secondary);                  /* خلفية ثانوية من tokens.css */
+    border-color: var(--color-border-primary);            /* حدود من tokens.css */
+  }
+  
+  .tableContainer {
+    background: var(--color-bg-secondary);                  /* خلفية ثانوية من tokens.css */
+    border-color: var(--color-border-primary);            /* حدود من tokens.css */
+  }
+
+  .skillItem {
+    background: var(--color-bg-secondary);                  /* خلفية ثانوية من tokens.css */
+    border-color: var(--color-border-primary);            /* حدود من tokens.css */
+  }
+
+  .portfolioImage {
+    background: var(--color-bg-tertiary);                  /* خلفية ثالثية من tokens.css */
+    border-color: var(--color-border-primary);            /* حدود من tokens.css */
+  }
+}

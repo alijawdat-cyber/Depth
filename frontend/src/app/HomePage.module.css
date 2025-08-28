@@ -1,88 +1,99 @@
-/* Home Page Styles */
+/* الصفحة الرئيسية - موحدة بالكامل مع tokens.css */
 .homeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
   min-height: 100vh;
-  background: var(--color-bg-surface);
-  color: var(--color-fg-primary);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Header موحد */
+.pageHeader {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 .titleGradient {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 1rem;
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
 }
 
 .roleCard {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
   height: 100%;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-subtle);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .roleCard:hover {
-  box-shadow: var(--shadow-xl);
-  transform: scale(1.02);
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
 }
 
 .iconBox {
-  color: var(--color-danger);
+  color: var(--color-error);                               /* لون خطأ من tokens.css */
 }
 
 .iconBox.blue {
-  color: var(--color-primary);
+  color: var(--color-primary);                             /* لون أساسي من tokens.css */
 }
 
 .iconBox.green {
-  color: var(--color-success);
+  color: var(--color-success);                             /* لون نجاح من tokens.css */
 }
 
 .iconBox.orange {
-  color: var(--color-warning);
+  color: var(--color-warning);                             /* لون تحذير من tokens.css */
 }
 
 .iconBox.red {
-  color: var(--color-danger);
+  color: var(--color-error);                               /* لون خطأ من tokens.css */
 }
 
 .featureDot {
-  width: 6px;
-  height: 6px;
+  width: var(--space-xs);                                /* 4px - حجم صغير من tokens.css */
+  height: var(--space-xs);                               /* 4px - حجم صغير من tokens.css */
   border-radius: 50%;
-  background-color: var(--color-danger);
+  background-color: var(--color-error);                    /* لون خطأ من tokens.css */
 }
 
 .featureDot.blue {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary);                  /* لون أساسي من tokens.css */
 }
 
 .featureDot.green {
-  background-color: var(--color-success);
+  background-color: var(--color-success);                  /* لون نجاح من tokens.css */
 }
 
 .featureDot.orange {
-  background-color: var(--color-warning);
+  background-color: var(--color-warning);                  /* لون تحذير من tokens.css */
 }
 
 .featureDot.red {
-  background-color: var(--color-danger);
+  background-color: var(--color-error);                    /* لون خطأ من tokens.css */
 }
 
-/* تجاوب للجوال */
-@media (max-width: 768px) {
+/* تجاوب للجوال - توحيد البريك‑بوينت */
+@media (max-width: 767px) {
   .titleGradient {
-    font-size: 2.5rem;
+    font-size: var(--fs-2xl);                             /* 24px - حجم خط كبير جداً من tokens.css */
   }
 }
 
-/* الوضع الليلي */
-[data-theme="dark"] .roleCard {
-  background: var(--color-bg-card);
-  border-color: var(--color-border-subtle);
-}
-
-[data-theme="dark"] .homeContainer {
-  background: var(--color-bg-surface);
-  color: var(--color-fg-primary);
-}
+/* تخصيصات الوضع الداكن محذوفة لأن tokens.css يتولاها تلقائياً */

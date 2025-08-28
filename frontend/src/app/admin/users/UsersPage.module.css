@@ -1,0 +1,122 @@
+/* صفحة المستخدمين - موحدة بالكامل مع tokens.css */
+.usersPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: 0;
+  max-width: 100%;
+  margin: 0 auto;
+  direction: rtl;
+}
+
+/* Header موحد */
+.pageHeader {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.pageTitle {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.2;
+}
+
+.statsSection {
+  margin-bottom: var(--space-xl);
+}
+
+.statsSection :global(.mantine-Grid-root) {
+  align-items: stretch;
+}
+
+.statsSection :global(.mantine-Grid-col) {
+  display: flex;
+  flex-direction: column;
+}
+
+.statsSection :global(.mantine-Grid-col > *) {
+  flex: 1;
+}
+
+.filtersSection {
+  margin-bottom: var(--space-lg);                         /* 16px - مسافة كبيرة من tokens.css */
+  padding: var(--space-md);                               /* 12px - مسافة متوسطة من tokens.css */
+  background: var(--color-bg-secondary);                  /* خلفية ثانوية من tokens.css */
+  border-radius: var(--radius-md);                        /* زوايا متوسطة من tokens.css */
+  border: 1px solid var(--color-border-primary);          /* حدود أساسية من tokens.css */
+}
+
+.filterSelect {
+  min-width: 200px;
+}
+
+.tableSection {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-outline-variant);
+  overflow: hidden;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: var(--page-max-width)) {
+  .usersPage {
+    padding: var(--space-4);
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtersSection {
+    padding: var(--space-3);
+  }
+
+  .filterSelect {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+@media (max-width: var(--page-max-width)) {
+  .usersPage {
+    padding: var(--space-3);
+  }
+
+  .statsSection {
+    margin-bottom: var(--space-6);
+  }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .usersPage {
+  color: var(--color-on-surface);
+}
+
+[data-theme="dark"] .filtersSection {
+  background: var(--color-bg-secondary);
+}
+
+[data-theme="dark"] .tableSection {
+  background: var(--color-bg-secondary);
+}

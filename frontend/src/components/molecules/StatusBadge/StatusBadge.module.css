@@ -65,39 +65,39 @@
 
 /* تخصيصات الحجم */
 .badge[data-size="xs"] {
-  font-size: 10px !important;
-  height: 18px !important;
-  padding: 0 6px !important;
+  font-size: var(--fs-xs) !important;                        /* حجم خط صغير جداً من tokens.css */
+  height: calc(var(--height-input-sm) * 0.5) !important;     /* ارتفاع صغير جداً من tokens.css */
+  padding: 0 var(--space-xs) !important;                     /* مسافة صغيرة جداً من tokens.css */
 }
 
 .badge[data-size="sm"] {
-  font-size: 12px !important;
-  height: 22px !important;
-  padding: 0 8px !important;
+  font-size: var(--fs-xs) !important;                        /* حجم خط صغير جداً من tokens.css */
+  height: calc(var(--height-input-sm) * 0.6) !important;     /* ارتفاع صغير من tokens.css */
+  padding: 0 var(--space-sm) !important;                     /* مسافة صغيرة من tokens.css */
 }
 
 .badge[data-size="md"] {
-  font-size: 13px !important;
-  height: 26px !important;
-  padding: 0 10px !important;
+  font-size: var(--fs-sm) !important;                        /* حجم خط صغير من tokens.css */
+  height: calc(var(--height-input-sm) * 0.72) !important;    /* ارتفاع متوسط من tokens.css */
+  padding: 0 var(--space-md) !important;                     /* مسافة متوسطة من tokens.css */
 }
 
 .badge[data-size="lg"] {
-  font-size: 14px !important;
-  height: 30px !important;
-  padding: 0 12px !important;
+  font-size: var(--fs-sm) !important;                        /* حجم خط صغير من tokens.css */
+  height: calc(var(--height-input-sm) * 0.83) !important;    /* ارتفاع كبير من tokens.css */
+  padding: 0 var(--space-md) !important;                     /* مسافة متوسطة من tokens.css */
 }
 
 .badge[data-size="xl"] {
-  font-size: 16px !important;
-  height: 34px !important;
-  padding: 0 14px !important;
+  font-size: var(--fs-md) !important;                        /* حجم خط متوسط من tokens.css */
+  height: calc(var(--height-input-sm) * 0.94) !important;    /* ارتفاع كبير جداً من tokens.css */
+  padding: 0 var(--space-lg) !important;                     /* مسافة كبيرة من tokens.css */
 }
 
 /* التصميم المتجاوب */
 @media (max-width: 767px) {
   .badge {
-    font-size: 11px !important;
+    font-size: var(--fs-xs) !important;
     height: 20px !important;
     padding: 0 6px !important;
   }
@@ -110,29 +110,29 @@
 
 /* الألوان المخصصة للحالات */
 .active[data-variant="light"] {
-  background-color: var(--color-success-container) !important;
-  color: var(--color-on-success-container) !important;
+  background-color: var(--color-success-subtle) !important;
+  color: var(--color-success) !important;
 }
 
 .failed[data-variant="light"] {
-  background-color: var(--color-error-container) !important;
-  color: var(--color-on-error-container) !important;
+  background-color: var(--color-error-subtle) !important;
+  color: var(--color-error) !important;
 }
 
 .warning[data-variant="light"] {
-  background-color: var(--color-warning-container) !important;
-  color: var(--color-on-warning-container) !important;
+  background-color: var(--color-warning-subtle) !important;
+  color: var(--color-warning) !important;
 }
 
 .pending[data-variant="light"],
 .processing[data-variant="light"] {
-  background-color: var(--color-primary-container) !important;
-  color: var(--color-on-primary-container) !important;
+  background-color: var(--color-info-subtle) !important;
+  color: var(--color-info) !important;
 }
 
 .inactive[data-variant="light"],
 .draft[data-variant="light"],
 .archived[data-variant="light"] {
-  background-color: var(--color-surface-variant) !important;
-  color: var(--color-on-surface-variant) !important;
+  background-color: var(--color-bg-subtle) !important;
+  color: var(--text-secondary) !important;
 }
