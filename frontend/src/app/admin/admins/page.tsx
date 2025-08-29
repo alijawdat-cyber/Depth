@@ -19,7 +19,8 @@ import {
   Paper,
   Divider,
   Avatar,
-  Tooltip
+  Tooltip,
+  Table
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -41,7 +42,6 @@ import {
 
 // استيراد المكونات الموجودة
 import StatsCard from '@/components/molecules/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
 
 import styles from './AdminsPage.module.css';
 
@@ -433,128 +433,105 @@ export default function AdminsPage() {
     ];
   }, [adminsData]);
 
-  // إعداد أعمدة الجدول
-  const tableColumns: DataTableColumn[] = [
-    {
-      key: 'profile',
-      label: 'الأدمن',
-      render: (_, row) => {
-        const admin = row as unknown as AdminUser;
-        return (
-          <Group gap="sm">
-            <Avatar
-              size="sm"
-              radius="sm"
-              name={admin.profile.fullName}
-              color="blue"
-            />
-            <Box>
-              <Group gap="xs" align="center">
-                <Text fw={600} size="sm">{admin.profile.fullName}</Text>
-                {admin.adminLevel === 'super_admin' && (
-                  <Tooltip label="Super Admin">
-                    <Crown size={14} color="orange" />
-                  </Tooltip>
-                )}
-              </Group>
-              <Group gap="xs" align="center">
-                <Mail size={12} />
-                <Text size="xs" c="dimmed">{admin.profile.email}</Text>
-              </Group>
-            </Box>
-          </Group>
-        );
-      }
-    },
-    {
-      key: 'adminLevel',
-      label: 'المستوى',
-      render: (value) => (
-        <Badge
-          size="sm"
-          variant="light"
-          color={value === 'super_admin' ? 'orange' : 'blue'}
-        >
-          {value === 'super_admin' ? 'Super Admin' : 'Admin'}
-        </Badge>
-      )
-    },
-    {
-      key: 'isActive',
-      label: 'الحالة',
-      render: (value) => (
-        <Badge
-          size="sm"
-          variant="light"
-          color={value ? 'green' : 'red'}
-        >
-          {value ? 'نشط' : 'غير نشط'}
-        </Badge>
-      )
-    },
-    {
-      key: 'permissions',
-      label: 'الصلاحيات',
-      render: (_, row) => {
-        const admin = row as unknown as AdminUser;
-        const activePermissions = Object.values(admin.permissions).filter(Boolean).length;
-        const totalPermissions = Object.keys(admin.permissions).length;
-        
-        return (
-          <Group gap="xs" align="center">
-            <Text size="sm" fw={500}>{activePermissions}/{totalPermissions}</Text>
-            <Badge size="xs" variant="light" color="gray">
-              {Math.round((activePermissions / totalPermissions) * 100)}%
-            </Badge>
-          </Group>
-        );
-      }
-    },
-    {
-      key: 'lastLoginAt',
-      label: 'آخر دخول',
-      render: (value) => (
+  // Helper function to render profile cell
+  const renderProfileCell = (admin: AdminUser) => (
+    <Group gap="sm">
+      <Avatar
+        size="sm"
+        radius="sm"
+        name={admin.profile.fullName}
+        color="blue"
+      />
+      <Box>
         <Group gap="xs" align="center">
-          <Clock size={12} />
-          <Text size="sm" c="dimmed">{formatRelativeTime(value as string)}</Text>
-        </Group>
-      )
-    },
-    {
-      key: 'actions',
-      label: 'الإجراءات',
-      render: (_, row) => {
-        const admin = row as unknown as AdminUser;
-        return (
-          <Group gap="xs">
-            <Tooltip label="عرض التفاصيل">
-              <ActionIcon
-                size="sm"
-                variant="light"
-                color="blue"
-                onClick={() => showAdminDetails(admin)}
-              >
-                <Eye size={14} />
-              </ActionIcon>
+          <Text fw={600} size="sm">{admin.profile.fullName}</Text>
+          {admin.adminLevel === 'super_admin' && (
+            <Tooltip label="Super Admin">
+              <Crown size={14} color="orange" />
             </Tooltip>
-            
-            {admin.adminLevel !== 'super_admin' && (
-              <Tooltip label={admin.isActive ? 'إيقاف' : 'تفعيل'}>
-                <ActionIcon
-                  size="sm"
-                  variant="light"
-                  color={admin.isActive ? 'red' : 'green'}
-                  onClick={() => confirmStatusChange(admin, admin.isActive ? 'deactivate' : 'activate')}
-                >
-                  {admin.isActive ? <UserX size={14} /> : <Check size={14} />}
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </Group>
-        );
-      }
-    }
-  ];
+          )}
+        </Group>
+        <Group gap="xs" align="center">
+          <Mail size={12} />
+          <Text size="xs" c="dimmed">{admin.profile.email}</Text>
+        </Group>
+      </Box>
+    </Group>
+  );
+
+  // Helper function to render admin level
+  const renderAdminLevel = (adminLevel: string) => (
+    <Badge
+      size="sm"
+      variant="light"
+      color={adminLevel === 'super_admin' ? 'orange' : 'blue'}
+    >
+      {adminLevel === 'super_admin' ? 'Super Admin' : 'Admin'}
+    </Badge>
+  );
+
+  // Helper function to render active status
+  const renderActiveStatus = (isActive: boolean) => (
+    <Badge
+      size="sm"
+      variant="light"
+      color={isActive ? 'green' : 'red'}
+    >
+      {isActive ? 'نشط' : 'غير نشط'}
+    </Badge>
+  );
+
+  // Helper function to render permissions
+  const renderPermissions = (admin: AdminUser) => {
+    const activePermissions = Object.values(admin.permissions).filter(Boolean).length;
+    const totalPermissions = Object.keys(admin.permissions).length;
+    
+    return (
+      <Group gap="xs" align="center">
+        <Text size="sm" fw={500}>{activePermissions}/{totalPermissions}</Text>
+        <Badge size="xs" variant="light" color="gray">
+          {Math.round((activePermissions / totalPermissions) * 100)}%
+        </Badge>
+      </Group>
+    );
+  };
+
+  // Helper function to render last login
+  const renderLastLogin = (lastLoginAt?: string) => (
+    <Group gap="xs" align="center">
+      <Clock size={12} />
+      <Text size="sm" c="dimmed">{formatRelativeTime(lastLoginAt || '')}</Text>
+    </Group>
+  );
+
+  // Helper function to render actions
+  const renderActions = (admin: AdminUser) => (
+    <Group gap="xs">
+      <Tooltip label="عرض التفاصيل">
+        <ActionIcon
+          size="sm"
+          variant="light"
+          color="blue"
+          onClick={() => showAdminDetails(admin)}
+        >
+          <Eye size={14} />
+        </ActionIcon>
+      </Tooltip>
+      
+      {admin.adminLevel !== 'super_admin' && (
+        <Tooltip label={admin.isActive ? 'إيقاف' : 'تفعيل'}>
+          <ActionIcon
+            size="sm"
+            variant="light"
+            color={admin.isActive ? 'red' : 'green'}
+            onClick={() => confirmStatusChange(admin, admin.isActive ? 'deactivate' : 'activate')}
+          >
+            {admin.isActive ? <UserX size={14} /> : <Check size={14} />}
+          </ActionIcon>
+        </Tooltip>
+      )}
+    </Group>
+  );
 
   return (
     <div className={styles.adminsContainer}>
@@ -614,15 +591,50 @@ export default function AdminsPage() {
       {/* جدول الأدمنز */}
       <div className={styles.tableSection}>
         <Paper className={styles.tableContainer} p="lg" radius="md" shadow="xs">
-          <DataTable
-            columns={tableColumns}
-            data={adminsData?.admins || []}
-            loading={loading}
-            searchable={true}
-            searchPlaceholder="البحث في الأدمنز..."
-            emptyText="لا يوجد أدمنز"
-            pageSize={10}
-          />
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>الأدمن</Table.Th>
+                <Table.Th>المستوى</Table.Th>
+                <Table.Th>الحالة</Table.Th>
+                <Table.Th>الصلاحيات</Table.Th>
+                <Table.Th>آخر دخول</Table.Th>
+                <Table.Th>الإجراءات</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {(adminsData?.admins || []).length === 0 ? (
+                <Table.Tr>
+                  <Table.Td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                    <Text c="dimmed">لا يوجد أدمنز</Text>
+                  </Table.Td>
+                </Table.Tr>
+              ) : (
+                (adminsData?.admins || []).map((admin) => (
+                  <Table.Tr key={admin.id}>
+                    <Table.Td>
+                      {renderProfileCell(admin)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderAdminLevel(admin.adminLevel)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderActiveStatus(admin.isActive)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderPermissions(admin)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderLastLogin(admin.lastLoginAt)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderActions(admin)}
+                    </Table.Td>
+                  </Table.Tr>
+                ))
+              )}
+            </Table.Tbody>
+          </Table>
         </Paper>
       </div>
 

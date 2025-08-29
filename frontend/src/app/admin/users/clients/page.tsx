@@ -17,7 +17,8 @@ import {
   SimpleGrid,
   Card,
   Rating,
-  Progress
+  Progress,
+  Table
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { 
@@ -40,8 +41,6 @@ import {
   Shield
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import styles from './ClientsPage.module.css';
 
 // Types للعملاء
@@ -547,12 +546,17 @@ const ClientsPage: React.FC = () => {
     }).format(new Date(dateString));
   };
 
-  // Table columns
-  const columns: DataTableColumn[] = [
+  // Table columns  
+  interface TableColumn {
+    key: string;
+    label: string;
+    render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode;
+  }
+
+  const columns: TableColumn[] = [
     {
       key: 'profile',
       label: 'الملف الشخصي',
-      width: 280,
       render: (_, row) => {
         const client = row as unknown as Client;
         return (
@@ -694,11 +698,19 @@ const ClientsPage: React.FC = () => {
             <Text size="xs" c="dimmed">
               انضم: {formatDate(client.registeredAt)}
             </Text>
-            <StatusBadge status={
-              client.status === 'active' ? 'active' : 
-              client.status === 'pending' ? 'pending' : 
-              client.status === 'suspended' ? 'failed' : 'inactive'
-            } />
+            <Badge 
+              color={
+                client.status === 'active' ? 'green' : 
+                client.status === 'pending' ? 'yellow' : 
+                client.status === 'suspended' ? 'red' : 'gray'
+              }
+              variant="light"
+              size="sm"
+            >
+              {client.status === 'active' ? 'نشط' : 
+               client.status === 'pending' ? 'معلق' : 
+               client.status === 'suspended' ? 'موقوف' : 'غير نشط'}
+            </Badge>
           </Stack>
         );
       }
@@ -726,7 +738,6 @@ const ClientsPage: React.FC = () => {
     {
       key: 'actions',
       label: 'إجراءات',
-      width: 120,
       render: (_, row) => {
         const client = row as unknown as Client;
         return (
@@ -895,19 +906,44 @@ const ClientsPage: React.FC = () => {
 
       {/* Data Table */}
       <div className={styles.tableContainer}>
-        <DataTable
-          columns={columns}
-          data={filteredClients as Record<string, unknown>[]}
-          searchable={false}
-          paginated={true}
-          pageSize={10}
-          emptyText="لا يوجد عملاء"
-          onRowClick={(row) => {
-            setSelectedClient(row as unknown as Client);
-            openDetails();
-          }}
-          className={styles.dataTable}
-        />
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              {columns.map((column) => (
+                <Table.Th key={column.key}>{column.label}</Table.Th>
+              ))}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {filteredClients.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Text c="dimmed">لا يوجد عملاء</Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              filteredClients.map((row) => (
+                <Table.Tr 
+                  key={row.id} 
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setSelectedClient(row);
+                    openDetails();
+                  }}
+                >
+                  {columns.map((column) => (
+                    <Table.Td key={column.key}>
+                      {column.render 
+                        ? column.render(row[column.key], row) 
+                        : String(row[column.key] ?? '')
+                      }
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))
+            )}
+          </Table.Tbody>
+        </Table>
       </div>
 
       {/* Client Details Modal */}
@@ -963,11 +999,18 @@ const ClientsPage: React.FC = () => {
                       VIP Client
                     </Badge>
                   )}
-                  <StatusBadge status={
-                    selectedClient.status === 'active' ? 'active' : 
-                    selectedClient.status === 'pending' ? 'pending' : 
-                    selectedClient.status === 'suspended' ? 'failed' : 'inactive'
-                  } />
+                  <Badge 
+                    color={
+                      selectedClient.status === 'active' ? 'green' : 
+                      selectedClient.status === 'pending' ? 'yellow' : 
+                      selectedClient.status === 'suspended' ? 'red' : 'gray'
+                    }
+                    variant="light"
+                  >
+                    {selectedClient.status === 'active' ? 'نشط' : 
+                     selectedClient.status === 'pending' ? 'معلق' : 
+                     selectedClient.status === 'suspended' ? 'موقوف' : 'غير نشط'}
+                  </Badge>
                 </Stack>
               </Group>
             </Card>

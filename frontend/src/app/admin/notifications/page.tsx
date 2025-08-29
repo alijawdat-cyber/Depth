@@ -20,7 +20,8 @@ import {
   Paper,
   Divider,
   Tooltip,
-  Checkbox
+  Checkbox,
+  Table
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -45,7 +46,6 @@ import {
 
 // استيراد المكونات الموجودة
 import StatsCard from '@/components/molecules/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
 
 import styles from './NotificationsPage.module.css';
 
@@ -546,150 +546,123 @@ export default function NotificationsPage() {
     ];
   }, [notificationsData]);
 
-  // إعداد أعمدة الجدول
-  const tableColumns: DataTableColumn[] = [
-    {
-      key: 'notification',
-      label: 'الإشعار',
-      render: (_, row) => {
-        const notification = row as unknown as NotificationData;
-        return (
-          <Group gap="sm" align="flex-start">
-            {getNotificationIcon(notification.type, notification.priority)}
-            <Box flex={1}>
-              <Group gap="xs" align="center" mb="xs">
-                <Text fw={600} size="sm" c={notification.status === 'unread' ? 'blue' : undefined}>
-                  {notification.title}
-                </Text>
-                {notification.status === 'unread' && (
-                  <Badge size="xs" color="blue" variant="light">
-                    جديد
-                  </Badge>
-                )}
-              </Group>
-              <Text size="xs" c="dimmed" lineClamp={2}>
-                {notification.message}
-              </Text>
-              {notification.actions && notification.actions.length > 0 && (
-                <Group gap="xs" mt="xs">
-                  {notification.actions.slice(0, 2).map((action, index) => (
-                    <Badge
-                      key={index}
-                      size="xs"
-                      variant="light"
-                      color="gray"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {action.label}
-                    </Badge>
-                  ))}
-                </Group>
-              )}
-            </Box>
+  // Helper functions to render table cells
+  const renderNotificationCell = (notification: NotificationData) => (
+    <Group gap="sm" align="flex-start">
+      {getNotificationIcon(notification.type, notification.priority)}
+      <Box flex={1}>
+        <Group gap="xs" align="center" mb="xs">
+          <Text fw={600} size="sm" c={notification.status === 'unread' ? 'blue' : undefined}>
+            {notification.title}
+          </Text>
+          {notification.status === 'unread' && (
+            <Badge size="xs" color="blue" variant="light">
+              جديد
+            </Badge>
+          )}
+        </Group>
+        <Text size="xs" c="dimmed" lineClamp={2}>
+          {notification.message}
+        </Text>
+        {notification.actions && notification.actions.length > 0 && (
+          <Group gap="xs" mt="xs">
+            {notification.actions.slice(0, 2).map((action, index) => (
+              <Badge
+                key={index}
+                size="xs"
+                variant="light"
+                color="gray"
+                style={{ cursor: 'pointer' }}
+              >
+                {action.label}
+              </Badge>
+            ))}
           </Group>
-        );
-      }
-    },
-    {
-      key: 'type',
-      label: 'النوع',
-      render: (value) => {
-        const typeLabels = {
-          project_update: 'مشروع',
-          payment_reminder: 'دفع',
-          message: 'رسالة',
-          system_alert: 'نظام',
-          marketing: 'تسويق'
-        };
-        return (
-          <Badge size="sm" variant="light" color="gray">
-            {typeLabels[value as keyof typeof typeLabels] || String(value)}
-          </Badge>
-        );
-      }
-    },
-    {
-      key: 'priority',
-      label: 'الأولوية',
-      render: (value) => {
-        const priorityLabels = {
-          urgent: 'عاجل',
-          high: 'عالي',
-          medium: 'متوسط',
-          low: 'منخفض'
-        };
-        return (
-          <Badge
-            size="sm"
-            variant="light"
-            color={getPriorityBadgeColor(value as string)}
-          >
-            {priorityLabels[value as keyof typeof priorityLabels]}
-          </Badge>
-        );
-      }
-    },
-    {
-      key: 'status',
-      label: 'الحالة',
-      render: (value) => (
-        <Badge
+        )}
+      </Box>
+    </Group>
+  );
+
+  const renderTypeCell = (type: string) => {
+    const typeLabels = {
+      project_update: 'مشروع',
+      payment_reminder: 'دفع',
+      message: 'رسالة',
+      system_alert: 'نظام',
+      marketing: 'تسويق'
+    };
+    return (
+      <Badge size="sm" variant="light" color="gray">
+        {typeLabels[type as keyof typeof typeLabels] || type}
+      </Badge>
+    );
+  };
+
+  const renderPriorityCell = (priority: string) => {
+    const priorityLabels = {
+      urgent: 'عاجل',
+      high: 'عالي',
+      medium: 'متوسط',
+      low: 'منخفض'
+    };
+    return (
+      <Badge
+        size="sm"
+        variant="light"
+        color={getPriorityBadgeColor(priority)}
+      >
+        {priorityLabels[priority as keyof typeof priorityLabels]}
+      </Badge>
+    );
+  };
+
+  const renderStatusCell = (status: string) => (
+    <Badge
+      size="sm"
+      variant="light"
+      color={status === 'unread' ? 'blue' : 'green'}
+    >
+      {status === 'unread' ? 'غير مقروء' : 'مقروء'}
+    </Badge>
+  );
+
+  const renderDateCell = (dateValue: string) => (
+    <Group gap="xs" align="center">
+      <Calendar size={12} />
+      <Box>
+        <Text size="sm">{formatRelativeTime(dateValue)}</Text>
+        <Text size="xs" c="dimmed">{formatDate(dateValue)}</Text>
+      </Box>
+    </Group>
+  );
+
+  const renderActionsCell = (notification: NotificationData) => (
+    <Group gap="xs">
+      <Tooltip label="عرض التفاصيل">
+        <ActionIcon
           size="sm"
           variant="light"
-          color={value === 'unread' ? 'blue' : 'green'}
+          color="blue"
+          onClick={() => showNotificationDetails(notification)}
         >
-          {value === 'unread' ? 'غير مقروء' : 'مقروء'}
-        </Badge>
-      )
-    },
-    {
-      key: 'createdAt',
-      label: 'التاريخ',
-      render: (value) => (
-        <Group gap="xs" align="center">
-          <Calendar size={12} />
-          <Box>
-            <Text size="sm">{formatRelativeTime(value as string)}</Text>
-            <Text size="xs" c="dimmed">{formatDate(value as string)}</Text>
-          </Box>
-        </Group>
-      )
-    },
-    {
-      key: 'actions',
-      label: 'الإجراءات',
-      render: (_, row) => {
-        const notification = row as unknown as NotificationData;
-        return (
-          <Group gap="xs">
-            <Tooltip label="عرض التفاصيل">
-              <ActionIcon
-                size="sm"
-                variant="light"
-                color="blue"
-                onClick={() => showNotificationDetails(notification)}
-              >
-                <Eye size={14} />
-              </ActionIcon>
-            </Tooltip>
-            
-            {notification.status === 'unread' && (
-              <Tooltip label="تحديد كمقروء">
-                <ActionIcon
-                  size="sm"
-                  variant="light"
-                  color="green"
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  <Check size={14} />
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </Group>
-        );
-      }
-    }
-  ];
+          <Eye size={14} />
+        </ActionIcon>
+      </Tooltip>
+      
+      {notification.status === 'unread' && (
+        <Tooltip label="تحديد كمقروء">
+          <ActionIcon
+            size="sm"
+            variant="light"
+            color="green"
+            onClick={() => markAsRead(notification.id)}
+          >
+            <Check size={14} />
+          </ActionIcon>
+        </Tooltip>
+      )}
+    </Group>
+  );
 
   return (
     <div className={styles.notificationsContainer}>
@@ -816,14 +789,50 @@ export default function NotificationsPage() {
       {/* جدول الإشعارات */}
       <div className={styles.tableSection}>
         <Paper className={styles.tableContainer} p="lg" radius="md" shadow="xs">
-          <DataTable
-            columns={tableColumns}
-            data={filteredNotifications}
-            loading={loading}
-            searchable={false} // استخدمنا البحث المخصص
-            emptyText="لا توجد إشعارات"
-            pageSize={15}
-          />
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>الإشعار</Table.Th>
+                <Table.Th>النوع</Table.Th>
+                <Table.Th>الأولوية</Table.Th>
+                <Table.Th>الحالة</Table.Th>
+                <Table.Th>التاريخ</Table.Th>
+                <Table.Th>الإجراءات</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {filteredNotifications.length === 0 ? (
+                <Table.Tr>
+                  <Table.Td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                    <Text c="dimmed">لا توجد إشعارات</Text>
+                  </Table.Td>
+                </Table.Tr>
+              ) : (
+                filteredNotifications.map((notification) => (
+                  <Table.Tr key={notification.id}>
+                    <Table.Td>
+                      {renderNotificationCell(notification)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderTypeCell(notification.type)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderPriorityCell(notification.priority)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderStatusCell(notification.status)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderDateCell(notification.createdAt)}
+                    </Table.Td>
+                    <Table.Td>
+                      {renderActionsCell(notification)}
+                    </Table.Td>
+                  </Table.Tr>
+                ))
+              )}
+            </Table.Tbody>
+          </Table>
         </Paper>
       </div>
 

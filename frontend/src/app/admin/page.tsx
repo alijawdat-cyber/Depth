@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Grid } from '@mantine/core';
+import { Grid, Table } from '@mantine/core';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable } from '@/components/molecules/DataTable/DataTable';
 import { 
   Users, 
   FileText, 
@@ -60,58 +59,6 @@ const dashboardStats = [
   },
 ];
 
-// بيانات الأنشطة الحديثة
-const recentActivities = [
-  {
-    id: '1042',
-    client: 'مطعم البرج',
-    type: 'تصوير طعام',
-    status: 'جديد',
-    time: 'منذ ساعة',
-    priority: 'عالية'
-  },
-  {
-    id: '1041',
-    client: 'شركة الأمل',
-    type: 'فيديو دعائي',
-    status: 'مراجعة',
-    time: 'منذ 3 ساعات',
-    priority: 'متوسطة'
-  },
-  {
-    id: '1040',
-    client: 'فندق بابل',
-    type: 'تصوير معماري',
-    status: 'معتمد',
-    time: 'أمس',
-    priority: 'منخفضة'
-  },
-  {
-    id: '1039',
-    client: 'مركز التجارة',
-    type: 'تصوير منتجات',
-    status: 'مكتمل',
-    time: 'منذ يومين',
-    priority: 'منخفضة'
-  }
-];
-
-// تكوين الجدول
-const tableConfig = {
-  columns: [
-    { key: 'id', label: '#', width: '80px' },
-    { key: 'client', label: 'العميل', sortable: true },
-    { key: 'type', label: 'نوع الطلب', sortable: true },
-    { key: 'status', label: 'الحالة', sortable: true },
-    { key: 'time', label: 'الوقت', sortable: true },
-    { key: 'priority', label: 'الأولوية', sortable: true }
-  ],
-  data: recentActivities,
-  searchable: true,
-  paginated: true,
-  pageSize: 5
-};
-
 export default function AdminDashboard() {
   return (
     <div className={styles.dashboard}>
@@ -139,9 +86,22 @@ export default function AdminDashboard() {
         <h2 className={styles.sectionTitle}>
           آخر الأنشطة
         </h2>
-        <DataTable
-          {...tableConfig}
-        />
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>النشاط</Table.Th>
+              <Table.Th>الوقت</Table.Th>
+              <Table.Th>الحالة</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Td>لا توجد أنشطة حالياً</Table.Td>
+              <Table.Td>-</Table.Td>
+              <Table.Td>-</Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
+        </Table>
       </div>
     </div>
   );

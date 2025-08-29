@@ -6,7 +6,12 @@ import {
   Group, 
   Text, 
   ActionIcon,
-  Stack
+  Stack,
+  Button,
+  Modal,
+  Select,
+  Table,
+  Badge
 } from '@mantine/core';
 import { 
   Users, 
@@ -19,11 +24,6 @@ import {
 
 // استيراد المكونات الموجودة
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
-import { Button } from '@/components/atoms/Button/Button';
-import { Modal } from '@/components/atoms/Modal/Modal';
-import { Select } from '@/components/atoms/Select/Select';
 
 import styles from './UsersPage.module.css';
 
@@ -123,7 +123,6 @@ const statusOptions = [
 ];
 
 export default function UsersPage() {
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [roleFilter, setRoleFilter] = useState('all');
@@ -154,11 +153,16 @@ export default function UsersPage() {
   }, [roleFilter, statusFilter]);
 
   // تكوين أعمدة الجدول
-  const columns: DataTableColumn[] = [
+  interface TableColumn {
+    key: string;
+    label: string;
+    render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode;
+  }
+
+  const columns: TableColumn[] = [
     {
       key: 'name',
       label: 'المستخدم',
-      sortable: true,
       render: (_, row) => {
         const user = row as User;
         return (
@@ -177,7 +181,6 @@ export default function UsersPage() {
     {
       key: 'role',
       label: 'الدور',
-      sortable: true,
       render: (value) => {
         const roleLabels = {
           admin: 'إدمن',
@@ -195,19 +198,26 @@ export default function UsersPage() {
     {
       key: 'status',
       label: 'الحالة',
-      sortable: true,
-      render: (value) => (
-        <StatusBadge 
-          status={value as 'active' | 'inactive' | 'pending'}
-          size="sm"
-          withIcon
-        />
-      )
+      render: (value) => {
+        const status = value as 'active' | 'inactive' | 'pending';
+        return (
+          <Badge 
+            color={
+              status === 'active' ? 'green' : 
+              status === 'inactive' ? 'gray' : 'yellow'
+            }
+            variant="light"
+            size="sm"
+          >
+            {status === 'active' ? 'نشط' : 
+             status === 'inactive' ? 'غير نشط' : 'معلق'}
+          </Badge>
+        );
+      }
     },
     {
       key: 'projects',
       label: 'المشاريع',
-      sortable: true,
       render: (value) => (
         <Text size="sm" ta="center">
           {(value as number) || 0}
@@ -217,7 +227,6 @@ export default function UsersPage() {
     {
       key: 'lastLogin',
       label: 'آخر دخول',
-      sortable: true,
       render: (value) => {
         if (!value) return <Text size="xs" c="dimmed">لم يدخل</Text>;
         const date = value as Date;
@@ -231,7 +240,6 @@ export default function UsersPage() {
     {
       key: 'actions',
       label: 'الإجراءات',
-      width: 120,
       render: (_, row) => {
         const user = row as User;
         return (
@@ -395,20 +403,41 @@ export default function UsersPage() {
 
       {/* Users Table */}
       <div className={styles.tableSection}>
-        <DataTable
-          columns={columns}
-          data={filteredUsers as Record<string, unknown>[]}
-          searchable={true}
-          searchPlaceholder="البحث في المستخدمين..."
-          paginated={true}
-          pageSize={10}
-          selectable={true}
-          selectedRows={selectedUsers}
-          onSelectionChange={setSelectedUsers}
-          onRowClick={(row) => handleViewUser(row as unknown as User)}
-          emptyText="لا توجد مستخدمين"
-          className={styles.tableSection}
-        />
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              {columns.map((column) => (
+                <Table.Th key={column.key}>{column.label}</Table.Th>
+              ))}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {filteredUsers.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Text c="dimmed">لا توجد مستخدمين</Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              filteredUsers.map((row) => (
+                <Table.Tr 
+                  key={row.id} 
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => handleViewUser(row)}
+                >
+                  {columns.map((column) => (
+                    <Table.Td key={column.key}>
+                      {column.render 
+                        ? column.render(row[column.key], row) 
+                        : String(row[column.key] ?? '')
+                      }
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))
+            )}
+          </Table.Tbody>
+        </Table>
       </div>
 
       {/* Delete Confirmation Modal */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Stack, ScrollArea, Divider, Text, Collapse, Box } from '@mantine/core';
+import { Stack, ScrollArea, Divider, Text, Collapse, Box, Button, ActionIcon } from '@mantine/core';
 import { 
   Home, 
   Users, 
@@ -20,8 +20,8 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { useDisclosure } from '@mantine/hooks';
-import { Button } from '../../atoms/Button/Button';
-import { ThemeToggle } from '../../atoms/ThemeToggle';
+import { useMantineColorScheme } from '@mantine/core';
+import { IconMoon, IconSun } from "@tabler/icons-react";
 import styles from './AppSidebar.module.css';
 
 // أنواع عناصر القائمة
@@ -360,6 +360,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   className
 }) => {
   const menuItems = items || getDefaultMenuItems(userRole);
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   
   // فلترة العناصر حسب دور المستخدم
   const filteredItems = menuItems.filter(item => 
@@ -383,7 +384,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         <Stack gap="xs" p="md">
           {/* مكون تبديل الثيم */}
           <Box className={styles.themeToggleContainer}>
-            <ThemeToggle size="sm" withLabels={false} />
+            <ActionIcon
+              onClick={toggleColorScheme}
+              variant="light"
+              size="sm"
+            >
+              {colorScheme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
+            </ActionIcon>
           </Box>
           
           {/* فاصل */}

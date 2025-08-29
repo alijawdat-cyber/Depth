@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Menu, Avatar, Text, Group, Divider, Badge } from '@mantine/core';
+import { Menu, Avatar, Text, Group, Divider, Badge, Button } from '@mantine/core';
 import { 
   User, 
   Settings, 
@@ -15,7 +15,6 @@ import {
   Palette,
   type LucideIcon
 } from 'lucide-react';
-import { Button } from '../../atoms/Button/Button';
 import styles from './UserMenu.module.css';
 
 // نوع عنصر القائمة

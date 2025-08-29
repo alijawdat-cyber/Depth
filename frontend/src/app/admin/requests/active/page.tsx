@@ -13,9 +13,12 @@ import {
   Text,
   Badge,
   ActionIcon,
+  Card,
+  Table,
+  Pagination,
+  Box,
   Avatar,
   SimpleGrid,
-  Card,
   Progress,
   RingProgress,
   Tooltip,
@@ -45,8 +48,6 @@ import {
   Timer
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 
 // Types للطلبات النشطة
 interface ActiveProject extends Record<string, unknown> {
@@ -623,7 +624,14 @@ const ActiveRequestsPage: React.FC = () => {
   };
 
   // Table columns
-  const columns: DataTableColumn[] = [
+  interface TableColumn {
+    key: string;
+    label: string;
+    width?: number;
+    render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode;
+  }
+
+  const columns: TableColumn[] = [
     {
       key: 'project',
       label: 'معلومات المشروع',
@@ -687,10 +695,17 @@ const ActiveRequestsPage: React.FC = () => {
                   <Star size={10} fill="currentColor" />
                   <Text size="xs">{project.creator.rating}</Text>
                 </Group>
-                <StatusBadge status={
-                  project.creator.status === 'available' ? 'active' : 
-                  project.creator.status === 'busy' ? 'pending' : 'inactive'
-                } size="xs" />
+                <Badge 
+                  color={
+                    project.creator.status === 'available' ? 'green' : 
+                    project.creator.status === 'busy' ? 'yellow' : 'gray'
+                  }
+                  size="xs"
+                  variant="light"
+                >
+                  {project.creator.status === 'available' ? 'نشط' : 
+                   project.creator.status === 'busy' ? 'مشغول' : 'غير نشط'}
+                </Badge>
                 {project.flags.creatorTopPerformer && (
                   <Badge color="gold" size="xs">نجم</Badge>
                 )}
@@ -774,10 +789,17 @@ const ActiveRequestsPage: React.FC = () => {
             <Text size="sm" fw={600}>
               {formatCurrency(project.pricing.totalAmount)}
             </Text>
-            <StatusBadge status={
-              project.pricing.paymentStatus === 'completed' ? 'active' :
-              project.pricing.paymentStatus === 'partial' ? 'pending' : 'failed'
-            } size="xs" />
+            <Badge 
+              color={
+                project.pricing.paymentStatus === 'completed' ? 'green' :
+                project.pricing.paymentStatus === 'partial' ? 'yellow' : 'red'
+              }
+              size="xs"
+              variant="light"
+            >
+              {project.pricing.paymentStatus === 'completed' ? 'مكتمل' :
+               project.pricing.paymentStatus === 'partial' ? 'جزئي' : 'فشل'}
+            </Badge>
             {project.pricing.paymentStatus !== 'completed' && (
               <Text size="xs" c="orange">
                 متبقي: {formatCurrency(project.pricing.remainingAmount)}
@@ -988,19 +1010,44 @@ const ActiveRequestsPage: React.FC = () => {
 
       {/* Data Table */}
       <div className={styles.tableContainer}>
-        <DataTable
-          columns={columns}
-          data={filteredProjects as Record<string, unknown>[]}
-          searchable={false}
-          paginated={true}
-          pageSize={10}
-          emptyText="لا يوجد طلبات نشطة"
-          onRowClick={(row) => {
-            setSelectedProject(row as unknown as ActiveProject);
-            openDetails();
-          }}
-          className={styles.dataTable}
-        />
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              {columns.map((column) => (
+                <Table.Th key={column.key}>{column.label}</Table.Th>
+              ))}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {filteredProjects.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Text c="dimmed">لا يوجد طلبات نشطة</Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              filteredProjects.map((row) => (
+                <Table.Tr 
+                  key={row.id} 
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setSelectedProject(row);
+                    openDetails();
+                  }}
+                >
+                  {columns.map((column) => (
+                    <Table.Td key={column.key}>
+                      {column.render 
+                        ? column.render(row[column.key], row) 
+                        : String(row[column.key] ?? '')
+                      }
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))
+            )}
+          </Table.Tbody>
+        </Table>
       </div>
 
       {/* Project Details Modal */}
@@ -1135,10 +1182,16 @@ const ActiveRequestsPage: React.FC = () => {
                   <Text size="sm">
                     <strong>المتبقي:</strong> {formatCurrency(selectedProject.pricing.remainingAmount)}
                   </Text>
-                  <StatusBadge status={
-                    selectedProject.pricing.paymentStatus === 'completed' ? 'active' :
-                    selectedProject.pricing.paymentStatus === 'partial' ? 'pending' : 'failed'
-                  } />
+                  <Badge 
+                    color={
+                      selectedProject.pricing.paymentStatus === 'completed' ? 'green' :
+                      selectedProject.pricing.paymentStatus === 'partial' ? 'yellow' : 'red'
+                    }
+                    variant="light"
+                  >
+                    {selectedProject.pricing.paymentStatus === 'completed' ? 'مكتمل' :
+                     selectedProject.pricing.paymentStatus === 'partial' ? 'جزئي' : 'فشل'}
+                  </Badge>
                 </Stack>
               </Card>
             </Group>

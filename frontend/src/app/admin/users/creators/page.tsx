@@ -20,7 +20,8 @@ import {
   Divider,
   SimpleGrid,
   Card,
-  Rating
+  Rating,
+  Table
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { 
@@ -39,8 +40,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import styles from './CreatorsPage.module.css';
 
 // Types
@@ -292,8 +291,6 @@ const CreatorsPage: React.FC = () => {
   
   // Modals
   const [detailsOpened, { open: openDetails, close: closeDetails }] = useDisclosure(false);
-  const [approveOpened, { open: openApprove, close: closeApprove }] = useDisclosure(false);
-  const [rejectOpened, { open: openReject, close: closeReject }] = useDisclosure(false);
 
   // Stats calculation
   const stats = useMemo(() => {
@@ -410,204 +407,6 @@ const CreatorsPage: React.FC = () => {
     }).format(amount);
   };
 
-  // Table columns
-  const columns: DataTableColumn[] = [
-    {
-      key: 'profile',
-      label: 'الملف الشخصي',
-      width: 250,
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Group gap="sm">
-            <Avatar
-              src={creator.profileImage}
-              size={40}
-              radius="md"
-            >
-              {creator.fullName.charAt(0)}
-            </Avatar>
-            <div>
-              <Text size="sm" fw={500}>{creator.displayName}</Text>
-              <Text size="xs" c="dimmed">{creator.fullName}</Text>
-              <Group gap="xs" mt={2}>
-                <MapPin size={12} />
-                <Text size="xs" c="dimmed">{creator.location.city}</Text>
-              </Group>
-            </div>
-          </Group>
-        );
-      }
-    },
-    {
-      key: 'specialties',
-      label: 'التخصصات',
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Group gap="xs">
-            {getSpecialtiesDisplay(creator.specialties)}
-          </Group>
-        );
-      }
-    },
-    {
-      key: 'experienceLevel',
-      label: 'مستوى الخبرة',
-      render: (value, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Stack gap="xs" align="flex-start">
-            {getExperienceDisplay(value as string)}
-            <Text size="xs" c="dimmed">{creator.yearsOfExperience} سنوات</Text>
-          </Stack>
-        );
-      }
-    },
-    {
-      key: 'rating',
-      label: 'التقييم',
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        if (creator.rating === 0) {
-          return <Text size="sm" c="dimmed">غير مقيم</Text>;
-        }
-        return (
-          <Stack gap="xs" align="flex-start">
-            <Group gap="xs">
-              <Rating value={creator.rating} readOnly size="sm" />
-              <Text size="sm" fw={500}>{creator.rating}</Text>
-            </Group>
-            <Text size="xs" c="dimmed">({creator.totalReviews} تقييم)</Text>
-          </Stack>
-        );
-      }
-    },
-    {
-      key: 'equipment',
-      label: 'المعدات',
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Stack gap="xs" align="flex-start">
-            {getEquipmentTierDisplay(creator.equipmentTier)}
-            <Text size="xs" c="dimmed">
-              {creator.hasOwnEquipment ? '✅ معدات شخصية' : '🏢 معدات الوكالة'}
-            </Text>
-          </Stack>
-        );
-      }
-    },
-    {
-      key: 'onboardingStatus',
-      label: 'الحالة',
-      render: (value, row) => {
-        const creator = row as unknown as Creator;
-        const statusMap: Record<string, 'pending' | 'active' | 'failed' | 'processing' | 'completed'> = {
-          'pending': 'pending',
-          'approved': 'active', 
-          'rejected': 'failed',
-          'active': 'processing',
-          'completed': 'completed'
-        };
-        return (
-          <Stack gap="xs" align="flex-start">
-            <StatusBadge status={statusMap[value as string]} />
-            {creator.isAvailable ? (
-              <Badge color="green" size="xs">متاح</Badge>
-            ) : (
-              <Badge color="orange" size="xs">مشغول</Badge>
-            )}
-          </Stack>
-        );
-      }
-    },
-    {
-      key: 'stats',
-      label: 'الإحصائيات',
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Stack gap="xs" align="flex-start">
-            <Text size="xs">
-              <strong>{creator.completedProjects}</strong> مشروع مكتمل
-            </Text>
-            <Text size="xs">
-              <strong>{creator.activeProjects}</strong> نشط حالياً
-            </Text>
-            <Text size="xs" c="dimmed">
-              {formatCurrency(creator.monthlyEarnings)} شهرياً
-            </Text>
-          </Stack>
-        );
-      }
-    },
-    {
-      key: 'actions',
-      label: 'إجراءات',
-      width: 120,
-      render: (_, row) => {
-        const creator = row as unknown as Creator;
-        return (
-          <Group gap="xs">
-            <ActionIcon
-              size="sm"
-              variant="light"
-              color="blue"
-              onClick={() => {
-                setSelectedCreator(creator);
-                openDetails();
-              }}
-            >
-              <Eye size={14} />
-            </ActionIcon>
-            
-            {creator.onboardingStatus === 'pending' && (
-              <>
-                <ActionIcon
-                  size="sm"
-                  variant="light"
-                  color="green"
-                  onClick={() => {
-                    setSelectedCreator(creator);
-                    openApprove();
-                  }}
-                >
-                  <UserCheck size={14} />
-                </ActionIcon>
-                
-                <ActionIcon
-                  size="sm"
-                  variant="light"
-                  color="red"
-                  onClick={() => {
-                    setSelectedCreator(creator);
-                    openReject();
-                  }}
-                >
-                  <UserX size={14} />
-                </ActionIcon>
-              </>
-            )}
-          </Group>
-        );
-      }
-    }
-  ];
-
-  // Handlers
-  const handleApproveCreator = () => {
-    console.log('Approving creator:', selectedCreator?.id);
-    closeApprove();
-    // Here you would call the API to approve the creator
-  };
-
-  const handleRejectCreator = () => {
-    console.log('Rejecting creator:', selectedCreator?.id);
-    closeReject();
-    // Here you would call the API to reject the creator
-  };
-
   return (
     <Container size="xl" className={styles.container}>
       {/* Header - يستخدم الكلاسات العالمية من globals.css مباشرة */}
@@ -701,19 +500,145 @@ const CreatorsPage: React.FC = () => {
 
       {/* Data Table */}
       <div className={styles.tableContainer}>
-        <DataTable
-          columns={columns}
-          data={filteredCreators as Record<string, unknown>[]}
-          searchable={false}
-          paginated={true}
-          pageSize={10}
-          emptyText="لا يوجد مبدعين"
-          onRowClick={(row) => {
-            setSelectedCreator(row as unknown as Creator);
-            openDetails();
-          }}
-          className={styles.dataTable}
-        />
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>الملف الشخصي</Table.Th>
+              <Table.Th>التقييم</Table.Th>
+              <Table.Th>المهارات</Table.Th>
+              <Table.Th>المحفظة</Table.Th>
+              <Table.Th>الحالة المالية</Table.Th>
+              <Table.Th>الحالة</Table.Th>
+              <Table.Th>تاريخ التسجيل</Table.Th>
+              <Table.Th>الإجراءات</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {filteredCreators.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={8} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Text c="dimmed">لا يوجد مبدعين</Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              filteredCreators.map((creator) => (
+                <Table.Tr 
+                  key={creator.id} 
+                  onClick={() => {
+                    setSelectedCreator(creator);
+                    openDetails();
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <Table.Td>
+                    <Group gap="md">
+                      <Avatar size="md" radius="xl">
+                        {creator.fullName.substring(0, 2)}
+                      </Avatar>
+                      <div>
+                        <Text fw={500} size="sm">{creator.displayName}</Text>
+                        <Text c="dimmed" size="xs">{creator.phone}</Text>
+                        <Text c="dimmed" size="xs">{creator.location.city} - {creator.location.area}</Text>
+                      </div>
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Stack gap="xs" align="flex-start">
+                      <Rating value={creator.rating} readOnly size="xs" />
+                      <Text size="xs" c="dimmed">{creator.completedProjects} مشروع</Text>
+                    </Stack>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      {creator.specialties.slice(0, 2).map((specialty, index) => (
+                        <Badge key={index} variant="light" size="xs">
+                          {specialty}
+                        </Badge>
+                      ))}
+                      {creator.specialties.length > 2 && (
+                        <Badge variant="outline" size="xs">
+                          +{creator.specialties.length - 2}
+                        </Badge>
+                      )}
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="sm">
+                      {creator.portfolioImages?.length || 0} عنصر
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Stack gap="xs" align="flex-start">
+                      <Text size="sm" fw={500}>
+                        {creator.monthlyEarnings.toLocaleString()} د.ع
+                      </Text>
+                      <Text size="xs" c="dimmed">المكاسب الكلية</Text>
+                    </Stack>
+                  </Table.Td>
+                  <Table.Td>
+                    <Stack gap="xs" align="flex-start">
+                      <Badge 
+                        color={
+                          creator.onboardingStatus === 'approved' ? 'green' :
+                          creator.onboardingStatus === 'pending' ? 'yellow' :
+                          creator.onboardingStatus === 'rejected' ? 'red' : 'gray'
+                        }
+                      >
+                        {creator.onboardingStatus === 'pending' ? 'قيد المراجعة' :
+                         creator.onboardingStatus === 'approved' ? 'مفعّل' :
+                         creator.onboardingStatus === 'rejected' ? 'مرفوض' : creator.onboardingStatus}
+                      </Badge>
+                      {creator.isAvailable ? (
+                        <Badge color="green" size="xs">متاح</Badge>
+                      ) : (
+                        <Badge color="orange" size="xs">مشغول</Badge>
+                      )}
+                    </Stack>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="sm">
+                      {new Date(creator.createdAt).toLocaleDateString('ar-IQ')}
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <ActionIcon 
+                        variant="subtle" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCreator(creator);
+                          openDetails();
+                        }}
+                      >
+                        <Eye size={16} />
+                      </ActionIcon>
+                      <ActionIcon 
+                        variant="subtle" 
+                        color="green"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('Approve creator:', creator.id);
+                        }}
+                      >
+                        <UserCheck size={16} />
+                      </ActionIcon>
+                      <ActionIcon 
+                        variant="subtle" 
+                        color="red"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('Reject creator:', creator.id);
+                        }}
+                      >
+                        <UserX size={16} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))
+            )}
+          </Table.Tbody>
+        </Table>
       </div>
 
       {/* Creator Details Modal */}
@@ -753,7 +678,11 @@ const CreatorsPage: React.FC = () => {
                   </div>
                 </Group>
                 <Stack gap="xs" align="flex-end">
-                  <StatusBadge status={selectedCreator.onboardingStatus === 'approved' ? 'active' : 'pending'} />
+                  <Badge 
+                    color={selectedCreator.onboardingStatus === 'approved' ? 'green' : 'yellow'}
+                  >
+                    {selectedCreator.onboardingStatus === 'approved' ? 'مفعّل' : 'قيد المراجعة'}
+                  </Badge>
                   {selectedCreator.isAvailable ? (
                     <Badge color="green">متاح للعمل</Badge>
                   ) : (
@@ -887,65 +816,6 @@ const CreatorsPage: React.FC = () => {
             )}
           </Stack>
         )}
-      </Modal>
-
-      {/* Approve Creator Modal */}
-      <Modal
-        opened={approveOpened}
-        onClose={closeApprove}
-        title="اعتماد المبدع"
-        size="md"
-        centered
-      >
-        <Stack gap="md">
-          <Text size="sm">
-            هل أنت متأكد من اعتماد المبدع <strong>{selectedCreator?.displayName}</strong>؟
-          </Text>
-          
-          <Text size="sm" c="dimmed">
-            سيتمكن المبدع من استلام المشاريع والعمل ضمن المنصة بعد الاعتماد.
-          </Text>
-          
-          <Group justify="flex-end" gap="md">
-            <Button variant="light" onClick={closeApprove}>
-              إلغاء
-            </Button>
-            <Button onClick={handleApproveCreator} color="green">
-              اعتماد المبدع
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      {/* Reject Creator Modal */}
-      <Modal
-        opened={rejectOpened}
-        onClose={closeReject}
-        title="رفض المبدع"
-        size="md"
-        centered
-      >
-        <Stack gap="md">
-          <Text size="sm">
-            هل أنت متأكد من رفض طلب المبدع <strong>{selectedCreator?.displayName}</strong>؟
-          </Text>
-          
-          <Text size="sm" c="red.7">
-            سيتم إشعار المبدع برفض طلبه ولن يتمكن من العمل ضمن المنصة.
-          </Text>
-          
-          <Group justify="flex-end" gap="md">
-            <Button variant="light" onClick={closeReject}>
-              إلغاء
-            </Button>
-            <Button 
-              onClick={handleRejectCreator} 
-              color="red"
-            >
-              رفض الطلب
-            </Button>
-          </Group>
-        </Stack>
       </Modal>
     </Container>
   );

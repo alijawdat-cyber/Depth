@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../styles/globals.css"; // استيراد نظام الأنماط العالمي الموحد
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import "@mantine/core/styles.css";

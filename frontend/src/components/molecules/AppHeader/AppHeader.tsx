@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { Group, Text, ActionIcon, Burger } from "@mantine/core";
-import Menu, { MenuItem, MenuDivider } from "@/components/atoms/Menu";
-import Avatar from "@/components/atoms/Avatar";
+import { Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, Avatar } from "@mantine/core";
 import { Bell, Settings, LogOut, User } from "lucide-react";
 import Image from "next/image";
 import styles from "./AppHeader.module.css";
@@ -108,7 +107,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <Menu
           position="bottom-end"
           width={260}
-          trigger={
+        >
+          <MenuTarget>
             <div className={styles.appHeaderUserMenu}>
               <Avatar
                 src={userAvatar}
@@ -135,14 +135,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 )}
               </div>
             </div>
-          }
-        >
-          {/* User Info Header */}
-          <div className={styles.appHeaderUserInfo}>
-            <Group gap="sm">
-              <Avatar
-                src={userAvatar}
-                name={userName}
+          </MenuTarget>
+
+          <MenuDropdown>
+            {/* User Info Header */}
+            <div className={styles.appHeaderUserInfo}>
+              <Group gap="sm">
+                <Avatar
+                  src={userAvatar}
+                  name={userName}
                 size="sm"
                 variant="filled"
               />
@@ -200,6 +201,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           >
             تسجيل الخروج
           </MenuItem>
+          </MenuDropdown>
         </Menu>
       </Group>
     </div>

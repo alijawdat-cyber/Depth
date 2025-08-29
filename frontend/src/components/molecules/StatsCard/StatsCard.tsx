@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import { Text, Group } from "@mantine/core";
-import Card from "@/components/atoms/Card";
+import { Text, Group, Card } from "@mantine/core";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import styles from "./StatsCard.module.css";
 
@@ -69,11 +68,8 @@ export const StatsCard: React.FC<StatsCardProps> = ({
       className={`${styles.statsCard} ${styles[`statsCard--${color}`]} ${styles[`statsCard--${size}`]} ${
         clickable ? styles.statsCardClickable : ''
       }`}
-      variant="filled"
       padding="lg"
-      clickable={clickable}
       onClick={handleClick}
-      loading={loading}
     >
       <div className={styles.statsCardContent}>
         {/* Header - Title and Icon */}

@@ -16,7 +16,8 @@ import {
   ActionIcon,
   Textarea,
   NumberInput,
-  Divider
+  Divider,
+  Table
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { 
@@ -35,8 +36,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import { DataTable, DataTableColumn } from '@/components/molecules/DataTable/DataTable';
-import { StatusBadge } from '@/components/molecules/StatusBadge/StatusBadge';
 import styles from './RequestsPage.module.css';
 
 // Types
@@ -254,7 +253,14 @@ const RequestsNewPage: React.FC = () => {
   };
 
   // Table columns
-  const columns: DataTableColumn[] = [
+  interface TableColumn {
+    key: string;
+    label: string;
+    width?: number;
+    render?: (value: unknown, row?: Record<string, unknown>) => React.ReactNode;
+  }
+
+  const columns: TableColumn[] = [
     {
       key: 'requestNumber',
       label: '#',
@@ -268,7 +274,6 @@ const RequestsNewPage: React.FC = () => {
     {
       key: 'clientName',
       label: 'العميل',
-      sortable: true,
       render: (value) => (
         <Group gap="xs">
           <User size={16} />
@@ -288,7 +293,24 @@ const RequestsNewPage: React.FC = () => {
     {
       key: 'status',
       label: 'الحالة',
-      render: (value) => <StatusBadge status={value as 'pending' | 'reviewing' | 'approved' | 'rejected'} />
+      render: (value) => {
+        const status = value as 'pending' | 'reviewing' | 'approved' | 'rejected';
+        return (
+          <Badge 
+            color={
+              status === 'approved' ? 'green' : 
+              status === 'reviewing' ? 'yellow' : 
+              status === 'rejected' ? 'red' : 'blue'
+            }
+            variant="light"
+            size="sm"
+          >
+            {status === 'pending' ? 'معلق' :
+             status === 'reviewing' ? 'مراجعة' :
+             status === 'approved' ? 'معتمد' : 'مرفوض'}
+          </Badge>
+        );
+      }
     },
     {
       key: 'priority',
@@ -298,7 +320,6 @@ const RequestsNewPage: React.FC = () => {
     {
       key: 'createdAt',
       label: 'التاريخ',
-      sortable: true,
       render: (value) => (
         <Group gap="xs">
           <Calendar size={14} />
@@ -451,19 +472,44 @@ const RequestsNewPage: React.FC = () => {
 
       {/* Data Table */}
       <div className={styles.tableContainer}>
-        <DataTable
-          columns={columns}
-          data={filteredRequests as Record<string, unknown>[]}
-          searchable={false}
-          paginated={true}
-          pageSize={10}
-          emptyText="لا توجد طلبات"
-          onRowClick={(row) => {
-            setSelectedRequest(row as unknown as ProjectRequest);
-            openDetails();
-          }}
-          className={styles.dataTable}
-        />
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              {columns.map((column) => (
+                <Table.Th key={column.key}>{column.label}</Table.Th>
+              ))}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {filteredRequests.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Text c="dimmed">لا توجد طلبات</Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              filteredRequests.map((row) => (
+                <Table.Tr 
+                  key={row.id} 
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setSelectedRequest(row);
+                    openDetails();
+                  }}
+                >
+                  {columns.map((column) => (
+                    <Table.Td key={column.key}>
+                      {column.render 
+                        ? column.render(row[column.key], row) 
+                        : String(row[column.key] ?? '')
+                      }
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))
+            )}
+          </Table.Tbody>
+        </Table>
       </div>
 
       {/* Request Details Modal */}
@@ -481,7 +527,18 @@ const RequestsNewPage: React.FC = () => {
                 <User size={16} />
                 <Text fw={500}>{selectedRequest.clientName}</Text>
               </Group>
-              <StatusBadge status={selectedRequest.status} />
+              <Badge 
+                color={
+                  selectedRequest.status === 'approved' ? 'green' : 
+                  selectedRequest.status === 'reviewing' ? 'yellow' : 
+                  selectedRequest.status === 'rejected' ? 'red' : 'blue'
+                }
+                variant="light"
+              >
+                {selectedRequest.status === 'pending' ? 'معلق' :
+                 selectedRequest.status === 'reviewing' ? 'مراجعة' :
+                 selectedRequest.status === 'approved' ? 'معتمد' : 'مرفوض'}
+              </Badge>
             </Group>
             
             <Divider />
