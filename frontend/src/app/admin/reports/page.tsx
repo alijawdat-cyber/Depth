@@ -878,10 +878,10 @@ export default function ReportsPage() {
       
       {/* العنوان وأدوات التحكم */}
       <div className={classes.pageHeader}>
-        <Title order={2} className={classes.pageTitle}>
+        <Title order={1} className={classes.pageTitle}>
           التقارير والتحليلات
         </Title>
-        <Text size="sm" c="dimmed" mb="lg">
+        <Text className={classes.pageDescription}>
           تحليلات شاملة لأداء المنصة والأعمال والمبدعين
         </Text>
 

@@ -384,11 +384,11 @@ const RequestsNewPage: React.FC = () => {
   return (
     <Container size="xl" className={styles.container}>
       {/* Header */}
-      <div className={styles.header}>
-        <Title order={1} className={styles.title}>
+      <div className={styles.pageHeader}>
+        <Title order={1} className={styles.pageTitle}>
           إدارة الطلبات الجديدة
         </Title>
-        <Text c="dimmed" size="sm">
+        <Text className={styles.pageDescription}>
           مراجعة وإدارة طلبات المشاريع الواردة من العملاء
         </Text>
       </div>

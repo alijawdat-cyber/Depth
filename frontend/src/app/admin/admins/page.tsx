@@ -564,10 +564,10 @@ export default function AdminsPage() {
       <div className={styles.pageHeader}>
         <Group justify="space-between" align="flex-start">
           <Box>
-            <Title order={2} className={styles.pageTitle}>
+            <Title order={1} className={styles.pageTitle}>
               إدارة الأدمنز
             </Title>
-            <Text size="sm" c="dimmed" mt="xs">
+            <Text className={styles.pageDescription}>
               إدارة المدراء والصلاحيات - متاح للـ Super Admin فقط
             </Text>
           </Box>

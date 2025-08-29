@@ -616,14 +616,14 @@ export default function InvoicesPage() {
   return (
     <Container fluid className={styles.container}>
       {/* Header */}
-      <div className={styles.header}>
+      <div className={styles.pageHeader}>
         <Group justify="space-between">
           <div>
-            <Title order={2} className={styles.title}>
+            <Title order={1} className={styles.pageTitle}>
               <IconFileInvoice size={28} className={styles.titleIcon} />
               إدارة الفواتير
             </Title>
-            <Text c="dimmed" mt={4}>
+            <Text className={styles.pageDescription}>
               إدارة وتتبع فواتير المشاريع والمدفوعات
             </Text>
           </div>

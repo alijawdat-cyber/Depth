@@ -611,11 +611,11 @@ const CreatorsPage: React.FC = () => {
   return (
     <Container size="xl" className={styles.container}>
       {/* Header */}
-      <div className={styles.header}>
-        <Title order={1} className={styles.title}>
+      <div className={styles.pageHeader}>
+        <Title order={1} className={styles.pageTitle}>
           إدارة المبدعين
         </Title>
-        <Text c="dimmed" size="sm">
+        <Text className={styles.pageDescription}>
           مراجعة وإدارة ملفات المبدعين الفريلانسرز ومتابعة أدائهم
         </Text>
       </div>

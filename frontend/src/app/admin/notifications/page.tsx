@@ -699,10 +699,10 @@ export default function NotificationsPage() {
       <div className={styles.pageHeader}>
         <Group justify="space-between" align="flex-start">
           <Box>
-            <Title order={2} className={styles.pageTitle}>
+            <Title order={1} className={styles.pageTitle}>
               إدارة الإشعارات
             </Title>
-            <Text size="sm" c="dimmed" mt="xs">
+            <Text className={styles.pageDescription}>
               مراقبة وإدارة جميع إشعارات النظام والمستخدمين
             </Text>
           </Box>

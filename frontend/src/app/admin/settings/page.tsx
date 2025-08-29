@@ -332,8 +332,8 @@ export default function SettingsPage() {
       {/* رأس الصفحة */}
       <div className={styles.pageHeader}>
         <div>
-          <Title className={styles.pageTitle}>إعدادات النظام</Title>
-          <Text size="sm" c="dimmed" mt="xs">
+          <Title order={1} className={styles.pageTitle}>إعدادات النظام</Title>
+          <Text className={styles.pageDescription}>
             إدارة الإعدادات العامة ومعاملات التسعير ومراقبة النظام
           </Text>
         </div>

@@ -458,10 +458,10 @@ export default function PaymentsPage() {
       {/* Header */}
       <Group justify="space-between" mb="xl">
         <div>
-          <Title order={2} className={styles.pageTitle}>
+          <Title order={1} className={styles.pageTitle}>
             إدارة المدفوعات
           </Title>
-          <Text c="dimmed" size="sm">
+          <Text className={styles.pageDescription}>
             تسجيل وتتبع جميع المدفوعات الواردة من العملاء
           </Text>
         </div>
