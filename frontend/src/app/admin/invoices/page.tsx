@@ -390,14 +390,14 @@ const mockInvoices: Invoice[] = [
 
 // Utility Functions
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('ar-IQ', {
+  return new Intl.NumberFormat('en-US', {
     style: 'decimal',
     minimumFractionDigits: 0,
   }).format(amount) + ' د.ع';
 };
 
 const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('ar', {
+  return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'

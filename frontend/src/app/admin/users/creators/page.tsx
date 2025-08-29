@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { 
-  Container, 
   Title, 
   Grid, 
   Group, 
@@ -40,7 +39,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import styles from './CreatorsPage.module.css';
 
 // Types
 interface Creator extends Record<string, unknown> {
@@ -391,7 +389,7 @@ const CreatorsPage: React.FC = () => {
     };
     
     return specialties.map(spec => (
-      <Badge key={spec} variant="light" size="xs" className={styles.specialtyBadge}>
+      <Badge key={spec} variant="light" size="xs" className="badge neutral">
         {specialtyIcons[spec as keyof typeof specialtyIcons] || '🔧'} {spec}
       </Badge>
     ));
@@ -400,7 +398,7 @@ const CreatorsPage: React.FC = () => {
   // Format currency
   const formatCurrency = (amount: number) => {
     if (amount === 0) return '0 د.ع';
-    return new Intl.NumberFormat('ar-IQ', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'IQD',
       minimumFractionDigits: 0
@@ -408,7 +406,7 @@ const CreatorsPage: React.FC = () => {
   };
 
   return (
-    <Container size="xl" className={styles.container}>
+    <>
       {/* Header - يستخدم الكلاسات العالمية من globals.css مباشرة */}
       <div className="pageHeader">
         <Title order={1} className="pageTitle">
@@ -420,7 +418,7 @@ const CreatorsPage: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <Grid className={styles.statsGrid}>
+      <Grid className="statsGrid">
         {stats.map((stat, index) => (
           <Grid.Col key={index} span={{ base: 12, xs: 6, sm: 4, lg: 2.4 }}>
             <StatsCard {...stat} />
@@ -428,69 +426,62 @@ const CreatorsPage: React.FC = () => {
         ))}
       </Grid>
 
-      {/* Filters */}
-      <div className={styles.filters}>
-        <Group justify="space-between" className={styles.filtersHeader}>
-          <Group gap="md">
-            <TextInput
-              placeholder="البحث في المبدعين..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.currentTarget.value)}
-              leftSection={<Search size={16} />}
-              className={styles.searchInput}
-            />
-            
-            <Select
-              placeholder="مستوى الخبرة"
-              value={experienceFilter}
-              onChange={setExperienceFilter}
-              data={[
-                { value: '', label: 'جميع المستويات' },
-                { value: 'fresh', label: 'مبتدئ' },
-                { value: 'experienced', label: 'متمرس' },
-                { value: 'expert', label: 'خبير' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="الحالة"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              data={[
-                { value: '', label: 'جميع الحالات' },
-                { value: 'pending', label: 'قيد المراجعة' },
-                { value: 'approved', label: 'معتمد' },
-                { value: 'rejected', label: 'مرفوض' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="المعدات"
-              value={equipmentFilter}
-              onChange={setEquipmentFilter}
-              data={[
-                { value: '', label: 'جميع المستويات' },
-                { value: 'silver', label: 'فضي' },
-                { value: 'gold', label: 'ذهبي' },
-                { value: 'platinum', label: 'بلاتيني' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="التوفر"
-              value={availabilityFilter}
-              onChange={setAvailabilityFilter}
-              data={[
-                { value: '', label: 'الجميع' },
-                { value: 'available', label: 'متاح' },
-                { value: 'busy', label: 'مشغول' }
-              ]}
-              className={styles.filterSelect}
-            />
-          </Group>
+  {/* Filters */}
+  <div className="card section filters">
+        <Group gap="md">
+          <TextInput
+            placeholder="البحث في المبدعين..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            leftSection={<Search size={16} />}
+          />
+          
+          <Select
+            placeholder="مستوى الخبرة"
+            value={experienceFilter}
+            onChange={setExperienceFilter}
+            data={[
+              { value: '', label: 'جميع المستويات' },
+              { value: 'fresh', label: 'مبتدئ' },
+              { value: 'experienced', label: 'متمرس' },
+              { value: 'expert', label: 'خبير' }
+            ]}
+          />
+          
+          <Select
+            placeholder="الحالة"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            data={[
+              { value: '', label: 'جميع الحالات' },
+              { value: 'pending', label: 'قيد المراجعة' },
+              { value: 'approved', label: 'معتمد' },
+              { value: 'rejected', label: 'مرفوض' }
+            ]}
+          />
+          
+          <Select
+            placeholder="المعدات"
+            value={equipmentFilter}
+            onChange={setEquipmentFilter}
+            data={[
+              { value: '', label: 'جميع المستويات' },
+              { value: 'silver', label: 'فضي' },
+              { value: 'gold', label: 'ذهبي' },
+              { value: 'platinum', label: 'بلاتيني' }
+            ]}
+          />
+          
+          <Select
+            placeholder="التوفر"
+            value={availabilityFilter}
+            onChange={setAvailabilityFilter}
+            data={[
+              { value: '', label: 'الجميع' },
+              { value: 'available', label: 'متاح' },
+              { value: 'busy', label: 'مشغول' }
+            ]}
+          />
 
           <Button leftSection={<Filter size={16} />} variant="light">
             فلاتر متقدمة
@@ -499,7 +490,7 @@ const CreatorsPage: React.FC = () => {
       </div>
 
       {/* Data Table */}
-      <div className={styles.tableContainer}>
+      <div className="card table">
         <Table>
           <Table.Thead>
             <Table.Tr>
@@ -570,7 +561,7 @@ const CreatorsPage: React.FC = () => {
                   <Table.Td>
                     <Stack gap="xs" align="flex-start">
                       <Text size="sm" fw={500}>
-                        {creator.monthlyEarnings.toLocaleString()} د.ع
+                        {new Intl.NumberFormat('en-US').format(creator.monthlyEarnings)} د.ع
                       </Text>
                       <Text size="xs" c="dimmed">المكاسب الكلية</Text>
                     </Stack>
@@ -597,7 +588,7 @@ const CreatorsPage: React.FC = () => {
                   </Table.Td>
                   <Table.Td>
                     <Text size="sm">
-                      {new Date(creator.createdAt).toLocaleDateString('ar-IQ')}
+                      {new Date(creator.createdAt).toLocaleDateString('en-US')}
                     </Text>
                   </Table.Td>
                   <Table.Td>
@@ -693,7 +684,7 @@ const CreatorsPage: React.FC = () => {
               
               <Divider my="md" />
               
-              <Text size="sm" className={styles.bio}>
+              <Text size="sm" className="pageDescription">
                 {selectedCreator.bio}
               </Text>
             </Card>
@@ -757,7 +748,7 @@ const CreatorsPage: React.FC = () => {
               <Text size="sm" c="dimmed" mb="md">المهارات والفئات</Text>
               <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 {selectedCreator.subcategories.map((skill) => (
-                  <div key={skill.id} className={styles.skillItem}>
+                  <div key={skill.id}>
                     <Group justify="apart" mb="xs">
                       <Text size="sm" fw={500}>{skill.subcategoryName}</Text>
                       <Badge 
@@ -791,7 +782,6 @@ const CreatorsPage: React.FC = () => {
                     component="a" 
                     href="#" 
                     size="xs"
-                    className={styles.viewAllLink}
                   >
                     <Group gap="xs">
                       <ExternalLink size={12} />
@@ -801,13 +791,12 @@ const CreatorsPage: React.FC = () => {
                 </Group>
                 <Group gap="md">
                   {selectedCreator.portfolioImages.slice(0, 4).map((image, index) => (
-                    <div key={index} className={styles.portfolioImage}>
+                    <div key={index}>
                       <Image 
                         src={image} 
                         alt={`عمل ${index + 1}`} 
                         width={120}
                         height={90}
-                        className={styles.portfolioImg}
                       />
                     </div>
                   ))}
@@ -817,7 +806,7 @@ const CreatorsPage: React.FC = () => {
           </Stack>
         )}
       </Modal>
-    </Container>
+  </>
   );
 };
 

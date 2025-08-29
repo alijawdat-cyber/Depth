@@ -1,143 +1,142 @@
-"use client";
-import React from "react";
-import { Text, Group, Card } from "@mantine/core";
-import { TrendingUp, TrendingDown } from "lucide-react";
-import styles from "./StatsCard.module.css";
-
-export type StatsCardColor = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+import React from 'react';
+import { Card, Group, Text, ThemeIcon, Box } from '@mantine/core';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 export interface StatsCardProps {
-  /** عنوان الإحصائية */
+  /** عنوان البطاقة */
   title: string;
   /** القيمة الرئيسية */
   value: string | number;
-  /** أيقونة اختيارية */
+  /** الأيقونة */
   icon?: React.ReactNode;
-  /** معلومات الاتجاه/التغيير */
+  /** معلومات الاتجاه */
   trend?: {
-    /** قيمة التغيير (نسبة مئوية أو رقم) */
     value: number;
-    /** اتجاه التغيير */
     direction: 'up' | 'down' | 'neutral';
-    /** نص وصفي للاتجاه */
     label?: string;
   };
   /** لون البطاقة */
-  color?: StatsCardColor;
-  /** وصف إضافي */
-  description?: string;
-  /** حالة التحميل */
-  loading?: boolean;
-  /** دالة النقر */
-  onClick?: () => void;
-  /** قابل للنقر */
-  clickable?: boolean;
-  /** الحجم */
+  color?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  /** حجم البطاقة */
   size?: 'sm' | 'md' | 'lg';
+  /** وصف اضافي */
+  description?: string;
+  /** قابلة للنقر */
+  clickable?: boolean;
+  /** عند النقر */
+  onClick?: () => void;
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({
+const StatsCard: React.FC<StatsCardProps> = ({
   title,
   value,
   icon,
   trend,
-  color = 'neutral',
-  description,
-  loading = false,
-  onClick,
-  clickable = false,
+  color = 'primary',
   size = 'md',
+  description,
+  clickable = false,
+  onClick
 }) => {
-  const handleClick = () => {
-    if (clickable && onClick) {
-      onClick();
-    }
+  // 🎯 تحديد الكلاسات من النظام المركزي حصراً
+  const getCardClass = () => {
+    let baseClass = 'card';
+    
+    // حجم البطاقة
+    if (size === 'sm') baseClass += ' cardSmall';
+    if (size === 'lg') baseClass += ' cardLarge';
+    
+    // لون البطاقة
+    if (color === 'success') baseClass += ' cardSuccess';
+    if (color === 'warning') baseClass += ' cardWarning';
+    if (color === 'danger') baseClass += ' cardError';
+    if (color === 'info') baseClass += ' cardInfo';
+    if (color === 'neutral') baseClass += ' cardSecondary';
+    
+    // قابلية النقر
+    if (clickable) baseClass += ' cursorPointer';
+    
+    return baseClass;
   };
 
-  const getTrendIcon = (direction: 'up' | 'down' | 'neutral') => {
-    switch (direction) {
-      case 'up': return <TrendingUp size={14} />;
-      case 'down': return <TrendingDown size={14} />;
-      case 'neutral': return null;
-      default: return null;
-    }
+  // 🎯 كلاس الشارة حسب الاتجاه
+  const getTrendBadgeClass = () => {
+    if (trend?.direction === 'up') return 'badge badgeSuccess';
+    if (trend?.direction === 'down') return 'badge badgeError';
+    return 'badge badgeSecondary'; // للحالة المحايدة
+  };
+
+  // 🎯 كلاس الأيقونة حسب الاتجاه
+  const getTrendIconClass = () => {
+    if (trend?.direction === 'up') return 'iconSuccess';
+    if (trend?.direction === 'down') return 'iconError';
+    return 'iconSecondary'; // للحالة المحايدة
   };
 
   return (
-    <Card
-      className={`${styles.statsCard} ${styles[`statsCard--${color}`]} ${styles[`statsCard--${size}`]} ${
-        clickable ? styles.statsCardClickable : ''
-      }`}
-      padding="lg"
-      onClick={handleClick}
-    >
-      <div className={styles.statsCardContent}>
-        {/* Header - Title and Icon */}
-        <div className={styles.statsCardHeader}>
-          <Text 
-            size="sm" 
-            className={styles.statsCardTitle}
+    <Card className={getCardClass()} onClick={clickable ? onClick : undefined}>
+      <Group justify="space-between" mb="var(--space-sm)">
+        {icon && (
+          <ThemeIcon
+            size={size === 'sm' ? 'md' : 'lg'}
+            radius="var(--radius-md)"
           >
-            {title}
-          </Text>
-          {icon && (
-            <div className={styles.statsCardIcon}>
-              {icon}
-            </div>
-          )}
-        </div>
-
-        {/* Main Value */}
-        <div className={styles.statsCardValue}>
-          <Text 
-            size={size === 'lg' ? '2xl' : size === 'sm' ? 'xl' : '2xl'}
-            fw={700}
-            className={styles.statsCardNumber}
-          >
-            {value}
-          </Text>
-
-          {/* Trend Indicator */}
-          {trend && (
-            <div className={styles.statsCardTrend}>
-              <Group gap={4} className={styles.statsCardTrendGroup}>
-                <span 
-                  className={`${styles.statsCardTrendIcon} ${styles[`statsCardTrend${trend.direction.charAt(0).toUpperCase() + trend.direction.slice(1)}`]}`}
-                >
-                  {getTrendIcon(trend.direction)}
-                </span>
-                <Text 
-                  size="sm" 
-                  fw={500}
-                  className={`${styles.statsCardTrendValue} ${styles[`statsCardTrend${trend.direction.charAt(0).toUpperCase() + trend.direction.slice(1)}`]}`}
-                >
-                  {trend.value > 0 && trend.direction !== 'neutral' ? '+' : ''}{trend.value}%
-                </Text>
-                {trend.label && (
-                  <Text 
-                    size="xs" 
-                    className={styles.statsCardTrendLabel}
-                  >
-                    {trend.label}
-                  </Text>
-                )}
-              </Group>
-            </div>
-          )}
-        </div>
-
-        {/* Description */}
-        {description && (
-          <Text 
-            size="xs" 
-            className={styles.statsCardDescription}
-          >
-            {description}
-          </Text>
+            {icon}
+          </ThemeIcon>
         )}
-      </div>
+        
+        {trend && (
+          <Group gap="var(--space-xs)">
+            {trend.direction === 'up' ? (
+              <TrendingUp size={14} className={getTrendIconClass()} />
+            ) : trend.direction === 'down' ? (
+              <TrendingDown size={14} className={getTrendIconClass()} />
+            ) : null}
+            <Text className={getTrendBadgeClass()}>
+              {trend.value}%
+            </Text>
+          </Group>
+        )}
+      </Group>
+
+      <Box mb="var(--space-xs)">
+        <Text
+          className="cardStatNumber"
+          size={size === 'sm' ? 'var(--fs-xl)' : 'var(--fs-3xl)'}
+          fw={700}
+        >
+          {value}
+        </Text>
+      </Box>
+
+      <Text className="cardStatLabel">
+        {title}
+      </Text>
+
+      {description && (
+        <Text
+          size="xs"
+          c="dimmed"
+          mt="var(--space-xs)"
+        >
+          {description}
+        </Text>
+      )}
+
+      {trend?.label && (
+        <Text
+          size="var(--fs-xs)"
+          mt="var(--space-xs)"
+          className="textMuted"
+        >
+          {trend.label}
+        </Text>
+      )}
     </Card>
   );
 };
+
+// تصدير named export ايضاً لدعم import patterns مختلفة
+export { StatsCard };
 
 export default StatsCard;

@@ -438,11 +438,11 @@ export default function SettingsPage() {
                   <div className={styles.impactLabel}>مثال: سعر المبدع</div>
                 </div>
                 <div className={styles.impactItem}>
-                  <div className={styles.impactValue}>+{Math.round(320000 * settings.business.agencyMarginPercent / 100).toLocaleString()} د.ع</div>
+                  <div className={styles.impactValue}>+{new Intl.NumberFormat('en-US').format(Math.round(320000 * settings.business.agencyMarginPercent / 100))} د.ع</div>
                   <div className={styles.impactLabel}>هامش الوكالة</div>
                 </div>
                 <div className={styles.impactItem}>
-                  <div className={styles.impactValue}>{Math.round(320000 * (1 + settings.business.agencyMarginPercent / 100)).toLocaleString()} د.ع</div>
+                  <div className={styles.impactValue}>{new Intl.NumberFormat('en-US').format(Math.round(320000 * (1 + settings.business.agencyMarginPercent / 100)))} د.ع</div>
                   <div className={styles.impactLabel}>السعر النهائي</div>
                 </div>
               </div>
@@ -592,7 +592,7 @@ export default function SettingsPage() {
                             <div className={styles.modifierValue}>
                               {modifier.type === 'multiplier' 
                                 ? modifier.value.toFixed(1) 
-                                : modifier.value.toLocaleString()
+                                : new Intl.NumberFormat('en-US').format(modifier.value)
                               }
                               {modifier.type === 'addition' && ' د.ع'}
                             </div>

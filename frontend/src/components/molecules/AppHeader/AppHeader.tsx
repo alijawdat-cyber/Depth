@@ -4,7 +4,7 @@ import { Group, Text, ActionIcon, Burger } from "@mantine/core";
 import { Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, Avatar } from "@mantine/core";
 import { Bell, Settings, LogOut, User } from "lucide-react";
 import Image from "next/image";
-import styles from "./AppHeader.module.css";
+// يستخدم كلاسات عالمية معرفة في globals.css (appHeader, appHeaderLogo, ...)
 
 export interface AppHeaderProps {
   /** عنوان التطبيق */
@@ -51,7 +51,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   burgerOpened = false,
 }) => {
   return (
-    <div className={styles.appHeader}>
+  <div className="appHeader">
       {/* Left Section */}
       <Group gap="md">
         {!hideBurger && (
@@ -59,7 +59,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             opened={burgerOpened}
             onClick={onMenuClick}
             size="sm"
-            className={styles.appHeaderBurger}
+            className="appHeaderBurger"
           />
         )}
         
@@ -69,12 +69,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             alt="Logo"
             width={24}
             height={24}
-            className={styles.appHeaderLogo}
+            className="appHeaderLogo"
           />
           <Text
             size="lg"
             fw={600}
-            className={styles.appHeaderTitle}
+            className="appHeaderTitle"
           >
             {title}
           </Text>
@@ -92,11 +92,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             variant="subtle"
             size="lg"
             onClick={onNotificationsClick}
-            className={styles.appHeaderNotificationsButton}
+            className="appHeaderNotificationsButton"
           >
             <Bell size={18} />
             {notifications > 0 && (
-              <div className={styles.appHeaderNotificationBadge}>
+              <div className="appHeaderNotificationBadge">
                 {notifications > 99 ? '99+' : notifications}
               </div>
             )}
@@ -109,18 +109,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           width={260}
         >
           <MenuTarget>
-            <div className={styles.appHeaderUserMenu}>
+            <div className="appHeaderUserMenu">
               <Avatar
                 src={userAvatar}
                 name={userName}
                 size="sm"
                 variant="filled"
               />
-              <div className={styles.appHeaderUserDetails}>
+              <div className="appHeaderUserDetails">
                 <Text
                   size="sm"
                   fw={500}
-                  className={styles.appHeaderUserText}
+                  className="appHeaderUserText"
                 >
                   {userName}
                 </Text>
@@ -128,7 +128,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   <Text
                     size="xs"
                     c="dimmed"
-                    className={styles.appHeaderUserText}
+                    className="appHeaderUserText"
                   >
                     {userCompany}
                   </Text>
@@ -139,7 +139,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
           <MenuDropdown>
             {/* User Info Header */}
-            <div className={styles.appHeaderUserInfo}>
+            <div className="appHeaderUserInfo">
               <Group gap="sm">
                 <Avatar
                   src={userAvatar}
@@ -151,7 +151,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 <Text
                   size="sm"
                   fw={500}
-                  className={styles.appHeaderUserText}
+                  className="appHeaderUserText"
                 >
                   {userName}
                 </Text>
@@ -159,7 +159,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   <Text
                     size="xs"
                     c="dimmed"
-                    className={styles.appHeaderUserText}
+                    className="appHeaderUserText"
                   >
                     {userEmail}
                   </Text>
@@ -168,7 +168,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   <Text
                     size="xs"
                     c="dimmed"
-                    className={styles.appHeaderUserText}
+                    className="appHeaderUserText"
                   >
                     {userCompany}
                   </Text>

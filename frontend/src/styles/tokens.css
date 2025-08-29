@@ -18,6 +18,7 @@
   /* ========== ألوان الهوية (Brand Colors) ========== */
   --color-primary: #6C2BFF;        /* بنفسجي رئيسي - أزرار أساسية، روابط مهمة، عناصر تفاعلية */
   --color-primary-hover: #4A1FC9;  /* بنفسجي داكن - حالة hover للعناصر الأساسية */
+  --color-primary-light: rgba(108, 43, 255, 0.15); /* بنفسجي شفاف - focus states وتأثيرات بصرية */
   --color-secondary: #3E5BFF;      /* أزرق ثانوي - عناصر مساعدة، badges، تفاصيل */
 
   /* ========== ألوان الخلفيات (Background Colors) ========== */
@@ -45,18 +46,32 @@
   --color-error-light: #ffe9e9;    /* أحمر فاتح - خلفيات رسائل الخطأ */
   --color-info: #3b82f6;           /* أزرق - معلومات، إشعارات عامة */
   --color-info-light: #eaf3ff;     /* أزرق فاتح - خلفيات المعلومات */
+  
+  /* Overlay colors */
+  --color-overlay-dark: rgba(0, 0, 0, 0.45); /* غطاء داكن شفاف فوق المحتوى (للموبايل سايدبار/مودال) */
+  --color-overlay-light: rgba(255, 255, 255, 0.2); /* غطاء فاتح اختياري */
 
-  /* ========== متغيرات مختصرة للتوافق (Shortcuts) ========== */
-  --bg: var(--color-bg-primary);           /* خلفية رئيسية - اختصار للخلفية الأساسية البيضاء/السوداء */
-  --bg-secondary: var(--color-bg-secondary); /* خلفية ثانوية - اختصار لخلفية البطاقات الرمادي الفاتح/الداكن */
-  --text: var(--color-text-primary);       /* نص أساسي - اختصار للون النص الرئيسي الداكن/الفاتح */
-  --text-secondary: var(--color-text-secondary); /* نص ثانوي - اختصار للون النص الثانوي المكتوم */
-  --border: var(--color-border-primary);   /* حدود أساسية - اختصار للون الحدود الافتراضية الرمادية */
+  /* ========== متغيرات مختصرة للراحة (Developer Shortcuts) ========== */
+  /* هذه المتغيرات مُستخدمة في ErrorBoundary.module.css و AdminDashboard.module.css */
+  --bg: var(--color-bg-primary);           /* خلفية مختصرة - للاستخدام في CSS modules */
+  --bg-secondary: var(--color-bg-secondary); /* خلفية ثانوية مختصرة */
+  --text: var(--color-text-primary);       /* نص مختصر - شائع في المكونات */
+  --text-secondary: var(--color-text-secondary); /* نص ثانوي مختصر */
+  --border: var(--color-border-primary);   /* حد مختصر - للاستخدام السريع */
+  
+  /* ========== متغيرات إضافية مطلوبة (Required Additional Variables) ========== */
+  --bd-1: 1px;                            /* سماكة حد أساسية - للاستخدام في CSS modules */
+  --font-weight-semibold: 600;            /* وزن خط متوسط الثقل - للعناوين والأزرار */
+  --color-on-primary: #ffffff;            /* نص أبيض فوق الخلفية الأساسية - للأزرار الملونة */
+  --color-on-primary-container: #ffffff;  /* نص أبيض فوق الحاويات الملونة - للبطاقات الخاصة */
 
   /* ========== الخطوط (Typography) ========== */
   --font-ar: 'Dubai', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; /* خط عربي - دبي */
   --font-en: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; /* خط إنجليزي */
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace; /* خط أحادي المسافة - للكود */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace; /* خط أحادي المسافة - للكود فقط */
+  
+  /* ملاحظة: --font-ar يطبق تلقائياً على body في globals.css ويورث لكل العناصر */
+  /* ملاحظة: --font-mono يستخدم فقط للكود والعناصر التقنية عند الحاجة */
 
   /* ========== أحجام النصوص (Font Sizes) ========== */
   --fs-xs: 12px;    /* صغير جداً - ملاحظات، تسميات مساعدة */
@@ -100,6 +115,52 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);              /* ظل خفيف */
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);               /* ظل متوسط */
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);             /* ظل كبير */
+
+  /* ========== النظام الهرمي للطبقات (Z-Index System) ========== */
+  /* نظام منطقي متدرج - كل مستوى له غرض واضح */
+  --z-base: 1;           /* العناصر الأساسية - أزرار، حقول */
+  --z-dropdown: 10;      /* القوائم المنسدلة، tooltips */
+  --z-sticky: 20;        /* العناصر الثابتة - جداول، headers */
+  --z-fixed: 30;         /* العناصر المثبتة - navbar, footer */
+  --z-modal-backdrop: 40; /* خلفية النوافذ المنبثقة */
+  --z-modal: 50;         /* النوافذ المنبثقة - dialogs */
+  --z-popover: 60;       /* العناصر المتداخلة فوق modals */
+  --z-tooltip: 70;       /* التلميحات - أعلى من كل شيء تقريباً */
+  --z-notification: 80;  /* الإشعارات - مهمة وواضحة */
+  --z-maximum: 90;       /* الحد الأقصى - حالات استثنائية فقط */
+
+  /* مستويات خاصة للتطبيق */
+  --z-header: var(--z-fixed);        /* الهيدر = 30 */
+  --z-sidebar: var(--z-fixed);       /* السايدبار = 30 (نفس مستوى الهيدر كما طُلب) */
+  --z-overlay: var(--z-modal-backdrop); /* الغطاء = 40 */
+
+  /* ========== نقاط التوقف المعتمدة (Breakpoints) ========== */
+  /* قيم CSS viewport الدقيقة المُحققة من المصادر الرسمية 2024-2025 */
+  
+  /* ========== نقاط التوقف المعتمدة (Verified Breakpoints 2024-2025) ========== */
+  
+  /* Mobile (CSS viewport widths) */
+  --bp-xs: 320px;      /* iPhone 5/SE (1st gen) */
+  --bp-sm: 360px;      /* Android الشائع (Galaxy) */
+  --bp-md: 390px;      /* iPhone 12/13/14 (6.1") */
+  --bp-ml: 412px;      /* Google Pixel / Samsung أكبر */
+  --bp-lg: 430px;      /* iPhone 15 Pro Max */
+  
+  /* Tablets (Android Window Size Classes) */
+  --bp-tab-sm: 600px;  /* Android Medium بداية */
+  --bp-tab: 768px;     /* iPad 9.7" Portrait */
+  --bp-tab-md: 820px;  /* iPad 10th/Air 11" Portrait */
+  --bp-tab-lg: 834px;  /* iPad Pro 11" Portrait */
+  --bp-tab-xl: 840px;  /* Android Expanded بداية */
+  --bp-tab-2xl: 1024px; /* iPad Pro 12.9" Portrait / iPads Landscape */
+  
+  /* Desktop / Laptops */
+  --bp-laptop: 1024px;     /* لابتوب صغير */
+  --bp-desktop: 1280px;    /* Desktop قياسي */
+  --bp-desktop-lg: 1536px; /* شاشة كبيرة */
+  --bp-fhd: 1920px;        /* Full HD (1080p) */
+  --bp-qhd: 2560px;        /* QHD/1440p */
+  --bp-4k: 3840px;         /* 4K UHD الحقيقي */
 }
 
 /* ========== الوضع الداكن ========== */
@@ -132,13 +193,17 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);   /* ظل داكن خفيف */
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);   /* ظل داكن متوسط */
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5); /* ظل داكن كبير */
+  
+  /* Overlay colors (dark theme tweaks) */
+  --color-overlay-dark: rgba(0, 0, 0, 0.5);
+  --color-overlay-light: rgba(255, 255, 255, 0.08);
 }
 
 /* ========== تطبيق النظام على الجذر/الجسم (يغطي كل الشاشة حتى عند التصغير) ========== */
 html, body, #__next {
   background-color: var(--color-bg-primary) !important; /* تأكيد الخلفية من التوكنز للفاتح/الداكن */
   color: var(--color-text-primary);
-  font-family: var(--font-ar);
+  /* ملاحظة: font-family ينطبق في globals.css لتجنب التضارب */
   /* ملاحظة: html ياخذ نفس الخلفية حتى المساحات الجانبية خارج المحتوى تصير سوداء بالداكن */
   transition: background-color 0.2s ease, color 0.2s ease;
 }

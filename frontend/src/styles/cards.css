@@ -1,0 +1,269 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🃏 أنماط البطاقات والمحتويات المؤطرة (Cards & Frames)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Card Base (البطاقة الأساسية) ——— */
+.card {
+  background-color: var(--color-bg-secondary);            /* خلفية ثانوية للتمييز */
+  border: 1px solid var(--color-border-primary);          /* حد خفيف محيط */
+  border-radius: var(--radius-md);                        /* زوايا دائرية متوسطة */
+  padding: var(--space-lg);                                /* حشو داخلي مريح */
+  box-shadow: var(--shadow-sm);                            /* ظل خفيف */
+  transition: box-shadow 0.2s ease, transform 0.2s ease;  /* انتقال ناعم للتفاعل */
+  position: relative;                                      /* أساس لعناصر مطلقة بالداخل */
+  overflow: hidden;                                        /* منع خروج المحتوى */
+}
+
+/* تفاعل البطاقة عند المرور */
+.card:hover {
+  box-shadow: var(--shadow-md);                            /* ظل أقوى عند المرور */
+  transform: translateY(-1px);                             /* حركة خفيفة للأعلى */
+}
+
+/* بطاقة قابلة للنقر */
+.cardClickable {
+  cursor: pointer;                                        /* إشارة النقر */
+  transition: all 0.2s ease;                              /* انتقال ناعم لكل الخصائص */
+}
+
+.cardClickable:hover {
+  border-color: var(--color-primary);                     /* تغيير لون الحد */
+  box-shadow: var(--shadow-lg);                            /* ظل أقوى */
+  transform: translateY(-2px);                             /* حركة أكبر */
+}
+
+.cardClickable:active {
+  transform: translateY(0);                                /* إرجاع الموضع عند الضغط */
+  box-shadow: var(--shadow-sm);                            /* تقليل الظل */
+}
+
+/* ——— Card Variants (أشكال مختلفة للبطاقات) ——— */
+
+/* بطاقة مسطحة بدون ظل */
+.cardFlat {
+  box-shadow: none;                                        /* إزالة الظل */
+  border-width: 1px;                                       /* حد رفيع */
+}
+
+.cardFlat:hover {
+  box-shadow: var(--shadow-sm);                            /* ظل خفيف عند المرور */
+}
+
+/* بطاقة بارزة بظل قوي */
+.cardRaised {
+  box-shadow: var(--shadow-lg);                            /* ظل قوي من البداية */
+  border: none;                                            /* بدون حد */
+}
+
+.cardRaised:hover {
+  box-shadow: var(--shadow-xl);                            /* ظل أقوى عند المرور */
+  transform: translateY(-3px);                             /* حركة أكبر */
+}
+
+/* بطاقة شفافة */
+.cardTransparent {
+  background-color: transparent;                           /* خلفية شفافة */
+  border: 1px dashed var(--color-border-secondary);        /* حد متقطع */
+  box-shadow: none;                                        /* بدون ظل */
+}
+
+/* بطاقة محددة (مفعلة) */
+.cardSelected {
+  border-color: var(--color-primary);                     /* حد ملون بالأساسي */
+  box-shadow: 0 0 0 2px var(--color-primary-light);       /* هالة ملونة حول البطاقة */
+  background-color: var(--color-primary-light);           /* خلفية خفيفة ملونة */
+}
+
+/* ——— Card Layout Components ——— */
+
+/* ترويسة البطاقة */
+.cardHeader {
+  padding-bottom: var(--space-md);                         /* مسافة أسفل الترويسة */
+  margin-bottom: var(--space-md);                          /* هامش أسفل */
+  border-bottom: 1px solid var(--color-border-primary);    /* خط فاصل */
+  display: flex;                                           /* ترتيب مرن */
+  align-items: center;                                     /* محاذاة وسط */
+  justify-content: space-between;                          /* توزيع العناصر */
+}
+
+/* عنوان البطاقة */
+.cardTitle {
+  font-size: var(--fs-lg);                                /* حجم كبير */
+  font-weight: 600;                                       /* وزن متوسط-ثقيل */
+  margin: 0;                                              /* إزالة الهوامش */
+  line-height: 1.3;                                       /* تباعد مريح */
+}
+
+/* وصف البطاقة */
+.cardDescription {
+  font-size: var(--fs-sm);                                /* حجم صغير */
+  font-weight: 400;                                       /* وزن عادي */
+  color: var(--color-text-secondary);                     /* لون ثانوي */
+  margin-top: var(--space-xs);                            /* مسافة صغيرة من العنوان */
+  line-height: 1.4;                                       /* تباعد مريح */
+}
+
+/* محتوى البطاقة */
+.cardContent {
+  flex: 1;                                                /* يمتد لملء المساحة المتاحة */
+  padding: 0;                                             /* بدون حشو إضافي */
+}
+
+/* تذييل البطاقة */
+.cardFooter {
+  margin-top: var(--space-lg);                            /* مسافة من المحتوى */
+  padding-top: var(--space-md);                           /* حشو علوي */
+  border-top: 1px solid var(--color-border-primary);      /* خط فاصل علوي */
+  display: flex;                                           /* ترتيب مرن */
+  align-items: center;                                     /* محاذاة وسط */
+  justify-content: space-between;                          /* توزيع العناصر */
+  gap: var(--space-sm);                                    /* مسافة بين العناصر */
+}
+
+/* ——— Status Cards (بطاقات حالة ملونة) ——— */
+
+.cardSuccess {
+  border-color: var(--color-success);                     /* حد أخضر */
+  background-color: var(--color-success-light);           /* خلفية خضراء فاتحة */
+}
+
+.cardWarning {
+  border-color: var(--color-warning);                     /* حد أصفر/برتقالي */
+  background-color: var(--color-warning-light);           /* خلفية صفراء فاتحة */
+}
+
+.cardError {
+  border-color: var(--color-error);                       /* حد أحمر */
+  background-color: var(--color-error-light);             /* خلفية حمراء فاتحة */
+}
+
+.cardInfo {
+  border-color: var(--color-info);                        /* حد أزرق */
+  background-color: var(--color-info-light);              /* خلفية زرقاء فاتحة */
+}
+
+/* ——— Card Sizes ——— */
+
+/* بطاقة صغيرة */
+.cardSmall {
+  padding: var(--space-md);                                /* حشو أقل */
+}
+
+.cardSmall .cardTitle {
+  font-size: var(--fs-md);                                 /* عنوان أصغر */
+}
+
+/* بطاقة كبيرة */
+.cardLarge {
+  padding: var(--space-xl);                                /* حشو أكبر */
+}
+
+.cardLarge .cardTitle {
+  font-size: var(--fs-xl);                                 /* عنوان أكبر */
+}
+
+/* ——— Special Cards ——— */
+
+/* بطاقة إحصائية */
+.cardStat {
+  text-align: center;                                      /* محاذاة وسط */
+  padding: var(--space-lg);                                /* حشو مريح */
+  background: linear-gradient(135deg, 
+    var(--color-primary-light) 0%, 
+    var(--color-bg-secondary) 100%);                       /* تدرج خلفية */
+  border: 1px solid var(--color-primary-light);           /* حد ملون */
+}
+
+.cardStatNumber {
+  font-size: var(--fs-3xl);                               /* حجم كبير جداً */
+  font-weight: 700;                                       /* وزن ثقيل */
+  color: var(--color-primary);                            /* لون الأساسي */
+  margin: 0;                                              /* إزالة الهوامش */
+  line-height: 1;                                         /* تباعد ضيق */
+}
+
+.cardStatLabel {
+  font-size: var(--fs-sm);                                /* حجم صغير */
+  font-weight: 500;                                       /* وزن متوسط */
+  color: var(--color-text-secondary);                     /* لون ثانوي */
+  margin-top: var(--space-xs);                            /* مسافة صغيرة من الرقم */
+}
+
+/* بطاقة عمل سريع */
+.cardAction {
+  border: 2px dashed var(--color-border-secondary);        /* حد متقطع */
+  background-color: transparent;                           /* خلفية شفافة */
+  display: flex;                                           /* ترتيب مرن */
+  align-items: center;                                     /* محاذاة وسط */
+  justify-content: center;                                 /* توسيط */
+  min-height: 120px;                                       /* ارتفاع أدنى */
+  cursor: pointer;                                        /* إشارة النقر */
+  transition: all 0.2s ease;                              /* انتقال ناعم */
+}
+
+.cardAction:hover {
+  border-color: var(--color-primary);                     /* تغيير لون الحد */
+  background-color: var(--color-primary-light);           /* إضافة خلفية خفيفة */
+  border-style: solid;                                    /* تغيير النمط لخط مستمر */
+}
+
+/* محتوى بطاقة العمل */
+.cardActionContent {
+  display: flex;                                           /* ترتيب مرن */
+  flex-direction: column;                                  /* ترتيب عمودي */
+  align-items: center;                                     /* محاذاة وسط */
+  gap: var(--space-sm);                                    /* مسافة بين العناصر */
+  color: var(--color-text-secondary);                     /* لون ثانوي */
+  font-weight: 500;                                       /* وزن متوسط */
+}
+
+/* ——— متجاوب ——— */
+
+@media (max-width: var(--bp-tab)) {
+  /* تقليل الحشو بالشاشات الصغيرة */
+  .card {
+    padding: var(--space-md);                              /* حشو أقل */
+  }
+  
+  .cardLarge {
+    padding: var(--space-lg);                              /* حشو أقل حتى للكبيرة */
+  }
+  
+  /* تبسيط ترويسة البطاقة */
+  .cardHeader {
+    flex-direction: column;                                /* ترتيب عمودي */
+    align-items: flex-start;                               /* محاذاة للبداية */
+    gap: var(--space-sm);                                  /* مسافة بين العناصر */
+  }
+  
+  /* تبسيط تذييل البطاقة */
+  .cardFooter {
+    flex-direction: column;                                /* ترتيب عمودي */
+    align-items: stretch;                                  /* امتداد العناصر */
+    gap: var(--space-sm);                                  /* مسافة بين العناصر */
+  }
+  
+  /* تقليل الحركة بالشاشات اللمسية */
+  .card:hover,
+  .cardClickable:hover,
+  .cardRaised:hover {
+    transform: none;                                       /* إزالة الحركة */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* إزالة كل الانتقالات والحركات للمستخدمين الذين يفضلون تقليل الحركة */
+  .card,
+  .cardClickable,
+  .cardAction {
+    transition: none;                                      /* إزالة الانتقالات */
+  }
+  
+  .card:hover,
+  .cardClickable:hover,
+  .cardRaised:hover {
+    transform: none;                                       /* إزالة الحركة */
+  }
+}

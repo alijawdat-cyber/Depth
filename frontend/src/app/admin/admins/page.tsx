@@ -185,7 +185,7 @@ const defaultPermissions: AdminPermissions = {
 // تنسيق التواريخ
 const formatDate = (dateString: string | undefined) => {
   if (!dateString) return 'غير محدد';
-  return new Date(dateString).toLocaleDateString('ar-IQ', {
+  return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

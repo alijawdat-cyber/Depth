@@ -33,10 +33,11 @@ import {
   User,
   Calendar,
   DollarSign,
-  MessageSquare
+  MessageSquare,
+  Plus
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import styles from './RequestsPage.module.css';
+import '../../../globals.css';
 
 // Types
 interface ProjectRequest extends Record<string, unknown> {
@@ -155,7 +156,7 @@ const mockRequests: ProjectRequest[] = [
 const RequestsNewPage: React.FC = () => {
   // State
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>('');
+  const [categoryFilter, setCategoryFilter] = useState<string | null>('');
   const [priorityFilter, setPriorityFilter] = useState<string | null>('');
   const [selectedRequest, setSelectedRequest] = useState<ProjectRequest | null>(null);
   
@@ -224,12 +225,12 @@ const RequestsNewPage: React.FC = () => {
         request.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         request.description.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesStatus = !statusFilter || request.status === statusFilter;
+      const matchesCategory = !categoryFilter || request.categoryName === categoryFilter;
       const matchesPriority = !priorityFilter || request.priority === priorityFilter;
       
-      return matchesSearch && matchesStatus && matchesPriority;
+      return matchesSearch && matchesCategory && matchesPriority;
     });
-  }, [searchQuery, statusFilter, priorityFilter]);
+  }, [searchQuery, categoryFilter, priorityFilter]);
 
   // Priority display helper
   const getPriorityDisplay = (priority: string) => {
@@ -245,7 +246,7 @@ const RequestsNewPage: React.FC = () => {
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'IQD',
       minimumFractionDigits: 0
@@ -266,7 +267,7 @@ const RequestsNewPage: React.FC = () => {
       label: '#',
       width: 140,
       render: (value) => (
-        <Text size="sm" fw={500} className={styles.requestNumber}>
+        <Text size="sm" fw={500}>
           {value as string}
         </Text>
       )
@@ -324,7 +325,7 @@ const RequestsNewPage: React.FC = () => {
         <Group gap="xs">
           <Calendar size={14} />
           <Text size="xs">
-            {new Date(value as string).toLocaleDateString('ar-IQ')}
+            {new Date(value as string).toLocaleDateString('en-US')}
           </Text>
         </Group>
       )
@@ -403,50 +404,53 @@ const RequestsNewPage: React.FC = () => {
   };
 
   return (
-    <Container size="xl" className={styles.container}>
+        <Container fluid p="xl">
       {/* Header */}
-      <div className={styles.pageHeader}>
-        <Title order={1} className={styles.pageTitle}>
-          إدارة الطلبات الجديدة
-        </Title>
-        <Text className={styles.pageDescription}>
-          مراجعة وإدارة طلبات المشاريع الواردة من العملاء
-        </Text>
+      <div className="pageHeader withActions">
+        <div className="pageHeaderContent">
+          <Title order={1} className="pageTitle">
+            الطلبات الجديدة
+          </Title>
+          <Text className="pageDescription">
+            مراجعة وإدارة الطلبات الجديدة الواردة من العملاء
+          </Text>
+        </div>
+        <div className="pageHeaderActions">
+          <Button leftSection={<Plus size={16} />}>
+            إضافة طلب جديد
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <Grid className={styles.statsGrid}>
+      <Grid className="statsGrid">
         {stats.map((stat, index) => (
-          <Grid.Col key={index} span={{ base: 12, xs: 6, sm: 4, lg: 2.4 }}>
-            <StatsCard {...stat} />
-          </Grid.Col>
+          <StatsCard key={index} {...stat} />
         ))}
       </Grid>
 
       {/* Filters */}
-      <div className={styles.filters}>
-        <Group justify="space-between" className={styles.filtersHeader}>
+      <div className="card section filters">
+        <Group justify="space-between">
           <Group gap="md">
             <TextInput
               placeholder="البحث في الطلبات..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
               leftSection={<Search size={16} />}
-              className={styles.searchInput}
             />
             
             <Select
-              placeholder="الحالة"
-              value={statusFilter}
-              onChange={setStatusFilter}
+              placeholder="الفئة"
+              value={categoryFilter}
+              onChange={setCategoryFilter}
               data={[
-                { value: '', label: 'جميع الحالات' },
-                { value: 'pending', label: 'جديد' },
-                { value: 'reviewing', label: 'مراجعة' },
-                { value: 'approved', label: 'معتمد' },
-                { value: 'rejected', label: 'مرفوض' }
+                { value: '', label: 'جميع الفئات' },
+                { value: 'photography', label: 'التصوير' },
+                { value: 'design', label: 'التصميم' },
+                { value: 'video', label: 'الفيديو' },
+                { value: 'editing', label: 'المونتاج' }
               ]}
-              className={styles.filterSelect}
             />
             
             <Select
@@ -455,12 +459,11 @@ const RequestsNewPage: React.FC = () => {
               onChange={setPriorityFilter}
               data={[
                 { value: '', label: 'جميع الأولويات' },
-                { value: 'low', label: 'منخفض' },
-                { value: 'normal', label: 'عادي' },
-                { value: 'high', label: 'عالي' },
+                { value: 'low', label: 'منخفضة' },
+                { value: 'medium', label: 'متوسطة' },
+                { value: 'high', label: 'عالية' },
                 { value: 'urgent', label: 'عاجل' }
               ]}
-              className={styles.filterSelect}
             />
           </Group>
 
@@ -470,8 +473,8 @@ const RequestsNewPage: React.FC = () => {
         </Group>
       </div>
 
-      {/* Data Table */}
-      <div className={styles.tableContainer}>
+      {/* Table */}
+      <div className="card table">
         <Table striped highlightOnHover withTableBorder>
           <Table.Thead>
             <Table.Tr>
@@ -563,14 +566,14 @@ const RequestsNewPage: React.FC = () => {
               <Grid.Col span={6}>
                 <Text size="sm" c="dimmed">التسليم المطلوب</Text>
                 <Text size="sm">
-                  {new Date(selectedRequest.deadline).toLocaleDateString('ar-IQ')}
+                  {new Date(selectedRequest.deadline).toLocaleDateString('en-US')}
                 </Text>
               </Grid.Col>
             </Grid>
             
             <div>
               <Text size="sm" c="dimmed" mb="xs">وصف المشروع</Text>
-              <Text size="sm" className={styles.description}>
+              <Text size="sm">
                 {selectedRequest.description}
               </Text>
             </div>
@@ -591,7 +594,7 @@ const RequestsNewPage: React.FC = () => {
             {selectedRequest.reviewNotes && (
               <div>
                 <Text size="sm" c="dimmed" mb="xs">ملاحظات المراجعة</Text>
-                <Text size="sm" className={styles.reviewNotes}>
+                <Text size="sm">
                   {selectedRequest.reviewNotes}
                 </Text>
               </div>

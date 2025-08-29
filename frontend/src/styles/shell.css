@@ -1,0 +1,228 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🧭 مكونات الهيكل المشتركة (Admin Shell / Header / Sidebar)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— AppHeader (مركزي) ——— */
+.appHeader {
+  height: var(--header-height);               /* ارتفاع الهيدر الموحد من التوكنز */
+  background-color: var(--color-bg-secondary);/* خلفية الهيدر نفس خلفيات الأقسام */
+  border-bottom: 1px solid var(--color-border-primary);  /* حد سفلي خفيف للفصل عن المحتوى */
+  padding: 0 var(--space-lg);                            /* مسافة أفقية داخلية للهيدر */
+  position: relative;                                    /* أساس لعنصر الشارة داخل الأيقونات */
+  z-index: var(--z-header);                              /* مستوى الهيدر = 30 */
+  display: flex;                                         /* ترتيب مرن لمحتويات الهيدر */
+  align-items: center;                                   /* محاذاة عمودية وسط */
+  justify-content: space-between;                        /* توزيع العناصر يمين/يسار */
+  box-shadow: var(--shadow-sm);                          /* ظل خفيف أسفل الهيدر */
+}
+
+.appHeaderLogo { height: 20px; width: auto; }             /* شعار صغير ثابت الارتفاع */
+.appHeaderTitle { white-space: nowrap; color: var(--color-text-primary); } /* العنوان ما يلف سطر */
+
+.appHeaderNotificationsButton { position: relative; color: var(--color-text-secondary); } /* لون أقل بروز */
+.appHeaderNotificationBadge {
+  position: absolute;                                     /* تموضع مطلق فوق الأيقونة */
+  top: -4px;                                              /* تحريك للأعلى شوية */
+  inset-inline-end: -4px;                                  /* محاذاة لنهاية السطر (يمّن بالـ RTL) */
+  background-color: var(--color-error);                   /* خلفية حمراء للشارة */
+  color: var(--color-text-inverse);                       /* نص أبيض فوق الأحمر */
+  border-radius: 50%;                                     /* شارة دائرية */
+  min-width: 16px;                                        /* عرض أدنى للشارة */
+  height: 16px;                                           /* ارتفاع الشارة */
+  font-size: var(--fs-xs);                                /* حجم خط صغير جداً */
+  display: flex;                                          /* توسيط الرقم داخل الشارة */
+  align-items: center;                                    /* توسيط عمودي */
+  justify-content: center;                                /* توسيط أفقي */
+  font-weight: 600;                                       /* وزن واضح للرقم */
+  border: 1px solid var(--color-bg-primary);              /* حد بنفس لون خلفية الصفحة لحدة أكثر */
+}
+
+.appHeaderUserMenu { display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; padding: var(--space-sm); border-radius: var(--radius-sm); transition: background-color 0.2s ease; } /* زر قائمة المستخدم */
+.appHeaderUserMenu:hover { background-color: var(--color-bg-secondary); } /* تمييز عند المرور */
+.appHeaderUserInfo { padding: var(--space-md); border-bottom: 1px solid var(--color-border-primary); margin-bottom: var(--space-xs); } /* ترويسة منسدلة داخل القائمة */
+.appHeaderUserText { line-height: 1.2; } /* نص عربي موحد */
+.appHeaderBurger { display: block; color: var(--color-text-primary); } /* زر القائمة للجوال */
+.appHeaderUserDetails { display: none; } /* إخفاء تفاصيل إضافية على الشاشات الصغيرة */
+
+@media (min-width: var(--bp-tab)) {
+  /* نخلي زر البورغر ظاهر بكل المقاسات حتى نفتح/نغلق السايدبار الأوفرلاي */
+  .appHeaderUserDetails { display: block; }
+}
+
+/* ——— AdminShell (مركزي) ——— */
+.adminShell { direction: rtl; } /* كل الإدارة RTL وخط دبي */
+
+/* Mantine AppShell adjustments within admin shell */
+.adminShell .mantine-AppShell-main { 
+  background-color: var(--color-bg-primary); 
+  padding: var(--space-xl);
+  min-height: calc(100vh - var(--header-height));
+  position: relative !important; /* ضروري لحصر overlay داخل المحتوى الرئيسي */
+}
+
+.adminShell .mantine-AppShell-header { 
+  background-color: var(--color-bg-secondary) !important; 
+  border-bottom: 1px solid var(--color-border-primary); 
+  height: var(--header-height) !important;
+}
+
+.adminShell .mantine-AppShell-navbar { 
+  background-color: var(--color-bg-secondary); 
+  border-inline-end: 1px solid var(--color-border-primary);
+  box-shadow: none;
+}
+
+.mainContent {
+  background-color: transparent; /* Mantine يدير الخلفية */
+  min-height: 100%;
+  position: relative; /* عشان الـ overlay يكون relative للمحتوى */
+}
+
+@media (max-width: var(--bp-tab)) { 
+  .adminShell .mantine-AppShell-main { 
+    padding: var(--space-lg); 
+  }
+  .adminShell .mantine-AppShell-navbar { 
+    box-shadow: var(--shadow-lg); 
+  }
+}
+
+/* تعتيم الخلفية عند فتح السايدبار - على المحتوى الرئيسي فقط */
+.mobileOverlay { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-overlay-dark); 
+  z-index: var(--z-overlay); 
+  cursor: pointer; 
+  backdrop-filter: blur(2px); 
+  pointer-events: all;
+  /* يحصر التعتيم داخل المحتوى الرئيسي فقط - لا يمتد للسايدبار أو الهيدر */
+}
+
+/* ——— Sidebar (مركزي) ——— */
+/* السايدبار القديم - للاستخدام المستقل خارج AppShell */
+.sidebar {
+  position: fixed;                                        /* ثابت بالنسبة للنافذة */
+  top: var(--header-height);                              /* يبدأ تحت الهيدر مباشرة */
+  inset-inline-start: 0;                                  /* يلتصق بجهة بداية السطر (يمين بالـ RTL) */
+  height: calc(100vh - var(--header-height));            /* يمتد لطول الشاشة ناقص الهيدر */
+  width: var(--sidebar-width);                            /* عرض ثابت بالديسكتوب */
+  background-color: var(--color-bg-secondary) !important; /* نفس لون بطاقات الأقسام */
+  border-inline-end: 1px solid var(--color-border-primary);/* حد من جهة النهاية للفصل عن المحتوى */
+  box-shadow: var(--shadow-sm);                           /* ظل خفيف لحافة السايدبار */
+  transform: translateX(100%);                            /* افتراضياً خارج الشاشة (للجوال) */
+  transition: transform 0.3s ease-in-out;                 /* حركة انزلاق ناعمة */
+  z-index: var(--z-sidebar);                              /* نفس مستوى الهيدر = 30 كما طُلب */
+  overflow: hidden;                                       /* منع overflow داخلي غير مرغوب */
+  display: flex;                                          /* ترتيب عمودي للعناصر */
+  flex-direction: column;                                 /* عناصر تحت بعض */
+}
+
+/* السايدبار الجديد - للاستخدام مع Mantine AppShell */
+.sidebarMantine {
+  height: 100%;                                          /* ملء ارتفاع Navbar */
+  display: flex;                                         /* ترتيب عمودي للعناصر */
+  flex-direction: column;                                /* عناصر تحت بعض */
+  background: transparent;                               /* Mantine يدير الخلفية */
+}
+
+.sidebar.open { transform: translateX(0); }               /* حالة الفتح: يظهر بالكامل */
+.sidebarThemeToggleContainer { display: flex; justify-content: center; padding: var(--space-xs) 0; margin-bottom: var(--space-xs); } /* حاوية زر تبديل الثيم */
+.sidebarScrollArea { flex: 1; height: 100%; }            /* منطقة تمرير تمتد لباقي الارتفاع */
+.sidebarDivider { margin: var(--space-md) var(--space-lg); border-color: var(--color-border-primary); } /* فاصل أقسام */
+.sidebarMenuGroup { margin-bottom: var(--space-xs); }     /* مسافة أسفل كل مجموعة */
+.sidebar .sidebarGroupButton {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  height: auto;
+  min-height: var(--height-button-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+} /* زر مجموعة عناصر شفاف افتراضياً */
+
+.sidebar .sidebarGroupButton:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+} /* تمييز عند المرور */
+.sidebarGroupChildren { padding-inline-end: var(--space-lg); border-inline-end: 2px solid var(--color-border-primary); } /* إزاحة داخلية وخط جانبي للأبناء */
+.sidebar .sidebarMenuItem {
+  color: var(--color-text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  height: auto;
+  min-height: var(--height-button-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  font-weight: 400;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: visible;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+} /* زر عنصر قائمة شفاف افتراضياً */
+
+.sidebar .sidebarMenuItem:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  transform: translateX(-2px);
+} /* حركة خفيفة RTL */
+
+.sidebar .sidebarMenuItem.activeItem,
+.sidebarMantine .sidebarMenuItem.activeItem {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+  font-weight: 600;
+  border-inline-end: 3px solid var(--color-primary-hover);
+} /* حالة مفعلة */
+
+.sidebar .sidebarMenuItem.childItem,
+.sidebarMantine .sidebarMenuItem.childItem {
+  padding-inline-end: var(--space-xl);
+  font-size: var(--fs-sm);
+} /* عنصر فرعي بمسافة إضافية */
+
+.sidebarMantine .sidebarMenuItem {
+  color: var(--color-text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  height: auto;
+  min-height: var(--height-button-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  font-weight: 400;
+  transition: all 0.2s ease-in-out;
+  background: transparent !important;
+}
+
+.sidebarMantine .sidebarMenuItem:hover {
+  background-color: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary);
+  transform: translateX(-2px);
+}
+.sidebarBadge { background: var(--color-info); color: var(--color-text-inverse); font-size: var(--fs-xs); font-weight: 600; padding: 2px 8px; border-radius: var(--radius-md); line-height: 1; min-width: 18px; text-align: center; position: absolute; inset-inline-end: 8px; top: 50%; transform: translateY(-50%); box-shadow: var(--shadow-sm); } /* شارة عداد/حالة */
+.sidebarBadge.sidebarBadgeNew { background: var(--color-warning); color: var(--color-text-inverse); animation: pulse 2s infinite; } /* شارة جديدة متحركة */
+
+/* السايدبار Overlay بكل المقاسات */
+@media (min-width: var(--bp-tab)) {
+  .sidebar { position: fixed; transform: translateX(100%); box-shadow: var(--shadow-lg); }
+  .sidebar.open { transform: translateX(0); }
+}
+
+@media (max-width: var(--bp-tab)) {                               /* موبايل */
+  .sidebar { width: 100vw; max-width: var(--sidebar-width-mobile); top: var(--header-height); height: calc(100vh - var(--header-height)); background-color: var(--color-bg-secondary) !important; box-shadow: var(--shadow-lg); } /* عرض يغطي شاشة الموبايل لليمين */
+  .sidebarMenuItem { min-height: var(--height-button-lg); } /* أزرار أكبر للمس */
+  .sidebarGroupButton { min-height: var(--height-button-lg); } /* نفس الشي للمجموعات */
+}
+
+@media (hover: hover) { .sidebarMenuItem:hover { box-shadow: var(--shadow-sm); } }
+@media (prefers-reduced-motion: reduce) { .sidebar { transition: none; background-color: var(--color-bg-secondary) !important; } .sidebarMenuItem { transition: none; } .sidebarMenuItem:hover { transform: none; } .sidebarBadge.sidebarBadgeNew { animation: none; } }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }

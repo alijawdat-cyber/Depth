@@ -1,0 +1,437 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🏷️ شارات العد والحالة (Badges & Status Indicators)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Base Badge Style ——— */
+.badge {
+  /* Layout */
+  display: inline-flex;                                    /* عرض مرن مضمن */
+  align-items: center;                                     /* محاذاة وسط عمودياً */
+  justify-content: center;                                 /* توسيط المحتوى */
+  gap: var(--space-xs);                                    /* مسافة صغيرة بين العناصر */
+  
+  /* Typography */
+  font-size: var(--fs-xs);                                /* حجم صغير جداً */
+  font-weight: 600;                                       /* وزن ثقيل للوضوح */
+  line-height: 1;                                         /* تباعد ضيق */
+  white-space: nowrap;                                    /* عدم لف النص */
+  
+  /* Appearance */
+  padding: var(--space-xs) var(--space-sm);               /* حشو مدمج */
+  border-radius: var(--radius-md);                        /* زوايا دائرية متوسطة */
+  border: 1px solid transparent;                          /* حد شفاف افتراضياً */
+  
+  /* Effects */
+  transition: all 0.2s ease;                              /* انتقال ناعم */
+  user-select: none;                                       /* منع تحديد النص */
+  vertical-align: middle;                                  /* محاذاة وسط مع النص المجاور */
+  
+  /* Default colors */
+  background-color: var(--color-bg-tertiary);             /* خلفية رمادية خفيفة */
+}
+
+/* ——— Badge Variants by Color ——— */
+
+/* شارة أساسية */
+.badgePrimary {
+  background-color: var(--color-primary);                 /* خلفية ملونة */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-primary);                     /* حد بنفس اللون */
+}
+
+/* شارة ثانوية */
+.badgeSecondary {
+  background-color: var(--color-bg-secondary);            /* خلفية ثانوية */
+  border-color: var(--color-border-primary);              /* حد خفيف */
+}
+
+/* شارة نجاح */
+.badgeSuccess {
+  background-color: var(--color-success);                 /* خلفية خضراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-success);                     /* حد أخضر */
+}
+
+/* شارة تحذير */
+.badgeWarning {
+  background-color: var(--color-warning);                 /* خلفية صفراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-warning);                     /* حد أصفر */
+}
+
+/* شارة خطأ */
+.badgeError,
+.badgeDanger {
+  background-color: var(--color-error);                   /* خلفية حمراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-error);                       /* حد أحمر */
+}
+
+/* شارة معلومات */
+.badgeInfo {
+  background-color: var(--color-info);                    /* خلفية زرقاء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-info);                        /* حد أزرق */
+}
+
+/* شارة محايدة */
+.badgeNeutral {
+  background-color: var(--color-bg-tertiary);             /* خلفية رمادية */
+  color: var(--color-text-secondary);                     /* نص ثانوي */
+  border-color: var(--color-border-primary);              /* حد خفيف */
+}
+
+/* ——— Badge Styles (Outline) ——— */
+
+/* شارة مخططة أساسية */
+.badgePrimaryOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-primary);                            /* نص ملون */
+  border-color: var(--color-primary);                     /* حد ملون */
+}
+
+/* شارة مخططة نجاح */
+.badgeSuccessOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-success);                            /* نص أخضر */
+  border-color: var(--color-success);                     /* حد أخضر */
+}
+
+/* شارة مخططة تحذير */
+.badgeWarningOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-warning);                            /* نص أصفر */
+  border-color: var(--color-warning);                     /* حد أصفر */
+}
+
+/* شارة مخططة خطأ */
+.badgeErrorOutline,
+.badgeDangerOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-error);                              /* نص أحمر */
+  border-color: var(--color-error);                       /* حد أحمر */
+}
+
+/* شارة مخططة معلومات */
+.badgeInfoOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-info);                               /* نص أزرق */
+  border-color: var(--color-info);                        /* حد أزرق */
+}
+
+/* ——— Badge Styles (Light) ——— */
+
+/* شارة أساسية فاتحة */
+.badgePrimaryLight {
+  background-color: var(--color-primary-light);           /* خلفية فاتحة */
+  color: var(--color-primary);                            /* نص ملون */
+  border-color: var(--color-primary-light);               /* حد فاتح */
+}
+
+/* شارة نجاح فاتحة */
+.badgeSuccessLight {
+  background-color: var(--color-success-light);           /* خلفية خضراء فاتحة */
+  color: var(--color-success);                            /* نص أخضر */
+  border-color: var(--color-success-light);               /* حد أخضر فاتح */
+}
+
+/* شارة تحذير فاتحة */
+.badgeWarningLight {
+  background-color: var(--color-warning-light);           /* خلفية صفراء فاتحة */
+  color: var(--color-warning);                            /* نص أصفر */
+  border-color: var(--color-warning-light);               /* حد أصفر فاتح */
+}
+
+/* شارة خطأ فاتحة */
+.badgeErrorLight,
+.badgeDangerLight {
+  background-color: var(--color-error-light);             /* خلفية حمراء فاتحة */
+  color: var(--color-error);                              /* نص أحمر */
+  border-color: var(--color-error-light);                 /* حد أحمر فاتح */
+}
+
+/* شارة معلومات فاتحة */
+.badgeInfoLight {
+  background-color: var(--color-info-light);              /* خلفية زرقاء فاتحة */
+  color: var(--color-info);                               /* نص أزرق */
+  border-color: var(--color-info-light);                  /* حد أزرق فاتح */
+}
+
+/* ——— Badge Sizes ——— */
+
+/* شارة صغيرة جداً */
+.badgeXs {
+  font-size: var(--fs-xxs);                               /* حجم نص صغير جداً */
+  padding: 2px var(--space-xs);                           /* حشو صغير جداً */
+  border-radius: var(--radius-sm);                        /* زوايا صغيرة */
+}
+
+/* شارة صغيرة */
+.badgeSm {
+  font-size: var(--fs-xs);                                /* حجم نص صغير */
+  padding: var(--space-xs) var(--space-sm);               /* حشو صغير */
+  border-radius: var(--radius-sm);                        /* زوايا صغيرة */
+}
+
+/* شارة متوسطة (افتراضية) */
+.badgeMd {
+  font-size: var(--fs-sm);                                /* حجم نص صغير-متوسط */
+  padding: var(--space-xs) var(--space-md);               /* حشو متوسط */
+  border-radius: var(--radius-md);                        /* زوايا متوسطة */
+}
+
+/* شارة كبيرة */
+.badgeLg {
+  font-size: var(--fs-md);                                /* حجم نص متوسط */
+  padding: var(--space-sm) var(--space-lg);               /* حشو كبير */
+  border-radius: var(--radius-md);                        /* زوايا متوسطة */
+  font-weight: 700;                                       /* وزن أثقل */
+}
+
+/* ——— Badge Shapes ——— */
+
+/* شارة دائرية */
+.badgeRounded {
+  border-radius: var(--radius-full);                      /* زوايا دائرية كاملة */
+  min-width: 24px;                                        /* عرض أدنى للدائرة */
+  height: 24px;                                           /* ارتفاع ثابت */
+  padding: 0;                                             /* بدون حشو */
+}
+
+.badgeRoundedSm {
+  border-radius: var(--radius-full);                      /* زوايا دائرية كاملة */
+  min-width: 18px;                                        /* عرض أدنى أصغر */
+  height: 18px;                                           /* ارتفاع أصغر */
+  padding: 0;                                             /* بدون حشو */
+  font-size: var(--fs-xs);                                /* حجم نص أصغر */
+}
+
+.badgeRoundedLg {
+  border-radius: var(--radius-full);                      /* زوايا دائرية كاملة */
+  min-width: 32px;                                        /* عرض أدنى أكبر */
+  height: 32px;                                           /* ارتفاع أكبر */
+  padding: 0;                                             /* بدون حشو */
+  font-size: var(--fs-md);                                /* حجم نص أكبر */
+}
+
+/* شارة مربعة */
+.badgeSquare {
+  border-radius: var(--radius-sm);                        /* زوايا صغيرة */
+  aspect-ratio: 1;                                        /* نسبة عرض لارتفاع 1:1 */
+  min-width: 24px;                                        /* عرض أدنى */
+  padding: 0;                                             /* بدون حشو */
+}
+
+/* ——— Badge with Icons ——— */
+
+/* شارة مع أيقونة */
+.badgeWithIcon {
+  gap: var(--space-xs);                                   /* مسافة بين الأيقونة والنص */
+}
+
+/* شارة أيقونة فقط */
+.badgeIcon {
+  padding: var(--space-xs);                               /* حشو متساوي */
+  border-radius: var(--radius-sm);                        /* زوايا صغيرة */
+  min-width: auto;                                        /* عرض تلقائي */
+  aspect-ratio: 1;                                        /* مربع */
+}
+
+/* ——— Status Indicators ——— */
+
+/* مؤشر حالة صغير */
+.statusDot {
+  width: 8px;                                             /* عرض صغير */
+  height: 8px;                                            /* ارتفاع صغير */
+  border-radius: 50%;                                     /* دائرة كاملة */
+  display: inline-block;                                  /* عرض مضمن */
+  flex-shrink: 0;                                         /* عدم الانكماش */
+  vertical-align: middle;                                 /* محاذاة وسط */
+}
+
+/* مؤشر متصل */
+.statusOnline {
+  background-color: var(--color-success);                 /* لون أخضر */
+  box-shadow: 0 0 0 2px var(--color-bg-primary);          /* حلقة بيضاء */
+}
+
+/* مؤشر منقطع */
+.statusOffline {
+  background-color: var(--color-text-secondary);          /* لون رمادي */
+  box-shadow: 0 0 0 2px var(--color-bg-primary);          /* حلقة بيضاء */
+}
+
+/* مؤشر مشغول */
+.statusBusy {
+  background-color: var(--color-warning);                 /* لون أصفر/برتقالي */
+  box-shadow: 0 0 0 2px var(--color-bg-primary);          /* حلقة بيضاء */
+}
+
+/* مؤشر لا يُزعج */
+.statusDnd {
+  background-color: var(--color-error);                   /* لون أحمر */
+  box-shadow: 0 0 0 2px var(--color-bg-primary);          /* حلقة بيضاء */
+}
+
+/* ——— Badge Animations ——— */
+
+/* شارة جديدة متحركة */
+.badgeNew {
+  animation: badgePulse 2s infinite;                      /* حركة نبض */
+}
+
+/* شارة عداد متحركة */
+.badgeCount {
+  animation: badgeScale 0.3s ease-out;                    /* حركة تكبير عند الظهور */
+}
+
+/* شارة تحديث */
+.badgeUpdated {
+  animation: badgeShake 0.5s ease-in-out;                 /* حركة اهتزاز خفيف */
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);                                  /* الحجم الطبيعي */
+    opacity: 1;                                           /* وضوح كامل */
+  }
+  50% {
+    transform: scale(1.05);                               /* تكبير خفيف */
+    opacity: 0.8;                                         /* وضوح أقل */
+  }
+}
+
+@keyframes badgeScale {
+  0% {
+    transform: scale(0.8);                                /* بداية صغيرة */
+    opacity: 0.6;                                         /* وضوح أقل */
+  }
+  100% {
+    transform: scale(1);                                  /* الحجم الطبيعي */
+    opacity: 1;                                           /* وضوح كامل */
+  }
+}
+
+@keyframes badgeShake {
+  0%, 100% { transform: translateX(0); }                  /* الموضع الطبيعي */
+  25% { transform: translateX(-2px); }                    /* حركة يسار */
+  75% { transform: translateX(2px); }                     /* حركة يمين */
+}
+
+/* ——— Interactive Badges ——— */
+
+/* شارة قابلة للنقر */
+.badgeClickable {
+  cursor: pointer;                                        /* إشارة النقر */
+  transition: all 0.2s ease;                              /* انتقال ناعم */
+}
+
+.badgeClickable:hover {
+  transform: translateY(-1px);                            /* حركة خفيفة للأعلى */
+  box-shadow: var(--shadow-sm);                            /* ظل خفيف */
+}
+
+.badgeClickable:active {
+  transform: translateY(0);                               /* إرجاع الموضع */
+}
+
+/* شارة قابلة للإغلاق */
+.badgeDismissible {
+  position: relative;                                     /* أساس لزر الإغلاق */
+  padding-inline-end: calc(var(--space-sm) + 16px);      /* مسافة لزر الإغلاق */
+}
+
+.badgeCloseButton {
+  position: absolute;                                     /* تموضع مطلق */
+  inset-inline-end: var(--space-xs);                     /* موضع من النهاية */
+  top: 50%;                                              /* منتصف عمودي */
+  transform: translateY(-50%);                           /* توسيط عمودي دقيق */
+  background: none;                                      /* بدون خلفية */
+  border: none;                                          /* بدون حد */
+  color: inherit;                                        /* وراثة اللون */
+  cursor: pointer;                                       /* إشارة النقر */
+  font-size: var(--fs-xs);                               /* حجم صغير */
+  line-height: 1;                                        /* تباعد ضيق */
+  padding: 0;                                            /* بدون حشو */
+  opacity: 0.7;                                          /* شفافية خفيفة */
+  transition: opacity 0.2s ease;                         /* انتقال ناعم */
+}
+
+.badgeCloseButton:hover {
+  opacity: 1;                                            /* وضوح كامل عند المرور */
+}
+
+/* ——— Badge Groups ——— */
+
+/* مجموعة شارات */
+.badgeGroup {
+  display: flex;                                          /* عرض مرن */
+  flex-wrap: wrap;                                        /* لف الشارات */
+  gap: var(--space-xs);                                   /* مسافة صغيرة بين الشارات */
+  align-items: center;                                    /* محاذاة وسط */
+}
+
+/* شارات متلاصقة */
+.badgeGroupAttached {
+  display: flex;                                          /* عرض مرن */
+  overflow: hidden;                                       /* قطع الزوايا */
+  border-radius: var(--radius-md);                        /* زوايا للمجموعة */
+}
+
+.badgeGroupAttached .badge {
+  border-radius: 0;                                       /* إزالة زوايا الشارات الداخلية */
+  border-inline-start-width: 0;                          /* إزالة الحد الأيسر */
+}
+
+.badgeGroupAttached .badge:first-child {
+  border-inline-start-width: 1px;                        /* إرجاع حد الأول */
+}
+
+/* ——— Responsive ——— */
+
+@media (max-width: var(--bp-tab)) {
+  /* تحسين الشارات للشاشات الصغيرة */
+  .badge {
+    font-size: var(--fs-sm);                              /* حجم نص أكبر للمس */
+    padding: var(--space-sm) var(--space-md);             /* حشو أكبر */
+    min-height: 28px;                                     /* ارتفاع أدنى للمس */
+  }
+  
+  .badgeSm {
+    font-size: var(--fs-xs);                              /* حجم نص مناسب */
+    min-height: 24px;                                     /* ارتفاع مناسب للمس */
+  }
+  
+  /* تبسيط مجموعات الشارات */
+  .badgeGroupAttached {
+    flex-direction: column;                               /* ترتيب عمودي */
+  }
+  
+  .badgeGroupAttached .badge {
+    border-inline-start-width: 1px;                      /* إرجاع الحد الجانبي */
+    border-top-width: 0;                                 /* إزالة الحد العلوي */
+  }
+  
+  .badgeGroupAttached .badge:first-child {
+    border-top-width: 1px;                               /* إرجاع حد الأول */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* إزالة الحركة للمستخدمين الذين يفضلون تقليل الحركة */
+  .badgeNew,
+  .badgeCount,
+  .badgeUpdated {
+    animation: none;                                      /* إزالة الحركة */
+  }
+  
+  .badgeClickable:hover {
+    transform: none;                                      /* إزالة الحركة */
+  }
+  
+  .badge {
+    transition: color 0.2s ease, background-color 0.2s ease; /* انتقال ألوان فقط */
+  }
+}

@@ -1,0 +1,481 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   📱 أنماط متجاوبة للشاشات المختلفة (Responsive Design)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Base Responsive Settings ——— */
+
+/* تحسين أساسي للنصوص العربية على الشاشات الصغيرة */
+@media (max-width: 768px) {
+  html {
+    font-size: 16px;                                       /* حجم خط أساسي أكبر للموبايل */
+    line-height: 1.6;                                      /* تباعد أوسع للقراءة */
+  }
+  
+  body {
+    font-size: var(--fs-md);                               /* حجم خط أساسي */
+    -webkit-text-size-adjust: 100%;                        /* منع تكبير النص التلقائي في iOS */
+    -ms-text-size-adjust: 100%;                            /* منع تكبير النص التلقائي في Windows Phone */
+  }
+}
+
+/* ——— Container Responsive Behavior ——— */
+
+/* حاويات متجاوبة */
+.containerResponsive {
+  width: 100%;                                            /* عرض كامل */
+  margin: 0 auto;                                         /* توسيط أفقي */
+  padding: 0 var(--space-lg);                             /* حشو جانبي */
+}
+
+@media (min-width: 640px) {
+  .containerResponsive {
+    max-width: 640px;                                     /* عرض أقصى للشاشات الصغيرة */
+  }
+}
+
+@media (min-width: 768px) {
+  .containerResponsive {
+    max-width: 768px;                                     /* عرض أقصى للتابلت */
+    padding: 0 var(--space-xl);                           /* حشو أكبر */
+  }
+}
+
+@media (min-width: 1024px) {
+  .containerResponsive {
+    max-width: 1024px;                                    /* عرض أقصى للديسكتوب الصغير */
+  }
+}
+
+@media (min-width: 1280px) {
+  .containerResponsive {
+    max-width: 1280px;                                    /* عرض أقصى للديسكتوب الكبير */
+  }
+}
+
+@media (min-width: 1536px) {
+  .containerResponsive {
+    max-width: 1536px;                                    /* عرض أقصى للشاشات العملاقة */
+  }
+}
+
+/* ——— Typography Responsive ——— */
+
+/* عناوين متجاوبة */
+.responsiveHeading {
+  font-weight: 700;                                      /* وزن ثقيل */
+  line-height: 1.2;                                      /* تباعد ضيق للعناوين */
+}
+
+@media (max-width: 480px) {
+  .responsiveHeading {
+    font-size: var(--fs-lg);                             /* حجم كبير للشاشات الصغيرة جداً */
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .responsiveHeading {
+    font-size: var(--fs-xl);                             /* حجم كبير جداً للموبايل */
+  }
+}
+
+@media (min-width: var(--bp-tab-2xl)) and (max-width: var(--bp-tab-2xl)) {
+  .responsiveHeading {
+    font-size: var(--fs-2xl);                            /* حجم كبير جداً للتابلت */
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsiveHeading {
+    font-size: var(--fs-3xl);                            /* حجم عملاق للديسكتوب */
+  }
+}
+
+/* نص متجاوب */
+.responsiveText {
+  line-height: 1.6;                                      /* تباعد مريح */
+}
+
+@media (max-width: 768px) {
+  .responsiveText {
+    font-size: var(--fs-md);                             /* حجم متوسط للموبايل */
+    line-height: 1.7;                                     /* تباعد أوسع للقراءة */
+  }
+}
+
+@media (min-width: 769px) {
+  .responsiveText {
+    font-size: var(--fs-lg);                             /* حجم كبير للديسكتوب */
+  }
+}
+
+/* ——— Layout Responsive Patterns ——— */
+
+/* تخطيط ثلاثي الأعمدة متجاوب */
+.responsiveThreeCol {
+  display: grid;                                          /* نظام الشبكة */
+  gap: var(--space-lg);                                   /* مسافة بين الأعمدة */
+}
+
+@media (max-width: 768px) {
+  .responsiveThreeCol {
+    grid-template-columns: 1fr;                           /* عمود واحد للموبايل */
+    gap: var(--space-md);                                 /* مسافة أقل */
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .responsiveThreeCol {
+    grid-template-columns: repeat(2, 1fr);                /* عمودين للتابلت */
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsiveThreeCol {
+    grid-template-columns: repeat(3, 1fr);                /* ثلاثة أعمدة للديسكتوب */
+  }
+}
+
+/* تخطيط شريط جانبي ومحتوى متجاوب */
+.responsiveSidebarLayout {
+  display: grid;                                          /* نظام الشبكة */
+  gap: var(--space-lg);                                   /* مسافة بين العناصر */
+  min-height: 100vh;                                      /* ارتفاع كامل للشاشة */
+}
+
+@media (max-width: 1024px) {
+  .responsiveSidebarLayout {
+    grid-template-columns: 1fr;                           /* عمود واحد للشاشات الصغيرة */
+    grid-template-rows: auto 1fr;                         /* ترتيب عمودي */
+  }
+  
+  .responsiveSidebar {
+    order: 1;                                             /* الشريط الجانبي يظهر أولاً */
+  }
+  
+  .responsiveMain {
+    order: 2;                                             /* المحتوى يظهر ثانياً */
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsiveSidebarLayout {
+    grid-template-columns: 280px 1fr;                     /* شريط جانبي ثابت + محتوى مرن */
+  }
+}
+
+/* ——— Navigation Responsive ——— */
+
+/* قائمة تنقل متجاوبة */
+.responsiveNav {
+  display: flex;                                          /* عرض مرن */
+  align-items: center;                                    /* محاذاة وسط */
+  gap: var(--space-md);                                   /* مسافة بين العناصر */
+}
+
+@media (max-width: 768px) {
+  .responsiveNav {
+    flex-direction: column;                               /* ترتيب عمودي للموبايل */
+    align-items: stretch;                                 /* امتداد العناصر */
+    gap: var(--space-sm);                                 /* مسافة أقل */
+  }
+  
+  .responsiveNavItem {
+    width: 100%;                                          /* عرض كامل */
+    text-align: center;                                   /* توسيط النص */
+    padding: var(--space-sm) var(--space-md);             /* حشو مريح للمس */
+    min-height: var(--height-button-lg);                  /* ارتفاع مناسب للمس */
+    display: flex;                                        /* عرض مرن */
+    align-items: center;                                  /* محاذاة وسط */
+    justify-content: center;                              /* توسيط المحتوى */
+  }
+}
+
+@media (min-width: 769px) {
+  .responsiveNav {
+    flex-direction: row;                                  /* ترتيب أفقي للديسكتوب */
+  }
+  
+  .responsiveNavItem {
+    padding: var(--space-sm) var(--space-md);             /* حشو أقل للديسكتوب */
+    white-space: nowrap;                                  /* عدم لف النص */
+  }
+}
+
+/* ——— Card Grid Responsive ——— */
+
+/* شبكة بطاقات متجاوبة */
+.responsiveCardGrid {
+  display: grid;                                          /* نظام الشبكة */
+  gap: var(--space-lg);                                   /* مسافة بين البطاقات */
+  padding: var(--space-lg);                               /* حشو حول الشبكة */
+}
+
+@media (max-width: 480px) {
+  .responsiveCardGrid {
+    grid-template-columns: 1fr;                           /* عمود واحد للشاشات الصغيرة جداً */
+    gap: var(--space-md);                                 /* مسافة أقل */
+    padding: var(--space-md);                             /* حشو أقل */
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .responsiveCardGrid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* بطاقات تكيفية للموبايل */
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .responsiveCardGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* بطاقات تكيفية للتابلت */
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsiveCardGrid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* بطاقات تكيفية للديسكتوب */
+  }
+}
+
+/* ——— Form Responsive ——— */
+
+/* نماذج متجاوبة */
+.responsiveForm {
+  display: grid;                                          /* نظام الشبكة */
+  gap: var(--space-lg);                                   /* مسافة بين الحقول */
+}
+
+@media (max-width: 768px) {
+  .responsiveForm {
+    grid-template-columns: 1fr;                           /* عمود واحد للموبايل */
+    gap: var(--space-md);                                 /* مسافة أقل */
+  }
+  
+  .responsiveFormRow {
+    grid-template-columns: 1fr;                           /* صف واحد للحقول */
+    gap: var(--space-sm);                                 /* مسافة أقل بين الحقول */
+  }
+}
+
+@media (min-width: 769px) {
+  .responsiveForm {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* حقول تكيفية */
+  }
+  
+  .responsiveFormRow {
+    display: grid;                                        /* نظام الشبكة للصف */
+    grid-template-columns: repeat(2, 1fr);                /* حقلين في الصف */
+    gap: var(--space-md);                                 /* مسافة بين الحقول */
+  }
+}
+
+/* مجموعة أزرار متجاوبة */
+.responsiveButtonGroup {
+  display: flex;                                          /* عرض مرن */
+  gap: var(--space-sm);                                   /* مسافة بين الأزرار */
+  justify-content: flex-end;                              /* محاذاة للنهاية */
+}
+
+@media (max-width: 768px) {
+  .responsiveButtonGroup {
+    flex-direction: column;                               /* ترتيب عمودي للموبايل */
+    gap: var(--space-sm);                                 /* مسافة بين الأزرار */
+  }
+  
+  .responsiveButtonGroup .btn {
+    width: 100%;                                          /* عرض كامل للأزرار */
+    justify-content: center;                              /* توسيط النص */
+    min-height: var(--height-button-lg);                  /* ارتفاع مناسب للمس */
+  }
+}
+
+/* ——— Table Responsive ——— */
+
+/* جداول متجاوبة */
+@media (max-width: 768px) {
+  .responsiveTable {
+    display: block;                                       /* عرض كتلة بدلاً من جدول */
+    overflow-x: auto;                                     /* تمرير أفقي */
+    white-space: nowrap;                                  /* عدم لف المحتوى */
+    border-radius: var(--radius-md);                      /* زوايا دائرية */
+    border: 1px solid var(--color-border-primary);        /* حد خفيف */
+  }
+  
+  .responsiveTable table {
+    width: auto;                                          /* عرض تلقائي */
+    min-width: 600px;                                     /* عرض أدنى للجدول */
+  }
+  
+  /* تحسين ظهور الجدول على الموبايل */
+  .responsiveTableCard {
+    display: none;                                        /* إخفاء الجدول العادي */
+  }
+  
+  .responsiveTableMobile {
+    display: block;                                       /* إظهار نسخة الموبايل */
+  }
+  
+  .responsiveTableMobileItem {
+    display: block;                                       /* عرض كبطاقة */
+    border: 1px solid var(--color-border-primary);        /* حد خفيف */
+    border-radius: var(--radius-md);                      /* زوايا دائرية */
+    margin-bottom: var(--space-md);                       /* مسافة بين البطاقات */
+    padding: var(--space-md);                             /* حشو داخلي */
+    background-color: var(--color-bg-secondary);          /* خلفية ثانوية */
+  }
+  
+  .responsiveTableMobileRow {
+    display: flex;                                        /* عرض مرن */
+    justify-content: space-between;                       /* توزيع العناصر */
+    align-items: center;                                  /* محاذاة وسط */
+    padding: var(--space-xs) 0;                           /* حشو عمودي */
+    border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */
+  }
+  
+  .responsiveTableMobileRow:last-child {
+    border-bottom: none;                                  /* إزالة الحد من الأخير */
+  }
+  
+  .responsiveTableMobileLabel {
+    font-weight: 600;                                     /* وزن ثقيل للتسمية */
+    color: var(--color-text-secondary);                   /* لون ثانوي */
+    font-size: var(--fs-sm);                              /* حجم صغير */
+  }
+  
+  .responsiveTableMobileValue {
+    font-weight: 400;                                     /* وزن عادي للقيمة */
+    text-align: left;                                     /* محاذاة يسار للقيم */
+  }
+}
+
+@media (min-width: 769px) {
+  .responsiveTableMobile {
+    display: none;                                        /* إخفاء نسخة الموبايل */
+  }
+  
+  .responsiveTableCard {
+    display: table;                                       /* إظهار الجدول العادي */
+  }
+}
+
+/* ——— Media Queries Helper Classes ——— */
+
+/* فئات مساعدة للإظهار/الإخفاء حسب حجم الشاشة */
+@media (max-width: 480px) {
+  .hideXs { display: none !important; }                   /* إخفاء على الشاشات الصغيرة جداً */
+  .showXs { display: block !important; }                  /* إظهار على الشاشات الصغيرة جداً */
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .hideSm { display: none !important; }                   /* إخفاء على الشاشات الصغيرة */
+  .showSm { display: block !important; }                  /* إظهار على الشاشات الصغيرة */
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hideMd { display: none !important; }                   /* إخفاء على الشاشات المتوسطة */
+  .showMd { display: block !important; }                  /* إظهار على الشاشات المتوسطة */
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .hideLg { display: none !important; }                   /* إخفاء على الشاشات الكبيرة */
+  .showLg { display: block !important; }                  /* إظهار على الشاشات الكبيرة */
+}
+
+@media (min-width: 1281px) {
+  .hideXl { display: none !important; }                   /* إخفاء على الشاشات الكبيرة جداً */
+  .showXl { display: block !important; }                  /* إظهار على الشاشات الكبيرة جداً */
+}
+
+/* ——— Touch Device Optimizations ——— */
+
+@media (hover: none) and (pointer: coarse) {
+  /* تحسينات للأجهزة اللمسية */
+  .btn,
+  .responsiveNavItem,
+  .badge,
+  .card {
+    min-height: var(--height-button-lg);                  /* ارتفاع مناسب للمس */
+  }
+  
+  .input,
+  .textarea,
+  .select {
+    min-height: var(--height-input-lg);                   /* ارتفاع مناسب للمس */
+    font-size: 16px;                                      /* منع التكبير في iOS */
+  }
+  
+  /* إزالة تأثيرات المرور للأجهزة اللمسية */
+  .card:hover,
+  .btn:hover {
+    transform: none;                                      /* إزالة الحركة */
+  }
+}
+
+/* ——— High DPI Screen Optimizations ——— */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* تحسينات للشاشات عالية الدقة */
+  .spinner,
+  .badge,
+  .btn {
+    transform: translateZ(0);                             /* تحسين الرندرة */
+  }
+}
+
+/* ——— Dark Mode Responsive ——— */
+
+@media (prefers-color-scheme: dark) {
+  /* تحسينات للثيم الداكن على الشاشات الصغيرة */
+  @media (max-width: 768px) {
+    .responsiveText {
+      line-height: 1.8;                                   /* تباعد أوسع للقراءة في الظلام */
+    }
+    
+    .card,
+    .responsiveTableMobileItem {
+      border-width: 2px;                                  /* حد أثخن للتمييز */
+    }
+  }
+}
+
+/* ——— Reduced Motion Responsive ——— */
+
+@media (prefers-reduced-motion: reduce) {
+  /* إزالة كل الحركات للمستخدمين الذين يفضلون تقليل الحركة */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;                /* تقليل مدة الحركة */
+    animation-iteration-count: 1 !important;              /* تكرار واحد فقط */
+    transition-duration: 0.01ms !important;               /* تقليل مدة الانتقال */
+  }
+}
+
+/* ——— Print Responsive ——— */
+
+@media print {
+  /* تحسينات للطباعة */
+  .responsiveSidebarLayout {
+    grid-template-columns: 1fr;                           /* عمود واحد للطباعة */
+  }
+  
+  .responsiveNav {
+    display: none;                                        /* إخفاء التنقل */
+  }
+  
+  .responsiveCardGrid {
+    grid-template-columns: 1fr;                           /* عمود واحد للبطاقات */
+    gap: var(--space-md);                                 /* مسافة أقل */
+  }
+  
+  .responsiveButtonGroup {
+    display: none;                                        /* إخفاء الأزرار */
+  }
+  
+  .card {
+    break-inside: avoid;                                  /* منع كسر البطاقة عبر الصفحات */
+    box-shadow: none;                                     /* إزالة الظل */
+    border: 1px solid var(--color-border-secondary);     /* حد للطباعة - من التوكنز */
+  }
+}

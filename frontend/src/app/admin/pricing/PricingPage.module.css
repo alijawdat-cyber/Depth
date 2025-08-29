@@ -145,7 +145,7 @@
   white-space: nowrap;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 .basePricesTable tbody tr {
@@ -517,7 +517,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: var(--z-dropdown);
   border-radius: inherit;
 }
 

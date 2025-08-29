@@ -1,0 +1,368 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🔘 أنماط الأزرار والروابط التفاعلية (Buttons & Interactive Links)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Button Base (الزر الأساسي) ——— */
+.btn {
+  display: inline-flex;                                    /* ترتيب مرن للمحتوى */
+  align-items: center;                                     /* محاذاة وسط عمودياً */
+  justify-content: center;                                 /* توسيط المحتوى */
+  gap: var(--space-sm);                                    /* مسافة بين الأيقونة والنص */
+  
+  /* Typography */
+  font-size: var(--fs-md);                                /* حجم نص عادي */
+  font-weight: 500;                                       /* وزن متوسط */
+  line-height: 1;                                         /* تباعد ضيق للأزرار */
+  text-decoration: none;                                  /* بدون خط تحت النص */
+  white-space: nowrap;                                    /* النص ما يلف سطر */
+  
+  /* Layout */
+  padding: var(--space-sm) var(--space-md);               /* حشو داخلي مريح */
+  border-radius: var(--radius-md);                        /* زوايا دائرية متوسطة */
+  border: 1px solid transparent;                          /* حد شفاف افتراضياً */
+  min-height: var(--height-button-md);                    /* ارتفاع أدنى موحد */
+  cursor: pointer;                                        /* إشارة النقر */
+  
+  /* Effects */
+  transition: all 0.2s ease;                              /* انتقال ناعم لكل الخصائص */
+  box-shadow: var(--shadow-sm);                            /* ظل خفيف */
+  position: relative;                                      /* أساس للعناصر المطلقة */
+  overflow: hidden;                                        /* منع خروج التأثيرات */
+  user-select: none;                                       /* منع تحديد النص */
+}
+
+.btn:focus {
+  outline: 2px solid var(--color-primary);                /* إطار تركيز واضح */
+  outline-offset: 2px;                                    /* مسافة الإطار عن الزر */
+}
+
+.btn:disabled {
+  opacity: 0.5;                                           /* تقليل الوضوح */
+  cursor: not-allowed;                                    /* إشارة منع */
+  pointer-events: none;                                   /* منع التفاعل */
+}
+
+/* ——— Button Variants (أشكال الأزرار) ——— */
+
+/* الزر الأساسي */
+.btnPrimary {
+  background-color: var(--color-primary);                 /* خلفية ملونة */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-primary);                     /* حد بنفس اللون */
+}
+
+.btnPrimary:hover {
+  background-color: var(--color-primary-hover);           /* خلفية أغمق عند المرور */
+  border-color: var(--color-primary-hover);               /* حد أغمق */
+  box-shadow: var(--shadow-md);                            /* ظل أقوى */
+  transform: translateY(-1px);                             /* حركة خفيفة للأعلى */
+}
+
+.btnPrimary:active {
+  background-color: var(--color-primary-pressed);         /* لون أغمق عند الضغط */
+  transform: translateY(0);                                /* إرجاع الموضع */
+  box-shadow: var(--shadow-sm);                            /* تقليل الظل */
+}
+
+/* الزر الثانوي */
+.btnSecondary {
+  background-color: var(--color-bg-secondary);            /* خلفية ثانوية */
+  color: var(--color-text-primary);                       /* نص عادي */
+  border-color: var(--color-border-primary);              /* حد عادي */
+}
+
+.btnSecondary:hover {
+  background-color: var(--color-bg-tertiary);             /* خلفية أغمق عند المرور */
+  border-color: var(--color-primary);                     /* حد ملون */
+  color: var(--color-primary);                            /* نص ملون */
+}
+
+/* الزر المخطط */
+.btnOutline {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-primary);                            /* نص ملون */
+  border-color: var(--color-primary);                     /* حد ملون */
+}
+
+.btnOutline:hover {
+  background-color: var(--color-primary);                 /* خلفية ملونة عند المرور */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+}
+
+/* الزر الشبحي (بدون حد) */
+.btnGhost {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-primary);                            /* نص ملون */
+  border-color: transparent;                               /* حد شفاف */
+  box-shadow: none;                                        /* بدون ظل */
+}
+
+.btnGhost:hover {
+  background-color: var(--color-primary-light);           /* خلفية خفيفة عند المرور */
+  box-shadow: var(--shadow-sm);                            /* إضافة ظل خفيف */
+}
+
+/* زر النص فقط */
+.btnText {
+  background-color: transparent;                           /* خلفية شفافة */
+  color: var(--color-primary);                            /* نص ملون */
+  border: none;                                           /* بدون حد */
+  box-shadow: none;                                        /* بدون ظل */
+  padding: var(--space-xs) var(--space-sm);               /* حشو أقل */
+  min-height: auto;                                       /* ارتفاع تلقائي */
+}
+
+.btnText:hover {
+  color: var(--color-primary-hover);                      /* لون أغمق عند المرور */
+  text-decoration: underline;                              /* خط تحت النص */
+  text-underline-offset: 2px;                             /* مسافة الخط عن النص */
+}
+
+/* ——— Status Button Colors ——— */
+
+.btnSuccess {
+  background-color: var(--color-success);                 /* خلفية خضراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-success);                     /* حد أخضر */
+}
+
+.btnSuccess:hover {
+  background-color: var(--color-success-hover);           /* أخضر أغمق */
+  border-color: var(--color-success-hover);               /* حد أغمق */
+}
+
+.btnWarning {
+  background-color: var(--color-warning);                 /* خلفية صفراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-warning);                     /* حد أصفر */
+}
+
+.btnWarning:hover {
+  background-color: var(--color-warning-hover);           /* أصفر أغمق */
+  border-color: var(--color-warning-hover);               /* حد أغمق */
+}
+
+.btnError,
+.btnDanger {
+  background-color: var(--color-error);                   /* خلفية حمراء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-error);                       /* حد أحمر */
+}
+
+.btnError:hover,
+.btnDanger:hover {
+  background-color: var(--color-error-hover);             /* أحمر أغمق */
+  border-color: var(--color-error-hover);                 /* حد أغمق */
+}
+
+.btnInfo {
+  background-color: var(--color-info);                    /* خلفية زرقاء */
+  color: var(--color-text-inverse);                       /* نص أبيض */
+  border-color: var(--color-info);                        /* حد أزرق */
+}
+
+.btnInfo:hover {
+  background-color: var(--color-info-hover);              /* أزرق أغمق */
+  border-color: var(--color-info-hover);                  /* حد أغمق */
+}
+
+/* ——— Button Sizes ——— */
+
+/* زر صغير */
+.btnSmall,
+.btnSm {
+  font-size: var(--fs-sm);                                /* حجم نص صغير */
+  padding: var(--space-xs) var(--space-sm);               /* حشو أقل */
+  min-height: var(--height-button-sm);                    /* ارتفاع أصغر */
+  border-radius: var(--radius-sm);                        /* زوايا أصغر */
+}
+
+/* زر كبير */
+.btnLarge,
+.btnLg {
+  font-size: var(--fs-lg);                                /* حجم نص كبير */
+  padding: var(--space-md) var(--space-lg);               /* حشو أكبر */
+  min-height: var(--height-button-lg);                    /* ارتفاع أكبر */
+  font-weight: 600;                                       /* وزن أثقل */
+}
+
+/* زر عريض (ملء العرض) */
+.btnBlock,
+.btnFullWidth {
+  width: 100%;                                            /* ملء العرض الكامل */
+  justify-content: center;                                /* توسيط المحتوى */
+}
+
+/* ——— Button Groups ——— */
+
+/* مجموعة أزرار متتالية */
+.btnGroup {
+  display: flex;                                          /* ترتيب أفقي */
+  flex-wrap: wrap;                                        /* لف الأزرار عند الحاجة */
+  gap: var(--space-sm);                                   /* مسافة بين الأزرار */
+}
+
+.btnGroup .btn {
+  flex: 1;                                               /* توزيع متساوي */
+  min-width: 0;                                          /* السماح بالانكماش */
+}
+
+/* مجموعة أزرار متلاصقة */
+.btnGroupAttached {
+  display: flex;                                          /* ترتيب أفقي */
+  border-radius: var(--radius-md);                        /* زوايا دائرية للمجموعة */
+  overflow: hidden;                                       /* قطع الزوايا الداخلية */
+  box-shadow: var(--shadow-sm);                            /* ظل موحد للمجموعة */
+}
+
+.btnGroupAttached .btn {
+  border-radius: 0;                                       /* إزالة الزوايا الداخلية */
+  border-inline-start-width: 0;                          /* إزالة الحد الأيسر (بالـ RTL) */
+  position: relative;                                     /* للحدود المتداخلة */
+}
+
+.btnGroupAttached .btn:first-child {
+  border-inline-start-width: 1px;                        /* إرجاع حد البداية للأول */
+}
+
+.btnGroupAttached .btn:hover {
+  z-index: var(--z-base);                                /* رفع الزر فوق الباقي عند المرور */
+}
+
+/* ——— Icon Buttons ——— */
+
+/* زر أيقونة فقط */
+.btnIcon {
+  padding: var(--space-sm);                               /* حشو متساوي من كل الجهات */
+  min-width: var(--height-button-md);                     /* عرض مربع */
+  min-height: var(--height-button-md);                    /* ارتفاع مربع */
+  border-radius: 50%;                                     /* شكل دائري */
+}
+
+.btnIconSm {
+  padding: var(--space-xs);                               /* حشو أقل */
+  min-width: var(--height-button-sm);                     /* عرض أصغر */
+  min-height: var(--height-button-sm);                    /* ارتفاع أصغر */
+}
+
+.btnIconLg {
+  padding: var(--space-md);                               /* حشو أكبر */
+  min-width: var(--height-button-lg);                     /* عرض أكبر */
+  min-height: var(--height-button-lg);                    /* ارتفاع أكبر */
+}
+
+/* ——— Loading State ——— */
+
+/* زر في حالة تحميل */
+.btnLoading {
+  position: relative;                                     /* أساس للـ spinner */
+  color: transparent !important;                          /* إخفاء النص */
+  pointer-events: none;                                   /* منع التفاعل */
+}
+
+.btnLoading::after {
+  content: '';                                            /* محتوى فارغ */
+  position: absolute;                                     /* تموضع مطلق */
+  top: 50%;                                               /* منتصف عمودي */
+  left: 50%;                                              /* منتصف أفقي */
+  transform: translate(-50%, -50%);                       /* توسيط دقيق */
+  width: 16px;                                            /* عرض الـ spinner */
+  height: 16px;                                           /* ارتفاع الـ spinner */
+  border: 2px solid currentColor;                         /* حد بلون النص */
+  border-top-color: transparent;                          /* جعل الجزء العلوي شفاف */
+  border-radius: 50%;                                     /* شكل دائري */
+  animation: spin 1s linear infinite;                     /* حركة دوران */
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); } /* دوران كامل */
+}
+
+/* ——— Links as Buttons ——— */
+
+/* رابط منسق كزر */
+.linkBtn {
+  display: inline-flex;                                   /* نفس ترتيب الزر */
+  align-items: center;                                    /* محاذاة وسط */
+  justify-content: center;                                /* توسيط */
+  gap: var(--space-sm);                                   /* مسافة بين العناصر */
+  font-weight: 500;                                       /* وزن متوسط */
+  text-decoration: none;                                  /* بدون خط تحت */
+  padding: var(--space-sm) var(--space-md);              /* حشو مثل الزر */
+  border-radius: var(--radius-md);                       /* زوايا دائرية */
+  transition: all 0.2s ease;                             /* انتقال ناعم */
+  color: var(--color-primary);                           /* لون الأساسي */
+  border: 1px solid transparent;                         /* حد شفاف */
+}
+
+.linkBtn:hover {
+  background-color: var(--color-primary-light);          /* خلفية خفيفة عند المرور */
+  text-decoration: none;                                  /* عدم إضافة خط تحت */
+}
+
+/* ——— Responsive ——— */
+
+@media (max-width: var(--bp-tab)) {
+  /* تحسين الأزرار للشاشات الصغيرة */
+  .btn {
+    min-height: var(--height-button-lg);                  /* ارتفاع أكبر للمس */
+    font-size: var(--fs-md);                              /* حجم نص مريح */
+  }
+  
+  .btnSmall {
+    min-height: var(--height-button-md);                  /* الصغير يصير متوسط */
+  }
+  
+  /* مجموعات الأزرار تصير عمودية */
+  .btnGroup {
+    flex-direction: column;                               /* ترتيب عمودي */
+  }
+  
+  .btnGroupAttached {
+    flex-direction: column;                               /* ترتيب عمودي */
+  }
+  
+  .btnGroupAttached .btn {
+    border-inline-start-width: 1px;                      /* إرجاع الحد الجانبي */
+    border-top-width: 0;                                 /* إزالة الحد العلوي */
+  }
+  
+  .btnGroupAttached .btn:first-child {
+    border-top-width: 1px;                               /* إرجاع حد الأول */
+  }
+}
+
+@media (hover: none) {
+  /* إزالة تأثيرات المرور للشاشات اللمسية */
+  .btn:hover,
+  .btnPrimary:hover,
+  .btnSecondary:hover,
+  .btnOutline:hover,
+  .btnGhost:hover {
+    transform: none;                                      /* إزالة الحركة */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* تقليل الحركة للمستخدمين الذين يفضلون ذلك */
+  .btn,
+  .linkBtn {
+    transition: color 0.2s ease, background-color 0.2s ease; /* انتقال ألوان فقط */
+  }
+  
+  .btn:hover,
+  .btnPrimary:hover {
+    transform: none;                                      /* إزالة الحركة */
+  }
+  
+  .btnLoading::after {
+    animation: none;                                      /* إزالة الدوران */
+    content: '⏳';                                        /* رمز تحميل ثابت */
+    font-size: var(--fs-md);                             /* حجم مناسب */
+    border: none;                                        /* إزالة الحد */
+    width: auto;                                         /* عرض تلقائي */
+    height: auto;                                        /* ارتفاع تلقائي */
+  }
+}

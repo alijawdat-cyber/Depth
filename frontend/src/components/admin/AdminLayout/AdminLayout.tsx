@@ -7,7 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { AppHeader } from '../../molecules/AppHeader/AppHeader';
 import { AppSidebar } from '../../molecules/AppSidebar/AppSidebar';
 import { adminMenuData } from '../AdminMenuData';
-import styles from './AdminLayout.module.css';
+// يستخدم كلاسات عالمية معرفة في globals.css (adminShell, mainContent, ...)
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -63,20 +63,30 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <AppShell
-      header={{ height: 50 }}                                /* ارتفاع ثابت - Mantine ما يدعم CSS variables */
-      className={`${styles.adminShell} ${isMobile && sidebarOpened ? styles.isSidebarOpen : ''}`}
+      header={{ height: 50 }}
+      navbar={{ 
+        width: 250, 
+        breakpoint: 'sm',
+        collapsed: { mobile: !sidebarOpened, desktop: !sidebarOpened }
+      }}
+      className={`adminShell`}
       styles={{
         main: {
           minHeight: '100vh',
-          paddingTop: 'var(--header-height)',                /* إضافة مسافة من الأعلى لتجنب تداخل الهيدر */
-          // إلغاء تحريك المحتوى على الموبايل؛ السايدبار يغطي كأوفرلاي
           transition: 'none',
+          position: 'relative',
         },
         header: {
-          backgroundColor: 'var(--color-bg-primary)',        /* خلفية رئيسية من tokens.css */
-          borderBottom: '1px solid var(--color-border-primary)', /* حدود من tokens.css */
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderBottom: '1px solid var(--color-border-primary)',
           padding: 0,
-          zIndex: isMobile && sidebarOpened ? 1200 : 1100, // تقليل z-index عند فتح السايدبار
+          zIndex: 'var(--z-header)',
+        },
+        navbar: {
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderInlineEnd: '1px solid var(--color-border-primary)',
+          zIndex: 'var(--z-sidebar)',
+          padding: 0,
         },
       }}
     >
@@ -90,23 +100,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           onMenuClick={toggleSidebar}
           onNotificationsClick={() => console.log('فتح الإشعارات')}
           onLogout={handleLogoutClick}
-          hideBurger={!isMobile}
-          burgerOpened={isMobile && sidebarOpened}
+          hideBurger={false}
+          burgerOpened={sidebarOpened}
         />
       </AppShell.Header>
 
-      <AppShell.Main className={`${styles.mainContent} ${!isMobile ? styles.mainContentDesktopPushed : ''}`}>
-        {/* سايدبار: ديسكتوب ثابت دائمًا، وموبايل حسب الحالة */}
+      <AppShell.Navbar>
         <AppSidebar
           items={updatedMenuData}
           userRole="admin"
-          isOpen={!isMobile || sidebarOpened}
+          isOpen={sidebarOpened}
           onClose={closeSidebar}
           onItemClick={handleMenuItemClick}
         />
+      </AppShell.Navbar>
+
+      <AppShell.Main className="mainContent">
+        {/* تعتيم الخلفية عند فتح السايدبار - على الموبايل فقط */}
         {isMobile && sidebarOpened && (
-          <div
-            className={styles.mobileOverlay}
+          <div 
+            className="mobileOverlay" 
             onClick={closeSidebar}
           />
         )}

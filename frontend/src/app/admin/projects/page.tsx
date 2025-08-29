@@ -470,7 +470,7 @@ export default function ProjectsPage() {
 
   // دالة تنسيق العملة
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ', {
+    return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount) + ' د.ع';
@@ -478,7 +478,7 @@ export default function ProjectsPage() {
 
   // دالة تنسيق التاريخ
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-IQ', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

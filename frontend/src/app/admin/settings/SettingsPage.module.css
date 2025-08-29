@@ -297,7 +297,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: var(--z-tooltip);
   background: var(--color-bg-secondary);
   color: white;
   padding: var(--space-xs) var(--space-md);

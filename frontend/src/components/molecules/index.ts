@@ -2,4 +2,3 @@
 export * from "./AppHeader";
 export * from "./AppSidebar"; 
 export * from "./StatsCard";
-export * from "./UserMenu";

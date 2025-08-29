@@ -1,0 +1,36 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🔤 نظام الخطوط الموحد (Unified Font System)
+   الهدف: تعريف خط دبي العربي لكل المشروع مع fallback للإنجليزي
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* وزن عادي 400 — للنصوص العامة والفقرات */
+@font-face {
+  font-family: Dubai;                  /* اسم العائلة المستخدم في --font-ar */
+  src: url('/fonts/Dubai-Regular.woff2') format('woff2'); /* مسار مطلق من public */
+  font-weight: 400;                    /* وزن عادي للنصوص العامة */
+  font-style: normal;                  /* بدون ميلان */
+  font-display: swap;                  /* عرض بديل مؤقت ثم استبدال بدبي */
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0020-007E; /* عربي + لاتيني أساسي */
+}
+
+/* وزن متوسط 500 — للعناوين المتوسطة والأزرار */
+@font-face {
+  font-family: Dubai;
+  src: url('/fonts/Dubai-Medium.woff2') format('woff2');
+  font-weight: 500;                    /* وزن متوسط للعناوين الفرعية والأزرار */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0020-007E;
+}
+
+/* وزن عريض 700 — للعناوين البارزة والتأكيدات */
+@font-face {
+  font-family: Dubai;
+  src: url('/fonts/Dubai-Bold.woff2') format('woff2');
+  font-weight: 700;                    /* وزن ثقيل للعناوين الرئيسية والتأكيدات */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0020-007E;
+}

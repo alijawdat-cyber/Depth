@@ -411,11 +411,11 @@ export default function PaymentsPage() {
 
   // Utility Functions
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
+    return new Intl.NumberFormat('en-US').format(amount) + ' د.ع';
   };
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('ar-IQ', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -425,7 +425,7 @@ export default function PaymentsPage() {
   };
 
   const formatDateShort = (date: Date) => {
-    return new Intl.DateTimeFormat('ar-IQ', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'

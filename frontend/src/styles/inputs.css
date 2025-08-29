@@ -1,0 +1,423 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   📝 حقول الإدخال والنماذج (Inputs & Form Fields)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Base Input Styles ——— */
+.input,
+.textarea,
+.select {
+  /* Layout */
+  width: 100%;                                            /* ملء العرض الكامل */
+  min-height: var(--height-input-md);                     /* ارتفاع أدنى موحد */
+  padding: var(--space-sm) var(--space-md);               /* حشو داخلي مريح */
+  border-radius: var(--radius-md);                        /* زوايا دائرية متوسطة */
+  
+  /* Typography */
+  font-size: var(--fs-md);                                /* حجم نص عادي */
+  font-weight: 400;                                       /* وزن عادي */
+  line-height: 1.4;                                       /* تباعد مريح */
+  
+  /* Appearance */
+  background-color: var(--color-bg-primary);              /* خلفية بيضاء */
+  border: 1px solid var(--color-border-primary);          /* حد خفيف */
+  
+  /* Effects */
+  transition: all 0.2s ease;                              /* انتقال ناعم لكل الخصائص */
+  box-shadow: var(--shadow-inset);                         /* ظل داخلي خفيف */
+  
+  /* Behavior */
+  resize: none;                                           /* منع تغيير الحجم افتراضياً */
+  appearance: none;                                       /* إزالة الأنماط المتصفح */
+  -webkit-appearance: none;                               /* سفاري */
+  -moz-appearance: none;                                  /* فايرفوكس */
+}
+
+/* حالة التركيز */
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;                                          /* إزالة الإطار الافتراضي */
+  border-color: var(--color-primary);                     /* حد ملون */
+  box-shadow: 0 0 0 2px var(--color-primary-light);       /* هالة ملونة */
+  background-color: var(--color-bg-primary);              /* خلفية أوضح */
+}
+
+/* حالة التعطيل */
+.input:disabled,
+.textarea:disabled,
+.select:disabled {
+  background-color: var(--color-bg-tertiary);             /* خلفية رمادية */
+  color: var(--color-text-disabled);                      /* نص باهت */
+  cursor: not-allowed;                                    /* إشارة منع */
+  opacity: 0.7;                                           /* تقليل الوضوح */
+}
+
+/* نص العنصر النائب (placeholder) */
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-secondary);                     /* لون ثانوي */
+  opacity: 0.6;                                           /* شفافية خفيفة */
+  font-style: normal;                                     /* نمط عادي */
+}
+
+/* ——— Input Variants ——— */
+
+/* حقل نص متعدد الأسطر */
+.textarea {
+  min-height: var(--height-textarea);                     /* ارتفاع أكبر للـ textarea */
+  resize: vertical;                                       /* السماح بتغيير الارتفاع فقط */
+  line-height: 1.5;                                       /* تباعد أوسع للقراءة */
+}
+
+/* قائمة اختيار */
+.select {
+  cursor: pointer;                                        /* إشارة النقر */
+  padding-inline-end: var(--space-xl);                   /* مسافة للسهم */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M4.427 9.573l3.396-3.396a.25.25 0 01.354 0l3.396 3.396a.25.25 0 01-.177.427H4.604a.25.25 0 01-.177-.427z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;                           /* عدم تكرار الصورة */
+  background-position: left var(--space-md) center;       /* موضع السهم من اليسار */
+  background-size: 16px 16px;                             /* حجم السهم */
+}
+
+[dir="rtl"] .select {
+  background-position: right var(--space-md) center;      /* موضع السهم من اليمين في الـ RTL */
+}
+
+/* ——— Input States ——— */
+
+/* حالة الخطأ */
+.inputError,
+.input.error,
+.textarea.error,
+.select.error {
+  border-color: var(--color-error);                       /* حد أحمر */
+  box-shadow: 0 0 0 2px var(--color-error-light);         /* هالة حمراء */
+}
+
+.inputError:focus,
+.input.error:focus,
+.textarea.error:focus,
+.select.error:focus {
+  border-color: var(--color-error);                       /* حد أحمر عند التركيز */
+  box-shadow: 0 0 0 2px var(--color-error-light);         /* هالة حمراء */
+}
+
+/* حالة النجاح */
+.inputSuccess,
+.input.success,
+.textarea.success,
+.select.success {
+  border-color: var(--color-success);                     /* حد أخضر */
+  box-shadow: 0 0 0 2px var(--color-success-light);       /* هالة خضراء */
+}
+
+/* حالة التحذير */
+.inputWarning,
+.input.warning,
+.textarea.warning,
+.select.warning {
+  border-color: var(--color-warning);                     /* حد أصفر */
+  box-shadow: 0 0 0 2px var(--color-warning-light);       /* هالة صفراء */
+}
+
+/* ——— Input Sizes ——— */
+
+/* حقل صغير */
+.inputSmall,
+.inputSm,
+.textareaSmall,
+.selectSmall {
+  min-height: var(--height-input-sm);                     /* ارتفاع أصغر */
+  padding: var(--space-xs) var(--space-sm);               /* حشو أقل */
+  font-size: var(--fs-sm);                                /* حجم نص أصغر */
+  border-radius: var(--radius-sm);                        /* زوايا أصغر */
+}
+
+/* حقل كبير */
+.inputLarge,
+.inputLg,
+.textareaLarge,
+.selectLarge {
+  min-height: var(--height-input-lg);                     /* ارتفاع أكبر */
+  padding: var(--space-md) var(--space-lg);               /* حشو أكبر */
+  font-size: var(--fs-lg);                                /* حجم نص أكبر */
+  font-weight: 500;                                       /* وزن أثقل */
+}
+
+/* ——— Input Groups & Labels ——— */
+
+/* مجموعة حقل (تسمية + حقل + رسالة) */
+.inputGroup {
+  display: flex;                                          /* ترتيب مرن */
+  flex-direction: column;                                 /* ترتيب عمودي */
+  gap: var(--space-xs);                                   /* مسافة صغيرة بين العناصر */
+  width: 100%;                                            /* ملء العرض */
+}
+
+/* تسمية الحقل */
+.inputLabel {
+  font-size: var(--fs-sm);                                /* حجم صغير */
+  font-weight: 600;                                       /* وزن ثقيل */
+  margin-bottom: var(--space-xs);                         /* مسافة أسفل التسمية */
+  display: block;                                         /* عرض كامل */
+}
+
+/* تسمية مطلوبة */
+.inputLabel.required::after {
+  content: ' *';                                          /* علامة النجمة */
+  color: var(--color-error);                              /* لون أحمر */
+  font-weight: 400;                                       /* وزن عادي */
+}
+
+/* نص مساعد */
+.inputHelp {
+  font-size: var(--fs-xs);                                /* حجم صغير جداً */
+  color: var(--color-text-secondary);                     /* لون ثانوي */
+  line-height: 1.3;                                       /* تباعد ضيق */
+  margin-top: var(--space-xs);                            /* مسافة من الحقل */
+}
+
+/* رسالة خطأ */
+.inputError-message,
+.errorMessage {
+  font-size: var(--fs-xs);                                /* حجم صغير جداً */
+  color: var(--color-error);                              /* لون أحمر */
+  font-weight: 500;                                       /* وزن متوسط */
+  margin-top: var(--space-xs);                            /* مسافة من الحقل */
+  display: flex;                                          /* ترتيب مرن */
+  align-items: center;                                    /* محاذاة وسط */
+  gap: var(--space-xs);                                   /* مسافة بين الأيقونة والنص */
+}
+
+/* رسالة نجاح */
+.inputSuccess-message,
+.successMessage {
+  font-size: var(--fs-xs);                                /* حجم صغير جداً */
+  color: var(--color-success);                            /* لون أخضر */
+  font-weight: 500;                                       /* وزن متوسط */
+  margin-top: var(--space-xs);                            /* مسافة من الحقل */
+  display: flex;                                          /* ترتيب مرن */
+  align-items: center;                                    /* محاذاة وسط */
+  gap: var(--space-xs);                                   /* مسافة بين الأيقونة والنص */
+}
+
+/* ——— Input with Icons ——— */
+
+/* حاوية حقل مع أيقونة */
+.inputWithIcon {
+  position: relative;                                     /* أساس للأيقونة المطلقة */
+  display: flex;                                          /* ترتيب مرن */
+  align-items: center;                                    /* محاذاة وسط */
+}
+
+/* الحقل داخل الحاوية */
+.inputWithIcon .input,
+.inputWithIcon .select {
+  padding-inline-start: var(--space-xl);                 /* مسافة للأيقونة من البداية */
+}
+
+/* الأيقونة */
+.inputIcon {
+  position: absolute;                                     /* تموضع مطلق */
+  inset-inline-start: var(--space-md);                   /* موضع من البداية */
+  top: 50%;                                              /* منتصف عمودي */
+  transform: translateY(-50%);                           /* توسيط عمودي دقيق */
+  color: var(--color-text-secondary);                    /* لون ثانوي */
+  pointer-events: none;                                  /* عدم التدخل في النقر */
+  z-index: var(--z-base);                                /* فوق الحقل */
+}
+
+/* أيقونة في النهاية */
+.inputIconEnd {
+  inset-inline-end: var(--space-md);                     /* موضع من النهاية */
+  inset-inline-start: auto;                              /* إلغاء موضع البداية */
+}
+
+.inputWithIcon .input.iconEnd,
+.inputWithIcon .select.iconEnd {
+  padding-inline-end: var(--space-xl);                   /* مسافة للأيقونة من النهاية */
+  padding-inline-start: var(--space-md);                 /* حشو عادي من البداية */
+}
+
+/* ——— Special Input Types ——— */
+
+/* حقل البحث */
+.inputSearch {
+  padding-inline-start: var(--space-xl);                 /* مسافة لأيقونة البحث */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;                           /* عدم تكرار الأيقونة */
+  background-position: right var(--space-md) center;     /* موضع الأيقونة من اليمين */
+  background-size: 16px 16px;                             /* حجم الأيقونة */
+}
+
+[dir="rtl"] .inputSearch {
+  background-position: left var(--space-md) center;      /* موضع الأيقونة من اليسار في الـ RTL */
+}
+
+/* حقل كلمة المرور */
+.inputPassword {
+  padding-inline-end: var(--space-xl);                   /* مسافة لزر إظهار/إخفاء */
+}
+
+/* زر إظهار/إخفاء كلمة المرور */
+.passwordToggle {
+  position: absolute;                                     /* تموضع مطلق */
+  inset-inline-end: var(--space-md);                     /* موضع من النهاية */
+  top: 50%;                                              /* منتصف عمودي */
+  transform: translateY(-50%);                           /* توسيط عمودي دقيق */
+  background: none;                                      /* بدون خلفية */
+  border: none;                                          /* بدون حد */
+  color: var(--color-text-secondary);                    /* لون ثانوي */
+  cursor: pointer;                                       /* إشارة النقر */
+  padding: var(--space-xs);                              /* حشو صغير */
+  border-radius: var(--radius-sm);                       /* زوايا صغيرة */
+  transition: color 0.2s ease;                           /* انتقال ناعم */
+}
+
+.passwordToggle:hover {
+  background-color: var(--color-bg-tertiary);            /* خلفية خفيفة */
+}
+
+/* ——— File Input ——— */
+
+/* حقل رفع الملفات */
+.inputFile {
+  position: relative;                                     /* أساس للتخصيص */
+  cursor: pointer;                                       /* إشارة النقر */
+  overflow: hidden;                                      /* منع خروج العناصر */
+}
+
+/* إخفاء حقل الملف الأصلي */
+.inputFile input[type="file"] {
+  position: absolute;                                     /* تموضع مطلق */
+  opacity: 0;                                            /* شفاف تماماً */
+  width: 100%;                                           /* ملء العرض */
+  height: 100%;                                          /* ملء الارتفاع */
+  cursor: pointer;                                       /* إشارة النقر */
+}
+
+/* تنسيق منطقة الرفع */
+.fileDropZone {
+  border: 2px dashed var(--color-border-secondary);      /* حد متقطع */
+  border-radius: var(--radius-md);                       /* زوايا دائرية */
+  padding: var(--space-xl);                              /* حشو كبير */
+  text-align: center;                                    /* محاذاة وسط */
+  background-color: var(--color-bg-secondary);           /* خلفية ثانوية */
+  transition: all 0.2s ease;                             /* انتقال ناعم */
+  cursor: pointer;                                       /* إشارة النقر */
+}
+
+.fileDropZone:hover,
+.fileDropZone.dragover {
+  border-color: var(--color-primary);                    /* حد ملون عند المرور */
+  background-color: var(--color-primary-light);          /* خلفية ملونة خفيفة */
+}
+
+/* نص منطقة الرفع */
+.fileDropText {
+  color: var(--color-text-secondary);                    /* لون ثانوي */
+  font-size: var(--fs-md);                               /* حجم عادي */
+  margin-bottom: var(--space-sm);                        /* مسافة أسفل */
+}
+
+/* ——— Range Input (شريط التمرير) ——— */
+
+.inputRange {
+  -webkit-appearance: none;                               /* إزالة النمط الافتراضي */
+  appearance: none;                                       /* إزالة النمط الافتراضي */
+  height: 6px;                                           /* ارتفاع الشريط */
+  background: var(--color-bg-tertiary);                  /* خلفية الشريط */
+  border-radius: 3px;                                    /* زوايا دائرية */
+  outline: none;                                         /* بدون إطار */
+  cursor: pointer;                                       /* إشارة النقر */
+}
+
+/* مقبض الشريط */
+.inputRange::-webkit-slider-thumb {
+  -webkit-appearance: none;                               /* إزالة النمط الافتراضي */
+  appearance: none;                                       /* إزالة النمط الافتراضي */
+  height: 20px;                                          /* ارتفاع المقبض */
+  width: 20px;                                           /* عرض المقبض */
+  border-radius: 50%;                                    /* شكل دائري */
+  background: var(--color-primary);                      /* لون المقبض */
+  cursor: pointer;                                       /* إشارة النقر */
+  box-shadow: var(--shadow-sm);                          /* ظل خفيف */
+}
+
+.inputRange::-moz-range-thumb {
+  height: 20px;                                          /* ارتفاع المقبض فايرفوكس */
+  width: 20px;                                           /* عرض المقبض فايرفوكس */
+  border-radius: 50%;                                    /* شكل دائري */
+  background: var(--color-primary);                      /* لون المقبض */
+  cursor: pointer;                                       /* إشارة النقر */
+  border: none;                                          /* بدون حد */
+  box-shadow: var(--shadow-sm);                          /* ظل خفيف */
+}
+
+/* ——— Checkbox & Radio ——— */
+
+.inputCheckbox,
+.inputRadio {
+  width: 18px;                                           /* عرض ثابت */
+  height: 18px;                                          /* ارتفاع ثابت */
+  min-height: 18px;                                      /* ارتفاع أدنى */
+  margin: 0;                                             /* إزالة الهوامش */
+  cursor: pointer;                                       /* إشارة النقر */
+  accent-color: var(--color-primary);                    /* لون التمييز */
+}
+
+.inputRadio {
+  border-radius: 50%;                                    /* شكل دائري للراديو */
+}
+
+/* تسمية الـ checkbox والراديو */
+.checkboxLabel,
+.radioLabel {
+  display: flex;                                         /* ترتيب مرن */
+  align-items: center;                                   /* محاذاة وسط */
+  gap: var(--space-sm);                                  /* مسافة بين المربع والنص */
+  cursor: pointer;                                       /* إشارة النقر */
+  font-size: var(--fs-md);                               /* حجم عادي */
+  line-height: 1.4;                                      /* تباعد مريح */
+}
+
+/* ——— Responsive ——— */
+
+@media (max-width: var(--bp-tab)) {
+  /* تحسين الحقول للشاشات الصغيرة */
+  .input,
+  .textarea,
+  .select {
+    min-height: var(--height-input-lg);                  /* ارتفاع أكبر للمس */
+    font-size: var(--fs-md);                             /* حجم نص مريح */
+    padding: var(--space-md);                            /* حشو مريح للمس */
+  }
+  
+  .inputSmall {
+    min-height: var(--height-input-md);                  /* الصغير يصير متوسط */
+  }
+  
+  /* تحسين تسميات الحقول */
+  .inputLabel {
+    font-size: var(--fs-md);                             /* حجم أكبر للتسميات */
+    margin-bottom: var(--space-sm);                      /* مسافة أكبر */
+  }
+  
+  /* تحسين أزرار التبديل */
+  .passwordToggle {
+    padding: var(--space-sm);                            /* حشو أكبر للمس */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* تقليل الحركة للمستخدمين الذين يفضلون ذلك */
+  .input,
+  .textarea,
+  .select,
+  .fileDropZone,
+  .passwordToggle {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; /* انتقال ألوان فقط */
+  }
+}

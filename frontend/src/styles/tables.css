@@ -1,0 +1,456 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   📊 نظام الجداول الموحد - Depth Design System
+   الهدف: ملف مخصص لكل استايلات الجداول والبطاقات التي تحتوي على جداول
+   المبدأ: تجاوب كامل مع تحسينات للموبايل والتابلت واللابتوب
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ========== البطاقة الأساسية للجدول ========== */
+/* بطاقة الجدول - تدعم التمرير الأفقي والعرض الكامل */
+.card.table {
+  padding: 0 !important;               /* لا توجد مسافة داخلية - أولوية قصوى */
+  overflow-x: auto !important;         /* تمرير أفقي إجباري للجداول الطويلة */
+  overflow-y: hidden !important;       /* منع التمرير العمودي إجباري */
+  position: relative;                  /* لتموضع المؤشرات البصرية */
+  display: block !important;           /* تأكيد أن البطاقة بلوك لدعم التمرير */
+  max-width: 100% !important;          /* عدم تجاوز عرض الحاوي الأب */
+}
+
+/* ========== تطبيق التمرير على جدول Mantine ========== */
+.card.table .mantine-Table-table,
+.card.table .table,
+.card.table table {
+  width: 100%;                         /* استغلال العرض الكامل */
+  min-width: 850px !important;         /* حد أدنى للعرض - إجباري */
+  display: table !important;           /* ضمان عرض الجدول كجدول */
+  table-layout: auto;                  /* تخطيط تلقائي حسب المحتوى */
+  border-spacing: 0;                   /* إزالة المسافات بين الخلايا */
+  border-collapse: separate;           /* فصل الحدود */
+}
+
+/* ========== تحسين مظهر الجدول العام ========== */
+.card.table .mantine-Table-thead,
+.card.table thead {
+  background: var(--color-bg-secondary); /* خلفية للرأس */
+  position: sticky;                    /* تثبيت الرأس عند التمرير */
+  top: 0;                             /* موضع التثبيت */
+  z-index: var(--z-sticky);                  /* للعناصر المثبتة = 20 */
+}
+
+.card.table .mantine-Table-tr:hover,
+.card.table tr:hover {
+  background: var(--color-bg-tertiary) !important; /* تمييز الصف عند المرور */
+  transition: background-color 0.2s ease; /* تأثير ناعم */
+}
+
+/* ========== استايلات الخلايا الأساسية ========== */
+.card.table .mantine-Table-td,
+.card.table .mantine-Table-th,
+.card.table td,
+.card.table th {
+  white-space: nowrap !important;      /* منع كسر المحتوى في الخلايا */
+  overflow: visible;                   /* إظهار المحتوى الزائد للمسافات */
+  text-align: center !important;       /* محاذاة في المنتصف */
+  min-width: 120px;                    /* حد أدنى لعرض الخلايا */
+  padding: var(--space-sm) var(--space-md); /* مسافات أكبر بين الأعمدة */
+  vertical-align: middle !important;   /* محاذاة وسطية */
+  line-height: 1.2;                    /* ارتفاع سطر أقل */
+  font-size: var(--fs-sm);             /* نص أصغر افتراضياً */
+  border-right: 3px solid transparent; /* مسافة أكبر بين الأعمدة */
+}
+
+/* ========== ضمان محاذاة مركزية لكل العناصر داخل الخلايا ========== */
+.card.table .mantine-Table-td *,
+.card.table .mantine-Table-th *,
+.card.table td *,
+.card.table th * {
+  text-align: center !important;       /* كل النصوص في المنتصف */
+  justify-content: center !important;  /* كل العناصر المرنة في المنتصف */
+  align-items: center !important;      /* كل العناصر محاذية وسطياً */
+  margin: 0 auto !important;           /* توسيط تلقائي */
+}
+
+/* ========== ترتيب أفقي للعناصر داخل الخلايا ========== */
+.card.table .mantine-Group-root,
+.card.table .mantine-Stack-root,
+.card.table .group,
+.card.table .stack {
+  display: flex !important;            /* ترتيب مرن */
+  flex-direction: row !important;      /* اتجاه أفقي - العناصر جنب بعض */
+  align-items: center !important;      /* محاذاة وسطية */
+  justify-content: center !important;  /* توسيط المحتوى */
+  gap: 2px !important;                 /* مسافة صغيرة جداً بين العناصر */
+  flex-wrap: nowrap !important;        /* عدم كسر السطر */
+  min-height: auto !important;         /* ارتفاع تلقائي */
+  margin: 0 auto !important;           /* توسيط في الخلية */
+  width: 100%;                         /* عرض كامل */
+}
+
+/* ========== توسيط خاص للشارات - موحد لكل الشاشات ========== */
+.card.table .mantine-Badge-root,
+.card.table .badge {
+  /* الأساسيات */
+  display: inline-flex !important;     /* flex لضمان توسيط النص داخلياً */
+  align-items: center !important;      /* محاذاة النص في الوسط عمودياً */
+  justify-content: center !important;  /* محاذاة النص في الوسط أفقياً */
+  text-align: center !important;       /* نص في المنتصف */
+  
+  /* الأبعاد المتجاوبة - موحدة وبدون قص */
+  min-height: 20px !important;         /* ارتفاع مناسب */
+  max-height: 24px !important;         /* حد أقصى للارتفاع */
+  min-width: 50px !important;          /* حد أدنى أكبر للعرض */
+  max-width: 120px !important;         /* حد أقصى أكبر لمنع القص */
+  width: auto !important;              /* عرض تلقائي حسب النص */
+  
+  /* النصوص والخطوط - بدون قص */
+  font-size: 11px !important;          /* حجم نص مناسب */
+  font-weight: 500 !important;         /* وزن متوسط */
+  line-height: 1.2 !important;         /* ارتفاع سطر مناسب */
+  white-space: nowrap !important;      /* منع كسر النص */
+  overflow: hidden !important;         /* إخفاء النص الزائد */
+  text-overflow: ellipsis !important;  /* نقاط عند القص */
+  
+  /* الحشو والمسافات - مناسبة */
+  padding: 2px 8px !important;         /* حشو مناسب لمنع القص */
+  margin: 1px auto !important;         /* توسيط الشارة مع مسافة صغيرة */
+  
+  /* الشكل - زوايا مستديرة أكثر */
+  border-radius: 8px !important;       /* زوايا مستديرة أكثر */
+  border: 1px solid transparent !important;   /* حد شفاف افتراضي */
+  
+  /* الانتقالات */
+  transition: all 0.2s ease !important;       /* انتقال ناعم */
+  
+  /* إزالة أي حشو إضافي من Mantine */
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+}
+
+/* ========== إجبار توحيد الباجات - قاعدة قوية ========== */
+.card.table .mantine-Badge-root[data-variant],
+.card.table .mantine-Badge-root:not([data-variant]) {
+  /* إجبار الأبعاد الموحدة بغض النظر عن النوع */
+  min-height: 20px !important;
+  max-height: 24px !important;
+  min-width: 50px !important;
+  max-width: 120px !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  border-radius: 8px !important;         /* زوايا مستديرة أكثر */
+  
+  /* منع قص النص */
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  
+  /* إجبار النص على التوسط */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* ========== توسيط النجوم والتقييمات ========== */
+.card.table .mantine-Rating-root {
+  font-size: var(--fs-sm) !important; /* نجوم أصغر */
+  gap: 2px !important;
+  margin: 0 auto !important;           /* توسيط النجوم */
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* ========== تصغير وتوسيط الأفاتار والأيقونات ========== */
+.card.table .mantine-Avatar-root {
+  width: 28px !important;              /* أفاتار أصغر */
+  height: 28px !important;
+  min-width: 28px !important;
+  font-size: var(--fs-xs) !important;
+  margin: 0 auto !important;           /* توسيط الأفاتار */
+}
+
+.card.table .mantine-ActionIcon-root {
+  width: 24px !important;              /* أيقونات أصغر */
+  height: 24px !important;
+  min-width: 24px !important;
+  margin: 0 auto !important;           /* توسيط الأيقونات */
+}
+
+/* ========== مؤشر بصري للتمرير الأفقي على الشاشات الصغيرة ========== */
+@media (max-width: 1023px) {
+  .card.table::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to left, var(--color-bg-primary), transparent);
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+  .card.table:hover::after {
+    opacity: 0.3; /* يقل الوضوح عند المرور لإظهار المحتوى */
+  }
+}
+
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   📱 التحسينات المتجاوبة للجداول (Responsive Table Optimizations)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ========== الموبايل الصغير (320px+) ========== */
+@media (min-width: 320px) {
+  /* تحسين الجداول للموبايل الصغير */
+  .card.table {
+    -webkit-overflow-scrolling: touch !important; /* تمرير ناعم لـ iOS Safari */
+    scrollbar-width: thin !important; /* شريط تمرير رفيع للفايرفوكس */
+    scroll-behavior: smooth;          /* تمرير ناعم */
+  }
+  
+  /* تحسين مظهر شريط التمرير */
+  .card.table::-webkit-scrollbar {
+    height: 6px !important;           /* ارتفاع أكبر قليلاً للمس */
+    background: transparent;          /* خلفية شفافة */
+  }
+  .card.table::-webkit-scrollbar-track {
+    background: var(--color-bg-tertiary); /* لون خلفية المسار */
+    border-radius: var(--radius-sm);  /* زوايا مدورة */
+  }
+  .card.table::-webkit-scrollbar-thumb {
+    background: var(--color-primary); /* لون العلامة التجارية */
+    border-radius: var(--radius-sm);  /* زوايا مدورة */
+    min-width: 40px;                  /* حد أدنى للمقبض */
+  }
+  .card.table::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-hover); /* لون أغمق عند المرور */
+  }
+  
+  /* تقليل العرض الأدنى للموبايل لتفعيل التمرير */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 700px !important;      /* عرض أقل للموبايل لضمان التمرير */
+  }
+  
+  /* تصغير النصوص والعناصر للموبايل الصغير */
+  .card.table .mantine-Table-td,
+  .card.table .mantine-Table-th,
+  .card.table td,
+  .card.table th {
+    font-size: 11px !important;       /* نص صغير جداً */
+    padding: 8px 12px !important;     /* مسافات أكبر لمنع التداخل */
+    line-height: 1.1 !important;      /* ارتفاع سطر أقل */
+    text-align: center !important;    /* محاذاة وسط للموبايل */
+    min-width: 90px !important;       /* عرض أكبر لمنع التداخل */
+    border-right: 4px solid transparent !important; /* مسافة أكبر بين الأعمدة */
+    white-space: normal !important;   /* السماح بكسر النص إذا ضروري */
+    word-wrap: break-word !important; /* كسر الكلمات الطويلة */
+  }
+  
+  /* ضمان توسيط كل المحتوى في الموبايل */
+  .card.table .mantine-Table-td *,
+  .card.table td * {
+    margin: 0 auto !important;         /* توسيط تلقائي لكل العناصر */
+    text-align: center !important;     /* نص في المنتصف */
+    justify-content: center !important; /* flexbox في المنتصف */
+  }
+  
+  .card.table .mantine-Avatar-root {
+    width: 24px !important;            /* أفاتار أصغر للموبايل */
+    height: 24px !important;
+    min-width: 24px !important;
+    font-size: 10px !important;
+  }
+  
+  .card.table .mantine-Badge-root {
+    font-size: 9px !important;        /* شارات صغيرة جداً - كما هو */
+    padding: 1px 4px !important;      /* حشو صغير كما هو */
+    min-height: 16px !important;      /* ارتفاع صغير كما هو */
+    /* الباقي يرث من الكلاس العام */
+  }
+}
+
+/* ========== الأندرويد الشائع (360px+) ========== */
+@media (min-width: 360px) {
+  /* تحسين النصوص للأندرويد الشائع */
+  .card.table .mantine-Table-td,
+  .card.table .mantine-Table-th,
+  .card.table td,
+  .card.table th {
+    font-size: var(--fs-xs) !important; /* 12px للأندرويد */
+    padding: 10px 14px !important;     /* مسافات أكبر للأندرويد */
+    text-align: center !important;     /* محاذاة وسط */
+    min-width: 100px !important;       /* عرض أكبر قليلاً */
+    border-right: 3px solid transparent !important; /* مسافة بين الأعمدة */
+  }
+  
+  /* ضمان توسيط المحتوى في الأندرويد */
+  .card.table .mantine-Table-td *,
+  .card.table td * {
+    margin: 0 auto !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  
+  .card.table .mantine-Avatar-root {
+    width: 26px !important;            /* أفاتار أكبر قليلاً */
+    height: 26px !important;
+    min-width: 26px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ========== التابلت (600px+) ========== */
+@media (min-width: 600px) {
+  /* تحسين الجداول للتابلت */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 750px !important;      /* عرض مناسب للتابلت */
+  }
+  
+  /* تحسين النصوص والعناصر للتابلت */
+  .card.table .mantine-Table-td,
+  .card.table .mantine-Table-th,
+  .card.table td,
+  .card.table th {
+    font-size: var(--fs-sm) !important; /* 14px للتابلت */
+    padding: 12px 16px !important;     /* مسافات مريحة للتابلت */
+    text-align: center !important;     /* محاذاة وسط للتابلت */
+    min-width: 110px !important;       /* عرض مناسب */
+    border-right: 3px solid transparent !important; /* مسافة بين الأعمدة */
+  }
+  
+  /* ضمان توسيط المحتوى في التابلت */
+  .card.table .mantine-Table-td *,
+  .card.table td * {
+    margin: 0 auto !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  
+  .card.table .mantine-Avatar-root {
+    width: 32px !important;            /* أفاتار مناسب للتابلت */
+    height: 32px !important;
+    min-width: 32px !important;
+    font-size: var(--fs-sm) !important;
+  }
+  
+  /* ضمان الترتيب الأفقي في التابلت */
+  .card.table .mantine-Group-root,
+  .card.table .mantine-Stack-root {
+    flex-direction: row !important;     /* ترتيب أفقي للتابلت */
+    gap: 2px !important;                /* مسافة صغيرة جداً بين العناصر */
+  }
+}
+
+/* ========== الشاشات الكبيرة (1024px+) - لابتوب ========== */
+@media (min-width: 1024px) {
+  /* تحسين الجداول للشاشات الكبيرة */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 900px !important;      /* عرض أكبر للاستفادة من المساحة */
+  }
+  
+  /* استعادة الأحجام الطبيعية للشاشات الكبيرة */
+  .card.table .mantine-Table-td,
+  .card.table .mantine-Table-th,
+  .card.table td,
+  .card.table th {
+    font-size: var(--fs-md) !important; /* حجم طبيعي 16px */
+    padding: var(--space-md) var(--space-lg) !important; /* مسافات مريحة للشاشات الكبيرة */
+    text-align: center !important;    /* محاذاة وسط للشاشات الكبيرة */
+    min-width: 120px !important;       /* عرض أكبر للشاشات الكبيرة */
+  }
+  
+  /* تقليل المسافات بين العناصر في الخلايا للابتوب - أفقياً */
+  .card.table .mantine-Group-root,
+  .card.table .mantine-Stack-root,
+  .card.table .group,
+  .card.table .stack {
+    gap: 2px !important;              /* مسافة صغيرة جداً بين العناصر */
+    flex-direction: row !important;   /* ترتيب أفقي للابتوب */
+  }
+  
+  /* تحسين خاص للأفاتار في اللابتوب */
+  .card.table .mantine-Avatar-root {
+    width: 32px !important;            /* أفاتار أصغر قليلاً */
+    height: 32px !important;
+    min-width: 32px !important;
+    margin-right: 3px !important;      /* مسافة صغيرة بعد الأفاتار */
+    margin-left: 0 !important;
+  }
+  
+  /* تحسين خاص للتقييم والنجوم في اللابتوب */
+  .card.table .mantine-Rating-root {
+    gap: 1px !important;               /* مسافة صغيرة جداً بين النجوم */
+    margin-right: 2px !important;      /* مسافة صغيرة بعد النجوم */
+    font-size: var(--fs-sm) !important; /* نجوم أصغر */
+  }
+  
+  /* تحسين النص بجانب النجوم والأرقام */
+  .card.table .mantine-Rating-root + *,
+  .card.table .mantine-Text-root {
+    margin-left: 2px !important;       /* مسافة صغيرة جداً */
+    font-size: var(--fs-sm) !important; /* نص أصغر */
+  }
+}
+
+/* ========== الديسكتوب القياسي (1280px+) ========== */
+@media (min-width: 1280px) {
+  /* تحسين الجداول للشاشات الكبيرة */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 1000px !important;     /* استغلال العرض الكامل للابتوب */
+  }
+  
+  /* تحسينات إضافية للديسكتوب - باجات موحدة وصغيرة */
+  .card.table .mantine-Badge-root,
+  .card.table .badge {
+    /* أبعاد موحدة وصغيرة للديسكتوب */
+    min-height: 18px !important;      /* ارتفاع صغير للديسكتوب */
+    max-height: 20px !important;      /* حد أقصى صغير */
+    padding: 1px 6px !important;      /* حشو صغير للديسكتوب */
+    font-size: 10px !important;       /* نص صغير للديسكتوب */
+    min-width: 36px !important;       /* عرض أصغر */
+    max-width: 72px !important;       /* حد أقصى أصغر */
+    
+    /* ضمان التوحيد الكامل */
+    box-sizing: border-box !important; /* حساب الحشو في الأبعاد */
+    vertical-align: middle !important; /* محاذاة وسط مع باقي العناصر */
+    border-radius: 3px !important;     /* زوايا صغيرة موحدة */
+  }
+  
+  /* تحسين المسافات بين العناصر للديسكتوب - أفقياً */
+  .card.table .mantine-Group-root,
+  .card.table .mantine-Stack-root {
+    gap: 2px !important;              /* مسافة صغيرة جداً للديسكتوب */
+    flex-direction: row !important;   /* ترتيب أفقي للديسكتوب */
+  }
+}
+
+/* ========== الديسكتوب الكبير (1536px+) ========== */
+@media (min-width: 1536px) {
+  /* استغلال أقصى للشاشات الكبيرة */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 1200px !important;     /* عرض كامل للشاشات الكبيرة */
+  }
+}
+
+/* ========== شاشات Full HD (1920px+) ========== */
+@media (min-width: 1920px) {
+  /* استغلال كامل لشاشات Full HD */
+  .card.table .mantine-Table-table,
+  .card.table .table,
+  .card.table table {
+    min-width: 1400px !important;     /* عرض أكبر للشاشات العريضة */
+  }
+}

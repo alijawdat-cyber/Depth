@@ -413,7 +413,7 @@ export default function CreatorAssignmentPage() {
             </Badge>
             {candidate.availability.startDate && (
               <Text size="xs" c="dimmed" mt={2}>
-                من {new Date(candidate.availability.startDate).toLocaleDateString('ar')}
+                من {new Date(candidate.availability.startDate).toLocaleDateString('en-US')}
               </Text>
             )}
           </div>
@@ -432,10 +432,10 @@ export default function CreatorAssignmentPage() {
         <td>
           <div className={styles.pricingInfo}>
             <Text size="sm" fw={600}>
-              {candidate.pricing.finalRate.toLocaleString()} د.ع
+              {new Intl.NumberFormat('en-US').format(candidate.pricing.finalRate)} د.ع
             </Text>
             <Text size="xs" c="dimmed">
-              أساسي: {candidate.pricing.baseRate.toLocaleString()}
+              أساسي: {new Intl.NumberFormat('en-US').format(candidate.pricing.baseRate)}
             </Text>
           </div>
         </td>
@@ -625,7 +625,7 @@ export default function CreatorAssignmentPage() {
                   </div>
                   <div>
                     <Text size="xs" c="dimmed">الميزانية</Text>
-                    <Text size="sm">{project.budget.toLocaleString()} د.ع</Text>
+                    <Text size="sm">{new Intl.NumberFormat('en-US').format(project.budget)} د.ع</Text>
                   </div>
                   <div>
                     <Text size="xs" c="dimmed">المدة</Text>

@@ -22,9 +22,8 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useMantineColorScheme } from '@mantine/core';
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import styles from './AppSidebar.module.css';
 
-// أنواع عناصر القائمة
+// يستخدم كلاسات عالمية معرفة في globals.css (sidebar, sidebarMenuItem, ...)
 export type MenuItemType = 'link' | 'group' | 'divider';
 
 // عنصر القائمة الأساسي
@@ -285,12 +284,12 @@ const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
   const [opened, { toggle }] = useDisclosure(false);
 
   if (item.type === 'divider') {
-    return <Divider className={styles.divider} />;
+    return <Divider className="sidebarDivider" />;
   }
 
   if (item.type === 'group') {
     return (
-      <div className={styles.menuGroup}>
+      <div className="sidebarMenuGroup">
         <Button
           variant="ghost"
           fullWidth
@@ -301,7 +300,7 @@ const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
               opened ? <ChevronDown size={16} /> : <ChevronRight size={16} />
             )
           }
-          className={styles.groupButton}
+          className="sidebarGroupButton"
           onClick={toggle}
         >
           <Text size="sm" fw={500}>
@@ -310,7 +309,7 @@ const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
         </Button>
         
         <Collapse in={opened}>
-          <div className={styles.groupChildren}>
+          <div className="sidebarGroupChildren">
             {item.children?.map((child) => (
               <MenuItemComponent
                 key={child.id}
@@ -327,19 +326,19 @@ const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
 
   return (
     <Button
-      variant={item.isActive ? "primary" : "ghost"}
+      variant="ghost"
       fullWidth
       justify="flex-start"
       leftSection={item.icon && <item.icon size={18} />}
       rightSection={
         item.badge && (
-          <span className={`${styles.badge} ${item.isNew ? styles.badgeNew : ''}`}>
+          <span className={`sidebarBadge ${item.isNew ? 'sidebarBadgeNew' : ''}`}>
             {item.badge}
           </span>
         )
       }
-      className={`${styles.menuItem} ${item.isActive ? styles.activeItem : ''} ${
-        level > 0 ? styles.childItem : ''
+      className={`sidebarMenuItem ${item.isActive ? 'activeItem' : ''} ${
+        level > 0 ? 'childItem' : ''
       }`}
       onClick={() => onItemClick?.(item)}
     >
@@ -379,11 +378,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   };
 
   return (
-    <div className={`${styles.sidebar} ${isOpen ? styles.open : ''} ${className || ''}`}>
-      <ScrollArea className={styles.scrollArea}>
+    <div className="sidebarMantine">
+      <ScrollArea h="100%" className="sidebarScrollArea">
         <Stack gap="xs" p="md">
           {/* مكون تبديل الثيم */}
-          <Box className={styles.themeToggleContainer}>
+          <Box className="sidebarThemeToggleContainer">
             <ActionIcon
               onClick={toggleColorScheme}
               variant="light"
@@ -394,7 +393,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </Box>
           
           {/* فاصل */}
-          <Divider className={styles.divider} />
+          <Divider className="sidebarDivider" />
           
           {filteredItems.map((item) => (
             <MenuItemComponent

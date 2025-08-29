@@ -546,7 +546,7 @@ export default function PricingPage() {
 
   // تنسيق العملة
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-IQ', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'IQD',
       minimumFractionDigits: 0,

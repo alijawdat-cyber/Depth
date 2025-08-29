@@ -11,7 +11,9 @@ import {
   Modal,
   Select,
   Table,
-  Badge
+  Badge,
+  Avatar,
+  Title
 } from '@mantine/core';
 import { 
   Users, 
@@ -24,8 +26,6 @@ import {
 
 // استيراد المكونات الموجودة
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-
-import styles from './UsersPage.module.css';
 
 // Types للمستخدمين
 interface User extends Record<string, unknown> {
@@ -166,10 +166,10 @@ export default function UsersPage() {
       render: (_, row) => {
         const user = row as User;
         return (
-          <Group gap="sm">
-            <div className={styles.userAvatar}>
+          <Group>
+            <Avatar size="sm" radius="xl">
               {user.name.charAt(0)}
-            </div>
+            </Avatar>
             <div>
               <Text fw={500} size="sm">{user.name}</Text>
               <Text size="xs" c="dimmed">{user.email}</Text>
@@ -219,7 +219,7 @@ export default function UsersPage() {
       key: 'projects',
       label: 'المشاريع',
       render: (value) => (
-        <Text size="sm" ta="center">
+        <Text size="sm">
           {(value as number) || 0}
         </Text>
       )
@@ -232,7 +232,7 @@ export default function UsersPage() {
         const date = value as Date;
         return (
           <Text size="xs" c="dimmed">
-            {date.toLocaleDateString('ar-IQ')}
+            {date.toLocaleDateString('en-US')}
           </Text>
         );
       }
@@ -243,7 +243,7 @@ export default function UsersPage() {
       render: (_, row) => {
         const user = row as User;
         return (
-          <Group gap={4} justify="center">
+          <Group>
             <ActionIcon
               size="sm"
               variant="subtle"
@@ -312,98 +312,96 @@ export default function UsersPage() {
   };
 
   return (
-    <div className={styles.usersPage}>
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <Text size="xl" fw={700} className={styles.pageTitle}>
+    <>
+      {/* Header - يستخدم الكلاسات العالمية من globals.css مع دعم الأزرار */}
+      <div className="pageHeader withActions">
+        <div className="pageHeaderContent">
+          <Title order={1} className="pageTitle">
             إدارة المستخدمين
-          </Text>
-          <Text size="sm" c="dimmed">
+          </Title>
+          <Text className="pageDescription">
             إدارة كل المستخدمين المسجلين في المنصة
           </Text>
         </div>
-        <Button
-          leftSection={<UserPlus size={16} />}
-          onClick={handleCreateUser}
-        >
-          إضافة مستخدم
-        </Button>
+        <div className="pageHeaderActions">
+          <Button
+            leftSection={<UserPlus size={16} />}
+            onClick={handleCreateUser}
+          >
+            إضافة مستخدم
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className={styles.statsSection}>
-        <Grid>
-          <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
-            <StatsCard
-              title="إجمالي المستخدمين"
-              value={stats.total.toString()}
-              icon={<Users size={20} />}
-              color="primary"
-              clickable
-              onClick={() => console.log('عرض كل المستخدمين')}
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
-            <StatsCard
-              title="المستخدمين النشطين"
-              value={stats.active.toString()}
-              icon={<Users size={20} />}
-              color="success"
-              trend={{
-                value: 8,
-                direction: 'up',
-                label: 'نمو هذا الشهر'
-              }}
-              clickable
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
-            <StatsCard
-              title="المبدعين"
-              value={stats.creators.toString()}
-              icon={<Shield size={20} />}
-              color="info"
-              clickable
-              onClick={() => setRoleFilter('creator')}
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
-            <StatsCard
-              title="العملاء"
-              value={stats.clients.toString()}
-              icon={<Users size={20} />}
-              color="warning"
-              clickable
-              onClick={() => setRoleFilter('client')}
-            />
-          </Grid.Col>
-        </Grid>
-      </div>
+      <Grid className="statsGrid">
+        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
+          <StatsCard
+            title="إجمالي المستخدمين"
+            value={stats.total.toString()}
+            icon={<Users size={20} />}
+            color="primary"
+            clickable
+            onClick={() => console.log('عرض كل المستخدمين')}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
+          <StatsCard
+            title="المستخدمين النشطين"
+            value={stats.active.toString()}
+            icon={<Users size={20} />}
+            color="success"
+            trend={{
+              value: 8,
+              direction: 'up',
+              label: 'نمو هذا الشهر'
+            }}
+            clickable
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
+          <StatsCard
+            title="المبدعين"
+            value={stats.creators.toString()}
+            icon={<Shield size={20} />}
+            color="info"
+            clickable
+            onClick={() => setRoleFilter('creator')}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
+          <StatsCard
+            title="العملاء"
+            value={stats.clients.toString()}
+            icon={<Users size={20} />}
+            color="warning"
+            clickable
+            onClick={() => setRoleFilter('client')}
+          />
+        </Grid.Col>
+      </Grid>
 
       {/* Filters */}
-      <div className={styles.filtersSection}>
+      <div className="card section filters">
         <Group gap="md">
           <Select
             placeholder="فلترة حسب الدور"
             data={roleOptions}
             value={roleFilter}
             onChange={(value) => setRoleFilter(value || 'all')}
-            className={styles.filterSelect}
           />
           <Select
             placeholder="فلترة حسب الحالة"
             data={statusOptions}
             value={statusFilter}
             onChange={(value) => setStatusFilter(value || 'all')}
-            className={styles.filterSelect}
           />
         </Group>
       </div>
 
       {/* Users Table */}
-      <div className={styles.tableSection}>
-        <Table striped highlightOnHover withTableBorder>
+      <div className="card table">
+        <Table>
           <Table.Thead>
             <Table.Tr>
               {columns.map((column) => (
@@ -414,7 +412,7 @@ export default function UsersPage() {
           <Table.Tbody>
             {filteredUsers.length === 0 ? (
               <Table.Tr>
-                <Table.Td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                <Table.Td colSpan={columns.length}>
                   <Text c="dimmed">لا توجد مستخدمين</Text>
                 </Table.Td>
               </Table.Tr>
@@ -422,7 +420,6 @@ export default function UsersPage() {
               filteredUsers.map((row) => (
                 <Table.Tr 
                   key={row.id} 
-                  style={{ cursor: 'pointer' }}
                   onClick={() => handleViewUser(row)}
                 >
                   {columns.map((column) => (
@@ -468,6 +465,6 @@ export default function UsersPage() {
           </Group>
         </Stack>
       </Modal>
-    </div>
+    </>
   );
 }

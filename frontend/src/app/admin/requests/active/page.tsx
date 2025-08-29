@@ -15,17 +15,15 @@ import {
   ActionIcon,
   Card,
   Table,
-  Pagination,
-  Box,
   Avatar,
   SimpleGrid,
+  Grid,
   Progress,
   RingProgress,
   Tooltip,
   Alert
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import styles from './ActiveRequestsPage.module.css';
 import { 
   Search, 
   Filter, 
@@ -598,18 +596,17 @@ const ActiveRequestsPage: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    if (amount === 0) return '0 د.ع';
+    if (amount === 0) return '0 IQD';
     if (amount >= 1000000) {
-      return `${(amount / 1000000).toFixed(1)}M د.ع`;
+      return `${(amount / 1000000).toFixed(1)}M IQD`;
+    } else if (amount >= 1000) {
+      return `${(amount / 1000).toFixed(0)}K IQD`;
     }
-    if (amount >= 1000) {
-      return `${Math.round(amount / 1000)}K د.ع`;
-    }
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
+    return `${new Intl.NumberFormat('en-US').format(amount)} IQD`;
   };
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('ar-IQ', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -898,109 +895,101 @@ const ActiveRequestsPage: React.FC = () => {
   };
 
   return (
-    <Container size="xl" className={styles.container}>
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <Group justify="apart">
-          <div>
-            <Title order={1} className={styles.pageTitle}>
-              إدارة الطلبات النشطة
-            </Title>
-            <Text className={styles.pageDescription}>
-              متابعة وإدارة المشاريع قيد التنفيذ مع أدوات تعيين المبدعين ومراقبة التقدم
-            </Text>
-          </div>
+    <Container fluid p="xl">
+      {/* Header - يستخدم الكلاسات العالمية من globals.css مع دعم الأزرار */}
+      <div className="pageHeader withActions">
+        <div className="pageHeaderContent">
+          <Title order={1} className="pageTitle">
+            إدارة الطلبات النشطة
+          </Title>
+          <Text className="pageDescription">
+            متابعة وإدارة المشاريع قيد التنفيذ مع أدوات تعيين المبدعين ومراقبة التقدم
+          </Text>
+        </div>
+        <div className="pageHeaderActions">
           <Button leftSection={<RefreshCw size={16} />} variant="light">
             تحديث البيانات
           </Button>
-        </Group>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <SimpleGrid cols={{ base: 2, xs: 3, lg: 6 }} className={styles.statsGrid}>
+      <Grid className="statsGrid">
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
-      </SimpleGrid>
+      </Grid>
 
       {/* Filters */}
-      <div className={styles.filters}>
-        <Group justify="space-between" className={styles.filtersHeader}>
-          <Group gap="md">
-            <TextInput
-              placeholder="البحث في المشاريع..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.currentTarget.value)}
-              leftSection={<Search size={16} />}
-              className={styles.searchInput}
-            />
-            
-            <Select
-              placeholder="المرحلة"
-              value={phaseFilter}
-              onChange={setPhaseFilter}
-              data={[
-                { value: '', label: 'جميع المراحل' },
-                { value: 'planning', label: 'تخطيط' },
-                { value: 'production', label: 'إنتاج' },
-                { value: 'review', label: 'مراجعة' },
-                { value: 'delivery', label: 'تسليم' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="حالة الصحة"
-              value={healthFilter}
-              onChange={setHealthFilter}
-              data={[
-                { value: '', label: 'جميع الحالات' },
-                { value: 'on_track', label: 'مستقر' },
-                { value: 'at_risk', label: 'معرض للخطر' },
-                { value: 'delayed', label: 'متأخر' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="نوع الخدمة"
-              value={categoryFilter}
-              onChange={setCategoryFilter}
-              data={[
-                { value: '', label: 'جميع الأنواع' },
-                { value: 'photo', label: 'تصوير' },
-                { value: 'video', label: 'فيديو' },
-                { value: 'design', label: 'تصميم' },
-                { value: 'editing', label: 'مونتاج' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="المبدع"
-              value={creatorFilter}
-              onChange={setCreatorFilter}
-              data={[
-                { value: '', label: 'الجميع' },
-                { value: 'assigned', label: 'مسند' },
-                { value: 'unassigned', label: 'غير مسند' }
-              ]}
-              className={styles.filterSelect}
-            />
-            
-            <Select
-              placeholder="الدفع"
-              value={paymentFilter}
-              onChange={setPaymentFilter}
-              data={[
-                { value: '', label: 'جميع الحالات' },
-                { value: 'pending', label: 'معلق' },
-                { value: 'partial', label: 'جزئي' },
-                { value: 'completed', label: 'مكتمل' }
-              ]}
-              className={styles.filterSelect}
-            />
-          </Group>
+      <div className="card section filters">
+        <Group gap="md">
+          <TextInput
+            placeholder="البحث في المشاريع..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            leftSection={<Search size={16} />}
+          />
+          
+          <Select
+            placeholder="المرحلة"
+            value={phaseFilter}
+            onChange={setPhaseFilter}
+            data={[
+              { value: '', label: 'جميع المراحل' },
+              { value: 'planning', label: 'تخطيط' },
+              { value: 'production', label: 'إنتاج' },
+              { value: 'review', label: 'مراجعة' },
+              { value: 'delivery', label: 'تسليم' }
+            ]}
+          />
+          
+          <Select
+            placeholder="حالة الصحة"
+            value={healthFilter}
+            onChange={setHealthFilter}
+            data={[
+              { value: '', label: 'جميع الحالات' },
+              { value: 'on_track', label: 'مستقر' },
+              { value: 'at_risk', label: 'معرض للخطر' },
+              { value: 'delayed', label: 'متأخر' }
+            ]}
+          />
+          
+          <Select
+            placeholder="نوع الخدمة"
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            data={[
+              { value: '', label: 'جميع الأنواع' },
+              { value: 'photo', label: 'تصوير' },
+              { value: 'video', label: 'فيديو' },
+              { value: 'design', label: 'تصميم' },
+              { value: 'editing', label: 'مونتاج' }
+            ]}
+          />
+          
+          <Select
+            placeholder="المبدع"
+            value={creatorFilter}
+            onChange={setCreatorFilter}
+            data={[
+              { value: '', label: 'الجميع' },
+              { value: 'assigned', label: 'مسند' },
+              { value: 'unassigned', label: 'غير مسند' }
+            ]}
+          />
+          
+          <Select
+            placeholder="الدفع"
+            value={paymentFilter}
+            onChange={setPaymentFilter}
+            data={[
+              { value: '', label: 'جميع الحالات' },
+              { value: 'pending', label: 'معلق' },
+              { value: 'partial', label: 'جزئي' },
+              { value: 'completed', label: 'مكتمل' }
+            ]}
+          />
 
           <Button leftSection={<Filter size={16} />} variant="light">
             فلاتر متقدمة
@@ -1009,7 +998,7 @@ const ActiveRequestsPage: React.FC = () => {
       </div>
 
       {/* Data Table */}
-      <div className={styles.tableContainer}>
+      <div className="card table">
         <Table striped highlightOnHover withTableBorder>
           <Table.Thead>
             <Table.Tr>

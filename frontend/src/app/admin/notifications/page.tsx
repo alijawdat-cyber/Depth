@@ -212,7 +212,7 @@ const mockNotificationsData: NotificationsResponse = {
 
 // تنسيق التواريخ
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('ar-IQ', {
+  return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

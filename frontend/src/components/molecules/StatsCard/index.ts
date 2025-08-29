@@ -1,2 +1,4 @@
-export { default } from './StatsCard';
-export type { StatsCardProps, StatsCardColor } from './StatsCard';
+import StatsCard from './StatsCard';
+export type { StatsCardProps } from './StatsCard';
+export { StatsCard };
+export default StatsCard;

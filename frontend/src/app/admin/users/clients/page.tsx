@@ -535,11 +535,11 @@ const ClientsPage: React.FC = () => {
     if (amount >= 1000) {
       return `${Math.round(amount / 1000)}K د.ع`;
     }
-    return new Intl.NumberFormat('ar-IQ').format(amount) + ' د.ع';
+    return new Intl.NumberFormat('en-US').format(amount) + ' د.ع';
   };
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('ar-IQ', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

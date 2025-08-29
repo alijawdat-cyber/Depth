@@ -1,0 +1,413 @@
+/* 
+   ═══════════════════════════════════════════════════════════════════
+   🛠️ أدوات مساعدة وفئات عامة (Utility Classes & Helpers)
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+/* ——— Display Utilities ——— */
+.show { display: block !important; }                      /* إظهار العنصر */
+.hide,
+.hidden { display: none !important; }                     /* إخفاء العنصر */
+.invisible { visibility: hidden !important; }             /* إخفاء بدون تأثير على التخطيط */
+.visible { visibility: visible !important; }              /* إظهار بعد إخفاء */
+
+/* عرض مرن */
+.dFlex { display: flex !important; }                      /* عرض مرن */
+.dInlineFlex { display: inline-flex !important; }         /* عرض مرن مضمن */
+.dGrid { display: grid !important; }                      /* عرض شبكة */
+.dInlineGrid { display: inline-grid !important; }         /* عرض شبكة مضمنة */
+.dBlock { display: block !important; }                    /* عرض كتلة */
+.dInline { display: inline !important; }                  /* عرض مضمن */
+.dInlineBlock { display: inline-block !important; }       /* عرض كتلة مضمنة */
+
+/* ——— Position Utilities ——— */
+.posRelative { position: relative !important; }           /* موضع نسبي */
+.posAbsolute { position: absolute !important; }           /* موضع مطلق */
+.posFixed { position: fixed !important; }                 /* موضع ثابت */
+.posSticky { position: sticky !important; }               /* موضع لاصق */
+.posStatic { position: static !important; }               /* موضع عادي */
+
+/* توسيط مطلق */
+.centerAbsolute {
+  position: absolute !important;                          /* موضع مطلق */
+  top: 50% !important;                                    /* منتصف عمودي */
+  left: 50% !important;                                   /* منتصف أفقي */
+  transform: translate(-50%, -50%) !important;            /* تصحيح التوسيط */
+}
+
+/* ملء المساحة المطلقة */
+.fullAbsolute {
+  position: absolute !important;                          /* موضع مطلق */
+  top: 0 !important;                                      /* أعلى */
+  left: 0 !important;                                     /* يسار */
+  width: 100% !important;                                 /* عرض كامل */
+  height: 100% !important;                                /* ارتفاع كامل */
+}
+
+/* ——— Z-Index Utilities ——— */
+.zIndex1 { z-index: var(--z-base) !important; }           /* الطبقة الأساسية */
+.zIndex10 { z-index: var(--z-dropdown) !important; }      /* القوائم المنسدلة */  
+.zIndex50 { z-index: var(--z-modal) !important; }         /* النوافذ المنبثقة */
+.zIndex100 { z-index: var(--z-popover) !important; }      /* العناصر المتداخلة */
+.zIndex200 { z-index: var(--z-tooltip) !important; }      /* التلميحات */
+.zIndex500 { z-index: var(--z-notification) !important; } /* الإشعارات */
+.zIndex1000 { z-index: var(--z-maximum) !important; }     /* الحد الأقصى */
+.zIndexMax { z-index: var(--z-maximum) !important; }      /* أعلى طبقة */
+
+/* ——— Float Utilities ——— */
+.floatLeft { float: left !important; }                    /* طفو يسار */
+.floatRight { float: right !important; }                  /* طفو يمين */
+.floatNone { float: none !important; }                    /* إلغاء الطفو */
+.clearfix::after {
+  content: '';                                            /* محتوى فارغ */
+  display: table;                                         /* عرض جدول */
+  clear: both;                                            /* مسح الطفو */
+}
+
+/* ——— Overflow Utilities ——— */
+.overflowHidden { overflow: hidden !important; }          /* إخفاء المحتوى الزائد */
+.overflowAuto { overflow: auto !important; }              /* تمرير تلقائي */
+.overflowScroll { overflow: scroll !important; }          /* تمرير دائماً */
+.overflowVisible { overflow: visible !important; }        /* إظهار المحتوى الزائد */
+.overflowXHidden { overflow-x: hidden !important; }       /* إخفاء أفقي */
+.overflowYHidden { overflow-y: hidden !important; }       /* إخفاء عمودي */
+.overflowXAuto { overflow-x: auto !important; }           /* تمرير أفقي تلقائي */
+.overflowYAuto { overflow-y: auto !important; }           /* تمرير عمودي تلقائي */
+
+/* ——— Width & Height Utilities ——— */
+.w25 { width: 25% !important; }                           /* عرض ربع */
+.w50 { width: 50% !important; }                           /* عرض نصف */
+.w75 { width: 75% !important; }                           /* عرض ثلاثة أرباع */
+.w100,
+.wFull { width: 100% !important; }                        /* عرض كامل */
+.wAuto { width: auto !important; }                        /* عرض تلقائي */
+.wFitContent { width: fit-content !important; }           /* عرض حسب المحتوى */
+.wMinContent { width: min-content !important; }           /* عرض أدنى حسب المحتوى */
+.wMaxContent { width: max-content !important; }           /* عرض أقصى حسب المحتوى */
+
+.h25 { height: 25% !important; }                          /* ارتفاع ربع */
+.h50 { height: 50% !important; }                          /* ارتفاع نصف */
+.h75 { height: 75% !important; }                          /* ارتفاع ثلاثة أرباع */
+.h100,
+.hFull { height: 100% !important; }                       /* ارتفاع كامل */
+.hAuto { height: auto !important; }                       /* ارتفاع تلقائي */
+.hScreen { height: 100vh !important; }                    /* ارتفاع الشاشة */
+.hFitContent { height: fit-content !important; }          /* ارتفاع حسب المحتوى */
+
+/* أحجام ثابتة */
+.size16 { width: 16px !important; height: 16px !important; } /* 16x16 بكسل */
+.size24 { width: 24px !important; height: 24px !important; } /* 24x24 بكسل */
+.size32 { width: 32px !important; height: 32px !important; } /* 32x32 بكسل */
+.size48 { width: 48px !important; height: 48px !important; } /* 48x48 بكسل */
+.size64 { width: 64px !important; height: 64px !important; } /* 64x64 بكسل */
+
+/* ——— Margin Utilities ——— */
+.m0 { margin: 0 !important; }                             /* بدون هامش */
+.mAuto { margin: auto !important; }                       /* هامش تلقائي */
+.mXs { margin: var(--space-xs) !important; }              /* هامش صغير جداً */
+.mSm { margin: var(--space-sm) !important; }              /* هامش صغير */
+.mMd { margin: var(--space-md) !important; }              /* هامش متوسط */
+.mLg { margin: var(--space-lg) !important; }              /* هامش كبير */
+.mXl { margin: var(--space-xl) !important; }              /* هامش كبير جداً */
+
+/* هوامش أفقية وعمودية */
+.mX0 { margin-left: 0 !important; margin-right: 0 !important; } /* هامش أفقي صفر */
+.mXAuto { margin-left: auto !important; margin-right: auto !important; } /* هامش أفقي تلقائي */
+.mXXs { margin-left: var(--space-xs) !important; margin-right: var(--space-xs) !important; }
+.mXSm { margin-left: var(--space-sm) !important; margin-right: var(--space-sm) !important; }
+.mXMd { margin-left: var(--space-md) !important; margin-right: var(--space-md) !important; }
+.mXLg { margin-left: var(--space-lg) !important; margin-right: var(--space-lg) !important; }
+
+.mY0 { margin-top: 0 !important; margin-bottom: 0 !important; } /* هامش عمودي صفر */
+.mYAuto { margin-top: auto !important; margin-bottom: auto !important; } /* هامش عمودي تلقائي */
+.mYXs { margin-top: var(--space-xs) !important; margin-bottom: var(--space-xs) !important; }
+.mYSm { margin-top: var(--space-sm) !important; margin-bottom: var(--space-sm) !important; }
+.mYMd { margin-top: var(--space-md) !important; margin-bottom: var(--space-md) !important; }
+.mYLg { margin-top: var(--space-lg) !important; margin-bottom: var(--space-lg) !important; }
+
+/* هوامش فردية */
+.mt0 { margin-top: 0 !important; }                        /* هامش علوي صفر */
+.mtAuto { margin-top: auto !important; }                  /* هامش علوي تلقائي */
+.mtXs { margin-top: var(--space-xs) !important; }         /* هامش علوي صغير جداً */
+.mtSm { margin-top: var(--space-sm) !important; }         /* هامش علوي صغير */
+.mtMd { margin-top: var(--space-md) !important; }         /* هامش علوي متوسط */
+.mtLg { margin-top: var(--space-lg) !important; }         /* هامش علوي كبير */
+.mtXl { margin-top: var(--space-xl) !important; }         /* هامش علوي كبير جداً */
+
+.mb0 { margin-bottom: 0 !important; }                     /* هامش سفلي صفر */
+.mbAuto { margin-bottom: auto !important; }               /* هامش سفلي تلقائي */
+.mbXs { margin-bottom: var(--space-xs) !important; }      /* هامش سفلي صغير جداً */
+.mbSm { margin-bottom: var(--space-sm) !important; }      /* هامش سفلي صغير */
+.mbMd { margin-bottom: var(--space-md) !important; }      /* هامش سفلي متوسط */
+.mbLg { margin-bottom: var(--space-lg) !important; }      /* هامش سفلي كبير */
+.mbXl { margin-bottom: var(--space-xl) !important; }      /* هامش سفلي كبير جداً */
+
+.ml0 { margin-left: 0 !important; }                       /* هامش يساري صفر */
+.mlAuto { margin-left: auto !important; }                 /* هامش يساري تلقائي */
+.mlXs { margin-left: var(--space-xs) !important; }        /* هامش يساري صغير جداً */
+.mlSm { margin-left: var(--space-sm) !important; }        /* هامش يساري صغير */
+.mlMd { margin-left: var(--space-md) !important; }        /* هامش يساري متوسط */
+.mlLg { margin-left: var(--space-lg) !important; }        /* هامش يساري كبير */
+
+.mr0 { margin-right: 0 !important; }                      /* هامش يميني صفر */
+.mrAuto { margin-right: auto !important; }                /* هامش يميني تلقائي */
+.mrXs { margin-right: var(--space-xs) !important; }       /* هامش يميني صغير جداً */
+.mrSm { margin-right: var(--space-sm) !important; }       /* هامش يميني صغير */
+.mrMd { margin-right: var(--space-md) !important; }       /* هامش يميني متوسط */
+.mrLg { margin-right: var(--space-lg) !important; }       /* هامش يميني كبير */
+
+/* ——— Padding Utilities ——— */
+.p0 { padding: 0 !important; }                            /* بدون حشو */
+.pXs { padding: var(--space-xs) !important; }             /* حشو صغير جداً */
+.pSm { padding: var(--space-sm) !important; }             /* حشو صغير */
+.pMd { padding: var(--space-md) !important; }             /* حشو متوسط */
+.pLg { padding: var(--space-lg) !important; }             /* حشو كبير */
+.pXl { padding: var(--space-xl) !important; }             /* حشو كبير جداً */
+
+/* حشو أفقي وعمودي */
+.pX0 { padding-left: 0 !important; padding-right: 0 !important; } /* حشو أفقي صفر */
+.pXXs { padding-left: var(--space-xs) !important; padding-right: var(--space-xs) !important; }
+.pXSm { padding-left: var(--space-sm) !important; padding-right: var(--space-sm) !important; }
+.pXMd { padding-left: var(--space-md) !important; padding-right: var(--space-md) !important; }
+.pXLg { padding-left: var(--space-lg) !important; padding-right: var(--space-lg) !important; }
+
+.pY0 { padding-top: 0 !important; padding-bottom: 0 !important; } /* حشو عمودي صفر */
+.pYXs { padding-top: var(--space-xs) !important; padding-bottom: var(--space-xs) !important; }
+.pYSm { padding-top: var(--space-sm) !important; padding-bottom: var(--space-sm) !important; }
+.pYMd { padding-top: var(--space-md) !important; padding-bottom: var(--space-md) !important; }
+.pYLg { padding-top: var(--space-lg) !important; padding-bottom: var(--space-lg) !important; }
+
+/* حشو فردي */
+.pt0 { padding-top: 0 !important; }                       /* حشو علوي صفر */
+.ptXs { padding-top: var(--space-xs) !important; }        /* حشو علوي صغير جداً */
+.ptSm { padding-top: var(--space-sm) !important; }        /* حشو علوي صغير */
+.ptMd { padding-top: var(--space-md) !important; }        /* حشو علوي متوسط */
+.ptLg { padding-top: var(--space-lg) !important; }        /* حشو علوي كبير */
+
+.pb0 { padding-bottom: 0 !important; }                    /* حشو سفلي صفر */
+.pbXs { padding-bottom: var(--space-xs) !important; }     /* حشو سفلي صغير جداً */
+.pbSm { padding-bottom: var(--space-sm) !important; }     /* حشو سفلي صغير */
+.pbMd { padding-bottom: var(--space-md) !important; }     /* حشو سفلي متوسط */
+.pbLg { padding-bottom: var(--space-lg) !important; }     /* حشو سفلي كبير */
+
+.pl0 { padding-left: 0 !important; }                      /* حشو يساري صفر */
+.plXs { padding-left: var(--space-xs) !important; }       /* حشو يساري صغير جداً */
+.plSm { padding-left: var(--space-sm) !important; }       /* حشو يساري صغير */
+.plMd { padding-left: var(--space-md) !important; }       /* حشو يساري متوسط */
+.plLg { padding-left: var(--space-lg) !important; }       /* حشو يساري كبير */
+
+.pr0 { padding-right: 0 !important; }                     /* حشو يميني صفر */
+.prXs { padding-right: var(--space-xs) !important; }      /* حشو يميني صغير جداً */
+.prSm { padding-right: var(--space-sm) !important; }      /* حشو يميني صغير */
+.prMd { padding-right: var(--space-md) !important; }      /* حشو يميني متوسط */
+.prLg { padding-right: var(--space-lg) !important; }      /* حشو يميني كبير */
+
+/* ——— Text Utilities ——— */
+.textLeft { text-align: left !important; }                /* محاذاة يسار */
+.textRight { text-align: right !important; }              /* محاذاة يمين */
+.textCenter { text-align: center !important; }            /* محاذاة وسط */
+.textJustify { text-align: justify !important; }          /* محاذاة ضبط */
+
+.textUppercase { text-transform: uppercase !important; }   /* أحرف كبيرة */
+.textLowercase { text-transform: lowercase !important; }   /* أحرف صغيرة */
+.textCapitalize { text-transform: capitalize !important; } /* أحرف أولى كبيرة */
+
+.textNowrap { white-space: nowrap !important; }           /* عدم لف النص */
+.textWrap { white-space: normal !important; }             /* لف النص */
+.textBreak { word-break: break-word !important; overflow-wrap: break-word !important; } /* كسر الكلمات الطويلة */
+
+.textTruncate {
+  overflow: hidden !important;                            /* إخفاء النص الزائد */
+  text-overflow: ellipsis !important;                     /* نقاط بدل النص المقطوع */
+  white-space: nowrap !important;                         /* عدم لف النص */
+}
+
+/* أوزان النص */
+.fontLight { font-weight: 300 !important; }               /* وزن خفيف */
+.fontNormal { font-weight: 400 !important; }              /* وزن عادي */
+.fontMedium { font-weight: 500 !important; }              /* وزن متوسط */
+.fontSemibold { font-weight: 600 !important; }            /* وزن متوسط-ثقيل */
+.fontBold { font-weight: 700 !important; }                /* وزن ثقيل */
+.fontExtrabold { font-weight: 800 !important; }           /* وزن ثقيل جداً */
+
+/* أحجام النص */
+.textXs { font-size: var(--fs-xs) !important; }           /* نص صغير جداً */
+.textSm { font-size: var(--fs-sm) !important; }           /* نص صغير */
+.textBase { font-size: var(--fs-md) !important; }         /* نص أساسي */
+.textLg { font-size: var(--fs-lg) !important; }           /* نص كبير */
+.textXl { font-size: var(--fs-xl) !important; }           /* نص كبير جداً */
+.text2Xl { font-size: var(--fs-2xl) !important; }         /* نص كبير جداً */
+.text3Xl { font-size: var(--fs-3xl) !important; }         /* نص عملاق */
+
+/* ألوان النص */
+.textPrimary { color: var(--color-text-primary) !important; } /* لون أساسي */
+.textSecondary { color: var(--color-text-secondary) !important; } /* لون ثانوي */
+.textMuted { color: var(--color-text-secondary) !important; opacity: 0.7; } /* لون باهت */
+.textDisabled { color: var(--color-text-disabled) !important; } /* لون معطل */
+.textSuccess { color: var(--color-success) !important; }   /* لون نجاح */
+.textError { color: var(--color-error) !important; }       /* لون خطأ */
+.textWarning { color: var(--color-warning) !important; }   /* لون تحذير */
+.textInfo { color: var(--color-info) !important; }         /* لون معلومات */
+
+/* ——— Background Utilities ——— */
+.bgPrimary { background-color: var(--color-bg-primary) !important; } /* خلفية أساسية */
+.bgSecondary { background-color: var(--color-bg-secondary) !important; } /* خلفية ثانوية */
+.bgTertiary { background-color: var(--color-bg-tertiary) !important; } /* خلفية ثالثية */
+.bgTransparent { background-color: transparent !important; } /* خلفية شفافة */
+.bgSuccess { background-color: var(--color-success) !important; } /* خلفية نجاح */
+.bgError { background-color: var(--color-error) !important; } /* خلفية خطأ */
+.bgWarning { background-color: var(--color-warning) !important; } /* خلفية تحذير */
+.bgInfo { background-color: var(--color-info) !important; } /* خلفية معلومات */
+
+/* خلفيات فاتحة */
+.bgSuccessLight { background-color: var(--color-success-light) !important; }
+.bgErrorLight { background-color: var(--color-error-light) !important; }
+.bgWarningLight { background-color: var(--color-warning-light) !important; }
+.bgInfoLight { background-color: var(--color-info-light) !important; }
+
+/* ——— Border Utilities ——— */
+.border { border: 1px solid var(--color-border-primary) !important; } /* حد عادي */
+.borderNone { border: none !important; }                  /* بدون حد */
+.border0 { border-width: 0 !important; }                  /* عرض حد صفر */
+.borderT { border-top: 1px solid var(--color-border-primary) !important; } /* حد علوي */
+.borderB { border-bottom: 1px solid var(--color-border-primary) !important; } /* حد سفلي */
+.borderL { border-left: 1px solid var(--color-border-primary) !important; } /* حد يساري */
+.borderR { border-right: 1px solid var(--color-border-primary) !important; } /* حد يميني */
+
+/* ألوان الحدود */
+.borderPrimary { border-color: var(--color-primary) !important; }
+.borderSuccess { border-color: var(--color-success) !important; }
+.borderError { border-color: var(--color-error) !important; }
+.borderWarning { border-color: var(--color-warning) !important; }
+.borderInfo { border-color: var(--color-info) !important; }
+
+/* زوايا دائرية */
+.rounded0 { border-radius: 0 !important; }                /* زوايا حادة */
+.roundedSm { border-radius: var(--radius-sm) !important; } /* زوايا صغيرة */
+.rounded { border-radius: var(--radius-md) !important; }   /* زوايا متوسطة */
+.roundedMd { border-radius: var(--radius-md) !important; } /* زوايا متوسطة */
+.roundedLg { border-radius: var(--radius-lg) !important; } /* زوايا كبيرة */
+.roundedXl { border-radius: var(--radius-xl) !important; } /* زوايا كبيرة جداً */
+.roundedFull { border-radius: var(--radius-full) !important; } /* دائرة كاملة */
+
+/* ——— Shadow Utilities ——— */
+.shadowNone { box-shadow: none !important; }              /* بدون ظل */
+.shadowSm { box-shadow: var(--shadow-sm) !important; }    /* ظل صغير */
+.shadow { box-shadow: var(--shadow-md) !important; }      /* ظل متوسط */
+.shadowMd { box-shadow: var(--shadow-md) !important; }    /* ظل متوسط */
+.shadowLg { box-shadow: var(--shadow-lg) !important; }    /* ظل كبير */
+.shadowXl { box-shadow: var(--shadow-xl) !important; }    /* ظل كبير جداً */
+.shadowInset { box-shadow: var(--shadow-inset) !important; } /* ظل داخلي */
+
+/* ——— Cursor Utilities ——— */
+.cursorPointer { cursor: pointer !important; }            /* إشارة نقر */
+.cursorDefault { cursor: default !important; }            /* إشارة افتراضية */
+.cursorNotAllowed { cursor: not-allowed !important; }     /* إشارة منع */
+.cursorWait { cursor: wait !important; }                  /* إشارة انتظار */
+.cursorHelp { cursor: help !important; }                  /* إشارة مساعدة */
+.cursorMove { cursor: move !important; }                  /* إشارة حركة */
+.cursorText { cursor: text !important; }                  /* إشارة نص */
+.cursorGrab { cursor: grab !important; }                  /* إشارة قبض */
+.cursorGrabbing { cursor: grabbing !important; }          /* إشارة قبض فعال */
+
+/* ——— User Select Utilities ——— */
+.selectNone { user-select: none !important; }             /* منع التحديد */
+.selectText { user-select: text !important; }             /* السماح بتحديد النص */
+.selectAll { user-select: all !important; }               /* تحديد الكل */
+.selectAuto { user-select: auto !important; }             /* تحديد تلقائي */
+
+/* ——— Pointer Events ——— */
+.pointerEventsNone { pointer-events: none !important; }   /* منع أحداث الإشارة */
+.pointerEventsAuto { pointer-events: auto !important; }   /* السماح بأحداث الإشارة */
+
+/* ——— Opacity Utilities ——— */
+.opacity0 { opacity: 0 !important; }                      /* شفاف تماماً */
+.opacity10 { opacity: 0.1 !important; }                   /* شفافية 10% */
+.opacity20 { opacity: 0.2 !important; }                   /* شفافية 20% */
+.opacity30 { opacity: 0.3 !important; }                   /* شفافية 30% */
+.opacity40 { opacity: 0.4 !important; }                   /* شفافية 40% */
+.opacity50 { opacity: 0.5 !important; }                   /* شفافية 50% */
+.opacity60 { opacity: 0.6 !important; }                   /* شفافية 60% */
+.opacity70 { opacity: 0.7 !important; }                   /* شفافية 70% */
+.opacity80 { opacity: 0.8 !important; }                   /* شفافية 80% */
+.opacity90 { opacity: 0.9 !important; }                   /* شفافية 90% */
+.opacity100 { opacity: 1 !important; }                    /* وضوح كامل */
+
+/* ——— Transition Utilities ——— */
+.transitionNone { transition: none !important; }          /* بدون انتقال */
+.transitionAll { transition: all 0.2s ease !important; }  /* انتقال لكل الخصائص */
+.transitionFast { transition: all 0.1s ease !important; } /* انتقال سريع */
+.transitionSlow { transition: all 0.5s ease !important; } /* انتقال بطيء */
+
+/* ——— Transform Utilities ——— */
+.transform { transform: translateZ(0) !important; }        /* تفعيل التحويلات */
+.transformNone { transform: none !important; }            /* إلغاء التحويلات */
+.rotate45 { transform: rotate(45deg) !important; }        /* دوران 45 درجة */
+.rotate90 { transform: rotate(90deg) !important; }        /* دوران 90 درجة */
+.rotate180 { transform: rotate(180deg) !important; }      /* دوران 180 درجة */
+.rotateNeg90 { transform: rotate(-90deg) !important; }    /* دوران -90 درجة */
+.scale50 { transform: scale(0.5) !important; }            /* تصغير 50% */
+.scale75 { transform: scale(0.75) !important; }           /* تصغير 75% */
+.scale100 { transform: scale(1) !important; }             /* حجم طبيعي */
+.scale110 { transform: scale(1.1) !important; }           /* تكبير 110% */
+.scale125 { transform: scale(1.25) !important; }          /* تكبير 125% */
+
+/* ——— Screen Reader Only ——— */
+.srOnly {
+  position: absolute !important;                          /* موضع مطلق */
+  width: 1px !important;                                  /* عرض بكسل واحد */
+  height: 1px !important;                                 /* ارتفاع بكسل واحد */
+  padding: 0 !important;                                  /* بدون حشو */
+  margin: -1px !important;                                /* هامش سالب */
+  overflow: hidden !important;                            /* إخفاء المحتوى */
+  clip: rect(0, 0, 0, 0) !important;                      /* قطع المحتوى */
+  white-space: nowrap !important;                         /* عدم لف النص */
+  border: 0 !important;                                   /* بدون حد */
+}
+
+/* ——— Print Utilities ——— */
+@media print {
+  .printHidden { display: none !important; }              /* إخفاء عند الطباعة */
+  .printOnly { display: block !important; }               /* إظهار عند الطباعة فقط */
+}
+
+@media screen {
+  .printOnly { display: none !important; }                /* إخفاء على الشاشة */
+}
+
+/* ——— Responsive Show/Hide ——— */
+@media (max-width: var(--bp-tab)) {
+  .hideMobile { display: none !important; }               /* إخفاء على الموبايل */
+  .showMobile { display: block !important; }              /* إظهار على الموبايل */
+}
+
+@media (min-width: var(--bp-tab)) {
+  .hideDesktop { display: none !important; }              /* إخفاء على الديسكتوب */
+  .showDesktop { display: block !important; }             /* إظهار على الديسكتوب */
+  .showMobile { display: none !important; }               /* إخفاء على الديسكتوب */
+}
+
+@media (max-width: var(--bp-tab-2xl)) {
+  .hideTablet { display: none !important; }               /* إخفاء على التابلت */
+  .showTablet { display: block !important; }              /* إظهار على التابلت */
+}
+
+/* ——— RTL Support ——— */
+[dir="rtl"] .textLeft { text-align: right !important; }   /* محاذاة يمين في الـ RTL */
+[dir="rtl"] .textRight { text-align: left !important; }   /* محاذاة يسار في الـ RTL */
+[dir="rtl"] .floatLeft { float: right !important; }       /* طفو يمين في الـ RTL */
+[dir="rtl"] .floatRight { float: left !important; }       /* طفو يسار في الـ RTL */
+
+/* ——— Debug Utilities ——— */
+.debug { outline: 2px solid red !important; }             /* إطار أحمر للتصحيح */
+.debugGreen { outline: 2px solid green !important; }      /* إطار أخضر للتصحيح */
+.debugBlue { outline: 2px solid blue !important; }        /* إطار أزرق للتصحيح */
+
+/* ——— Icon Utilities (للأيقونات الملونة) ——— */
+.iconSuccess { color: var(--color-success) !important; }  /* أيقونة خضراء للنجاح */
+.iconError { color: var(--color-error) !important; }      /* أيقونة حمراء للخطأ */
+.iconWarning { color: var(--color-warning) !important; }  /* أيقونة برتقالية للتحذير */
+.iconInfo { color: var(--color-info) !important; }        /* أيقونة زرقاء للمعلومات */
+.iconPrimary { color: var(--color-primary) !important; }  /* أيقونة بنفسجية أساسية */
+.iconSecondary { color: var(--color-text-secondary) !important; } /* أيقونة رمادية ثانوية */
+.iconMuted { color: var(--color-text-muted) !important; } /* أيقونة باهتة */
