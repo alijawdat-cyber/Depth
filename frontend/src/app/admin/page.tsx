@@ -1,15 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Grid, Table } from '@mantine/core';
+import { Table } from '@mantine/core';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
 import { 
   Users, 
   FileText, 
-  Briefcase, 
+  Briefcase,
   DollarSign
 } from 'lucide-react';
-import styles from './AdminDashboard.module.css';
 
 // بيانات الإحصائيات المؤقتة
 const dashboardStats = [
@@ -61,29 +60,24 @@ const dashboardStats = [
 
 export default function AdminDashboard() {
   return (
-    <div className={styles.dashboard}>
+    <div className="pageContainer">
       {/* Stats Cards */}
-      <div className={styles.statsSection}>
-        <Grid>
-          {dashboardStats.map((stat, index) => (
-            <Grid.Col key={index} span={{ base: 12, sm: 6, lg: 3 }}>
-              <StatsCard
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                trend={stat.trend}
-                color={stat.color}
-                clickable
-                onClick={() => console.log(`تم النقر على ${stat.title}`)}
-              />
-            </Grid.Col>
-          ))}
-        </Grid>
+      <div className="grid gridCols4 gridGapLg mbXl">
+        {dashboardStats.map((stat, index) => (
+          <div key={index} className="colSpan1">
+            <StatsCard
+              key={index}
+              {...stat}
+              clickable
+              onClick={() => console.log(`Clicked on ${stat.title}`)}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Recent Activities Table */}
-      <div className={styles.activitiesSection}>
-        <h2 className={styles.sectionTitle}>
+      <div className="card">
+        <h2 className="pageTitle mbMd">
           آخر الأنشطة
         </h2>
         <Table striped highlightOnHover withTableBorder>

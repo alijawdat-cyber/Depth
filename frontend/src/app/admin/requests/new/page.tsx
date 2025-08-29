@@ -37,7 +37,6 @@ import {
   Plus
 } from 'lucide-react';
 import { StatsCard } from '@/components/molecules/StatsCard/StatsCard';
-import '../../../globals.css';
 
 // Types
 interface ProjectRequest extends Record<string, unknown> {

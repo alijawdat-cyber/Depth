@@ -353,10 +353,8 @@ const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
 export const AppSidebar: React.FC<AppSidebarProps> = ({
   items,
   userRole,
-  isOpen = true,
   onClose,
-  onItemClick,
-  className
+  onItemClick
 }) => {
   const menuItems = items || getDefaultMenuItems(userRole);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
