@@ -610,12 +610,12 @@ const CreatorsPage: React.FC = () => {
 
   return (
     <Container size="xl" className={styles.container}>
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <Title order={1} className={styles.pageTitle}>
+      {/* Header - يستخدم الكلاسات العالمية من globals.css مباشرة */}
+      <div className="pageHeader">
+        <Title order={1} className="pageTitle">
           إدارة المبدعين
         </Title>
-        <Text className={styles.pageDescription}>
+        <Text className="pageDescription">
           مراجعة وإدارة ملفات المبدعين الفريلانسرز ومتابعة أدائهم
         </Text>
       </div>
