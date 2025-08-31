@@ -37,6 +37,14 @@ const mantineTheme = createTheme({
   fontFamily: 'var(--font-primary)', // خط من التوكنز
   primaryColor: 'brand', // اللون الأساسي
   defaultRadius: 'md', // نصف قطر افتراضي
+  // ربط الظلال بقيم التوكنز المركزية
+  shadows: {
+    xs: 'var(--shadow-sm)',
+    sm: 'var(--shadow-sm)',
+    md: 'var(--shadow-md)',
+    lg: 'var(--shadow-lg)',
+    xl: 'var(--shadow-lg)'
+  },
   colors: {
   brand: brandScale, // أساسي
   blue: infoScale, // معلوماتي
@@ -143,13 +151,18 @@ const mantineTheme = createTheme({
   Badge: { styles: { root: { '&[data-color="gray"], &[color="gray"]': { backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)' } } } }, // شارة رمادية
   ThemeIcon: { styles: { root: { '&[data-variant="light"]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color="brand"]': { color: 'var(--color-primary)' }, '&[data-variant="light"][data-color="blue"]': { color: 'var(--color-info)' }, '&[data-variant="light"][data-color="green"]': { color: 'var(--color-success)' }, '&[data-variant="light"][data-color="orange"], &[data-variant="light"][data-color="yellow"]': { color: 'var(--color-warning)' }, '&[data-variant="light"][data-color="red"]': { color: 'var(--color-error)' }, '&[data-variant="light"][data-color="gray"]': { color: 'var(--color-text-secondary)' } } } }, // light ties to tokens
   ActionIcon: { styles: { root: { '&[data-variant="light"]': { backgroundColor: 'var(--color-bg-tertiary) !important', borderColor: 'var(--color-border-primary)' }, '&[data-variant="light"][data-color]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color="brand"]': { color: 'var(--color-primary)' }, '&[data-variant="light"][data-color="blue"]': { color: 'var(--color-info)' }, '&[data-variant="light"][data-color="green"]': { color: 'var(--color-success)' }, '&[data-variant="light"][data-color="orange"], &[data-variant="light"][data-color="yellow"]': { color: 'var(--color-warning)' }, '&[data-variant="light"][data-color="red"]': { color: 'var(--color-error)' }, '&[data-variant="light"][data-color="gray"]': { color: 'var(--color-text-secondary)' } } } }, // light ties + borders
-    Card: {
+  Card: {
       defaultProps: { withBorder: true }, // حدود افتراضيًا
       styles: {
         root: {
           backgroundColor: 'var(--color-bg-secondary)',
           borderColor: 'var(--color-border-primary)',
-          '--card-radius': 'var(--radius-lg)',
+      '--card-radius': 'var(--radius-lg)',
+      // ظل خفيف افتراضي + رفع عند المرور
+      // يعتمد على theme.shadows.sm/md المربوطة بالتوكنز
+      boxShadow: 'var(--shadow-sm)',
+      transition: 'box-shadow .15s ease',
+      '&:hover': { boxShadow: 'var(--shadow-md)' }
         }
       }
     },
