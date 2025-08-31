@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import "./app-shell.css";
 import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Divider, Badge, useMantineColorScheme } from "@mantine/core";
 import Image from "next/image";
 import Link from "next/link";

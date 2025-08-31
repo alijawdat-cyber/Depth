@@ -1,0 +1,113 @@
+/* 🧭 App Shell Layout and Sidebar styles */
+
+.app-shell { /* شبكة رئيسية */
+  display: grid; /* شبكة */
+  grid-template-areas: "header header" "sidebar main"; /* مناطق */
+  grid-template-columns: var(--sidebar-width) 1fr; /* عمود سايدبار + محتوى */
+  grid-template-rows: var(--header-height) 1fr; /* هيدر ثابت */
+  height: 100dvh; /* تثبيت الإطار بكامل الشاشة */
+  overflow: hidden; /* التمرير محصور داخل aside/main */
+  background-color: var(--color-bg-primary); /* خلفية */
+}
+
+.app-header { /* رأس موحّد */
+  grid-area: header; /* منطقة الهيدر */
+  display: flex; align-items: center; justify-content: space-between; /* توزيع */
+  padding: 0 var(--space-md); /* تقليل الحشو الجانبي للاقتراب من الحواف */
+  background-color: var(--color-bg-secondary); /* خلفية */
+  border-bottom: 1px solid var(--color-border-primary); /* حد */
+  z-index: var(--z-fixed); height: var(--header-height); /* طبقة وارتفاع */
+}
+
+/* شعار التطبيق ضمن الهيدر - يعتمد التوكنز */
+.app-logo { height: var(--fs-lg); width: auto; display: block; }
+
+/* داكن فقط: خلي الشعار يطلع بلون فاتح (يعادل text-inverse) بدون تغيير ملف التوكنز أو الـ SVG */
+[data-mantine-color-scheme="dark"] .app-header .app-logo {
+  filter: brightness(0) invert(1); /* يحوّل الألوان الداكنة إلى فاتحة */
+}
+
+.app-sidebar { /* سايدبار موحّد */
+  grid-area: sidebar; /* منطقة */
+  padding: var(--space-md) var(--space-md) var(--space-lg); /* حشو */
+  background-color: var(--color-bg-secondary); /* خلفية */
+  border-inline-end: 1px solid var(--color-border-primary); /* حد منطقي */
+  overflow-y: auto; scrollbar-width: thin; /* تمرير */
+}
+
+.app-main { /* محتوى رئيسي */
+  grid-area: main; padding: var(--space-lg); background-color: var(--color-bg-primary); overflow-y: auto; min-height: 0; /* منع مشاكل التمرير */
+}
+
+/* موبايل: السايدبار كـ overlay يفتح من جهة النهاية (RTL-ready) */
+@media (max-width: 640px) {
+  .app-shell { grid-template-areas: "header" "main"; grid-template-columns: 1fr; grid-template-rows: var(--header-height) 1fr; height: 100dvh; overflow: hidden; }
+  .app-shell .app-main {
+    padding-inline: calc(var(--space-sm) + var(--space-xs)); /* زيادة طفيفة للحافة الجانبية */
+    padding-block: var(--space-sm);
+    min-height: calc(100dvh - var(--header-height));
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* سايدبار الموبايل: حشو موحّد وصغير من كل الجهات */
+  .mobile-sidebar {
+    padding: var(--space-sm) !important;
+    /* تقليل العرض للموبايل لكل الأدوار بدون المساس بـ tokens.css */
+    width: min(
+      calc(var(--sidebar-width) - var(--space-xl)),
+      calc(100vw - var(--space-lg))
+    ) !important;
+  }
+
+  /* تقليل كثافة عناصر الروابط داخل سايدبار الموبايل */
+  .mobile-sidebar .mantine-NavLink-root {
+    padding-block: var(--space-sm) !important;
+  }
+
+  /* إزالة الحشو الجانبي المكرر من أي Container داخل المحتوى بالموبايل */
+  .app-main .mantine-Container-root { padding-inline: 0 !important; }
+
+  /* ===== ضبط الكثافة العمودية لكل الأدوار بالموبايل ===== */
+  .app-main .mantine-Container-root .mantine-Stack-root { gap: var(--space-sm) !important; }
+  .app-main .mantine-Container-root .mantine-Group-root { gap: var(--space-sm) !important; }
+  .app-main .mantine-Container-root .mantine-Divider-root { margin-block: var(--space-sm) !important; }
+  .app-main .mantine-Container-root .mantine-Card-root { padding: var(--space-md) !important; }
+
+  .app-main .mantine-Container-root .mantine-Card-root + .mantine-Alert-root { margin-top: var(--space-md) !important; }
+
+  .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; }
+  .app-sidebar .sidebar-inner { padding-inline: var(--space-md); padding-block: var(--space-sm); }
+}
+
+/* طبقات overlay للموبايل */
+.mobile-overlay { position: fixed; top: var(--header-height); inset-inline: 0; bottom: 0; background: var(--overlay-scrim); z-index: var(--z-fixed); }
+.mobile-sidebar { position: fixed; top: var(--header-height); inset-inline-start: 0; width: var(--sidebar-width); height: calc(100dvh - var(--header-height)); background-color: var(--color-bg-secondary); border-inline-start: 1px solid var(--color-border-primary); box-shadow: var(--shadow-lg); }
+
+/* Sidebar NavLink UX */
+.app-sidebar .mantine-NavLink-root {
+  padding-inline: 0 !important;
+  padding-block: var(--space-md);
+  text-align: right;
+  border-radius: var(--radius-md);
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.app-sidebar .mantine-NavLink-root:hover,
+.app-sidebar .mantine-NavLink-root:focus-visible {
+  background-color: color-mix(in oklab, var(--color-primary) 30%, var(--color-bg-secondary));
+  padding-inline-start: var(--space-sm);
+}
+
+.app-sidebar .mantine-NavLink-root[aria-current="page"],
+.app-sidebar .mantine-NavLink-root[data-active="true"] {
+  background-color: color-mix(in oklab, var(--color-primary) 30%, var(--color-bg-secondary));
+  box-shadow: inset 0 0 0 1px var(--color-border-primary);
+  padding-inline-start: var(--space-sm);
+}
+
+.app-sidebar .mantine-NavLink-body { flex: 1 1 auto; min-width: 0; }
+.app-sidebar .mantine-NavLink-label { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-sidebar .mantine-NavLink-section:first-child { margin-inline-end: var(--space-xs); }
+.app-sidebar .mantine-NavLink-section:last-child { margin-inline-start: var(--space-sm); }
+.app-sidebar .mantine-NavLink-children { border-inline-start: 1px solid var(--color-border-primary); margin-inline-start: var(--space-md); padding-inline-start: var(--space-sm); }
