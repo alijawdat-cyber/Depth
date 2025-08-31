@@ -1,1 +1,20 @@
-/* overrides: menu dropdown/items - copied later from mantine.css */
+/* 📜 Overrides: Mantine Menu */
+
+.mantine-Menu-dropdown {
+	background-color: var(--color-bg-primary);  /* خلفية أساسية */
+	border: 1px solid var(--color-border-primary);  /* حد رمادي */
+	border-radius: var(--radius-md);  /* زوايا متوسطة */
+	box-shadow: var(--shadow-md);  /* ظل متوسط */
+	padding: var(--space-xs);  /* حشو صغير */
+}
+
+.mantine-Menu-item {
+	font-family: var(--mantine-font-family);  /* خط دبي */
+	padding: var(--space-xs) var(--space-sm);  /* حشو صغير */
+	border-radius: var(--radius-sm);  /* زوايا صغيرة */
+	transition: background-color 0.2s ease;  /* انتقال سلس */
+}
+
+.mantine-Menu-item:hover {
+	background-color: var(--color-bg-secondary);  /* خلفية ثانوية عند التمرير */
+}

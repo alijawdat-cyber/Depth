@@ -1,1 +1,111 @@
-/* overrides: tables (wide/compact behaviors) - copied later from mantine.css */
+/* 📊 Overrides: Mantine Table + Wide/Compact */
+
+.mantine-Table-root {
+	width: 100%;  /* افتراضي: عرض كامل */
+	border-collapse: collapse;  /* انهيار الحدود */
+	font-family: var(--mantine-font-family);  /* خط دبي */
+}
+
+.mantine-Card-root[data-fit="content"] :is(table, .mantine-Table-table),
+.mantine-Stack-root[data-fit="content"] :is(table, .mantine-Table-table),
+.mantine-Group-root[data-fit="content"] :is(table, .mantine-Table-table) {
+	width: max-content;            /* عرض الجدول = عرض المحتوى */
+	table-layout: auto;            /* حساب أعمدة ديناميكي حسب المحتوى */
+}
+
+@media (min-width: 1024px) {
+	.mantine-Card-root[data-fit="content"],
+	.mantine-Stack-root[data-fit="content"],
+	.mantine-Group-root[data-fit="content"] {
+		width: max-content;          /* تتقلص بقدر المحتوى */
+		max-width: 100%;             /* لا تتجاوز الشبكة */
+	}
+}
+
+.mantine-Table-root th {
+	background-color: var(--color-bg-secondary);
+	padding: var(--space-sm);
+	font-weight: var(--font-weight-bold);
+	border-bottom: 2px solid var(--color-border-primary);
+}
+
+.mantine-Table-root td {
+	padding: var(--space-sm);
+	border-bottom: 1px solid var(--color-border-primary);
+}
+
+.mantine-Card-root[data-compact="true"] .mantine-Table-root :is(th, td),
+.mantine-Stack-root[data-compact="true"] .mantine-Table-root :is(th, td),
+.mantine-Group-root[data-compact="true"] .mantine-Table-root :is(th, td) {
+	padding-block: var(--space-xs);
+	padding-inline: var(--space-sm);
+}
+
+.mantine-Table-root tr:hover { background-color: var(--color-bg-tertiary); }
+
+@media (max-width: 640px) {
+	.mantine-Card-root[data-responsive="wide"],
+	.mantine-Stack-root[data-responsive="wide"],
+	.mantine-Group-root[data-responsive="wide"] {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		-webkit-overflow-scrolling: touch;
+		display: block;
+		max-width: 100%;
+	}
+
+	.mantine-Card-root[data-responsive="wide"] .mantine-Table-root,
+	.mantine-Stack-root[data-responsive="wide"] .mantine-Table-root,
+	.mantine-Group-root[data-responsive="wide"] .mantine-Table-root {
+		width: auto !important;
+		max-width: none !important;
+	}
+
+	.mantine-Card-root[data-responsive="wide"] :is(table, .mantine-Table-table),
+	.mantine-Stack-root[data-responsive="wide"] :is(table, .mantine-Table-table),
+	.mantine-Group-root[data-responsive="wide"] :is(table, .mantine-Table-table) {
+		width: max-content !important;
+		table-layout: auto !important;
+		display: inline-table;
+	}
+
+	.mantine-Card-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table),
+	.mantine-Stack-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table),
+	.mantine-Group-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table) {
+		min-width: var(--wide-content-min-w-sm) !important;
+	}
+
+	.mantine-Table-root th[data-cell="num"],
+	.mantine-Table-root th[data-cell="date"] {
+		white-space: nowrap;
+		direction: ltr;
+		unicode-bidi: isolate;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.mantine-Table-root td[data-cell="num"],
+	.mantine-Table-root td[data-cell="date"],
+	.mantine-Table-root td[data-cell="id"],
+	.mantine-Table-root td[data-cell="code"] {
+		white-space: nowrap !important;
+		direction: ltr;
+		unicode-bidi: isolate;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.mantine-Table-root td[data-cell="num"],
+	.mantine-Table-root td[data-cell="date"],
+	.mantine-Table-root th[data-cell="num"],
+	.mantine-Table-root th[data-cell="date"] {
+		width: 1% !important;
+		max-width: 1% !important;
+	}
+
+	.mantine-Table-root td[data-cell="id"],
+	.mantine-Table-root td[data-cell="code"],
+	.mantine-Table-root th[data-cell="id"],
+	.mantine-Table-root th[data-cell="code"] {
+		width: max-content !important;
+		max-width: none !important;
+	}
+}
