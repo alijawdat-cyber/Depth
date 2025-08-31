@@ -9,7 +9,6 @@ Depth Frontend — منصة المكوّنات والشاشات
 هيكلة متوقعة:
 - src/components/ — المكوّنات (لاحقًا)
 - src/screens/ — الشاشات (لاحقًا)
-- .storybook/ — إعداد Storybook (لاحقًا)
 - tests/snapshots/ — لقطات Playwright (لاحقًا)
 
 تشغيل محلي:

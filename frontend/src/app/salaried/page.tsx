@@ -19,16 +19,16 @@ import {
   Avatar
 } from '@mantine/core';
 import {
-  IconBriefcase,
-  IconEye,
-  IconUpload,
-  IconCalendar,
-  IconClock,
-  IconCheck,
-  IconClipboardList,
-  IconUser,
-  IconChartLine
-} from '@tabler/icons-react';
+  Briefcase,
+  Eye,
+  Upload,
+  Calendar,
+  Clock,
+  Check,
+  ClipboardList,
+  User,
+  LineChart
+} from 'lucide-react';
 
 // البيانات الوهمية للموظف الحالي
 import { mockSalariedEmployees } from '@/data/employees';
@@ -88,12 +88,12 @@ export default function SalariedDashboard() {
             <Button 
               variant="filled" 
               color="brand"
-              leftSection={<IconUpload size={18} />}
+              leftSection={<Upload size={18} />}
             >
               رفع تقرير
             </Button>
             <ActionIcon variant="light" size="lg" color="brand">
-              <IconCalendar size={20} />
+              <Calendar size={20} />
             </ActionIcon>
           </Group>
         </Group>
@@ -115,7 +115,7 @@ export default function SalariedDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="blue">
-                  <IconClock size={28} />
+                  <Clock size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -136,7 +136,7 @@ export default function SalariedDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconCheck size={28} />
+                  <Check size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -157,7 +157,7 @@ export default function SalariedDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="orange">
-                  <IconClipboardList size={28} />
+                  <ClipboardList size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -178,7 +178,7 @@ export default function SalariedDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconChartLine size={28} />
+                  <LineChart size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -221,7 +221,7 @@ export default function SalariedDashboard() {
               <Title order={3} size="lg">
                 مهامي اليوم
               </Title>
-              <Button variant="light" size="sm" rightSection={<IconEye size={16} />}>
+              <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
                 عرض الكل
               </Button>
             </Group>
@@ -276,10 +276,10 @@ export default function SalariedDashboard() {
                       
                       <Group gap="xs">
                         <ActionIcon variant="light" color="brand">
-                          <IconEye size={16} />
+                          <Eye size={16} />
                         </ActionIcon>
                         <ActionIcon variant="light" color="blue">
-                          <IconUpload size={16} />
+                          <Upload size={16} />
                         </ActionIcon>
                       </Group>
                     </Group>
@@ -287,7 +287,7 @@ export default function SalariedDashboard() {
                 ))}
               </Stack>
             ) : (
-              <Alert variant="light" color="brand" icon={<IconBriefcase size={16} />}>
+              <Alert variant="light" color="brand" icon={<Briefcase size={16} />}>
                 ما عندك مهام مسندة اليوم. استمتع بيومك! 
               </Alert>
             )}
@@ -308,7 +308,7 @@ export default function SalariedDashboard() {
                   color="brand"
                   size="md"
                   fullWidth
-                  leftSection={<IconBriefcase size={20} />}
+                  leftSection={<Briefcase size={20} />}
                 >
                   مهامي
                 </Button>
@@ -320,7 +320,7 @@ export default function SalariedDashboard() {
                   color="blue"
                   size="md"
                   fullWidth
-                  leftSection={<IconCalendar size={20} />}
+                  leftSection={<Calendar size={20} />}
                 >
                   التقويم
                 </Button>
@@ -332,7 +332,7 @@ export default function SalariedDashboard() {
                   color="orange"
                   size="md"
                   fullWidth
-                  leftSection={<IconUpload size={20} />}
+                  leftSection={<Upload size={20} />}
                 >
                   رفع تقرير
                 </Button>
@@ -344,7 +344,7 @@ export default function SalariedDashboard() {
                   color="green"
                   size="md"
                   fullWidth
-                  leftSection={<IconUser size={20} />}
+                  leftSection={<User size={20} />}
                 >
                   ملفي الشخصي
                 </Button>

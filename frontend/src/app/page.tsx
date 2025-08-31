@@ -19,16 +19,16 @@ import {
   Tabs
 } from '@mantine/core';
 import {
-  IconUserShield,
-  IconUser,
-  IconCamera,
-  IconBriefcase,
-  IconUsersGroup,
-  IconLogin,
-  IconEye,
-  IconSettings,
-  IconChevronRight
-} from '@tabler/icons-react';
+  ShieldCheck,
+  User,
+  Camera,
+  Briefcase,
+  UsersRound,
+  LogIn,
+  Eye,
+  Settings,
+  ChevronRight
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // استيراد البيانات الوهمية لكل الأدوار
@@ -186,22 +186,22 @@ export default function RoleTestingPage() {
         {/* عرض المستخدمين */}
         <Tabs value={selectedRole} onChange={(value) => setSelectedRole((value as UserRole) || 'all')}>
           <Tabs.List justify="center" mb="xl">
-            <Tabs.Tab value="all" leftSection={<IconUsersGroup size={16} />}>
+            <Tabs.Tab value="all" leftSection={<UsersRound size={16} />}>
               الكل ({Object.values(allUsers).flat().length})
             </Tabs.Tab>
-            <Tabs.Tab value="super_admin" leftSection={<IconUserShield size={16} />} color="red">
+            <Tabs.Tab value="super_admin" leftSection={<ShieldCheck size={16} />} color="red">
               سوبر أدمن
             </Tabs.Tab>
-            <Tabs.Tab value="admin" leftSection={<IconSettings size={16} />} color="orange">
+            <Tabs.Tab value="admin" leftSection={<Settings size={16} />} color="orange">
               أدمن
             </Tabs.Tab>
-            <Tabs.Tab value="creator" leftSection={<IconCamera size={16} />} color="green">
+            <Tabs.Tab value="creator" leftSection={<Camera size={16} />} color="green">
               مبدع (6)
             </Tabs.Tab>
-            <Tabs.Tab value="client" leftSection={<IconBriefcase size={16} />} color="blue">
+            <Tabs.Tab value="client" leftSection={<Briefcase size={16} />} color="blue">
               عميل (4)
             </Tabs.Tab>
-            <Tabs.Tab value="salariedEmployee" leftSection={<IconUser size={16} />} color="brand">
+            <Tabs.Tab value="salariedEmployee" leftSection={<User size={16} />} color="brand">
               موظف (5)
             </Tabs.Tab>
           </Tabs.List>
@@ -247,7 +247,7 @@ export default function RoleTestingPage() {
                           color={user.color}
                           onClick={() => simulateLogin(user)}
                         >
-                          <IconLogin size={16} />
+                          <LogIn size={16} />
                         </ActionIcon>
                       </Group>
 
@@ -299,15 +299,15 @@ export default function RoleTestingPage() {
                           color={user.color}
                           size="sm"
                           fullWidth
-                          leftSection={<IconLogin size={16} />}
-                          rightSection={<IconChevronRight size={16} />}
+                          leftSection={<LogIn size={16} />}
+                          rightSection={<ChevronRight size={16} />}
                           onClick={() => simulateLogin(user)}
                         >
                           تسجيل دخول
                         </Button>
                         
                         <ActionIcon variant="subtle" color="gray">
-                          <IconEye size={16} />
+                          <Eye size={16} />
                         </ActionIcon>
                       </Group>
                     </Stack>
