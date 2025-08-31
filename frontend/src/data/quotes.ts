@@ -1,0 +1,1 @@
+export { mockQuotes } from './notifications';

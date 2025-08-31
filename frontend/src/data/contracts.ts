@@ -1,0 +1,1 @@
+export { mockContracts } from './notifications';

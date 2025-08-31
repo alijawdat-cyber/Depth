@@ -1,0 +1,169 @@
+/* 📝 حقول الإدخال والنماذج مبسطة - 3 أنواع و3 أحجام فقط */
+
+/* ========== حقل الإدخال الأساسي ========== */
+.input, .textarea, .select {
+  width: 100%; /* ملء العرض الكامل للحاوي */
+  min-height: var(--size-md); /* ارتفاع ثابت 44px للمس المريح */
+  padding: var(--space-sm) var(--space-md); /* حشو مريح للكتابة */
+  
+  font-size: var(--fs-md); line-height: 1.4; /* نص واضح ومقروء */
+  font-family: inherit; /* وراثة خط دبي من الأب */
+  
+  background-color: var(--color-bg-primary); /* خلفية بيضاء/سوداء */
+  border: 1px solid var(--color-border-primary); /* حد رمادي خفيف */
+  border-radius: var(--radius-md); /* زوايا دائرية 8px */
+  
+  transition: all 0.2s ease; /* انتقال ناعم للتفاعل */
+  appearance: none; /* إزالة الأنماط الافتراضية */
+}
+
+.input::placeholder, .textarea::placeholder { 
+  color: var(--color-text-secondary); /* نص placeholder رمادي */
+}
+
+/* ========== حالات التفاعل ========== */
+.input:focus, .textarea:focus, .select:focus {
+  outline: none; /* إزالة الإطار الافتراضي */
+  border-color: var(--color-primary); /* حد ملون عند التركيز */
+  background-color: var(--color-bg-primary); /* تأكيد الخلفية */
+}
+
+.input:disabled, .textarea:disabled, .select:disabled {
+  background-color: var(--color-bg-tertiary); /* خلفية رمادية */
+  color: var(--color-text-secondary); /* نص باهت */
+  cursor: not-allowed; /* إشارة منع */
+}
+
+/* ========== أنواع الحقول ========== */
+
+/* حقل نص متعدد الأسطر */
+.textarea {
+  min-height: calc(var(--size-md) * 2); /* ارتفاع ضعف الحقل العادي */
+  resize: vertical; /* تغيير الحجم عمودياً فقط */
+  line-height: 1.5; /* تباعد أوسع للقراءة */
+}
+
+/* قائمة اختيار */
+.select {
+  cursor: pointer; /* إشارة النقر */
+  padding-left: var(--space-xl); /* مسافة للسهم */
+  /* استخدام mask بدل لون ثابت حتى يرث اللون من التوكنز */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: var(--fs-md); mask-size: var(--fs-md); /* حجم الأيقونة من التوكنز */
+  -webkit-mask-position: right var(--space-md) center; mask-position: right var(--space-md) center;
+  background-color: var(--color-text-secondary); /* لون الأيقونة من التوكنز */
+}
+
+/* ========== أحجام الحقول (3 فقط) ========== */
+
+/* صغير - حقول الفلترة، البحث السريع */
+.input-sm, .textarea-sm, .select-sm {
+  min-height: var(--size-sm); /* ارتفاع أصغر 36px */
+  padding: var(--space-xs) var(--space-sm); /* حشو أقل */
+  font-size: var(--fs-sm); /* نص أصغر */
+  border-radius: var(--radius-sm); /* زوايا أصغر */
+}
+
+/* متوسط (افتراضي) - حقول النماذج العادية */
+.input-md, .textarea-md, .select-md {
+  min-height: var(--size-md); /* ارتفاع عادي 44px */
+  padding: var(--space-sm) var(--space-md); /* حشو عادي */
+  font-size: var(--fs-md); /* نص عادي */
+}
+
+/* كبير - حقول مهمة في الموبايل، تسجيل دخول */
+.input-lg, .textarea-lg, .select-lg {
+  min-height: var(--size-lg); /* ارتفاع أكبر 52px */
+  padding: var(--space-md) var(--space-lg); /* حشو أكبر */
+  font-size: var(--fs-lg); /* نص أكبر */
+}
+
+/* ========== حالات الحقول ========== */
+
+/* حقل صحيح - "تم التحقق"، "متوفر" */
+.input-success, .textarea-success, .select-success {
+  border-color: var(--color-success); /* حد أخضر */
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-success), transparent 90%); /* هالة خضراء مشتقة */
+}
+
+/* حقل خطأ - "مطلوب"، "غير صحيح" */
+.input-error, .textarea-error, .select-error {
+  border-color: var(--color-error); /* حد أحمر */
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-error), transparent 90%); /* هالة حمراء مشتقة */
+}
+
+/* حقل تحذير - "قارب على الانتهاء" */
+.input-warning, .textarea-warning, .select-warning {
+  border-color: var(--color-warning); /* حد برتقالي */
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-warning), transparent 90%); /* هالة برتقالية مشتقة */
+}
+
+/* ========== مجموعة الحقل ========== */
+.input-group {
+  display: flex; flex-direction: column; /* ترتيب عمودي */
+  gap: var(--space-xs); width: 100%; /* مسافة صغيرة، عرض كامل */
+}
+
+/* تسمية الحقل */
+.input-label {
+  font-size: var(--fs-sm); font-weight: 600; /* نص صغير وثقيل */
+  color: var(--color-text-primary); /* لون أساسي */
+  margin-bottom: var(--space-xs); /* مسافة صغيرة أسفل */
+}
+.input-label.required::after { content: ' *'; color: var(--color-error); } /* علامة المطلوب */
+
+/* نص المساعدة */
+.input-help {
+  font-size: var(--fs-xs); color: var(--color-text-secondary); /* نص صغير ورمادي */
+  line-height: 1.4; margin-top: var(--space-xs); /* تباعد ومسافة */
+}
+
+/* رسائل الحالة */
+.input-message {
+  font-size: var(--fs-xs); font-weight: 500; /* نص صغير وواضح */
+  display: flex; align-items: center; gap: var(--space-xs); /* ترتيب مع أيقونة */
+  margin-top: var(--space-xs); /* مسافة من الحقل */
+}
+.input-message.success { color: var(--color-success); } /* رسالة خضراء */
+.input-message.error { color: var(--color-error); } /* رسالة حمراء */
+.input-message.warning { color: var(--color-warning); } /* رسالة برتقالية */
+
+/* ========== حقول خاصة ========== */
+
+/* حقل البحث */
+.input-search {
+  padding-right: var(--space-xl); /* مسافة لأيقونة البحث */
+  /* استخدام mask بدل لون ثابت */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.5 0a6.5 6.5 0 004.89 10.86l2.82 2.82a1 1 0 001.42-1.42l-2.82-2.82A6.5 6.5 0 106.5 0zm0 2a4.5 4.5 0 110 9 4.5 4.5 0 010-9z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.5 0a6.5 6.5 0 004.89 10.86l2.82 2.82a1 1 0 001.42-1.42l-2.82-2.82A6.5 6.5 0 106.5 0zm0 2a4.5 4.5 0 110 9 4.5 4.5 0 010-9z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: var(--fs-md); mask-size: var(--fs-md); /* أيقونة بحث من التوكنز */
+  -webkit-mask-position: left var(--space-md) center; mask-position: left var(--space-md) center; /* موضع الأيقونة */
+  background-color: var(--color-text-secondary); /* لون الأيقونة من التوكنز */
+}
+
+/* مربع اختيار */
+.checkbox, .radio {
+  width: var(--fs-lg); height: var(--fs-lg); min-height: var(--fs-lg); /* حجم من التوكنز بدل px ثابت */
+  margin: 0; cursor: pointer; /* إزالة الهامش، إشارة نقر */
+  accent-color: var(--color-primary); /* لون التمييز */
+}
+.radio { border-radius: 50%; } /* شكل دائري للراديو */
+
+/* تسمية المربع */
+.checkbox-label, .radio-label {
+  display: flex; align-items: center; gap: var(--space-sm); /* ترتيب مع المربع */
+  cursor: pointer; font-size: var(--fs-md); line-height: 1.4; /* نص مريح */
+}
+
+/* ========== استجابة للشاشات ========== */
+@media (max-width: var(--bp-mobile)) {
+  .input, .textarea, .select { 
+    min-height: var(--size-lg); font-size: var(--fs-md); /* حقول أكبر للموبايل */
+    padding: var(--space-md); /* حشو أكبر للمس */
+  }
+  .input-sm { min-height: var(--size-md); } /* الصغير يصير متوسط */
+  .input-label { font-size: var(--fs-md); margin-bottom: var(--space-sm); } /* تسمية أكبر */
+}

@@ -1,0 +1,288 @@
+/* 📊 جداول وقوائم منظمة - أنماط موحدة */
+
+/* ========== الجدول الأساسي ========== */
+
+.table {
+  width: 100%; /* عرض كامل */
+  border-collapse: collapse; /* دمج الحدود */
+  background-color: var(--color-bg-primary); /* خلفية أساسية */
+  border-radius: var(--radius-md); /* زوايا دائرية */
+  overflow: hidden; /* إخفاء المتدفق للزوايا */
+}
+
+.table th,
+.table td {
+  padding: var(--space-md); /* حشو متوسط */
+  text-align: center; /* محاذاة وسط أفقياً */
+  vertical-align: middle; /* محاذاة وسط عمودياً */
+  border-bottom: 1px solid var(--color-border-primary); /* حد أسفل */
+}
+
+.table th {
+  background-color: var(--color-bg-secondary); /* خلفية ثانوية للهيدر */
+  color: var(--color-text-primary); /* لون أساسي */
+  font-size: var(--fs-sm); /* حجم صغير */
+  position: sticky; /* موضع لاصق */
+  top: 0; /* لصق للأعلى */
+  z-index: var(--z-base); /* طبقة أساسية */
+}
+
+.table td {
+  color: var(--color-text-secondary); /* لون ثانوي للمحتوى */
+  font-size: var(--fs-md); /* حجم متوسط */
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-bg-tertiary); /* خلفية عند التمرير */
+}
+
+
+/* ========== أحجام الجداول ========== */
+
+/* جدول صغير - للبيانات المضغوطة */
+.table-sm th,
+.table-sm td {
+  padding: var(--space-sm); /* حشو صغير */
+  font-size: var(--fs-sm); /* نص صغير */
+}
+
+/* جدول كبير - للبيانات المفصلة */
+.table-lg th,
+.table-lg td {
+  padding: var(--space-lg); /* حشو كبير */
+  font-size: var(--fs-lg); /* نص كبير */
+}
+
+
+/* ========== أنواع الجداول ========== */
+
+/* جدول مخطط - صفوف متناوبة */
+.table-striped tbody tr:nth-child(even) {
+  background-color: var(--color-bg-secondary); /* خلفية ثانوية للصفوف الزوجية */
+}
+
+/* جدول محدد - حدود واضحة */
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--color-border-primary); /* حد شامل */
+}
+
+/* جدول بدون حدود */
+.table-borderless th,
+.table-borderless td {
+  border: none; /* بدون حدود */
+}
+
+
+/* ========== حالات الصفوف ========== */
+
+.table tr.selected {
+  background-color: var(--color-primary-light); /* خلفية ملونة للمحدد */
+}
+
+.table tr.success {
+  background-color: var(--color-success); /* خلفية خضراء */
+  color: var(--color-text-inverse); /* نص معكوس */
+}
+
+.table tr.warning {
+  background-color: var(--color-warning); /* خلفية برتقالية */
+  color: var(--color-text-inverse); /* نص معكوس */
+}
+
+.table tr.error {
+  background-color: var(--color-error); /* خلفية حمراء */
+  color: var(--color-text-inverse); /* نص معكوس */
+}
+
+.table tr.info {
+  background-color: var(--color-info); /* خلفية زرقاء */
+  color: var(--color-text-inverse); /* نص معكوس */
+}
+
+
+/* ========== أعمدة خاصة ========== */
+
+.table .col-actions {
+  width: 1%; /* عرض أدنى للأزرار */
+  white-space: nowrap; /* عدم انكسار النص */
+}
+
+.table .col-number {
+  width: var(--size-lg); /* عرض ثابت للأرقام */
+  text-align: center; /* محاذاة وسط */
+  font-variant-numeric: tabular-nums; /* أرقام متساوية العرض */
+}
+
+.table .col-date {
+  width: var(--sidebar-width); /* عرض مناسب للتواريخ */
+  text-align: center; /* محاذاة وسط */
+}
+
+.table .col-status {
+  width: var(--size-lg); /* عرض مناسب للحالات */
+  text-align: center; /* محاذاة وسط */
+}
+
+
+/* ========== حاوي الجدول ========== */
+
+.table-container {
+  border: 1px solid var(--color-border-primary); /* حد خارجي */
+  border-radius: var(--radius-md); /* زوايا دائرية */
+  background-color: var(--color-bg-primary); /* خلفية أساسية */
+  overflow: hidden; /* إخفاء المتدفق */
+}
+
+.table-responsive {
+  overflow-x: auto; /* تمرير أفقي */
+  scrollbar-width: thin; /* شريط تمرير رفيع */
+}
+
+/* تخصيص شريط التمرير */
+.table-responsive::-webkit-scrollbar {
+  height: var(--space-xs); /* ارتفاع شريط التمرير */
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background-color: var(--color-bg-secondary); /* خلفية المسار */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-primary); /* لون الشريط */
+  border-radius: var(--radius-sm); /* زوايا دائرية */
+}
+
+
+/* ========== ترويسة وتذييل الجدول ========== */
+
+.table-header {
+  display: flex;
+  align-items: center; /* محاذاة وسط عمودي */
+  justify-content: space-between; /* توزيع بين البداية والنهاية */
+  padding: var(--space-md); /* حشو متوسط */
+  background-color: var(--color-bg-secondary); /* خلفية ثانوية */
+  border-bottom: 1px solid var(--color-border-primary); /* حد أسفل */
+}
+
+.table-title {
+  font-size: var(--fs-lg); /* حجم كبير */
+  color: var(--color-text-primary); /* لون أساسي */
+  margin: 0; /* بدون هامش */
+}
+
+.table-actions {
+  display: flex;
+  align-items: center; /* محاذاة وسط عمودي */
+  gap: var(--space-sm); /* مسافة بين الأزرار */
+}
+
+.table-footer {
+  display: flex;
+  align-items: center; /* محاذاة وسط عمودي */
+  justify-content: space-between; /* توزيع بين البداية والنهاية */
+  padding: var(--space-md); /* حشو متوسط */
+  background-color: var(--color-bg-secondary); /* خلفية ثانوية */
+  border-top: 1px solid var(--color-border-primary); /* حد علوي */
+}
+
+.table-info {
+  font-size: var(--fs-sm); /* حجم صغير */
+  color: var(--color-text-secondary); /* لون ثانوي */
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center; /* محاذاة وسط عمودي */
+  gap: var(--space-xs); /* مسافة بين الأزرار */
+}
+
+
+/* ========== ترتيب الأعمدة ========== */
+
+.table th.sortable {
+  cursor: pointer; /* إشارة نقر */
+  user-select: none; /* منع تحديد النص */
+  position: relative; /* للأيقونة */
+}
+
+.table th.sortable:hover {
+  background-color: var(--color-bg-tertiary); /* خلفية عند التمرير */
+}
+
+.table th.sorted-asc::after {
+  content: '↑'; /* سهم للأعلى */
+  position: absolute;
+  left: var(--space-xs); /* موضع من اليسار */
+  color: var(--color-primary); /* لون ملون */
+}
+
+.table th.sorted-desc::after {
+  content: '↓'; /* سهم للأسفل */
+  position: absolute;
+  left: var(--space-xs); /* موضع من اليسار */
+  color: var(--color-primary); /* لون ملون */
+}
+
+
+/* ========== حالة التحميل ========== */
+
+.table-loading {
+  position: relative; /* للطبقة */
+}
+
+.table-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; /* تغطية كاملة */
+  background-color: var(--color-bg-primary); /* خلفية شفافة */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* توسيط المحتوى */
+  z-index: var(--z-dropdown); /* طبقة عالية */
+}
+
+
+/* ========== استجابة الموبايل ========== */
+
+/* لا تستخدم var() داخل media لضمان دعم كل المتصفحات */
+@media (max-width: 640px) {
+  .table-header {
+    flex-direction: column; /* ترتيب عمودي */
+    align-items: flex-start; /* محاذاة للبداية */
+    gap: var(--space-sm); /* مسافة بين العناصر */
+  }
+  
+  .table-actions {
+    width: 100%; /* عرض كامل */
+    justify-content: flex-start; /* محاذاة للبداية */
+  }
+  
+  .table-footer {
+    flex-direction: column; /* ترتيب عمودي */
+    align-items: flex-start; /* محاذاة للبداية */
+    gap: var(--space-sm); /* مسافة بين العناصر */
+  }
+  
+  /* إخفاء أعمدة غير مهمة في الموبايل */
+  .table .hide-mobile {
+    display: none; /* إخفاء في الشاشات الصغيرة */
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--space-sm); /* حشو أقل للموبايل */
+    font-size: var(--fs-sm); /* نص أصغر */
+  }
+}
+
+/* عندما تكون البطاقة data-fit="content"، لا تفرض الجداول العرض الكامل في الشاشات الكبيرة */
+@media (min-width: 1024px) {
+  .mantine-Card-root[data-fit="content"] .table,
+  .mantine-Card-root[data-fit="content"] table {
+    width: max-content;
+  }
+}

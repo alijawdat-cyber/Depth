@@ -1,0 +1,30 @@
+/* 🔄 إعادة ضبط المتصفحات - توحيد السلوك عبر كل المتصفحات */
+
+* { box-sizing: border-box; } /* حساب الحشو والحد ضمن العرض - منع overflow غير متوقع */
+*::before, *::after { box-sizing: border-box; } /* نفس الشي للعناصر المولدة بـ CSS */
+
+html { line-height: 1.15; -webkit-text-size-adjust: 100%; } /* منع تكبير النص التلقائي في iOS */
+body { margin: 0; font-family: inherit; } /* إزالة الهامش الافتراضي، وراثة الخط */
+
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: inherit; } /* إزالة هوامش العناوين الافتراضية */
+p, ul, ol, dl, blockquote, figure { margin: 0; padding: 0; } /* إزالة هوامش الفقرات والقوائم */
+
+button, input, optgroup, select, textarea { font-family: inherit; font-size: 100%; } /* وراثة الخط من الأب */
+button, select { text-transform: none; } /* منع تحويل النص التلقائي في بعض المتصفحات */
+
+button, [type="button"], [type="reset"], [type="submit"] { 
+  appearance: button; -webkit-appearance: button; /* تأكيد شكل الزر في كل المتصفحات */
+  cursor: pointer; /* إشارة النقر للأزرار */
+}
+
+[type="search"] { appearance: textfield; -webkit-appearance: textfield; outline-offset: -2px; } /* توحيد شكل حقل البحث */
+[type="search"]::-webkit-search-decoration { -webkit-appearance: none; } /* إزالة الزخرفة في Safari */
+
+input, textarea, select { outline: none; border: none; background: transparent; } /* إزالة الأنماط الافتراضية */
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--color-primary); } /* تركيز موحد */
+
+a { color: inherit; text-decoration: none; } /* الروابط ترث اللون وبدون خط تحت */
+img, svg { max-width: 100%; height: auto; display: block; } /* الصور متجاوبة وبلوك افتراضياً */
+
+table { border-collapse: collapse; border-spacing: 0; } /* إزالة المسافات بين خلايا الجدول */
+th, td { padding: 0; text-align: inherit; } /* إزالة الحشو الافتراضي، وراثة المحاذاة */

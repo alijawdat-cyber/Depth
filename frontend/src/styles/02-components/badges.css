@@ -1,0 +1,205 @@
+/* 🏷️ شارات وعلامات مبسطة - 3 أحجام و5 ألوان فقط */
+
+/* ========== الشارة الأساسية ========== */
+.badge {
+  display: inline-flex; align-items: center; /* عرض مرن ووسط */
+  font-size: var(--fs-xs); /* نص صغير */
+  line-height: 1; /* تباعد سطري */
+  
+  padding: var(--space-xs) var(--space-sm); /* حشو مريح */
+  border-radius: var(--radius-full); /* زوايا دائرية تامة */
+  border: 1px solid transparent; /* حد شفاف للثبات */
+  
+  white-space: nowrap; overflow: hidden; /* منع الانكسار والطفح */
+  text-overflow: ellipsis; /* اختصار النص الطويل */
+  transition: all 0.2s ease; /* انتقال ناعم */
+}
+
+/* ========== أحجام الشارات (3 فقط) ========== */
+
+/* صغيرة - العدادات، الحالات المصغرة */
+.badge-sm {
+  font-size: var(--fs-xs); padding: var(--space-xs); /* نص وحشو صغير */
+  min-height: var(--fs-sm); /* ارتفاع أدنى */
+}
+
+/* متوسطة (افتراضي) - الشارات العادية */
+.badge-md {
+  font-size: var(--fs-xs); padding: var(--space-xs) var(--space-sm); /* حجم عادي */
+  min-height: var(--fs-md); /* ارتفاع مريح */
+}
+
+/* كبيرة - الشارات المميزة، الرتب */
+.badge-lg {
+  font-size: var(--fs-sm); padding: var(--space-sm) var(--space-md); /* نص وحشو أكبر */
+  min-height: var(--fs-lg); /* ارتفاع كبير */
+}
+
+/* ========== ألوان الشارات (5 فقط) ========== */
+
+/* افتراضية - "معلق"، "قيد المراجعة" */
+.badge-default {
+  background-color: var(--color-bg-secondary); /* خلفية رمادية فاتحة */
+  color: var(--color-text-primary); /* نص أساسي */
+  border-color: var(--color-border-primary); /* حد رمادي */
+}
+
+/* أولية - "مهم"، "جديد" */
+.badge-primary {
+  background-color: var(--color-primary); /* خلفية زرقاء */
+  color: white; /* نص أبيض للتباين */
+  border-color: var(--color-primary); /* حد بنفس اللون */
+}
+
+/* نجاح - "مفعل"، "تم" */
+.badge-success {
+  background-color: var(--color-success); /* خلفية خضراء */
+  color: white; /* نص أبيض */
+  border-color: var(--color-success); /* حد أخضر */
+}
+
+/* تحذير - "انتباه"، "قارب على الانتهاء" */
+.badge-warning {
+  background-color: var(--color-warning); /* خلفية برتقالية */
+  color: white; /* نص أبيض */
+  border-color: var(--color-warning); /* حد برتقالي */
+}
+
+/* خطأ - "معطل"، "رُفض" */
+.badge-error {
+  background-color: var(--color-error); /* خلفية حمراء */
+  color: white; /* نص أبيض */
+  border-color: var(--color-error); /* حد أحمر */
+}
+
+/* ========== أنواع الشارات ========== */
+
+/* شارة مليئة (افتراضي) - الحالات الواضحة، ملونة بالكامل */
+
+/* شارة محددة - الحالات الخفيفة */
+.badge-outlined {
+  background-color: transparent; /* خلفية شفافة */
+}
+.badge-outlined.badge-default { color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.badge-outlined.badge-primary { color: var(--color-primary); border-color: var(--color-primary); }
+.badge-outlined.badge-success { color: var(--color-success); border-color: var(--color-success); }
+.badge-outlined.badge-warning { color: var(--color-warning); border-color: var(--color-warning); }
+.badge-outlined.badge-error { color: var(--color-error); border-color: var(--color-error); }
+
+/* شارة خفيفة - الحالات الناعمة، استخدام الخلفية الثانوية فقط */
+.badge-light {
+  border: none; /* بدون حد */
+  background-color: var(--color-bg-secondary); /* خلفية ثانوية موحدة */
+  color: var(--color-text-secondary); /* نص ثانوي موحد */
+}
+
+/* ========== شارات خاصة ========== */
+
+/* شارة عداد - "3 رسائل جديدة" */
+.badge-count {
+  border-radius: var(--radius-full); /* دائرية تماماً */
+  min-width: var(--fs-lg); height: var(--fs-lg); /* حجم ثابت دائري */
+  padding: 0; /* بدون حشو إضافي */
+  display: inline-flex; align-items: center; justify-content: center; /* توسيط تام */
+  font-size: var(--fs-xs); /* نص صغير */
+}
+
+/* شارة نقطة - فقط لون بدون نص */
+.badge-dot {
+  width: var(--space-sm); height: var(--space-sm); /* حجم صغير دائري */
+  border-radius: var(--radius-full); padding: 0; /* دائرة كاملة، بدون حشو */
+  border: none; /* بدون حد */
+  display: inline-block; /* كتلة مع السطر */
+  flex-shrink: 0; /* لا تنكمش */
+}
+
+/* شارة حالة - "متصل"، "غير متاح" */
+.badge-status {
+  position: relative; /* للنقطة المتحركة */
+  padding-left: var(--space-lg); /* مساحة للنقطة */
+}
+.badge-status::before {
+  content: ''; position: absolute; /* نقطة مطلقة الموضع */
+  left: var(--space-xs); top: 50%; /* موضع النقطة */
+  transform: translateY(-50%); /* توسيط عمودي */
+  width: var(--space-sm); height: var(--space-sm); /* حجم النقطة من التوكنز */
+  border-radius: 50%; /* دائرية */
+  background-color: currentColor; /* بنفس لون النص */
+}
+
+/* شارة قابلة للحذف */
+.badge-dismissible {
+  padding-right: var(--space-lg); /* مساحة لزر الحذف */
+  position: relative; /* لموضع الزر */
+}
+.badge-dismissible .badge-close {
+  position: absolute; right: var(--space-xs); /* موضع الزر */
+  top: 50%; transform: translateY(-50%); /* توسيط عمودي */
+  background: none; border: none; /* بدون خلفية أو حد */
+  color: inherit; /* لون موروث */
+  cursor: pointer; padding: 0; /* إشارة نقر، بدون حشو */
+  width: var(--fs-sm); height: var(--fs-sm); /* حجم ثابت */
+  display: flex; align-items: center; justify-content: center; /* توسيط */
+  font-size: var(--fs-xs); line-height: 1; /* خط صغير */
+  border-radius: var(--radius-full); /* دائري */
+  transition: all 0.2s ease; /* انتقال ناعم */
+}
+.badge-dismissible .badge-close:hover {
+  background-color: var(--color-bg-tertiary); /* خلفية عند التمرير */
+}
+
+/* ========== مجموعات الشارات ========== */
+
+/* حاوي الشارات */
+.badges-group {
+  display: inline-flex; align-items: center; /* صف مرن ووسط */
+  gap: var(--space-xs); /* مسافة 8px بين الشارات */
+  flex-wrap: wrap; /* انكسار للسطر التالي */
+}
+
+/* شارات متداخلة */
+.badges-stacked {
+  display: inline-flex; /* صف مرن */
+  margin-left: -4px; /* تداخل خفيف */
+}
+.badges-stacked .badge {
+  margin-left: 4px; border: 2px solid var(--color-bg-primary); /* تداخل مع حد أبيض */
+  position: relative; z-index: 1; /* طبقة أساسية */
+}
+.badges-stacked .badge:hover {
+  z-index: 2; /* رفع للأمام عند المرور */
+}
+
+/* ========== حالات تفاعلية ========== */
+
+/* شارة قابلة للنقر */
+.badge-clickable {
+  cursor: pointer; /* إشارة النقر */
+  transition: all 0.2s ease; /* انتقال ناعم */
+}
+.badge-clickable:hover {
+  background-color: var(--color-bg-tertiary); /* خلفية أغمق عند المرور */
+}
+
+/* شارة نشطة */
+.badge-active {
+  background-color: var(--color-primary); /* خلفية نشطة */
+  color: var(--color-text-inverse); /* نص معكوس */
+}
+
+/* شارة معطلة */
+.badge-disabled {
+  color: var(--color-text-secondary); /* لون باهت */
+  cursor: not-allowed; /* منع النقر */
+  pointer-events: none; /* منع التفاعل */
+}
+
+/* ========== استجابة للشاشات ========== */
+@media (max-width: var(--bp-mobile)) {
+  .badges-group { 
+    gap: var(--space-xs); /* مسافة أقل بين الشارات */
+    max-width: 100%; overflow-x: auto; /* تمرير أفقي إذا لزم */
+    scrollbar-width: none; -ms-overflow-style: none; /* إخفاء شريط التمرير */
+  }
+  .badges-group::-webkit-scrollbar { display: none; } /* إخفاء في webkit */
+}
