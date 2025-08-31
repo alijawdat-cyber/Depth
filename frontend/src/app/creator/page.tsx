@@ -18,17 +18,17 @@ import {
   ThemeIcon,
   Avatar
 } from '@mantine/core';
-import {
-  IconCamera,
-  IconEye,
-  IconUpload,
-  IconCalendar,
-  IconStar,
-  IconClock,
-  IconCheck,
-  IconPalette,
-  IconChartLine
-} from '@tabler/icons-react';
+  import {
+    Camera,
+    Eye,
+    Upload,
+    Calendar,
+    Star,
+    Clock,
+    Check,
+  Paintbrush,
+  LineChart
+  } from 'lucide-react';
 
 // البيانات الوهمية للمبدع الحالي
 import { mockCreators } from '@/data/creators';
@@ -91,7 +91,7 @@ export default function CreatorDashboard() {
             <Button 
               variant="filled" 
               color="green"
-              leftSection={<IconUpload size={18} />}
+              leftSection={<Upload size={18} />}
             >
               رفع عمل جديد
             </Button>
@@ -115,7 +115,7 @@ export default function CreatorDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="blue">
-                  <IconClock size={28} />
+                  <Clock size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -136,7 +136,7 @@ export default function CreatorDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconCheck size={28} />
+                  <Check size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -157,7 +157,7 @@ export default function CreatorDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="yellow">
-                  <IconStar size={28} />
+                  <Star size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -178,7 +178,7 @@ export default function CreatorDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconClock size={28} />
+                  <Clock size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -228,7 +228,7 @@ export default function CreatorDashboard() {
               <Title order={3} size="lg">
                 مشاريعي الحالية
               </Title>
-              <Button variant="light" size="sm" rightSection={<IconEye size={16} />}>
+              <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
                 عرض الكل
               </Button>
             </Group>
@@ -285,10 +285,10 @@ export default function CreatorDashboard() {
                       
                       <Group gap="xs">
                         <ActionIcon variant="light" color="green">
-                          <IconEye size={16} />
+                          <Eye size={16} />
                         </ActionIcon>
                         <ActionIcon variant="light" color="blue">
-                          <IconUpload size={16} />
+                          <Upload size={16} />
                         </ActionIcon>
                       </Group>
                     </Group>
@@ -296,7 +296,7 @@ export default function CreatorDashboard() {
                 ))}
               </Stack>
             ) : (
-              <Alert variant="light" color="green" icon={<IconPalette size={16} />}>
+              <Alert variant="light" color="green" icon={<Paintbrush size={16} />}>
                 ما عندك مشاريع مسندة حالياً. راح تيجيك إشعارات عند توفر مشاريع جديدة!
               </Alert>
             )}
@@ -317,7 +317,7 @@ export default function CreatorDashboard() {
                   color="green"
                   size="md"
                   fullWidth
-                  leftSection={<IconCamera size={20} />}
+                  leftSection={<Camera size={20} />}
                 >
                   معرض أعمالي
                 </Button>
@@ -329,7 +329,7 @@ export default function CreatorDashboard() {
                   color="blue"
                   size="md"
                   fullWidth
-                  leftSection={<IconCalendar size={20} />}
+                  leftSection={<Calendar size={20} />}
                 >
                   إدارة التوفر
                 </Button>
@@ -341,7 +341,7 @@ export default function CreatorDashboard() {
                   color="orange"
                   size="md"
                   fullWidth
-                  leftSection={<IconUpload size={20} />}
+                  leftSection={<Upload size={20} />}
                 >
                   رفع ملفات
                 </Button>
@@ -353,7 +353,7 @@ export default function CreatorDashboard() {
                   color="brand"
                   size="md"
                   fullWidth
-                  leftSection={<IconChartLine size={20} />}
+                  leftSection={<LineChart size={20} />}
                 >
                   إحصائياتي
                 </Button>
@@ -422,7 +422,7 @@ export default function CreatorDashboard() {
                 </Grid.Col>
               )) || (
                 <Grid.Col span={12}>
-                  <Alert variant="light" color="yellow" icon={<IconCamera size={16} />}>
+                  <Alert variant="light" color="yellow" icon={<Camera size={16} />}>
                     أضف أعمالك لمعرض البورتفوليو لجذب عملاء أكثر!
                   </Alert>
                 </Grid.Col>

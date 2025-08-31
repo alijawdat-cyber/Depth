@@ -19,15 +19,15 @@ import {
   Alert
 } from '@mantine/core';
 import {
-  IconUsers,
-  IconCurrencyDollar,
-  IconClipboardList,
-  IconChartLine,
-  IconTrendingUp,
-  IconAlertTriangle,
-  IconEye,
-  IconArrowRight
-} from '@tabler/icons-react';
+  Users,
+  DollarSign,
+  ClipboardList,
+  LineChart,
+  TrendingUp,
+  AlertTriangle,
+  Eye,
+  ArrowRight
+} from 'lucide-react';
 
 // البيانات من الموك
 import { mockProjects } from '@/data/projects';
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="blue">
-                  <IconClipboardList size={28} />
+                  <ClipboardList size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconUsers size={28} />
+                  <Users size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="brand">
-                  <IconUsers size={28} />
+                  <Users size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconCurrencyDollar size={28} />
+                  <DollarSign size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                   <Title order={3} size="lg">
                     آخر الأنشطة
                   </Title>
-                  <Button variant="light" size="sm" rightSection={<IconEye size={16} />}>
+                  <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
                     عرض الكل
                   </Button>
                 </Group>
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
                         variant="light"
                         color={notif.priority === 'urgent' ? 'red' : notif.priority === 'high' ? 'orange' : 'blue'}
                       >
-                        <IconAlertTriangle size={12} />
+                        <AlertTriangle size={12} />
                       </ThemeIcon>
                       <Stack gap={0} style={{ flex: 1 }}>
                         <Text size="xs" fw={500}>
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
                   variant="light" 
                   size="sm" 
                   fullWidth
-                  rightSection={<IconArrowRight size={16} />}
+                  rightSection={<ArrowRight size={16} />}
                 >
                   عرض كل التنبيهات
                 </Button>
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
                 <Group justify="space-between" align="center">
                   <Title order={3} size="lg">المدفوعات الأخيرة</Title>
                   <Group gap={6}>
-                    <IconTrendingUp size={18} />
+                    <TrendingUp size={18} />
                     <Text size="sm" c="dimmed">اتجاه جيد</Text>
                   </Group>
                 </Group>
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                   color="blue"
                   size="md"
                   fullWidth
-                  leftSection={<IconUsers size={20} />}
+                  leftSection={<Users size={20} />}
                 >
                   إدارة المبدعين
                 </Button>
@@ -339,7 +339,7 @@ export default function AdminDashboard() {
                   color="green"
                   size="md"
                   fullWidth
-                  leftSection={<IconClipboardList size={20} />}
+                  leftSection={<ClipboardList size={20} />}
                 >
                   المشاريع النشطة
                 </Button>
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                   color="orange"
                   size="md"
                   fullWidth
-                  leftSection={<IconCurrencyDollar size={20} />}
+                  leftSection={<DollarSign size={20} />}
                 >
                   الفواتير المعلقة
                 </Button>
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
                   color="brand"
                   size="md"
                   fullWidth
-                  leftSection={<IconChartLine size={20} />}
+                  leftSection={<LineChart size={20} />}
                 >
                   التقارير المالية
                 </Button>

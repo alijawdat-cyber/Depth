@@ -12,10 +12,10 @@ import {
   Group
 } from '@mantine/core';
 import {
-  IconAlertTriangle,
-  IconRefresh,
-  IconHome
-} from '@tabler/icons-react';
+  AlertTriangle,
+  RefreshCw,
+  Home
+} from 'lucide-react';
 
 // ================================
 // شاشة الخطأ الموحدة للأدمن
@@ -32,7 +32,7 @@ export default function AdminError({ error, reset }: Props) {
   <Center style={{ minHeight: 'calc(100dvh - var(--header-height))' }}>
   <Stack gap="lg" align="center" style={{ maxWidth: 'min(100%, var(--sidebar-width))' }}>
           <ThemeIcon size="xl" radius="xl" variant="light" color="red">
-            <IconAlertTriangle size={40} />
+            <AlertTriangle size={40} />
           </ThemeIcon>
           
           <Stack gap="sm" align="center">
@@ -68,7 +68,7 @@ export default function AdminError({ error, reset }: Props) {
             <Button
               variant="filled"
               color="blue"
-              leftSection={<IconRefresh size={16} />}
+              leftSection={<RefreshCw size={16} />}
               onClick={reset}
             >
               المحاولة مرة أخرى
@@ -76,7 +76,7 @@ export default function AdminError({ error, reset }: Props) {
             <Button
               variant="light"
               color="gray"
-              leftSection={<IconHome size={16} />}
+              leftSection={<Home size={16} />}
               component="a"
               href="/admin"
             >

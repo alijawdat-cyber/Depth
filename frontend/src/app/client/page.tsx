@@ -18,15 +18,15 @@ import {
   ThemeIcon
 } from '@mantine/core';
 import {
-  IconPlus,
-  IconEye,
-  IconFileText,
-  IconCurrencyDollar,
-  IconClock,
-  IconCheck,
-  IconAlertTriangle,
-  IconChartLine
-} from '@tabler/icons-react';
+  Plus,
+  Eye,
+  FileText,
+  DollarSign,
+  Clock,
+  Check,
+  AlertTriangle,
+  LineChart
+} from 'lucide-react';
 
 // البيانات الوهمية للعميل الحالي
 import { mockClients } from '@/data/clients';
@@ -67,7 +67,7 @@ export default function ClientDashboard() {
             <Button 
               variant="filled" 
               color="blue"
-              leftSection={<IconPlus size={18} />}
+              leftSection={<Plus size={18} />}
             >
               طلب جديد
             </Button>
@@ -91,7 +91,7 @@ export default function ClientDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="blue">
-                  <IconClock size={28} />
+                  <Clock size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -112,7 +112,7 @@ export default function ClientDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconCheck size={28} />
+                  <Check size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -133,7 +133,7 @@ export default function ClientDashboard() {
                   </Text>
                 </Stack>
                 <ThemeIcon size="xl" radius="md" variant="light" color="green">
-                  <IconCurrencyDollar size={28} />
+                  <DollarSign size={28} />
                 </ThemeIcon>
               </Group>
             </Card>
@@ -159,7 +159,7 @@ export default function ClientDashboard() {
                   variant="light" 
                   color={pendingInvoices > 0 ? "orange" : "green"}
                 >
-                  {pendingInvoices > 0 ? <IconAlertTriangle size={28} /> : <IconCheck size={28} />}
+                  {pendingInvoices > 0 ? <AlertTriangle size={28} /> : <Check size={28} />}
                 </ThemeIcon>
               </Group>
             </Card>
@@ -175,7 +175,7 @@ export default function ClientDashboard() {
               <Title order={3} size="lg">
                 مشاريعي النشطة
               </Title>
-              <Button variant="light" size="sm" rightSection={<IconEye size={16} />}>
+              <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
                 عرض الكل
               </Button>
             </Group>
@@ -229,10 +229,10 @@ export default function ClientDashboard() {
                       
                       <Group gap="xs">
                         <ActionIcon variant="light" color="blue">
-                          <IconEye size={16} />
+                          <Eye size={16} />
                         </ActionIcon>
                         <ActionIcon variant="light" color="gray">
-                          <IconFileText size={16} />
+                          <FileText size={16} />
                         </ActionIcon>
                       </Group>
                     </Group>
@@ -240,7 +240,7 @@ export default function ClientDashboard() {
                 ))}
               </Stack>
             ) : (
-              <Alert variant="light" color="blue" icon={<IconFileText size={16} />}>
+              <Alert variant="light" color="blue" icon={<FileText size={16} />}>
                 ما عندك مشاريع حالياً. ابدأ بإنشاء طلب جديد!
               </Alert>
             )}
@@ -261,7 +261,7 @@ export default function ClientDashboard() {
                   color="blue"
                   size="md"
                   fullWidth
-                  leftSection={<IconFileText size={20} />}
+                  leftSection={<FileText size={20} />}
                 >
                   طلب مشروع جديد
                 </Button>
@@ -273,7 +273,7 @@ export default function ClientDashboard() {
                   color="green"
                   size="md"
                   fullWidth
-                  leftSection={<IconEye size={20} />}
+                  leftSection={<Eye size={20} />}
                 >
                   عرض المشاريع
                 </Button>
@@ -285,7 +285,7 @@ export default function ClientDashboard() {
                   color="orange"
                   size="md"
                   fullWidth
-                  leftSection={<IconCurrencyDollar size={20} />}
+                  leftSection={<DollarSign size={20} />}
                 >
                   الفواتير والدفع
                 </Button>
@@ -297,7 +297,7 @@ export default function ClientDashboard() {
                   color="brand"
                   size="md"
                   fullWidth
-                  leftSection={<IconChartLine size={20} />}
+                  leftSection={<LineChart size={20} />}
                 >
                   تقاريري
                 </Button>

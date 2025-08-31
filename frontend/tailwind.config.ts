@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 export default {
-  content: ['./src/**/*.{ts,tsx,mdx,css}', './.storybook/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx,mdx,css}'],
   theme: {
     screens: {
       // الأساسية - Mobile-first - موحدة مع tokens.css

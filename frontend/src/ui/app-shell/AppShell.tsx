@@ -5,7 +5,7 @@ import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Divider, Bad
 import Image from "next/image"; // صورة
 import Link from "next/link"; // روابط
 import { useDisclosure } from "@mantine/hooks"; // فتح/غلق
-import { IconBell, IconSettings, IconUser, IconHome2, IconLayoutGrid, IconCamera, IconBriefcase, IconFileText, IconCurrencyDollar, IconCalendar, IconSun, IconMoon, IconDevices, IconUsers, IconCategory, IconTool, IconChartBar } from "@tabler/icons-react"; // أيقونات
+import { Bell, Settings, User, Home, LayoutGrid, Camera, Briefcase, FileText, DollarSign, Calendar, Sun, Moon, Monitor, Users, Shapes, Wrench, BarChart3 } from "lucide-react"; // أيقونات
 import { useTheme } from "@/shared/theme"; // ثيم
 
 type Props = { children: React.ReactNode; userRole: 'admin' | 'creator' | 'client' | 'salariedEmployee' | 'guest'; }; // خصائص المكوّن
@@ -20,10 +20,10 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
   const ThemeSwitcher = () => { // مبدّل الثيم
     const getThemeIcon = () => { // أيقونة حسب الثيم
       switch (theme) { // اختيار
-        case 'light': return <IconSun size={16} />; // فاتح
-        case 'dark': return <IconMoon size={16} />; // داكن
-        case 'system': return <IconDevices size={16} />; // نظام
-        default: return <IconDevices size={16} />; // افتراضي
+  case 'light': return <Sun size={16} />; // فاتح
+  case 'dark': return <Moon size={16} />; // داكن
+  case 'system': return <Monitor size={16} />; // نظام
+  default: return <Monitor size={16} />; // افتراضي
       }
     };
 
@@ -41,17 +41,17 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
   type NavItem = { label: string; href?: string; icon?: React.ElementType; children?: NavItem[]; defaultOpened?: boolean; }; // عنصر تنقل
 
   const getNavigationItems = (): NavItem[] => { // بناء القائمة
-    const base: NavItem[] = [{ label: 'الرئيسية', href: `/${userRole}`, icon: IconHome2 }]; // أساس
+  const base: NavItem[] = [{ label: 'الرئيسية', href: `/${userRole}`, icon: Home }]; // أساس
 
     if (userRole === 'admin') { // أدمن
       return [ // قوائم الأدمن
-        { label: 'لوحة التحكم', href: '/admin', icon: IconHome2 }, // داشبورد
-        { label: 'إدارة المستخدمين', icon: IconUsers, children: [ // مستخدمين
-          { label: 'الأدمنز', icon: IconUser, children: [ // أدمنز
+        { label: 'لوحة التحكم', href: '/admin', icon: Home }, // داشبورد
+        { label: 'إدارة المستخدمين', icon: Users, children: [ // مستخدمين
+          { label: 'الأدمـنز', icon: User, children: [ // أدمـنز
             { label: 'قائمة الأدمنز', href: '/admin/users/admins' }, // قائمة
             { label: 'إضافة أدمن جديد', href: '/admin/users/admins/new' }, // إضافة
           ]},
-          { label: 'المبدعون', icon: IconCamera, children: [ // مبدعون
+          { label: 'المبدعون', icon: Camera, children: [ // مبدعون
             { label: 'قائمة المبدعين', href: '/admin/users/creators' }, // قائمة
             { label: 'طلبات الانضمام', href: '/admin/users/creators/pending' }, // انضمام
             { label: 'طلبات المعدات', href: '/admin/users/creators/equipment-requests' }, // معدات
@@ -59,18 +59,18 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
             { label: 'طلبات الفئات الرئيسية', href: '/admin/users/creators/category-requests' }, // فئات رئيسية
             { label: 'طلبات الفئات الفرعية', href: '/admin/users/creators/subcategory-requests' }, // فئات فرعية
           ]},
-          { label: 'العملاء', icon: IconUsers, children: [ // عملاء
+          { label: 'العملاء', icon: Users, children: [ // عملاء
             { label: 'قائمة العملاء', href: '/admin/users/clients' }, // قائمة
             { label: 'طلبات الانضمام', href: '/admin/users/clients/pending-registrations' }, // انضمام
           ]},
-          { label: 'الموظفون بالراتب', icon: IconBriefcase, children: [ // موظفون
+          { label: 'الموظفون بالراتب', icon: Briefcase, children: [ // موظفون
             { label: 'قائمة الموظفين', href: '/admin/users/employees' }, // قائمة
             { label: 'دعوة موظف', href: '/admin/users/employees/invite' }, // دعوة
             { label: 'الدعوات المرسلة', href: '/admin/users/employees/invitations' }, // دعوات
           ]},
-          { label: 'مركز الطلبات الشامل', href: '/admin/users/requests-center', icon: IconLayoutGrid }, // مركز الطلبات
+          { label: 'مركز الطلبات الشامل', href: '/admin/users/requests-center', icon: LayoutGrid }, // مركز الطلبات
         ]},
-        { label: 'إدارة الخدمات والتصنيفات', icon: IconCategory, children: [ // خدمات وتصنيفات
+        { label: 'إدارة الخدمات والتصنيفات', icon: Shapes, children: [ // خدمات وتصنيفات
           { label: 'الفئات الرئيسية', children: [ // رئيسية
             { label: 'قائمة الفئات', href: '/admin/services/categories' }, // قائمة
             { label: 'إضافة فئة جديدة', href: '/admin/services/categories/new' }, // إضافة
@@ -83,9 +83,9 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
             { label: 'قائمة المجالات', href: '/admin/services/industries' }, // قائمة
             { label: 'إضافة مجال جديد', href: '/admin/services/industries/new' }, // إضافة
           ]},
-          { label: 'ربط الفئات بالصناعات', href: '/admin/services/mappings', icon: IconLayoutGrid }, // ربط
+          { label: 'ربط الفئات بالصناعات', href: '/admin/services/mappings', icon: LayoutGrid }, // ربط
         ]},
-        { label: 'التسعير والماليات', icon: IconCurrencyDollar, children: [ // تسعير
+        { label: 'التسعير والماليات', icon: DollarSign, children: [ // تسعير
           { label: 'معدلات التسعير', children: [ // معدلات
             { label: 'جميع المعدلات', href: '/admin/pricing/modifiers' }, // الكل
             { label: 'حاسبة التسعير', href: '/admin/pricing/modifiers/calculator' }, // حاسبة
@@ -102,7 +102,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
           ]},
           { label: 'التقارير المالية', href: '/admin/pricing/reports/financial' }, // تقارير
         ]},
-        { label: 'إدارة المشاريع', icon: IconBriefcase, children: [ // مشاريع
+        { label: 'إدارة المشاريع', icon: Briefcase, children: [ // مشاريع
           { label: 'طلبات المشاريع', children: [ // طلبات
             { label: 'قائمة الطلبات', href: '/admin/projects/requests' }, // قائمة
           ]},
@@ -119,13 +119,13 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
             { label: 'إنشاء عقد', href: '/admin/projects/contracts/new' }, // إنشاء
           ]},
         ]},
-        { label: 'النظام والإعدادات', icon: IconTool, children: [ // نظام
+        { label: 'النظام والإعدادات', icon: Wrench, children: [ // نظام
           { label: 'الإعدادات العامة', href: '/admin/system/settings' }, // عامة
           { label: 'المحتوى والقوالب', href: '/admin/system/content' }, // محتوى
           { label: 'الأدوات المساعدة', href: '/admin/system/tools' }, // أدوات
           { label: 'المراقبة والسجلات', href: '/admin/system/monitoring' }, // مراقبة
         ]},
-        { label: 'التقارير والتحليلات', icon: IconChartBar, children: [ // تقارير
+        { label: 'التقارير والتحليلات', icon: BarChart3, children: [ // تقارير
           { label: 'تقارير الأداء', href: '/admin/analytics/performance' }, // أداء
           { label: 'التحليلات المتقدمة', href: '/admin/analytics/advanced' }, // متقدمة
           { label: 'التصدير والمشاركة', href: '/admin/analytics/export' }, // تصدير
@@ -136,23 +136,23 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
     switch (userRole) { // الأدوار الأخرى
       case 'creator': return [ // مبدع
         ...base, // أساس
-        { label: 'مشاريعي', href: '/creator/projects', icon: IconCamera }, // مشاريع
-        { label: 'معرض الأعمال', href: '/creator/portfolio', icon: IconLayoutGrid }, // معرض
-        { label: 'التوفر', href: '/creator/availability', icon: IconCalendar }, // توفر
-        { label: 'الملف الشخصي', href: '/creator/profile', icon: IconUser }, // ملف
+        { label: 'مشاريعي', href: '/creator/projects', icon: Camera }, // مشاريع
+        { label: 'معرض الأعمال', href: '/creator/portfolio', icon: LayoutGrid }, // معرض
+        { label: 'التوفر', href: '/creator/availability', icon: Calendar }, // توفر
+        { label: 'الملف الشخصي', href: '/creator/profile', icon: User }, // ملف
       ];
       case 'client': return [ // عميل
         ...base, // أساس
-        { label: 'طلب جديد', href: '/client/new-request', icon: IconFileText }, // طلب
-        { label: 'مشاريعي', href: '/client/projects', icon: IconBriefcase }, // مشاريع
-        { label: 'الفواتير', href: '/client/invoices', icon: IconCurrencyDollar }, // فواتير
-        { label: 'الرسائل', href: '/client/messages', icon: IconBell }, // رسائل
+        { label: 'طلب جديد', href: '/client/new-request', icon: FileText }, // طلب
+        { label: 'مشاريعي', href: '/client/projects', icon: Briefcase }, // مشاريع
+        { label: 'الفواتير', href: '/client/invoices', icon: DollarSign }, // فواتير
+        { label: 'الرسائل', href: '/client/messages', icon: Bell }, // رسائل
       ];
       case 'salariedEmployee': return [ // موظف
         ...base, // أساس
-        { label: 'مهامي', href: '/salaried/tasks', icon: IconBriefcase }, // مهام
-        { label: 'المشاريع', href: '/salaried/projects', icon: IconLayoutGrid }, // مشاريع
-        { label: 'التقويم', href: '/salaried/schedule', icon: IconCalendar }, // تقويم
+        { label: 'مهامي', href: '/salaried/tasks', icon: Briefcase }, // مهام
+        { label: 'المشاريع', href: '/salaried/projects', icon: LayoutGrid }, // مشاريع
+        { label: 'التقويم', href: '/salaried/schedule', icon: Calendar }, // تقويم
       ];
       default: return base; // ضيف
     }
@@ -185,9 +185,9 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
           </Group>
           <Group gap="sm" className="header-actions" wrap="nowrap"> {/* يمين الهيدر */}
             <ThemeSwitcher /> {/* تبديل ثيم */}
-            <ActionIcon variant="light" size="sm" aria-label="إشعارات"><IconBell size={18} /></ActionIcon> {/* إشعارات */}
-            <ActionIcon variant="light" size="sm" aria-label="إعدادات"><IconSettings size={18} /></ActionIcon> {/* إعدادات */}
-            <ActionIcon variant="light" size="sm" aria-label="حساب"><IconUser size={18} /></ActionIcon> {/* حساب */}
+            <ActionIcon variant="light" size="sm" aria-label="إشعارات"><Bell size={18} /></ActionIcon> {/* إشعارات */}
+            <ActionIcon variant="light" size="sm" aria-label="إعدادات"><Settings size={18} /></ActionIcon> {/* إعدادات */}
+            <ActionIcon variant="light" size="sm" aria-label="حساب"><User size={18} /></ActionIcon> {/* حساب */}
           </Group>
         </Group>
       </Box>
@@ -198,7 +198,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
             <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text> {/* عنوان */}
             {navigationItems.map(renderNavItem)} {/* عناصر */}
             <Divider my="sm" /> {/* فاصل */}
-            <NavLink label="الإعدادات" leftSection={<IconSettings size={18} />} c="dimmed" /> {/* إعدادات */}
+            <NavLink label="الإعدادات" leftSection={<Settings size={18} />} c="dimmed" /> {/* إعدادات */}
           </Box>
         </ScrollArea.Autosize>
       </Box>
@@ -215,7 +215,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
                 <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text> {/* عنوان */}
                 {navigationItems.map(renderNavItem)} {/* عناصر */}
                 <Divider my="sm" /> {/* فاصل */}
-                <NavLink label="الإعدادات" leftSection={<IconSettings size={18} />} onClick={close} c="dimmed" /> {/* إعدادات */}
+                <NavLink label="الإعدادات" leftSection={<Settings size={18} />} onClick={close} c="dimmed" /> {/* إعدادات */}
               </Box>
             </ScrollArea.Autosize>
           </Box>

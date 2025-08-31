@@ -12,12 +12,11 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    ignores: [
+  ignores: [
       "node_modules/**",
       ".next/**",
       "out/**",
       "build/**",
-  "storybook-static/**",
       "next-env.d.ts",
     ],
   },
@@ -27,17 +26,7 @@ const eslintConfig = [
       import: (await import("eslint-plugin-import")).default ?? (await import("eslint-plugin-import"))
     },
     rules: {
-      // منع استيراد lucide-react مباشرة خارج ملف Icon.tsx
-      'import/no-restricted-paths': ["error", {
-        zones: [
-          {
-            target: "./src",
-            from: "lucide-react",
-            message: "يُمنع استيراد lucide-react مباشرة؛ استعمل src/components/primitives/Icon.tsx",
-            except: ["./src/components/primitives/Icon.tsx"],
-          }
-        ]
-      }],
+      // السماح باستيراد lucide-react مباشرة (ماكو Icon.tsx مركزي حالياً)
 
       // منع بعض inline styles الخطرة: color/background/border/boxShadow
       'no-restricted-syntax': [
