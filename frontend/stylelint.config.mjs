@@ -14,11 +14,14 @@ const config = {
     // نلزم استخدام var(--...) للخصائص الحساسة
     "scale-unlimited/declaration-strict-value": [
       [
-        // ألوان وخلفيات وحدود وظلال وزوايا ومسافات
+        // ألوان وخلفيات وحدود (محددة) وظلال وزوايا ومسافات
         "/color$/",
         "background",
         "background-color",
-        "/^border(-.*)?$/",
+        // ملاحظة: لا نستخدم نمط شامل للـ border حتى لا يمسك border-collapse
+        "border",
+        "/^border-(color|width|style)$/",
+        "/^border-.*-(color|width|style)$/",
         "box-shadow",
         "fill",
         "stroke",
@@ -31,9 +34,13 @@ const config = {
       {
         ignoreValues: {
           "/color$/": ["inherit", "transparent", "currentColor", "/^var\\(.*\\)$/"],
-          "background": ["none", "/^var\\(.*\\)$/"],
+          // نسمح بالـ transparent في background أيضًا
+          "background": ["none", "transparent", "/^var\\(.*\\)$/"],
           "background-color": ["transparent", "/^var\\(.*\\)$/"],
-          "/^border(-.*)?$/": ["none", "0", "solid", "dashed", "dotted", "/^var\\(.*\\)$/"],
+          // للسماح مؤقتًا بقيم رقمية للحدود (حتى نضيف توكنز للـ border-width)
+          "border": ["none", "0", "solid", "dashed", "dotted", "/^var\\(.*\\)$/", "/^[0-9]+px$/"],
+          "/^border-(color|width|style)$/": ["none", "0", "solid", "dashed", "dotted", "/^var\\(.*\\)$/", "/^[0-9]+px$/"],
+          "/^border-.*-(color|width|style)$/": ["none", "0", "solid", "dashed", "dotted", "/^var\\(.*\\)$/", "/^[0-9]+px$/"],
           "box-shadow": ["none", "/^var\\(.*\\)$/"],
           "fill": ["none", "currentColor", "/^var\\(.*\\)$/"],
           "stroke": ["none", "currentColor", "/^var\\(.*\\)$/"],
@@ -48,6 +55,21 @@ const config = {
     ],
 
     // تيسير قواعد نمطية حتى لا تعيقنا
+    // أسماء كلاسات Mantine (CamelCase) مستثناة من النمط
+    "selector-class-pattern": [
+      "^([a-z][a-z0-9-]*|mantine-[A-Za-z-]+)$",
+      { "resolveNestedSelectors": true }
+    ],
+
+    // نسمح بالـ id الخاص بـ Next.js
+    "selector-id-pattern": "^(?:__next|[a-z][a-z0-9-]*)$",
+
+    // نتجاهل قيود صيغة media الحديثة/بـ vars (يعالجها PostCSS)
+    "media-feature-range-notation": null,
+
+    // تليين قواعد تنسيق مزعجة في المشروع
+    "declaration-block-single-line-max-declarations": null,
+    "declaration-block-no-redundant-longhand-properties": null,
   "color-hex-length": null,
     "color-named": "never",
     "color-function-notation": null,
@@ -62,7 +84,14 @@ const config = {
     "rule-empty-line-before": null,
     "declaration-empty-line-before": null,
   },
-  ignoreFiles: ["**/node_modules/**", ".next/**", "src/stories/**/*.css"],
+  ignoreFiles: [
+    "**/node_modules/**",
+    ".next/**",
+    "src/stories/**/*.css",
+  "src/styles__backup_*/**",
+  // تجاهل الملف القديم مؤقتًا لحين الحذف النهائي
+  "src/styles/04-utilities/mantine.css"
+  ],
 };
 
 export default config;

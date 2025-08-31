@@ -18,4 +18,4 @@ npm run dev # المنفذ 3030
 ```
 
 ملاحظات:
-- التوكنز مأخوذة من الوثيقة: documentation/06-frontend/01-design-tokens.md ومحقونة كـ CSS vars في src/styles/01-foundation/globals.css.
+- التوكنز مأخوذة من الوثيقة: documentation/06-frontend/01-design-tokens.md ومحقونة كـ CSS vars عبر `src/styles/00-tokens/tokens.css` ويتم تجميعها في `src/styles/01-base/globals.css`.

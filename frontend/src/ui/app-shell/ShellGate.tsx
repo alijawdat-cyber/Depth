@@ -1,29 +1,16 @@
-"use client";
-import React from 'react';
-import { usePathname } from 'next/navigation';
-import { DepthAppShell } from './AppShell';
+"use client"; // مكوّن عميل
+import React from 'react'; // React
+import { usePathname } from 'next/navigation'; // مسار الصفحة
+import { DepthAppShell } from './AppShell'; // غلاف التطبيق
 
-type Props = { children: React.ReactNode };
+type Props = { children: React.ReactNode }; // خصائص المكوّن
 
-export function ShellGate({ children }: Props){
-  const pathname = usePathname();
-  
-  // تحديد الدور حسب المسار - نظام موحد للكل
-  const isAdmin = pathname?.startsWith('/admin');
-  const isCreator = pathname?.startsWith('/creator');
-  const isClient = pathname?.startsWith('/client');
-  const isSalaried = pathname?.startsWith('/salaried');
-  
-  // تحديد الدور للنظام الموحد - كل الأدوار تستخدم نفس النظام
-  const userRole = isAdmin ? 'admin' : 
-                   isCreator ? 'creator' : 
-                   isClient ? 'client' : 
-                   isSalaried ? 'salariedEmployee' : 'guest';
-  
-  // نظام موحد لكل الأدوار بدون استثناءات
-  return (
-    <DepthAppShell userRole={userRole}>
-      {children}
-    </DepthAppShell>
-  );
+export function ShellGate({ children }: Props){ // بوابة الشيل
+  const pathname = usePathname(); // المسار الحالي
+  const isAdmin = pathname?.startsWith('/admin'); // أدمن
+  const isCreator = pathname?.startsWith('/creator'); // مبدع
+  const isClient = pathname?.startsWith('/client'); // عميل
+  const isSalaried = pathname?.startsWith('/salaried'); // موظف راتب
+  const userRole = isAdmin ? 'admin' : isCreator ? 'creator' : isClient ? 'client' : isSalaried ? 'salariedEmployee' : 'guest'; // تحديد الدور
+  return <DepthAppShell userRole={userRole}>{children}</DepthAppShell>; // نظام موحد لكل الأدوار
 }

@@ -1,16 +1,11 @@
-/* 📱 Overrides: Responsive helpers for Mantine components */
-
 @media (max-width: 430px) {
 	.mantine-Grid-root .mantine-Grid-col[data-span="6"],
 	.mantine-Grid-root .mantine-Grid-col[data-span="4"],
-	.mantine-Grid-root .mantine-Grid-col[data-span="3"] {
-		flex: 0 0 100% !important;
-		max-width: 100% !important;
-	}
+	.mantine-Grid-root .mantine-Grid-col[data-span="3"] { flex: 0 0 100% !important; /* عمود=100% */ max-width: 100% !important; /* عرض كامل */ }
 }
 
 @media (max-width: 640px) {
-	.app-header { padding-inline: var(--space-sm); }
-	.app-header .header-nav, .app-header .header-actions { gap: var(--space-sm); min-inline-size: 0; }
-	.app-header .header-nav > * { min-width: 0; }
+	.app-header { padding-inline: var(--space-sm); } /* حشو جانبي للهيدر */
+	.app-header .header-nav, .app-header .header-actions { gap: var(--space-sm); /* تباعد */ min-inline-size: 0; /* يسمح بالتقلص */ }
+	.app-header .header-nav > * { min-width: 0; } /* عناصر قابلة للتقلص */
 }

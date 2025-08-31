@@ -1,15 +1,8 @@
-/* ↔️ Overrides: RTL direction fixes for Mantine components */
-
 .mantine-Input-input,
 .mantine-Textarea-input,
-.mantine-Select-input {
-	direction: rtl;
-	text-align: right;
-}
+.mantine-Select-input { direction: rtl; /* اتجاه */ text-align: right; /* محاذاة */ }
 
 .mantine-Table-root th,
-.mantine-Table-root td {
-	direction: rtl;
-}
+.mantine-Table-root td { direction: rtl; /* جدول RTL */ }
 
-.mantine-Table-root :is(th, td) { text-align: center !important; vertical-align: middle !important; }
+.mantine-Table-root :is(th, td) { text-align: center !important; /* توسيط نص */ vertical-align: middle !important; /* توسيط عمودي */ }

@@ -99,7 +99,11 @@
 
   /* ========== طبقة التعتيم/الأوفرلاي ========== */
   /* ضبابية خفيفة متوازنة للواجهات المنبثقة والـmobile overlay */
-  --overlay-scrim: color-mix(in oklab, black 30%, transparent);
+  /* استخدام rgba بدل أسماء ألوان لتوافق lint */
+  --overlay-scrim: color-mix(in oklab, rgba(0, 0, 0, 1) 30%, transparent);
+
+  /* ظل داخلي موحّد لاستخدامات تمييز العناصر النشطة */
+  --shadow-inset: inset 0 0 0 1px var(--color-border-primary);
 }
 
 /* ========== الوضع الداكن ========== */
@@ -121,7 +125,7 @@
   --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.65);   /* متوسط أقرب بالداكن */
   --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.75);  /* كبير محكّم بالداكن */
   /* أوفرلاي بالداكن أخف حتى ما يثقل */
-  --overlay-scrim: color-mix(in oklab, white 20%, transparent);
+  --overlay-scrim: color-mix(in oklab, rgba(255, 255, 255, 1) 20%, transparent);
 }
 
 /* ========== تطبيق الألوان على الجذر ========== */

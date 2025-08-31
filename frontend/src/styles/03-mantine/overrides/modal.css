@@ -1,21 +1,19 @@
-/* 🪟 Overrides: Mantine Modal */
-
 .mantine-Modal-root .mantine-Modal-content {
-	background-color: var(--color-bg-primary);
-	border-radius: var(--radius-lg);
-	box-shadow: var(--shadow-lg);
-	padding: var(--space-xl);
-	font-family: var(--mantine-font-family);
+	background-color: var(--color-bg-primary); /* خلفية */
+	border-radius: var(--radius-lg); /* زوايا */
+	box-shadow: var(--shadow-lg); /* ظل */
+	padding: var(--space-xl); /* حشو داخلي */
+	font-family: var(--mantine-font-family); /* خط موحّد */
 }
 
 .mantine-Modal-root .mantine-Modal-header {
-	border-bottom: 1px solid var(--color-border-primary);
-	padding-bottom: var(--space-sm);
-	margin-bottom: var(--space-md);
+	border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */
+	padding-bottom: var(--space-sm); /* حشو سفلي */
+	margin-bottom: var(--space-md); /* مسافة تحت */
 }
 
 .mantine-Modal-root .mantine-Modal-title {
-	font-family: var(--mantine-font-family);
-	font-weight: var(--font-weight-bold);
-	color: var(--color-text-primary);
+	font-family: var(--mantine-font-family); /* خط */
+	font-weight: var(--font-weight-bold); /* عنوان عريض */
+	color: var(--color-text-primary); /* لون نص */
 }

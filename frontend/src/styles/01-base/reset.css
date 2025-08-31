@@ -1,30 +1,27 @@
-/* 🔄 إعادة ضبط المتصفحات - توحيد السلوك عبر كل المتصفحات */
+/* 🔄 Reset: توحيد سلوك المتصفحات */
 
-* { box-sizing: border-box; } /* حساب الحشو والحد ضمن العرض - منع overflow غير متوقع */
-*::before, *::after { box-sizing: border-box; } /* نفس الشي للعناصر المولدة بـ CSS */
+* { box-sizing: border-box; } /* حساب الحشو والحد ضمن العرض */
+*::before, *::after { box-sizing: border-box; } /* نفس الشي لعناصر ::before/::after */
 
-html { line-height: 1.15; -webkit-text-size-adjust: 100%; } /* منع تكبير النص التلقائي في iOS */
-body { margin: 0; font-family: inherit; } /* إزالة الهامش الافتراضي، وراثة الخط */
+html { line-height: 1.15; -webkit-text-size-adjust: 100%; /* stylelint-disable-line property-no-vendor-prefix */ } /* منع تكبير نص iOS */
+body { margin: 0; font-family: inherit; } /* إزالة هامش ووراثة الخط */
 
-h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: inherit; } /* إزالة هوامش العناوين الافتراضية */
-p, ul, ol, dl, blockquote, figure { margin: 0; padding: 0; } /* إزالة هوامش الفقرات والقوائم */
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: inherit; } /* ضبط عناوين بدون هوامش */
+p, ul, ol, dl, blockquote, figure { margin: 0; padding: 0; } /* إزالة هوامش/حشوات أساسية */
 
-button, input, optgroup, select, textarea { font-family: inherit; font-size: 100%; } /* وراثة الخط من الأب */
-button, select { text-transform: none; } /* منع تحويل النص التلقائي في بعض المتصفحات */
+button, input, optgroup, select, textarea { font-family: inherit; font-size: 100%; } /* وراثة الخط والحجم */
+button, select { text-transform: none; } /* منع تحويل النص تلقائياً */
 
-button, [type="button"], [type="reset"], [type="submit"] { 
-  appearance: button; -webkit-appearance: button; /* تأكيد شكل الزر في كل المتصفحات */
-  cursor: pointer; /* إشارة النقر للأزرار */
-}
+button, [type="button"], [type="reset"], [type="submit"] { appearance: button; -webkit-appearance: button; /* stylelint-disable-line property-no-vendor-prefix */ cursor: pointer; } /* توحيد شكل الأزرار والإشارة */
 
-[type="search"] { appearance: textfield; -webkit-appearance: textfield; outline-offset: -2px; } /* توحيد شكل حقل البحث */
-[type="search"]::-webkit-search-decoration { -webkit-appearance: none; } /* إزالة الزخرفة في Safari */
+[type="search"] { appearance: textfield; -webkit-appearance: textfield; /* stylelint-disable-line property-no-vendor-prefix */ outline-offset: -2px; } /* شكل حقل البحث */
+[type="search"]::-webkit-search-decoration { -webkit-appearance: none; /* stylelint-disable-line property-no-vendor-prefix */ } /* إزالة زخرفة Safari */
 
 input, textarea, select { outline: none; border: none; background: transparent; } /* إزالة الأنماط الافتراضية */
-/* تركيز الحقول يُدار عبر Mantine (حد + ظل) من overrides/input.css لتجنب ازدواجية التركيز */
+/* تركيز الحقول يجي من Mantine overrides/input.css (حد + ظل) */
 
-a { color: inherit; text-decoration: none; } /* الروابط ترث اللون وبدون خط تحت */
-img, svg { max-width: 100%; height: auto; display: block; } /* الصور متجاوبة وبلوك افتراضياً */
+a { color: inherit; text-decoration: none; } /* روابط بدون لون خاص/خط */
+img, svg { max-width: 100%; height: auto; display: block; } /* صور/SVG متجاوبة */
 
-table { border-collapse: collapse; border-spacing: 0; } /* إزالة المسافات بين خلايا الجدول */
-th, td { padding: 0; text-align: inherit; } /* إزالة الحشو الافتراضي، وراثة المحاذاة */
+table { border-collapse: collapse; border-spacing: 0; } /* إزالة فجوات الجداول */
+th, td { padding: 0; text-align: inherit; } /* إزالة حشو، محاذاة تورّث */
