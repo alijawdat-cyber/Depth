@@ -159,10 +159,8 @@ const mantineTheme = createTheme({
           borderColor: 'var(--color-border-primary)',
       '--card-radius': 'var(--radius-lg)',
           // نخلي الظل الافتراضي من Mantine (shadow prop)
-          // ونقوّي حالة hover/focus حتى تتغلب على أي قيمة shadow
-          transition: 'box-shadow .15s ease',
-          '&:hover': { boxShadow: 'var(--shadow-lg) !important' },
-          '&:focus-visible': { boxShadow: 'var(--shadow-lg) !important' }
+          // التحكم بظل hover/focus مقفول من overrides/card.css حسب سياسة المشروع
+          transition: 'box-shadow .15s ease'
         }
       }
     },

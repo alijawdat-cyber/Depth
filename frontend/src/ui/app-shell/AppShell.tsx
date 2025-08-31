@@ -1,6 +1,5 @@
 "use client"; // مكوّن عميل
 import React from "react"; // React
-import "./app-shell.css"; // أنماط الشيل
 import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Divider, Badge, useMantineColorScheme } from "@mantine/core"; // Mantine
 import Image from "next/image"; // صورة
 import Link from "next/link"; // روابط

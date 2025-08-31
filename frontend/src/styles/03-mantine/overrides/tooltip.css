@@ -1,0 +1,4 @@
+/* ⚙️ Overrides: Mantine Tooltip — مقفول على التوكنز */
+
+.mantine-Tooltip-tooltip { background-color: var(--color-text-primary); color: var(--color-text-inverse); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); font-family: var(--font-primary); font-size: var(--fs-sm); }
+.mantine-Tooltip-arrow { color: var(--color-text-primary); }

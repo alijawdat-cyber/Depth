@@ -1,0 +1,13 @@
+/* ⚙️ Overrides: Mantine ActionIcon — مقفول على التوكنز */
+
+.mantine-ActionIcon-root {
+  border-radius: var(--radius-md);
+  transition: box-shadow .15s ease, background-color .15s ease;
+}
+
+.mantine-ActionIcon-root[data-size="sm"] { width: var(--size-sm); height: var(--size-sm); }
+.mantine-ActionIcon-root[data-size="md"] { width: var(--size-md); height: var(--size-md); }
+.mantine-ActionIcon-root[data-size="lg"] { width: var(--size-lg); height: var(--size-lg); }
+
+.mantine-ActionIcon-root:hover { box-shadow: var(--shadow-sm); }
+.mantine-ActionIcon-root[data-disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }

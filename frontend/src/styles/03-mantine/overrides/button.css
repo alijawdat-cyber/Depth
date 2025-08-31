@@ -1,0 +1,25 @@
+/* ⚙️ Overrides: Mantine Button — مقفول على التوكنز (سياسة المشروع) */
+
+.mantine-Button-root {
+  border-radius: var(--radius-md);
+  min-height: var(--size-md);
+  transition: background-color .15s ease, box-shadow .15s ease, color .15s ease, border-color .15s ease;
+}
+
+/* variants الأساسية (light محددة مسبقًا عبر الثيم — نخلي الباقي هنا حسب سياسة التحكم من overrides) */
+.mantine-Button-root[data-variant="filled"] { background-color: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-primary); }
+.mantine-Button-root[data-variant="filled"]:hover { background-color: var(--color-primary-hover); }
+
+.mantine-Button-root[data-variant="outline"] { background-color: transparent; color: var(--color-primary); border-color: var(--color-border-primary); }
+.mantine-Button-root[data-variant="outline"]:hover { background-color: var(--color-bg-tertiary); }
+
+.mantine-Button-root[data-variant="transparent"] { background-color: transparent; color: var(--color-primary); }
+.mantine-Button-root[data-variant="transparent"]:hover { background-color: var(--color-bg-tertiary); }
+
+/* أحجام من التوكنز */
+.mantine-Button-root[data-size="sm"] { min-height: var(--size-sm); }
+.mantine-Button-root[data-size="md"] { min-height: var(--size-md); }
+.mantine-Button-root[data-size="lg"] { min-height: var(--size-lg); }
+
+/* حالة التعطيل */
+.mantine-Button-root[data-disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }

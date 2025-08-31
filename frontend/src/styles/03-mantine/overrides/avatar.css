@@ -1,0 +1,7 @@
+/* ⚙️ Overrides: Mantine Avatar — مقفول على التوكنز */
+
+.mantine-Avatar-root { box-shadow: none; }
+.mantine-Avatar-root[data-size="sm"] { width: var(--size-sm); height: var(--size-sm); }
+.mantine-Avatar-root[data-size="md"] { width: var(--size-md); height: var(--size-md); }
+.mantine-Avatar-root[data-size="lg"] { width: var(--size-lg); height: var(--size-lg); }
+.mantine-Avatar-root[data-radius="xl"], .mantine-Avatar-root[style*="radius: xl"] { border-radius: var(--radius-full) !important; }
