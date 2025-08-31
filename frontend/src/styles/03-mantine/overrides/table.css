@@ -20,6 +20,14 @@
 
 .mantine-Table-root tr:hover { background-color: var(--color-bg-tertiary); } /* Hover */
 
+/* كثافات الجدول: compact عبر data-density على الوعاء الحاوي */
+.mantine-Card-root[data-density="compact"] .mantine-Table-root :is(th, td),
+.mantine-Stack-root[data-density="compact"] .mantine-Table-root :is(th, td),
+.mantine-Group-root[data-density="compact"] .mantine-Table-root :is(th, td) {
+	padding-block: var(--space-xs);
+	padding-inline: calc(var(--space-sm) * 0.75);
+}
+
 /* ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
 @media (max-width: 640px) {
 	.mantine-Card-root[data-responsive="wide"],

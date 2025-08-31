@@ -1,0 +1,30 @@
+/* ♿️ Overrides: Unified focus-visible — ضمن التوكنز فقط */
+
+/* أزرار */
+.mantine-Button-root:focus-visible,
+.mantine-ActionIcon-root:focus-visible,
+.mantine-ThemeIcon-root:focus-visible,
+.mantine-NavLink-root:focus-visible,
+.mantine-Alert-root:focus-visible,
+.mantine-Card-root:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* حقول إدخال */
+.mantine-Input-input:focus-visible,
+.mantine-Select-input:focus-visible,
+.mantine-Textarea-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .mantine-Button-root,
+  .mantine-ActionIcon-root,
+  .mantine-NavLink-root,
+  .mantine-Card-root { transition: none; }
+}

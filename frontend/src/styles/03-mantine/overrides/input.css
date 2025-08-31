@@ -10,7 +10,7 @@
 	font-size: var(--fs-md);  /* حجم أساسي */
 	border: 1px solid var(--color-border-primary);  /* حد رمادي */
 	border-radius: var(--radius-md);  /* زوايا أساسية */
-	padding: var(--space-sm);  /* حشو صغير */
+	padding: 0 var(--space-sm);  /* عمودي يُحكم من min-height */
 	transition: border-color 0.2s ease;  /* انتقال سلس للحد */
 }
 
@@ -48,8 +48,28 @@
 	font-size: var(--fs-md);
 	border: 1px solid var(--color-border-primary);
 	border-radius: var(--radius-md);
-	padding: var(--space-sm);
+	padding: 0 var(--space-sm);
 	transition: border-color .2s ease, box-shadow .2s ease;
 }
 .mantine-Select-input:focus { border-color: var(--color-primary); box-shadow: var(--shadow-sm); outline: none; }
 .mantine-Select-input:disabled { opacity: .6; cursor: not-allowed; background-color: var(--color-bg-secondary); }
+
+/* أحجام موحّدة: Input & Select (ارتفاع من التوكنز) */
+.mantine-Input-input[data-size="sm"],
+.mantine-Input-root[data-size="sm"] .mantine-Input-input,
+.mantine-Select-input[data-size="sm"],
+.mantine-Select-root[data-size="sm"] .mantine-Select-input { min-height: var(--size-sm); }
+
+.mantine-Input-input[data-size="md"],
+.mantine-Input-root[data-size="md"] .mantine-Input-input,
+.mantine-Select-input[data-size="md"],
+.mantine-Select-root[data-size="md"] .mantine-Select-input { min-height: var(--size-md); }
+
+.mantine-Input-input[data-size="lg"],
+.mantine-Input-root[data-size="lg"] .mantine-Input-input,
+.mantine-Select-input[data-size="lg"],
+.mantine-Select-root[data-size="lg"] .mantine-Select-input { min-height: var(--size-lg); }
+
+/* كثافة مضغوطة للحقول عند الطلب */
+.mantine-Input-wrapper[data-compact="true"] .mantine-Input-input,
+.mantine-Select-root[data-compact="true"] .mantine-Select-input { padding-inline: var(--space-sm); }
