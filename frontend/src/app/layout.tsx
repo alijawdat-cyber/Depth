@@ -1,9 +1,9 @@
 import React from "react";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import "@/styles/01-foundation/globals.css";
+import "@/styles/01-base/globals.css";
 import { ColorSchemeScript } from "@mantine/core";
-import { UiProviders } from "@/styles/03-layout/app-shell/UiProviders";
+import { UiProviders } from "@/ui/app-shell/UiProviders";
 
 export const metadata = {
 	title: "Depth",

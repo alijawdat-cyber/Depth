@@ -1,0 +1,28 @@
+/* 🔤 نظام الخطوط الموحد - خط دبي العربي مع fallback إنجليزي */
+
+/* ========== تعريف خط دبي (3 أوزان) ========== */
+@font-face {
+  font-family: Dubai; src: url('/fonts/Dubai-Regular.woff2') format('woff2'); /* خط عادي 400 - نصوص عامة وفقرات */
+  font-weight: 400; font-style: normal; font-display: swap; /* عرض بديل ثم استبدال */
+}
+
+@font-face {
+  font-family: Dubai; src: url('/fonts/Dubai-Medium.woff2') format('woff2'); /* خط متوسط 500 - عناوين فرعية وأزرار */
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: Dubai; src: url('/fonts/Dubai-Bold.woff2') format('woff2'); /* خط عريض 700 - عناوين رئيسية */
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+/* ========== تطبيق الخط العربي ========== */
+body { 
+  font-family: var(--font-primary); /* خط من التوكنز */
+  font-size: var(--fs-md); /* حجم أساسي 16px */
+  line-height: var(--line-height-normal); /* تباعد أسطر مريح للقراءة */
+  -webkit-font-smoothing: antialiased; /* تحسين النص في Chrome/Safari */
+  -moz-osx-font-smoothing: grayscale; /* تحسين النص في Firefox على Mac */
+}
+
+/* ملاحظة: أصناف النص القياسية تُدار عبر Tailwind. لتجنب التعارض، أزلنا أصناف .text-* و.font-* من هنا. أبقينا قواعد HTML الأساسية فقط داخل مكونات Mantine عبر الثيم. */

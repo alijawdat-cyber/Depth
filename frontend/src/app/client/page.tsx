@@ -294,7 +294,7 @@ export default function ClientDashboard() {
               <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                 <Button
                   variant="light"
-                  color="violet"
+                  color="brand"
                   size="md"
                   fullWidth
                   leftSection={<IconChartLine size={20} />}
