@@ -11,10 +11,6 @@ export default {
   'lg': '768px',     /* iPad Portrait - موحد مع --bp-tablet */
   'xl': '1024px',    /* لابتوب / iPad Landscape - موحد مع --bp-desktop */
       '2xl': '1280px',   /* Desktop قياسي */
-  // Aliases واضحة بالأسماء لسهولة القراءة والاستخدام
-  'mobile': '640px',   /* == md */
-  'tablet': '768px',   /* == lg */
-  'desktop': '1024px', /* == xl */
     },
     extend: {
       fontFamily: {

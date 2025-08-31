@@ -4,6 +4,7 @@
 .mantine-Stack-root[data-fit="content"] :is(table, .mantine-Table-table),
 .mantine-Group-root[data-fit="content"] :is(table, .mantine-Table-table) { width: max-content; /* عرض=محتوى */ table-layout: auto; /* حساب أعمدة ديناميكي */ }
 
+/* ميديا كويري مقفلة: min-width 1024px ثابت حسب سياسة breakpoints */
 @media (min-width: 1024px) {
 	.mantine-Card-root[data-fit="content"],
 	.mantine-Stack-root[data-fit="content"],
@@ -19,6 +20,7 @@
 
 .mantine-Table-root tr:hover { background-color: var(--color-bg-tertiary); } /* Hover */
 
+/* ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
 @media (max-width: 640px) {
 	.mantine-Card-root[data-responsive="wide"],
 	.mantine-Stack-root[data-responsive="wide"],
