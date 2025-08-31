@@ -161,8 +161,8 @@ const mantineTheme = createTheme({
           // نخلي الظل الافتراضي من Mantine (shadow prop)
           // ونقوّي حالة hover/focus حتى تتغلب على أي قيمة shadow
           transition: 'box-shadow .15s ease',
-          '&:hover': { boxShadow: 'var(--shadow-md) !important' },
-          '&:focus-visible': { boxShadow: 'var(--shadow-md) !important' }
+          '&:hover': { boxShadow: 'var(--shadow-lg) !important' },
+          '&:focus-visible': { boxShadow: 'var(--shadow-lg) !important' }
         }
       }
     },
