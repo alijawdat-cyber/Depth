@@ -13,12 +13,15 @@ export type DevicePreset = {
 
 export const DEVICE_MATRIX: DevicePreset[] = [
   // iPhone — قياسي وكبير
-  { id: 'iphone-14/15/16', label: 'iPhone 390w', width: 390, category: 'mobile' },
+  { id: 'iphone-14/15/16', label: 'iPhone 393w', width: 393, category: 'mobile' },
   { id: 'iphone-pro-max',   label: 'iPhone 430w', width: 430, category: 'mobile' },
 
   // Android — شائع
   { id: 'android-compact',  label: 'Android 360w', width: 360, category: 'mobile' },
   { id: 'android-large',    label: 'Android 412w', width: 412, category: 'mobile' },
+
+  // Mobile threshold — مطابق لـ md=640px في Tailwind/tokens
+  { id: 'mobile-threshold', label: 'Mobile 640w', width: 640, category: 'mobile' },
 
   // Tablets
   { id: 'tablet-portrait',  label: 'Tablet 768w', width: 768, category: 'tablet' },

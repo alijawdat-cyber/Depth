@@ -59,7 +59,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <Container size="xl" className="admin-main">
+  <Container size="xl" className="admin-main" px={0}>
       {/* عنوان الصفحة الموحد */}
       <Stack gap="lg">
   <Group justify="space-between" align="center">

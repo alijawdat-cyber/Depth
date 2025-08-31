@@ -14,7 +14,7 @@ import {
 export default function AdminLoading() {
   return (
     <Container size="xl" className="admin-main">
-      <Center style={{ minHeight: 'calc(100vh - var(--header-height))' }}>
+  <Center style={{ minHeight: 'calc(100dvh - var(--header-height))' }}>
         <Stack gap="md" align="center">
           <Loader size="lg" color="blue" />
           <Text size="lg" fw={500} c="dimmed">

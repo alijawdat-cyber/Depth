@@ -1,260 +1,0 @@
-/* 📦 حاويات ومخططات أساسية - 3 أحجام فقط */
-
-/* ========== الحاوي الأساسي ========== */
-
-.container {
-  width: 100%; /* عرض كامل افتراضي */
-  margin-left: auto;
-  margin-right: auto; /* توسيط أفقي */
-  padding-left: var(--space-md);
-  padding-right: var(--space-md); /* حشو جانبي موحد */
-}
-
-/* حاوي صغير - للمحتوى المضغوط، النماذج */
-.container-sm {
-  max-width: var(--bp-mobile); /* 640px كحد أقصى حسب --bp-mobile */
-}
-
-/* حاوي متوسط - للمحتوى العادي، الصفحات */
-.container-md {
-  max-width: var(--bp-tablet); /* 768px كحد أقصى حسب --bp-tablet */
-}
-
-/* حاوي كبير - للمحتوى الواسع، الجداول */
-.container-lg {
-  max-width: var(--bp-desktop); /* 1024px كحد أقصى حسب --bp-desktop */
-}
-
-/* حاوي مليء - بدون حد أقصى للعرض */
-.container-fluid {
-  max-width: none; /* عرض مليء */
-}
-
-
-/* ========== التخطيط المرن ========== */
-
-.flex {
-  display: flex; /* عرض مرن */
-}
-
-.flex-col {
-  flex-direction: column; /* ترتيب عمودي */
-}
-
-.flex-row {
-  flex-direction: row; /* ترتيب أفقي */
-}
-
-.flex-wrap {
-  flex-wrap: wrap; /* انكسار للسطر التالي */
-}
-
-.flex-nowrap {
-  flex-wrap: nowrap; /* عدم انكسار */
-}
-
-/* محاذاة أفقية */
-.justify-start {
-  justify-content: flex-start; /* بداية */
-}
-
-.justify-center {
-  justify-content: center; /* وسط */
-}
-
-.justify-end {
-  justify-content: flex-end; /* نهاية */
-}
-
-.justify-between {
-  justify-content: space-between; /* توزيع بينهم */
-}
-
-.justify-around {
-  justify-content: space-around; /* توزيع حولهم */
-}
-
-/* محاذاة عمودية */
-.items-start {
-  align-items: flex-start; /* بداية عمودية */
-}
-
-.items-center {
-  align-items: center; /* وسط عمودي */
-}
-
-.items-end {
-  align-items: flex-end; /* نهاية عمودية */
-}
-
-.items-stretch {
-  align-items: stretch; /* امتداد عمودي */
-}
-
-
-/* ========== المسافات بين العناصر ========== */
-
-.gap-xs {
-  gap: var(--space-xs); /* مسافة صغيرة جداً */
-}
-
-.gap-sm {
-  gap: var(--space-sm); /* مسافة صغيرة */
-}
-
-.gap-md {
-  gap: var(--space-md); /* مسافة متوسطة */
-}
-
-.gap-lg {
-  gap: var(--space-lg); /* مسافة كبيرة */
-}
-
-.gap-xl {
-  gap: var(--space-xl); /* مسافة كبيرة جداً */
-}
-
-
-/* ========== الموضع والطبقات ========== */
-
-.relative {
-  position: relative; /* موضع نسبي */
-}
-
-.absolute {
-  position: absolute; /* موضع مطلق */
-}
-
-.fixed {
-  position: fixed; /* موضع ثابت */
-}
-
-.sticky {
-  position: sticky; /* موضع لاصق */
-  top: 0; /* لصق للأعلى */
-}
-
-/* طبقات z-index */
-.z-base {
-  z-index: var(--z-base); /* طبقة أساسية */
-}
-
-.z-dropdown {
-  z-index: var(--z-dropdown); /* طبقة منسدلة */
-}
-
-.z-fixed {
-  z-index: var(--z-fixed); /* طبقة ثابتة */
-}
-
-.z-modal {
-  z-index: var(--z-modal); /* طبقة منبثقة */
-}
-
-.z-notification {
-  z-index: var(--z-notification); /* طبقة إشعارات */
-}
-
-
-/* ========== العرض والارتفاع ========== */
-
-.w-full {
-  width: 100%; /* عرض كامل */
-}
-
-.w-auto {
-  width: auto; /* عرض تلقائي */
-}
-
-.h-full {
-  height: 100%; /* ارتفاع كامل */
-}
-
-.h-auto {
-  height: auto; /* ارتفاع تلقائي */
-}
-
-.h-screen {
-  height: 100vh; /* ارتفاع الشاشة */
-}
-
-.min-h-screen {
-  min-height: 100vh; /* حد أدنى ارتفاع الشاشة */
-}
-
-
-/* ========== العرض والإخفاء ========== */
-
-.block {
-  display: block; /* عرض كتلة */
-}
-
-.inline {
-  display: inline; /* عرض مع السطر */
-}
-
-.inline-block {
-  display: inline-block; /* كتلة مع السطر */
-}
-
-.hidden {
-  display: none; /* إخفاء تام */
-}
-
-.invisible {
-  visibility: hidden; /* إخفاء مع احتلال المساحة */
-}
-
-.visible {
-  visibility: visible; /* إظهار */
-}
-
-
-/* ========== التمرير ========== */
-
-.overflow-hidden {
-  overflow: hidden; /* إخفاء المتدفق */
-}
-
-.overflow-auto {
-  overflow: auto; /* تمرير تلقائي */
-}
-
-.overflow-scroll {
-  overflow: scroll; /* تمرير دائم */
-}
-
-.overflow-x-auto {
-  overflow-x: auto; /* تمرير أفقي تلقائي */
-}
-
-.overflow-y-auto {
-  overflow-y: auto; /* تمرير عمودي تلقائي */
-}
-
-
-/* ========== استجابة الموبايل ========== */
-
-@media (max-width: var(--bp-mobile)) {
-  .container {
-    padding-left: var(--space-sm);
-    padding-right: var(--space-sm); /* حشو أقل للموبايل */
-  }
-  
-  /* إخفاء في الموبايل */
-  .hidden-mobile {
-    display: none; /* إخفاء في الشاشات الصغيرة */
-  }
-  
-  /* إظهار في الموبايل فقط */
-  .mobile-only {
-    display: block; /* إظهار في الشاشات الصغيرة */
-  }
-}
-
-@media (min-width: var(--bp-mobile)) {
-  /* إخفاء في التابلت والديسكتوب */
-  .mobile-only {
-    display: none; /* إخفاء في الشاشات الكبيرة */
-  }
-}

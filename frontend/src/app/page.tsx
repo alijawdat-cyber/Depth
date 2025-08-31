@@ -229,7 +229,7 @@ export default function RoleTestingPage() {
                             {user.fullName.charAt(0)}
                           </Avatar>
                           <Stack gap={0}>
-                            <Text fw={600} size="sm">
+                            <Text fw={600} size="sm" style={{ fontWeight: 'var(--font-weight-semibold)' }}>
                               {user.fullName}
                             </Text>
                             <Badge 
@@ -440,7 +440,7 @@ export default function RoleTestingPage() {
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
                 <Badge color="red" fullWidth size="lg">🔴 سوبر أدمن</Badge>
-                <Text size="xs" fw={600}>علي جواد الربيعي</Text>
+                <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>علي جواد الربيعي</Text>
                 <Text size="xs">✅ إدارة كل شي (25+ شاشة)</Text>
                 <Text size="xs">✅ إدارة أدمنز + إضافة/حذف</Text>
                 <Text size="xs">✅ impersonate (دخول نيابة)</Text>
@@ -457,7 +457,7 @@ export default function RoleTestingPage() {
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
                 <Badge color="orange" fullWidth size="lg">🟠 أدمن عادي</Badge>
-                <Text size="xs" fw={600}>أحمد محمد حسن</Text>
+                <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>أحمد محمد حسن</Text>
                 <Text size="xs">✅ إدارة مستخدمين (20+ شاشة)</Text>
                 <Text size="xs">✅ إدارة مشاريع وتعيين</Text>
                 <Text size="xs">❌ إدارة أدمنز آخرين</Text>
@@ -474,7 +474,7 @@ export default function RoleTestingPage() {
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
                 <Badge color="green" fullWidth size="lg">🟢 مبدع فريلانسر</Badge>
-                <Text size="xs" fw={600}>فاطمة أحمد علي (+ 5 آخرين)</Text>
+                <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>فاطمة أحمد علي (+ 5 آخرين)</Text>
                 <Text size="xs">✅ مشاريعه المسندة فقط (14 شاشة)</Text>
                 <Text size="xs">✅ سعره بعد موافقة الأدمن</Text>
                 <Text size="xs">❌ أسعار العملاء أو الهامش</Text>
@@ -491,7 +491,7 @@ export default function RoleTestingPage() {
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
                 <Badge color="blue" fullWidth size="lg">🔵 عميل</Badge>
-                <Text size="xs" fw={600}>محمد صالح أحمد (+ 3 آخرين)</Text>
+                <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>محمد صالح أحمد (+ 3 آخرين)</Text>
                 <Text size="xs">✅ مشاريعه فقط (12 شاشة)</Text>
                 <Text size="xs">✅ السعر النهائي فقط</Text>
                 <Text size="xs">❌ هامش الوكالة أو تفاصيل التكلفة</Text>
@@ -508,7 +508,7 @@ export default function RoleTestingPage() {
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
                 <Badge color="violet" fullWidth size="lg">🟣 موظف براتب</Badge>
-                <Text size="xs" fw={600}>سارة عبد الله محمد (+ 4 آخرين)</Text>
+                <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>سارة عبد الله محمد (+ 4 آخرين)</Text>
                 <Text size="xs">✅ مهامه المسندة فقط (10 شاشات)</Text>
                 <Text size="xs">❌ أي أسعار إطلاقاً</Text>
                 <Text size="xs">✅ رفع تقارير العمل</Text>

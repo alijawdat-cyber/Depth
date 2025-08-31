@@ -8,46 +8,13 @@
 @import url('./reset.css');      /* إعادة ضبط المتصفحات - توحيد السلوك */
 @import url('./typography.css'); /* نظام الخطوط - خط دبي العربي */
 
-/* ========== الطبقة الثانية: المكونات ========== */
-@import url('../02-components/buttons.css');    /* أزرار وروابط تفاعلية */
-@import url('../02-components/inputs.css');     /* حقول إدخال ونماذج */
-@import url('../02-components/cards.css');      /* بطاقات ومحتوى مؤطر */
-@import url('../02-components/badges.css');     /* شارات وحالات ومؤشرات */
-@import url('../02-components/states.css');     /* حالات تطبيق (تحميل، فارغ، خطأ) */
+/* ========== الطبقة الثانية: تخصيص Mantine + الأدوات ========== */
 
-/* ========== الطبقة الثالثة: التخطيط ========== */
-@import url('../03-layout/containers.css');     /* حاويات وتخطيط عام */
-@import url('../03-layout/grids.css');          /* أنظمة الشبكة والتخطيط المرن */
-/* تم توحيد الهيكل تحت .app-shell داخل mantine.css، لا حاجة لـ shell.css */
-@import url('../03-layout/tables.css');         /* جداول ومحتوى مرتب */
-
-/* ========== الطبقة الرابعة: تخصيص مانتين ========== */
+/* ========== تخصيص مانتاين ========== */
 @import url('../04-utilities/mantine.css');     /* تخصيصات Mantine موحدة */
 
-/* ========== الطبقة الخامسة: تخصيصات عامة ========== */
+/* ========== أدوات عامة ========== */
 
-/* كل الأدوار تستخدم نفس التخطيط من shell.css - موحد بالكامل */
 @import url('../04-utilities/utilities.css'); /* أدوات عامة: سكرول أفقي، LTR-inline، منع اللفّ للأرقام */
 
-/* ========== إجبار استخدام التوكنز المركزية ========== */
-
-/* كل النصوص تستخدم التوكنز المركزية افتراضياً */
-* {
-  color: inherit; /* وراثة اللون من الحاوي */
-}
-
-body {
-  color: var(--color-text-primary); /* اللون الأساسي للجسم */
-}
-
-/* النصوص الثانوية من التوكنز فقط */
-*[c="dimmed"],
-*[data-c="dimmed"],
-.text-secondary {
-  color: var(--color-text-secondary) !important;
-}
-
-/* منع استخدام ألوان مباشرة - إجبار المركزية */
-*[color="gray"]:not(.mantine-ActionIcon-root):not(.mantine-Button-root) {
-  color: var(--color-text-secondary) !important;
-}
+/* (محذوف) لون body مغطّى من tokens.css؛ نتجنب التكرار هنا */

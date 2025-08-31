@@ -4,88 +4,14 @@
    ⭐ إعادة تعيين متغيرات مانتين الأساسية
    ================================= */
 
-:root {
-  /* الألوان الأساسية - مركزية بالكامل */
-  --mantine-color-blue: var(--color-primary);  /* الأزرق الأساسي */
-  --mantine-color-green: var(--color-success);  /* الأخضر الثانوي */
-  --mantine-color-orange: var(--color-warning);  /* البرتقالي المميز */
-  --mantine-color-red: var(--color-error);  /* الأحمر للخطر */
-  --mantine-color-yellow: var(--color-warning);  /* الأصفر للتحذير */
-  
-  /* ربط ألوان النصوص المباشرة بالتوكنز المركزية */
-  --mantine-color-dimmed: var(--color-text-secondary);  /* النص الثانوي */
-  --mantine-color-gray: var(--color-text-secondary);    /* الرمادي = ثانوي */
-  --mantine-color-dark: var(--color-text-primary);      /* الأسود = أساسي */
-  
-  /* الخط الأساسي */
-  --mantine-font-family: var(--font-primary);  /* خط من التوكنز */
-  --mantine-font-size-xs: var(--fs-xs);  /* حجم صغير جداً */
-  --mantine-font-size-sm: var(--fs-sm);  /* حجم صغير */
-  --mantine-font-size-md: var(--fs-md);  /* حجم متوسط */
-  --mantine-font-size-lg: var(--fs-lg);  /* حجم كبير */
-  --mantine-font-size-xl: var(--fs-xl);  /* حجم كبير جداً */
-  
-  /* المسافات والأبعاد */
-  --mantine-spacing-xs: var(--space-xs);  /* مسافة صغيرة 8px */
-  --mantine-spacing-sm: var(--space-sm);  /* مسافة متوسطة 16px */
-  --mantine-spacing-md: var(--space-md);  /* مسافة أساسية 24px */
-  --mantine-spacing-lg: var(--space-lg);  /* مسافة متوسطة كبيرة 32px */
-  --mantine-spacing-xl: var(--space-xl);  /* مسافة كبيرة 48px */
-  
-  /* الزوايا الدائرية */
-  --mantine-radius-xs: var(--radius-sm);  /* زوايا صغيرة */
-  --mantine-radius-sm: var(--radius-sm);  /* زوايا صغيرة */
-  --mantine-radius-md: var(--radius-md);  /* زوايا أساسية */
-  --mantine-radius-lg: var(--radius-lg);  /* زوايا كبيرة */
-  --mantine-radius-xl: var(--radius-lg);  /* زوايا كبيرة جداً */
-  
-  /* نقاط الكسر - إجبارية مطلقة لتجاوز Mantine */
-  --mantine-breakpoint-xs: 0px !important;      /* أقل من sm */
-  --mantine-breakpoint-sm: var(--bp-sm) !important;    /* الهواتف الحقيقية */
-  --mantine-breakpoint-md: var(--bp-mobile) !important;    /* الهواتف الكبيرة - موحد مع tokens.css */
-  --mantine-breakpoint-lg: var(--bp-tablet) !important;    /* التابلت - موحد مع tokens.css */
-  --mantine-breakpoint-xl: var(--bp-desktop) !important;   /* اللابتوب - موحد مع tokens.css */
-  --mantine-breakpoint-sm-value: var(--bp-sm);
-  --mantine-breakpoint-md-value: var(--bp-mobile);
-  --mantine-breakpoint-lg-value: var(--bp-tablet);
-  --mantine-breakpoint-xl-value: var(--bp-desktop);
-}
+/* تُدار قيم Mantine المتغيرة عبر الثيم داخل UiProviders.tsx. نُبقي هذا الملف لسلوكيات مركبة واستجابة واجهات فقط. */
 
 /* =================================
    ⭐ تخصيص الأزرار لمانتين
    ================================= */
 
 /* إعادة تعيين أزرار مانتين */
-.mantine-Button-root {
-  font-family: var(--mantine-font-family);  /* خط دبي */
-  font-weight: var(--font-weight-medium);  /* وزن متوسط موحد */
-  border-radius: var(--radius-md);  /* زوايا أساسية */
-  transition: all 0.2s ease;  /* انتقال سلس */
-}
-
-/* زر أساسي - أزرق */
-.mantine-Button-root[data-variant="filled"] {
-  background-color: var(--color-primary);  /* خلفية زرقاء */
-  color: var(--color-text-inverse);  /* نص أبيض */
-  border: none;  /* بلا حد */
-}
-
-.mantine-Button-root[data-variant="filled"]:hover {
-  background-color: var(--color-primary-hover);  /* أزرق أغمق عند التمرير */
-  transform: translateY(-1px);  /* رفع بسيط */
-}
-
-/* زر ثانوي - أخضر */
-.mantine-Button-root[data-variant="outline"] {
-  background-color: transparent;  /* خلفية شفافة */
-  color: var(--color-success);  /* نص أخضر */
-  border: 1px solid var(--color-success);  /* حد أخضر */
-}
-
-.mantine-Button-root[data-variant="outline"]:hover {
-  background-color: var(--color-success);  /* خلفية خضراء عند التمرير */
-  color: var(--color-text-inverse);  /* نص أبيض */
-}
+/* تخصيص الأزرار يُدار بالكامل من Mantine Theme داخل UiProviders.tsx */
 
 /* =================================
    ⭐ تخصيص الحقول لمانتين  
@@ -124,51 +50,7 @@
    ⭐ تطبيق الألوان المركزية على مكونات Mantine
    ================================= */
 
-/* ربط كل النصوص الثانوية بالتوكنز المركزية */
-/* الافتراضي للنصوص يكون Secondary حتى يظهر السرد بوضوح */
-.mantine-Text-root {
-  color: var(--color-text-secondary);
-}
-
-/* النصوص الثانوية من التوكنز */
-.mantine-Text-root[data-c*="dimmed"],
-.mantine-Text-root[c*="dimmed"],
-*[data-c*="dimmed"],
-*[c*="dimmed"] {
-  color: var(--color-text-secondary) !important;
-}
-
-/* الألوان الرمادية من التوكنز */
-*[data-color*="gray"],
-*[color*="gray"] {
-  color: var(--color-text-secondary) !important;
-}
-
-/* Badge وActionIcon colors */
-.mantine-Badge-root[data-color="gray"],
-.mantine-ActionIcon-root[data-color="gray"] {
-  color: var(--color-text-secondary) !important;
-  background-color: var(--color-bg-tertiary) !important;
-}
-
-/* Alert colors */
-.mantine-Alert-root[data-color="gray"] {
-  background-color: var(--color-bg-secondary) !important;
-  color: var(--color-text-secondary) !important;
-  border-color: var(--color-border-primary) !important;
-}
-
-/* تطبيق عام لكل النصوص في مكونات Mantine */
-.mantine-Text-root,
-.mantine-Title-root {
-  color: inherit; /* وراثة اللون من الحاوي */
-}
-
-/* تطبيق الألوان الثانوية على كل العناصر */
-*[data-c="dimmed"],
-*[c="dimmed"] {
-  color: var(--color-text-secondary) !important;
-}
+/* ألوان الحالات (dimmed/gray) تُدار من Mantine Theme داخل UiProviders.tsx */
 
 /* إجبار كل النصوص على استخدام التوكنز - قوانين شاملة */
 /* تعطيل إجبار النص الأساسي داخل الحاويات للسماح لقواعد UiProviders بالتحكم */
@@ -177,47 +59,7 @@
 .mantine-Group-root .mantine-Text-root:not([c]):not([data-c]) { color: var(--color-text-primary) !important; } */
 
 /* النصوص الثانوية - أولوية عالية */
-.mantine-Text-root[c="dimmed"],
-.mantine-Text-root[data-c="dimmed"],
-*[c="dimmed"],
-*[data-c="dimmed"] {
-  color: var(--color-text-secondary) !important;
-}
-
-/* تطبيق عام على كل النصوص */
-:is(.mantine-Text-root, .mantine-Title-root, .mantine-Badge-root) {
-  color: inherit;
-}
-
-/* النصوص بدون تحديد لون = أساسي */
-/* إزالة الإجبار العام للون الأساسي حتى تعمل قواعد Title/Text من الثيم */
-/* :is(.mantine-Text-root, .mantine-Title-root):not([c]):not([data-c]):not([color]):not([data-color]) { color: var(--color-text-primary) !important; } */
-
-/* =================================
-   ⭐ تخصيص البطاقات لمانتين
-   ================================= */
-
-/* إعادة تعيين بطاقات مانتين */
-.mantine-Card-root {
-  background-color: var(--color-bg-secondary);  /* خلفية ثانوية للبطاقات - صحيح */
-  border: 1px solid var(--color-border-primary);  /* حد رمادي */
-  border-radius: var(--radius-md);  /* زوايا متوسطة */
-  padding: var(--space-lg);  /* حشو كبير */
-  box-shadow: var(--shadow-sm);  /* ظل خفيف */
-  transition: box-shadow 0.3s ease;  /* انتقال سلس للظل */
-}
-
-.mantine-Card-root:hover {
-  box-shadow: var(--shadow-md);  /* ظل متوسط عند التمرير */
-}
-
-/* عنوان البطاقة */
-.mantine-Card-root .mantine-Title-root {
-  font-family: var(--mantine-font-family);  /* خط دبي */
-  color: inherit;  /* اتباع قواعد Title في الثيم */
-  margin-bottom: var(--space-sm);  /* مسافة سفلية */
-}
-
+/* ألوان النصوص/الحالات (dimmed/gray) تُدار من Mantine Theme. نُبقي الوراثة الافتراضية فقط عند الحاجة داخل المكونات. */
 /* =================================
    ⭐ تخصيص القوائم لمانتين
    ================================= */
@@ -273,19 +115,15 @@
 }
 
 .mantine-Table-root th {
-  background-color: var(--color-bg-secondary);  /* خلفية ثانوية للرؤوس */
-  padding: var(--space-sm);  /* حشو صغير */
-  text-align: center;  /* محاذاة وسط أفقياً */
-  vertical-align: middle; /* محاذاة وسط عمودياً */
-  font-weight: var(--font-weight-bold);  /* وزن عريض موحد */
-  border-bottom: 2px solid var(--color-border-primary);  /* حد سفلي */
+  background-color: var(--color-bg-secondary);
+  padding: var(--space-sm);
+  font-weight: var(--font-weight-bold);
+  border-bottom: 2px solid var(--color-border-primary);
 }
 
 .mantine-Table-root td {
-  padding: var(--space-sm);  /* حشو صغير */
-  border-bottom: 1px solid var(--color-border-primary);  /* حد سفلي خفيف */
-  text-align: center;  /* محاذاة وسط أفقياً */
-  vertical-align: middle; /* محاذاة وسط عمودياً */
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 /* تقليل الحشو على مستوى الحاوي بدون إضافة توكنز جديدة */
@@ -463,8 +301,11 @@
   .mantine-Grid-root .mantine-Grid-col {
     flex: 0 0 100% !important;
     max-width: 100% !important;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm); /* تقليل الفراغ العمودي بين العناصر */
   }
+
+  /* آخر عنصر ما يحتاج مسافة إضافية */
+  .mantine-Grid-root .mantine-Grid-col:last-child { margin-bottom: 0; }
 }
 
 @media (min-width: 431px) {
@@ -490,10 +331,7 @@
 }
 
 /* محاذاة وسط إجبارية لتجاوز أنماط Mantine الافتراضية عند اختلاف ترتيب التحميل */
-.mantine-Table-root :is(th, td) {
-  text-align: center !important;
-  vertical-align: middle !important;
-}
+.mantine-Table-root :is(th, td) { text-align: center !important; vertical-align: middle !important; }
 
 /* =================================
    ⭐ تخصيص NavLink للسايدبار (مركزي وتحت نطاق .app-sidebar)
@@ -553,6 +391,11 @@
 /* شعار التطبيق ضمن الهيدر - يعتمد التوكنز */
 .app-logo { height: var(--fs-lg); width: auto; display: block; }
 
+/* داكن فقط: خلي الشعار يطلع بلون فاتح (يعادل text-inverse) بدون تغيير ملف التوكنز أو الـ SVG */
+[data-mantine-color-scheme="dark"] .app-header .app-logo {
+  filter: brightness(0) invert(1); /* يحوّل الألوان الداكنة إلى فاتحة */
+}
+
 .app-sidebar { /* سايدبار موحّد */
   grid-area: sidebar; /* منطقة */
   padding: var(--space-md) var(--space-md) var(--space-lg); /* حشو */
@@ -573,14 +416,57 @@
   .app-header .header-nav > * { min-width: 0; }
 
   .app-shell { grid-template-areas: "header" "main"; grid-template-columns: 1fr; grid-template-rows: var(--header-height) 1fr; height: 100dvh; overflow: hidden; }
-  .app-shell .app-main { padding: var(--space-md); min-height: calc(100dvh - var(--header-height)); width: 100%; overflow-x: hidden; }
+  .app-shell .app-main {
+    padding-inline: calc(var(--space-sm) + var(--space-xs)); /* زيادة طفيفة للحافة الجانبية */
+    padding-block: var(--space-sm);
+    min-height: calc(100dvh - var(--header-height));
+    width: 100%;
+    overflow-x: hidden;
+  }
   /* إخفاء السايدبار المكتبي بالموبايل (نعتمد overlay فقط) */
   .app-shell > .app-sidebar { display: none; }
+
+  /* سايدبار الموبايل: حشو موحّد وصغير من كل الجهات */
+  .mobile-sidebar {
+    padding: var(--space-sm) !important;
+    /* تقليل العرض للموبايل لكل الأدوار بدون المساس بـ tokens.css */
+    width: min(
+      calc(var(--sidebar-width) - var(--space-xl)),
+      calc(100vw - var(--space-lg))
+    ) !important;
+  }
+
+  /* تقليل كثافة عناصر الروابط داخل سايدبار الموبايل */
+  .mobile-sidebar .mantine-NavLink-root {
+    padding-block: var(--space-sm) !important;
+  }
+
+  /* إزالة الحشو الجانبي المكرر من أي Container داخل المحتوى بالموبايل */
+  .app-main .mantine-Container-root {
+    padding-inline: 0 !important; /* يعتمد الحشو من app-main فقط */
+  }
+
+  /* ===== ضبط الكثافة العمودية لكل الأدوار بالموبايل ===== */
+  .app-main .mantine-Container-root .mantine-Stack-root { gap: var(--space-sm) !important; }
+  .app-main .mantine-Container-root .mantine-Group-root { gap: var(--space-sm) !important; }
+  .app-main .mantine-Container-root .mantine-Divider-root { margin-block: var(--space-sm) !important; }
+  /* تقليل حشو بطاقات Mantine بالموبايل داخل كل الصفحات */
+  .app-main .mantine-Container-root .mantine-Card-root { padding: var(--space-md) !important; }
+
+  /* مسافة متساوية قبل التنبيه الأخير حتى ما يلتصق بالبطاقة التي قبله */
+  .app-main .mantine-Container-root .mantine-Card-root + .mantine-Alert-root {
+    margin-top: var(--space-md) !important;
+  }
+
+  /* حشو داخلي مخفف لمحتوى السايدبار بالموبايل */
+  .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; }
+  /* على الديسكتوب نحافظ على الحشو الأكبر داخل السايدبار */
+  .app-sidebar .sidebar-inner { padding-inline: var(--space-md); padding-block: var(--space-sm); }
 }
 
 /* طبقات overlay للموبايل (مُدارة من React state داخل AppShell.tsx)
   ملاحظة: تغطي المحتوى الرئيسي فقط (تحت الهيدر) ولا تغطي الهيدر */
-.mobile-overlay { position: fixed; top: var(--header-height); inset-inline: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: var(--z-fixed); }
+.mobile-overlay { position: fixed; top: var(--header-height); inset-inline: 0; bottom: 0; background: var(--overlay-scrim); z-index: var(--z-fixed); }
 .mobile-sidebar { position: fixed; top: var(--header-height); inset-inline-start: 0; width: var(--sidebar-width); height: calc(100dvh - var(--header-height)); background-color: var(--color-bg-secondary); border-inline-start: 1px solid var(--color-border-primary); box-shadow: var(--shadow-lg); }
 
 .app-sidebar .mantine-NavLink-body { /* حاوية نص الرابط */

@@ -29,7 +29,7 @@ type Props = {
 export default function AdminError({ error, reset }: Props) {
   return (
     <Container size="xl" className="admin-main">
-      <Center style={{ minHeight: 'calc(100vh - var(--header-height))' }}>
+  <Center style={{ minHeight: 'calc(100dvh - var(--header-height))' }}>
   <Stack gap="lg" align="center" style={{ maxWidth: 'min(100%, var(--sidebar-width))' }}>
           <ThemeIcon size="xl" radius="xl" variant="light" color="red">
             <IconAlertTriangle size={40} />

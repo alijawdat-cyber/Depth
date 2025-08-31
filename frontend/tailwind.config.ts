@@ -13,18 +13,54 @@ export default {
       '2xl': '1280px',   /* Desktop قياسي */
     },
     extend: {
-      screens: {
-        // إضافية للدقة
-        'xs-legacy': '320px',    /* iPhone SE القديم */
-        'android-lg': '412px',   /* Pixel devices */
-        'iphone-pm': '430px',    /* iPhone 15 Pro Max */
-        'tab-compact': '600px',  /* Android Medium start */
-        'tab-air': '820px',      /* iPad Air 11" */
-        'tab-pro': '834px',      /* iPad Pro 11" */
-        'tab-expanded': '840px', /* Android Expanded */
-        'fhd': '1920px',         /* Full HD */
-        'qhd': '2560px',         /* QHD/1440p */
-        '4k': '3840px',          /* 4K UHD */
+      fontFamily: {
+        sans: ['var(--font-primary)']
+      },
+      fontSize: {
+        xs: 'var(--fs-xs)',
+        sm: 'var(--fs-sm)',
+        base: 'var(--fs-md)',
+        lg: 'var(--fs-lg)',
+        xl: 'var(--fs-xl)'
+      },
+      colors: {
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          inverse: 'var(--color-text-inverse)'
+        },
+        brand: {
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+          light: 'var(--color-primary-light)'
+        },
+        bg: {
+          primary: 'var(--color-bg-primary)',
+          secondary: 'var(--color-bg-secondary)',
+          tertiary: 'var(--color-bg-tertiary)'
+        },
+        border: {
+          primary: 'var(--color-border-primary)',
+          secondary: 'var(--color-border-secondary)'
+        },
+        state: {
+          success: 'var(--color-success)',
+          warning: 'var(--color-warning)',
+          error: 'var(--color-error)',
+          info: 'var(--color-info)'
+        }
+      },
+      boxShadow: {
+        sm: 'var(--shadow-sm)',
+        DEFAULT: 'var(--shadow-md)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)'
+      },
+      borderRadius: {
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        full: 'var(--radius-full)'
       }
     }
   },

@@ -25,38 +25,4 @@ body {
   -moz-osx-font-smoothing: grayscale; /* تحسين النص في Firefox على Mac */
 }
 
-/* ========== فئات أحجام النصوص ========== */
-.text-xs { font-size: var(--fs-xs); line-height: var(--line-height-tight); } /* 12px - شارات، تواريخ صغيرة */
-.text-sm { font-size: var(--fs-sm); line-height: var(--line-height-normal); } /* 14px - أوصاف، نص ثانوي */
-.text-md { font-size: var(--fs-md); line-height: var(--line-height-normal); } /* 16px - نص أساسي، محتوى */
-.text-lg { font-size: var(--fs-lg); line-height: var(--line-height-normal); } /* 18px - عناوين بطاقات */
-.text-xl { font-size: var(--fs-xl); line-height: var(--line-height-tight); } /* 24px - عناوين صفحات */
-
-/* ========== فئات أوزان النصوص ========== */
-.font-normal { font-weight: var(--font-weight-normal); } /* عادي - نص عام، فقرات */
-.font-medium { font-weight: var(--font-weight-medium); } /* متوسط - أزرار، تسميات مهمة */
-.font-bold { font-weight: var(--font-weight-bold); } /* عريض - عناوين، تأكيدات */
-
-/* ========== فئات ألوان النصوص ========== */
-.text-primary { color: var(--color-text-primary); } /* أسود/أبيض - نص رئيسي */
-.text-secondary { color: var(--color-text-secondary); } /* رمادي - نص ثانوي */
-.text-inverse { color: var(--color-text-inverse); } /* أبيض/أسود - نص عكسي */
-
-/* ========== فئات محاذاة النصوص ========== */
-.text-right { text-align: right; } /* محاذاة يمين - افتراضي للعربي */
-.text-left { text-align: left; } /* محاذاة يسار - للأرقام والإنجليزي */
-.text-center { text-align: center; } /* توسيط - عناوين، إحصائيات */
-
-/* ========== العناوين الهرمية ========== */
-h1, .h1 { font-size: var(--fs-xl); font-weight: 700; line-height: 1.2; margin-bottom: var(--space-lg); } /* عنوان صفحة */
-h2, .h2 { font-size: var(--fs-lg); font-weight: 600; line-height: 1.3; margin-bottom: var(--space-md); } /* عنوان قسم */
-h3, .h3 { font-size: var(--fs-md); font-weight: 600; line-height: 1.4; margin-bottom: var(--space-sm); } /* عنوان فرعي */
-
-/* توزيع ألوان النصوص العام (HTML خام) */
-h1, .h1, h2, .h2 { color: var(--color-text-primary); }
-h3, .h3, h4, .h4, h5, .h5, h6, .h6, small, label { color: var(--color-text-secondary); }
-
-/* ========== نصوص خاصة ========== */
-.mono { font-family: ui-monospace, 'SF Mono', Consolas, monospace; } /* خط أحادي - كود، أرقام */
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* قطع النص الطويل */
-.break-words { word-wrap: break-word; overflow-wrap: break-word; } /* كسر الكلمات الطويلة */
+/* ملاحظة: أصناف النص القياسية تُدار عبر Tailwind. لتجنب التعارض، أزلنا أصناف .text-* و.font-* من هنا. أبقينا قواعد HTML الأساسية فقط داخل مكونات Mantine عبر الثيم. */

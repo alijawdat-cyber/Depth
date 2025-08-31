@@ -8,50 +8,43 @@ import { ShellGate } from "./ShellGate";
 type Props = { children: React.ReactNode };
 
 // ثيم Mantine مربوط بالتوكنز المركزية (عميل) - الخط من --font-primary في tokens.css
+const brandScale = [
+  'var(--color-primary-light)',
+  'var(--color-primary-light)',
+  'var(--color-primary-light)',
+  'var(--color-primary)',
+  'var(--color-primary)',
+  'var(--color-primary)',
+  'var(--color-primary)',
+  'var(--color-primary-hover)',
+  'var(--color-primary-hover)',
+  'var(--color-primary-hover)'
+ ] as const;
+
+const infoScale = [
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)',
+  'var(--color-info)'
+ ] as const;
+
 const mantineTheme = createTheme({
   fontFamily: 'var(--font-primary)',
   primaryColor: 'brand',
   defaultRadius: 'md',
   colors: {
     // اللون الأساسي (بنفسجي الهوية)
-    brand: [
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)'
-    ],
-    // أزرق (نربطه بالـ primary)
-    blue: [
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)'
-    ],
-    // بنفسجي Mantine (violet) نفس primary للاتساق
-    violet: [
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary-light)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)',
-      'var(--color-primary-hover)'
-    ],
+    brand: brandScale,
+    // الأزرق المعلوماتي يربط بـ --color-info
+    blue: infoScale,
+    // بنفسجي Mantine (violet) = synonym مؤقت للهوية
+    violet: brandScale,
     // أخضر نجاح
     green: [
       'var(--color-success)',
@@ -106,6 +99,20 @@ const mantineTheme = createTheme({
     ],
   },
   components: {
+    Notifications: {
+      styles: {
+        root: {
+          zIndex: 'var(--z-notification)'
+        }
+      }
+    },
+    Modal: {
+      styles: {
+        content: {
+          zIndex: 'var(--z-modal)'
+        }
+      }
+    },
     Button: {
       defaultProps: { size: 'md' },
       styles: {
@@ -122,8 +129,11 @@ const mantineTheme = createTheme({
           '&[data-variant="light"][data-color]': {
             backgroundColor: 'var(--color-bg-tertiary) !important'
           },
-          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="blue"], &[data-variant="light"][data-color="violet"]': {
+          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="violet"]': {
             color: 'var(--color-primary)'
+          },
+          '&[data-variant="light"][data-color="blue"]': {
+            color: 'var(--color-info)'
           },
           '&[data-variant="light"][data-color="green"]': {
             color: 'var(--color-success)'
@@ -140,6 +150,16 @@ const mantineTheme = createTheme({
         }
       }
     },
+    Badge: {
+      styles: {
+        root: {
+          '&[data-color="gray"], &[color="gray"]': {
+            backgroundColor: 'var(--color-bg-tertiary)',
+            color: 'var(--color-text-secondary)'
+          }
+        }
+      }
+    },
     ThemeIcon: {
       styles: {
         root: {
@@ -151,8 +171,11 @@ const mantineTheme = createTheme({
             backgroundColor: 'var(--color-bg-tertiary) !important'
           },
           // لون الأيقونة حسب النطاق اللوني من التوكنز
-          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="blue"], &[data-variant="light"][data-color="violet"]': {
+          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="violet"]': {
             color: 'var(--color-primary)'
+          },
+          '&[data-variant="light"][data-color="blue"]': {
+            color: 'var(--color-info)'
           },
           '&[data-variant="light"][data-color="green"]': {
             color: 'var(--color-success)'
@@ -180,8 +203,11 @@ const mantineTheme = createTheme({
           '&[data-variant="light"][data-color]': {
             backgroundColor: 'var(--color-bg-tertiary) !important'
           },
-          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="blue"], &[data-variant="light"][data-color="violet"]': {
+          '&[data-variant="light"][data-color="brand"], &[data-variant="light"][data-color="violet"]': {
             color: 'var(--color-primary)'
+          },
+          '&[data-variant="light"][data-color="blue"]': {
+            color: 'var(--color-info)'
           },
           '&[data-variant="light"][data-color="green"]': {
             color: 'var(--color-success)'
@@ -219,18 +245,12 @@ const mantineTheme = createTheme({
     Text: {
       styles: {
         root: {
-          // افتراضياً: النصوص العامة تُعتبر سرد/ثانوية إذا لم يحدد لون عبر prop c
-          '&:not([c]):not([data-c])': {
-            color: 'var(--color-text-secondary)'
-          },
-          // استثناءات واضحة: نص كبير أو عريض يبقى primary
-          '&:not([c]):not([data-c])[size="lg"],&:not([c]):not([data-c])[size="xl"],&:not([c]):not([data-c])[fw="600"],&:not([c]):not([data-c])[fw="700"]': {
-            color: 'var(--color-text-primary)'
-          },
-          // dimmed يبقى ثانوي بقوة
-          '&[data-c="dimmed"], &[c="dimmed"]': {
-            color: 'var(--color-text-secondary) !important'
-          },
+          // افتراضي: اعتبر النص ثانوي إن لم يحدد لون
+          '&:not([c]):not([data-c])': { color: 'var(--color-text-secondary)' },
+          // الاستثناءات: titles/نص كبير/وزن عالي يظهر Primary
+          '&:not([c]):not([data-c])[size="lg"],&:not([c]):not([data-c])[size="xl"],&:not([c]):not([data-c])[fw="600"],&:not([c]):not([data-c])[fw="700"]': { color: 'var(--color-text-primary)' },
+          // dimmed ثانوي دائمًا
+          '&[data-c="dimmed"], &[c="dimmed"]': { color: 'var(--color-text-secondary) !important' }
         }
       }
     },
@@ -242,22 +262,10 @@ const mantineTheme = createTheme({
             color: 'var(--color-text-primary)'
           },
           // عناوين فرعية/سرد
-          '&[data-order="3"], &[order="3"], &[data-order="4"], &[order="4"], &[data-order="5"], &[order="5"], &[data-order="6"], &[order="6"]': {
-            color: 'var(--color-text-secondary)'
-          }
+          '&[data-order="3"], &[order="3"], &[data-order="4"], &[order="4"], &[data-order="5"], &[order="5"], &[data-order="6"], &[order="6"]': { color: 'var(--color-text-secondary)' }
         }
       }
     },
-    Badge: {
-      styles: {
-        root: {
-          '&[data-color="gray"], &[color="gray"]': {
-            backgroundColor: 'var(--color-bg-tertiary)',
-            color: 'var(--color-text-secondary)',
-          },
-        }
-      }
-    }
   },
 });
 
@@ -269,6 +277,8 @@ const cssVariablesResolver: CSSVariablesResolver = () => ({
     '--mantine-color-text': 'var(--color-text-primary)',
     '--mantine-color-dimmed': 'var(--color-text-secondary)',
   '--mantine-color-anchor': 'var(--color-primary)',
+  '--mantine-color-gray-7': 'var(--color-text-secondary)',
+  '--mantine-color-gray-6': 'var(--color-border-primary)',
   // فرض خلفية variant=light لكل الألوان من التوكن المركزي
   '--mantine-color-brand-light': 'var(--color-bg-tertiary)',
   '--mantine-color-blue-light': 'var(--color-bg-tertiary)',
@@ -284,6 +294,8 @@ const cssVariablesResolver: CSSVariablesResolver = () => ({
     '--mantine-color-text': 'var(--color-text-primary)',
     '--mantine-color-dimmed': 'var(--color-text-secondary)',
   '--mantine-color-anchor': 'var(--color-primary)',
+  '--mantine-color-gray-7': 'var(--color-text-secondary)',
+  '--mantine-color-gray-6': 'var(--color-border-primary)',
   // نفس الشي بالوضع الداكن
   '--mantine-color-brand-light': 'var(--color-bg-tertiary)',
   '--mantine-color-blue-light': 'var(--color-bg-tertiary)',

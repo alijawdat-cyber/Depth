@@ -265,7 +265,7 @@ export function DepthAppShell({ children, userRole }: Props){
           leftSection={left}
           component={Link}
           href={item.href}
-          c="var(--color-text-secondary)"
+          c="dimmed"
           defaultOpened={item.defaultOpened}
         >
           {hasChildren && item.children!.map(renderNavItem)}
@@ -277,7 +277,7 @@ export function DepthAppShell({ children, userRole }: Props){
         key={item.label}
         label={item.label}
         leftSection={left}
-        c="var(--color-text-secondary)"
+  c="dimmed"
         defaultOpened={item.defaultOpened}
       >
         {hasChildren && item.children!.map(renderNavItem)}
@@ -286,7 +286,7 @@ export function DepthAppShell({ children, userRole }: Props){
   };
 
   return (
-    <Box className={shellClass}>
+    <Box className={shellClass} data-role={userRole}>
       {/* الهيدر */}
       <Box component="header" className="app-header">
         <Group h="100%" justify="space-between" w="100%" wrap="nowrap">
@@ -318,14 +318,14 @@ export function DepthAppShell({ children, userRole }: Props){
       {/* الشريط الجانبي */}
   <Box component="aside" className="app-sidebar">
   <ScrollArea.Autosize mah="calc(100dvh - var(--header-height))" type="scroll">
-          <Box p="lg">
+          <Box p="lg" className="sidebar-inner">
             <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text>
             {navigationItems.map(renderNavItem)}
             <Divider my="sm" />
             <NavLink 
               label="الإعدادات" 
               leftSection={<IconSettings size={18} />} 
-              c="var(--color-text-secondary)"
+              c="dimmed"
             />
           </Box>
         </ScrollArea.Autosize>
@@ -341,7 +341,7 @@ export function DepthAppShell({ children, userRole }: Props){
         <Box className="md:hidden mobile-overlay" onClick={close}>
           <Box className="app-sidebar mobile-sidebar" onClick={(e) => e.stopPropagation()}>
             <ScrollArea.Autosize mah="calc(100dvh - var(--header-height))" type="scroll">
-              <Box p="lg">
+              <Box p="md" className="sidebar-inner">
                 <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text>
                 {navigationItems.map(renderNavItem)}
                 <Divider my="sm" />
@@ -349,7 +349,7 @@ export function DepthAppShell({ children, userRole }: Props){
                   label="الإعدادات" 
                   leftSection={<IconSettings size={18} />} 
                   onClick={close}
-                  c="var(--color-text-secondary)"
+                  c="dimmed"
                 />
               </Box>
             </ScrollArea.Autosize>
