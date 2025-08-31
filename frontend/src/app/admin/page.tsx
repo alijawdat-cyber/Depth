@@ -14,7 +14,6 @@ import {
   Divider,
   Avatar,
   Table,
-  Progress,
   ThemeIcon,
   Alert
 } from '@mantine/core';
@@ -35,7 +34,8 @@ import { mockClients } from '@/data/clients';
 import { mockCreators } from '@/data/creators';
 import { mockInvoices, mockPayments } from '@/data/invoicing';
 import { mockNotifications } from '@/data/notifications';
-import { formatCurrencyIQD, formatNumber, formatDateYMD } from '@/shared/format';
+import { formatCurrencyIQD, formatDateYMD } from '@/shared/format';
+import { CountUp, AnimatedProgress } from '@/shared/motion';
 
 export default function AdminDashboard() {
   // حساب الـ KPIs من البيانات الموجودة
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
                     إجمالي المشاريع
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(totalProjects)}
+                    <CountUp value={totalProjects} />
                   </Text>
                   <Text size="xs" c="green">
                     {activeProjects} نشط
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
                     إجمالي العملاء
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(totalClients)}
+                    <CountUp value={totalClients} />
                   </Text>
                   <Text size="xs" c="blue">
                     كلهم نشطين
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                     المبدعون النشطون
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(totalCreators)}
+                    <CountUp value={totalCreators} />
                   </Text>
                   <Text size="xs" c="green">
                     متاحين للعمل
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
                     إجمالي الإيرادات
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatCurrencyIQD(totalRevenue)}
+                    <CountUp value={totalRevenue} format={formatCurrencyIQD} />
                   </Text>
                   <Text size="xs" c="green">
                     {totalLineItems} عنصر
@@ -276,11 +276,13 @@ export default function AdminDashboard() {
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
-                    {mockPayments.slice(0, 5).map((p) => (
+                    {mockPayments.slice(0, 5).map((p, idx) => (
                       <Table.Tr key={p.id}>
                         <Table.Td data-cell="id" ta="center" style={{ verticalAlign: 'middle' }}>{p.reference}</Table.Td>
                         <Table.Td ta="center" style={{ verticalAlign: 'middle' }}>{p.clientId}</Table.Td>
-                        <Table.Td data-cell="num" ta="center" style={{ verticalAlign: 'middle' }}>{formatCurrencyIQD(p.amount)}</Table.Td>
+                        <Table.Td data-cell="num" ta="center" style={{ verticalAlign: 'middle' }}>
+                          <CountUp value={p.amount} delayMs={idx * 120} format={formatCurrencyIQD} />
+                        </Table.Td>
                         <Table.Td data-cell="date" ta="center" style={{ verticalAlign: 'middle' }}>{formatDateYMD(p.receivedAt)}</Table.Td>
                       </Table.Tr>
                     ))}
@@ -304,7 +306,7 @@ export default function AdminDashboard() {
                         <Text size="sm">{inv.invoiceNumber}</Text>
                         <Text size="xs" c="dimmed">{formatCurrencyIQD(inv.amount.total)}</Text>
                       </Group>
-                      <Progress value={Math.min(100, (inv.amount.total % 1000000) / 10000)} size="sm" color="green" />
+                      <AnimatedProgress value={Math.min(100, (inv.amount.total % 1000000) / 10000)} />
                     </div>
                   ))}
                 </Stack>

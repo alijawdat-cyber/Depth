@@ -1,0 +1,18 @@
+/* 🎞️ Motion primitives (token-only) */
+
+.motion-progress { 
+  position: relative;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  block-size: 8px;
+  overflow: hidden;
+}
+
+.motion-progress-bar {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 0%;
+  background: var(--color-success);
+  border-radius: var(--radius-full);
+  transition: inline-size .15s linear;
+}
