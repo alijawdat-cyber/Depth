@@ -158,11 +158,11 @@ const mantineTheme = createTheme({
           backgroundColor: 'var(--color-bg-secondary)',
           borderColor: 'var(--color-border-primary)',
       '--card-radius': 'var(--radius-lg)',
-      // ظل خفيف افتراضي + رفع عند المرور
-      // يعتمد على theme.shadows.sm/md المربوطة بالتوكنز
-      boxShadow: 'var(--shadow-sm)',
-      transition: 'box-shadow .15s ease',
-      '&:hover': { boxShadow: 'var(--shadow-md)' }
+          // نخلي الظل الافتراضي من Mantine (shadow prop)
+          // ونقوّي حالة hover/focus حتى تتغلب على أي قيمة shadow
+          transition: 'box-shadow .15s ease',
+          '&:hover': { boxShadow: 'var(--shadow-md) !important' },
+          '&:focus-visible': { boxShadow: 'var(--shadow-md) !important' }
         }
       }
     },
