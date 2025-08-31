@@ -1,0 +1,51 @@
+/* ⚙️ Overrides: Sidebar NavLink — تخصيص أدق وفق التوكنز */
+
+.app-sidebar .mantine-NavLink-root {
+  padding-inline: 0 !important;
+  padding-block: var(--space-md);
+  min-height: 40px; /* هدف لمس مريح */
+  text-align: right;
+  border-radius: var(--radius-md);
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.app-sidebar .mantine-NavLink-root:hover,
+.app-sidebar .mantine-NavLink-root:focus-visible {
+  background-color: color-mix(in oklab, var(--color-primary) 30%, var(--color-bg-secondary));
+  transform: translateX(var(--space-xs)); /* بدون إعادة تدفق */
+}
+
+.app-sidebar .mantine-NavLink-root[aria-current="page"],
+.app-sidebar .mantine-NavLink-root[data-active="true"] {
+  background-color: color-mix(in oklab, var(--color-primary) 30%, var(--color-bg-secondary));
+  box-shadow: var(--shadow-inset);
+  transform: translateX(var(--space-xs));
+}
+
+.app-sidebar .mantine-NavLink-body { flex: 1 1 auto; min-width: 0; }
+.app-sidebar .mantine-NavLink-label { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-sidebar .mantine-NavLink-section:first-child { margin-inline-end: var(--space-xs); }
+.app-sidebar .mantine-NavLink-section:last-child { margin-inline-start: var(--space-sm); }
+.app-sidebar .mantine-NavLink-children { border-inline-start: 1px solid var(--color-border-primary); margin-inline-start: var(--space-md); padding-inline-start: var(--space-sm); }
+
+/* تركيز لوحة المفاتيح */
+.app-sidebar .mantine-NavLink-root:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* أسهم التوسيع: نغّمقها شوية بالهوفر */
+.app-sidebar .mantine-NavLink-chevron { transition: transform .15s ease, opacity .15s ease; }
+.app-sidebar .mantine-NavLink-root:hover .mantine-NavLink-chevron { opacity: .85; }
+.app-sidebar .mantine-NavLink-root[data-expanded="true"] .mantine-NavLink-chevron { transform: rotate(90deg); }
+
+/* أجهزة بواجهة لمس (coarse) نزيد المساحة العمودية قليلاً */
+@media (pointer: coarse) {
+  .app-sidebar .mantine-NavLink-root { padding-block: var(--space-lg); }
+}
+
+/* تقليل الحركة عند التفضيل */
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar .mantine-NavLink-root { transition: none; }
+  .app-sidebar .mantine-NavLink-chevron { transition: none; }
+}

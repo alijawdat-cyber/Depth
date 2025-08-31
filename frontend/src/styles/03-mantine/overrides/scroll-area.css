@@ -1,0 +1,6 @@
+/* ⚙️ Overrides: Mantine ScrollArea — مقفول على التوكنز */
+
+.mantine-ScrollArea-root { scrollbar-width: thin; }
+.mantine-ScrollArea-viewport::-webkit-scrollbar { height: var(--space-xs); width: var(--space-xs); }
+.mantine-ScrollArea-viewport::-webkit-scrollbar-track { background-color: var(--color-bg-secondary); }
+.mantine-ScrollArea-viewport::-webkit-scrollbar-thumb { background-color: var(--color-border-primary); border-radius: var(--radius-sm); }

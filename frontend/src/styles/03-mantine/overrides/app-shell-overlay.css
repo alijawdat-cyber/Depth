@@ -1,0 +1,33 @@
+/* ⚙️ Overrides: App Shell Mobile Overlay & Sidebar */
+
+.mobile-overlay {
+  position: fixed; /* ثابت */
+  top: var(--header-height); /* من أعلى */
+  inset-inline: 0; /* يمين/يسار */
+  bottom: 0; /* أسفل */
+  background: var(--overlay-scrim); /* تعتيم */
+  z-index: var(--z-fixed); /* طبقة */
+}
+
+.mobile-sidebar {
+  position: fixed; /* ثابت */
+  top: var(--header-height); /* من أعلى */
+  inset-inline-start: 0; /* بداية */
+  width: var(--sidebar-width); /* عرض */
+  height: calc(100dvh - var(--header-height)); /* طول */
+  background-color: var(--color-bg-secondary); /* خلفية */
+  border-inline-start: 1px solid var(--color-border-primary); /* حد */
+  box-shadow: var(--shadow-lg); /* ظل */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* موبايل - 640px ثابت */
+@media (max-width: 640px) {
+  .mobile-sidebar { padding: var(--space-sm) !important; /* حشو */ width: min( calc(var(--sidebar-width) - var(--space-xl)), calc(100vw - var(--space-lg)) ) !important; /* عرض متكيّف */ padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0)); }
+  .mobile-sidebar .mantine-NavLink-root { padding-block: var(--space-sm) !important; /* كثافة أقل */ }
+  .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; /* حشو */ }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-overlay, .mobile-sidebar { transition: none !important; }
+}

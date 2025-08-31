@@ -1,0 +1,10 @@
+/* ⚙️ Overrides: Mantine Badge — مقفول على التوكنز */
+
+.mantine-Badge-root {
+  border-radius: var(--radius-sm);
+}
+
+.mantine-Badge-root[data-variant="filled"] { background-color: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-primary); }
+.mantine-Badge-root[data-variant="outline"] { background-color: transparent; color: var(--color-text-primary); border-color: var(--color-border-primary); }
+
+/* حالة gray الخاصة موجودة بالثيم — هنانا نخلي العام */

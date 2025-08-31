@@ -1,0 +1,15 @@
+/* ⚙️ Overrides: Mantine Typography — Text/Title وفق التوكنز */
+
+.mantine-Text-root:not([c],[data-c]) { color: var(--color-text-secondary); }
+.mantine-Text-root:not([c],[data-c])[size="lg"],
+.mantine-Text-root:not([c],[data-c])[size="xl"],
+.mantine-Text-root:not([c],[data-c])[fw="600"],
+.mantine-Text-root:not([c],[data-c])[fw="700"] { color: var(--color-text-primary); }
+.mantine-Text-root[c="dimmed"], .mantine-Text-root[data-c="dimmed"] { color: var(--color-text-secondary) !important; }
+
+.mantine-Title-root[data-order="1"], .mantine-Title-root[order="1"],
+.mantine-Title-root[data-order="2"], .mantine-Title-root[order="2"] { color: var(--color-text-primary); }
+.mantine-Title-root[data-order="3"], .mantine-Title-root[order="3"],
+.mantine-Title-root[data-order="4"], .mantine-Title-root[order="4"],
+.mantine-Title-root[data-order="5"], .mantine-Title-root[order="5"],
+.mantine-Title-root[data-order="6"], .mantine-Title-root[order="6"] { color: var(--color-text-secondary); }

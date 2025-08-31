@@ -1,0 +1,8 @@
+/* ⚙️ Overrides: Mantine Layout helpers — Container/Group/Stack مركزة على التوكنز */
+
+/* Container padding الافتراضي */
+.mantine-Container-root { padding: var(--space-lg); }
+
+/* Group/Stack فواصل افتراضية حسب التوكنز عند وجود data-compact */
+.mantine-Group-root[data-compact="true"] { gap: var(--space-xs); }
+.mantine-Stack-root[data-compact="true"] { gap: var(--space-xs); }

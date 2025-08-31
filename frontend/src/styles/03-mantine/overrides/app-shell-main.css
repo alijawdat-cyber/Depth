@@ -1,0 +1,29 @@
+/* ⚙️ Overrides: App Shell Main */
+
+.app-main {
+  grid-area: main; /* منطقة */
+  padding: var(--space-lg); /* حشو */
+  background-color: var(--color-bg-primary); /* خلفية */
+  overflow-y: auto; /* تمرير */
+  min-height: 0; /* منع مشاكل */
+  padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0));
+  scrollbar-gutter: stable both-edges; /* ثبات التخطيط مع شريط التمرير */
+}
+
+/* موبايل - 640px ثابت */
+@media (max-width: 640px) {
+  .app-shell .app-main {
+  padding-inline: calc(var(--space-sm) + var(--space-xs)); /* حافة */
+    padding-block: var(--space-sm); /* عمودي */
+    min-height: calc(100dvh - var(--header-height)); /* طول */
+    width: 100%; /* عرض كامل */
+    overflow-x: hidden; /* بدون تمرير أفقي */
+  padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0));
+  }
+  .app-main .mantine-Container-root { padding-inline: 0 !important; /* بدون حشو جانبي */ }
+  .app-main .mantine-Container-root .mantine-Stack-root { gap: var(--space-sm) !important; /* فجوة */ }
+  .app-main .mantine-Container-root .mantine-Group-root { gap: var(--space-sm) !important; /* فجوة */ }
+  .app-main .mantine-Container-root .mantine-Divider-root { margin-block: var(--space-sm) !important; /* هامش */ }
+  .app-main .mantine-Container-root .mantine-Card-root { padding: var(--space-md) !important; /* حشو */ }
+  .app-main .mantine-Container-root .mantine-Card-root + .mantine-Alert-root { margin-top: var(--space-md) !important; /* تباعد */ }
+}

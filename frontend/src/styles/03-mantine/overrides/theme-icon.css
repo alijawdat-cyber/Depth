@@ -1,0 +1,5 @@
+/* ⚙️ Overrides: Mantine ThemeIcon — مقفول على التوكنز */
+
+.mantine-ThemeIcon-root[data-size="sm"] { width: var(--size-sm); height: var(--size-sm); }
+.mantine-ThemeIcon-root[data-size="md"] { width: var(--size-md); height: var(--size-md); }
+.mantine-ThemeIcon-root[data-size="lg"] { width: var(--size-lg); height: var(--size-lg); }

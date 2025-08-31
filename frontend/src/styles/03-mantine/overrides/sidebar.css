@@ -1,0 +1,19 @@
+/* ⚙️ Overrides: App Sidebar (حاوية السايدبار) — مقفول على التوكنز */
+
+.app-sidebar {
+  grid-area: sidebar; /* منطقة */
+  padding: var(--space-md) var(--space-md) var(--space-lg); /* حشو */
+  background-color: var(--color-bg-secondary); /* خلفية */
+  border-inline-end: 1px solid var(--color-border-primary); /* حد */
+  overflow-y: auto; /* تمرير */
+  scrollbar-width: thin; /* شريط رفيع */
+  scrollbar-gutter: stable both-edges; /* ثبات التخطيط مع الشريط */
+}
+
+/* موبايل - ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
+@media (max-width: 640px) {
+  .mobile-sidebar { padding: var(--space-sm) !important; /* حشو */ width: min( calc(var(--sidebar-width) - var(--space-xl)), calc(100vw - var(--space-lg)) ) !important; /* عرض متكيّف */ }
+  .mobile-sidebar .mantine-NavLink-root { padding-block: var(--space-sm) !important; /* كثافة أقل */ }
+  .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; /* حشو */ }
+  .app-sidebar .sidebar-inner { padding-inline: var(--space-md); /* جانبي */ padding-block: var(--space-sm); /* عمودي */ padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0)); }
+}

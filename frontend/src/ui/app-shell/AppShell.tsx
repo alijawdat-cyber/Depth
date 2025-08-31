@@ -1,6 +1,5 @@
 "use client"; // مكوّن عميل
 import React from "react"; // React
-import "./app-shell.css"; // أنماط الشيل
 import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Divider, Badge, useMantineColorScheme } from "@mantine/core"; // Mantine
 import Image from "next/image"; // صورة
 import Link from "next/link"; // روابط
@@ -179,7 +178,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
       <Box component="header" className="app-header"> {/* الهيدر */}
         <Group h="100%" justify="space-between" w="100%" wrap="nowrap"> {/* توزيع */}
           <Group gap="sm" className="header-nav" wrap="nowrap"> {/* يسار الهيدر */}
-            <Burger opened={opened} onClick={toggle} aria-label="فتح القائمة" className="md:hidden mobile:hidden" /> {/* زر برغر */}
+            <Burger opened={opened} onClick={toggle} aria-label="فتح القائمة" className="md:hidden" /> {/* زر برغر */}
             <Image src="/logo-depth.svg" alt="Depth" width={110} height={28} priority className="app-logo" /> {/* شعار */}
             <Badge size="sm" variant="light" color={userRole === 'admin' ? 'red' : 'blue'}>{userRole === 'admin' ? 'أدمن' : userRole === 'creator' ? 'مبدع' : userRole === 'client' ? 'عميل' : userRole === 'salariedEmployee' ? 'موظف' : 'ضيف'}</Badge> {/* دور */}
           </Group>
@@ -192,7 +191,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
         </Group>
       </Box>
 
-      <Box component="aside" className="app-sidebar hidden md:block mobile:block"> {/* الشريط الجانبي */}
+  <Box component="aside" className="app-sidebar hidden md:block"> {/* الشريط الجانبي */}
         <ScrollArea.Autosize mah="calc(100dvh - var(--header-height))" type="scroll"> {/* تمرير */}
           <Box p="lg" className="sidebar-inner"> {/* داخل الشريط */}
             <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text> {/* عنوان */}
@@ -208,7 +207,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
       </Box>
 
       {opened && ( // شريط جانبي للموبايل
-        <Box className="md:hidden mobile:hidden mobile-overlay" onClick={close}> {/* طبقة إغلاق */}
+  <Box className="md:hidden mobile-overlay" onClick={close}> {/* طبقة إغلاق */}
           <Box className="app-sidebar mobile-sidebar" onClick={(e) => e.stopPropagation()}> {/* لوحة جانبية */}
             <ScrollArea.Autosize mah="calc(100dvh - var(--header-height))" type="scroll"> {/* تمرير */}
               <Box p="md" className="sidebar-inner"> {/* داخل الشريط */}

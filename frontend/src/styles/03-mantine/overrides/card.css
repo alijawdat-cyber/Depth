@@ -1,0 +1,17 @@
+/* 📦 Overrides: Mantine Card — توحيد ظل الهوفر من التوكنز */
+
+/*
+  ملاحظة:
+  - بعض الحالات، خاصّة مع prop shadow في <Card shadow="sm|md|lg">،
+    ممكن الستايل inline أو ترتيب CSS يمنع تأثير :hover.
+  - نخلي override مركزي بأولوية أعلى ويستعمل قيم التوكنز مباشرة.
+*/
+
+.mantine-Card-root {
+  transition: box-shadow .15s ease; /* انتقال ناعم */
+}
+
+.mantine-Card-root:hover,
+.mantine-Card-root:focus-visible {
+  box-shadow: var(--shadow-md) !important; /* ظل كبير موحّد على hover/focus */
+}

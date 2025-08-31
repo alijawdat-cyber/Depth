@@ -1,0 +1,24 @@
+/* ⚙️ Overrides: App Shell Grid (layout العام) */
+
+.app-shell {
+  display: grid; /* شبكة */
+  grid-template-areas: "header header" "sidebar main"; /* مناطق */
+  grid-template-columns: var(--sidebar-width) 1fr; /* سايدبار+محتوى */
+  grid-template-rows: var(--header-height) 1fr; /* هيدر ثابت */
+  height: 100dvh; /* ارتفاع */
+  overflow: hidden; /* منع تمرير خارجي */
+  background-color: var(--color-bg-primary); /* خلفية */
+  padding-bottom: env(safe-area-inset-bottom, 0); /* احترام الحافة الآمنة */
+}
+
+/* موبايل - 640px ثابت */
+@media (max-width: 640px) {
+  .app-shell {
+    grid-template-areas: "header" "main"; /* عمود واحد */
+    grid-template-columns: 1fr; /* عمود */
+    grid-template-rows: var(--header-height) 1fr; /* هيدر+محتوى */
+  height: 100dvh;
+    overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
