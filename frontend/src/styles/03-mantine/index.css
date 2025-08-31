@@ -1,0 +1,8 @@
+/* مركّب overrides الخاصة بـ Mantine (مقسمة) */
+@import url('./overrides/input.css');
+@import url('./overrides/menu.css');
+@import url('./overrides/table.css');
+@import url('./overrides/modal.css');
+@import url('./overrides/notifications.css');
+@import url('./overrides/responsive.css');
+@import url('./overrides/rtl.css');

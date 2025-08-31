@@ -1,0 +1,56 @@
+.mantine-Table-root { width: 100%; /* عرض كامل */ border-collapse: collapse; /* دمج حدود */ font-family: var(--mantine-font-family); /* خط */ }
+
+.mantine-Card-root[data-fit="content"] :is(table, .mantine-Table-table),
+.mantine-Stack-root[data-fit="content"] :is(table, .mantine-Table-table),
+.mantine-Group-root[data-fit="content"] :is(table, .mantine-Table-table) { width: max-content; /* عرض=محتوى */ table-layout: auto; /* حساب أعمدة ديناميكي */ }
+
+@media (min-width: 1024px) {
+	.mantine-Card-root[data-fit="content"],
+	.mantine-Stack-root[data-fit="content"],
+	.mantine-Group-root[data-fit="content"] { width: max-content; /* تتقلص */ max-width: 100%; /* لا تتجاوز الشبكة */ }
+}
+
+.mantine-Table-root th { background-color: var(--color-bg-secondary); /* رأس: خلفية */ padding: var(--space-sm); /* حشو */ font-weight: var(--font-weight-bold); /* ثقيل */ border-bottom: 2px solid var(--color-border-primary); /* حد سفلي */ }
+.mantine-Table-root td { padding: var(--space-sm); /* حشو */ border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */ }
+
+.mantine-Card-root[data-compact="true"] .mantine-Table-root :is(th, td),
+.mantine-Stack-root[data-compact="true"] .mantine-Table-root :is(th, td),
+.mantine-Group-root[data-compact="true"] .mantine-Table-root :is(th, td) { padding-block: var(--space-xs); /* تقليل عمودي */ padding-inline: var(--space-sm); /* تقليل أفقي */ }
+
+.mantine-Table-root tr:hover { background-color: var(--color-bg-tertiary); } /* Hover */
+
+@media (max-width: 640px) {
+	.mantine-Card-root[data-responsive="wide"],
+	.mantine-Stack-root[data-responsive="wide"],
+	.mantine-Group-root[data-responsive="wide"] { overflow-x: auto; /* تمرير أفقي */ overscroll-behavior-x: contain; /* احتواء */ -webkit-overflow-scrolling: touch; /* iOS */ display: block; /* بلوك */ max-width: 100%; /* لا يتجاوز */ }
+
+	.mantine-Card-root[data-responsive="wide"] .mantine-Table-root,
+	.mantine-Stack-root[data-responsive="wide"] .mantine-Table-root,
+	.mantine-Group-root[data-responsive="wide"] .mantine-Table-root { width: auto !important; /* عرض تلقائي */ max-width: none !important; /* بدون حد */ }
+
+	.mantine-Card-root[data-responsive="wide"] :is(table, .mantine-Table-table),
+	.mantine-Stack-root[data-responsive="wide"] :is(table, .mantine-Table-table),
+	.mantine-Group-root[data-responsive="wide"] :is(table, .mantine-Table-table) { width: max-content !important; /* عرض=محتوى */ table-layout: auto !important; /* تخطيط تلقائي */ display: inline-table; /* داخل السطر */ }
+
+	.mantine-Card-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table),
+	.mantine-Stack-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table),
+	.mantine-Group-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table) { min-width: var(--wide-content-min-w-sm) !important; /* حد أدنى */ }
+
+	.mantine-Table-root th[data-cell="num"],
+	.mantine-Table-root th[data-cell="date"] { white-space: nowrap; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ }
+
+	.mantine-Table-root td[data-cell="num"],
+	.mantine-Table-root td[data-cell="date"],
+	.mantine-Table-root td[data-cell="id"],
+	.mantine-Table-root td[data-cell="code"] { white-space: nowrap !important; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ }
+
+	.mantine-Table-root td[data-cell="num"],
+	.mantine-Table-root td[data-cell="date"],
+	.mantine-Table-root th[data-cell="num"],
+	.mantine-Table-root th[data-cell="date"] { width: 1% !important; /* أضيق عرض */ max-width: 1% !important; /* نفس الحد */ }
+
+	.mantine-Table-root td[data-cell="id"],
+	.mantine-Table-root td[data-cell="code"],
+	.mantine-Table-root th[data-cell="id"],
+	.mantine-Table-root th[data-cell="code"] { width: max-content !important; /* حسب المحتوى */ max-width: none !important; /* بلا حد */ }
+}

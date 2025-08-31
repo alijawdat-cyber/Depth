@@ -1,0 +1,8 @@
+.mantine-Input-input,
+.mantine-Textarea-input,
+.mantine-Select-input { direction: rtl; /* اتجاه */ text-align: right; /* محاذاة */ }
+
+.mantine-Table-root th,
+.mantine-Table-root td { direction: rtl; /* جدول RTL */ }
+
+.mantine-Table-root :is(th, td) { text-align: center !important; /* توسيط نص */ vertical-align: middle !important; /* توسيط عمودي */ }

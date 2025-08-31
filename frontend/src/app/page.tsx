@@ -201,7 +201,7 @@ export default function RoleTestingPage() {
             <Tabs.Tab value="client" leftSection={<IconBriefcase size={16} />} color="blue">
               عميل (4)
             </Tabs.Tab>
-            <Tabs.Tab value="salariedEmployee" leftSection={<IconUser size={16} />} color="violet">
+            <Tabs.Tab value="salariedEmployee" leftSection={<IconUser size={16} />} color="brand">
               موظف (5)
             </Tabs.Tab>
           </Tabs.List>
@@ -286,7 +286,7 @@ export default function RoleTestingPage() {
                         )}
                         
                         {user.role === 'salariedEmployee' && (
-                          <Alert color="violet" variant="light">
+                          <Alert color="brand" variant="light">
                             <Text size="xs">💰 لا يرى الأسعار (ضمن الراتب)</Text>
                           </Alert>
                         )}
@@ -383,7 +383,7 @@ export default function RoleTestingPage() {
               <Grid.Col span={{ base: 6, sm: 3, lg: 2 }}>
                 <Group justify="center">
                   <Stack align="center" gap={0}>
-                    <Text size="xl" fw={700} c="violet">
+                    <Text size="xl" fw={700} c="brand">
                       {mockSalariedEmployees.length}
                     </Text>
                     <Text size="xs" c="dimmed" ta="center">
@@ -507,7 +507,7 @@ export default function RoleTestingPage() {
             
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <Stack gap="xs">
-                <Badge color="violet" fullWidth size="lg">🟣 موظف براتب</Badge>
+                <Badge color="brand" fullWidth size="lg">🟣 موظف براتب</Badge>
                 <Text size="xs" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>سارة عبد الله محمد (+ 4 آخرين)</Text>
                 <Text size="xs">✅ مهامه المسندة فقط (10 شاشات)</Text>
                 <Text size="xs">❌ أي أسعار إطلاقاً</Text>
@@ -516,7 +516,7 @@ export default function RoleTestingPage() {
                 <Text size="xs">✅ تقويم المهام</Text>
                 <Text size="xs">✅ ملف شخصي محدود</Text>
                 <Divider my="xs" />
-                <Badge size="xs" color="violet" variant="outline">
+                <Badge size="xs" color="brand" variant="outline">
                   مهام فقط - ضمن الراتب
                 </Badge>
               </Stack>

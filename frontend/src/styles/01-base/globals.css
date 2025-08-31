@@ -1,0 +1,8 @@
+/* globals.css — نقطة تجميع الأنماط */
+@import url("tailwindcss"); /* إطار Tailwind */
+@import url('../00-tokens/tokens.css'); /* توكنز مركزية */
+@import url('../01-base/reset.css'); /* إعادة ضبط */
+@import url('../00-tokens/typography.css'); /* الخطوط */
+@import url('../03-mantine/index.css'); /* تخصيصات Mantine */
+@import url('../04-utilities/utilities.css'); /* أدوات عامة */
+/* ملاحظة: تخطيط .app-shell داخل src/ui/app-shell/app-shell.css ويُستورد من المكوّن. */

@@ -1,0 +1,30 @@
+/* 🎛️ Overrides: Mantine Inputs */
+
+/* إعادة تعيين حقول الإدخال */
+.mantine-Input-wrapper {
+	margin-bottom: var(--space-sm);  /* مسافة سفلية */
+}
+
+.mantine-Input-input {
+	font-family: var(--mantine-font-family);  /* خط دبي */
+	font-size: var(--fs-md);  /* حجم أساسي */
+	border: 1px solid var(--color-border-primary);  /* حد رمادي */
+	border-radius: var(--radius-md);  /* زوايا أساسية */
+	padding: var(--space-sm);  /* حشو صغير */
+	transition: border-color 0.2s ease;  /* انتقال سلس للحد */
+}
+
+.mantine-Input-input:focus {
+	border-color: var(--color-primary);  /* حد ملون عند التركيز */
+	outline: none;  /* إزالة المحيط الافتراضي */
+	box-shadow: var(--shadow-sm);  /* ظل خفيف */
+}
+
+/* تسميات الحقول */
+.mantine-Input-label {
+	font-family: var(--mantine-font-family);  /* خط دبي */
+	font-weight: var(--font-weight-medium);  /* وزن متوسط موحد */
+	color: var(--color-text-primary);  /* لون أساسي */
+	margin-bottom: var(--space-xs);  /* مسافة سفلية صغيرة */
+	display: block;  /* عرض كتلي */
+}

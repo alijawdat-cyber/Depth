@@ -61,7 +61,7 @@ export default function SalariedDashboard() {
             <Avatar 
               size="xl" 
               radius="xl"
-              color="violet"
+              color="brand"
             >
               {currentEmployee.fullName.charAt(0)}
             </Avatar>
@@ -73,7 +73,7 @@ export default function SalariedDashboard() {
                 {currentEmployee.jobTitle} - قسم {currentEmployee.department}
               </Text>
               <Group gap="xs">
-                <Badge variant="light" color="violet">
+                <Badge variant="light" color="brand">
                   {currentEmployee.employmentType === 'full_time' ? 'دوام كامل' : 
                    currentEmployee.employmentType === 'part_time' ? 'دوام جزئي' : 'تعاقد'}
                 </Badge>
@@ -87,12 +87,12 @@ export default function SalariedDashboard() {
           <Group gap="sm">
             <Button 
               variant="filled" 
-              color="violet"
+              color="brand"
               leftSection={<IconUpload size={18} />}
             >
               رفع تقرير
             </Button>
-            <ActionIcon variant="light" size="lg" color="violet">
+            <ActionIcon variant="light" size="lg" color="brand">
               <IconCalendar size={20} />
             </ActionIcon>
           </Group>
@@ -199,7 +199,7 @@ export default function SalariedDashboard() {
                 <Badge 
                   key={skill} 
                   variant="light" 
-                  color="violet" 
+                  color="brand" 
                   size="lg"
                 >
                   {skill.replace('_', ' ')}
@@ -233,7 +233,7 @@ export default function SalariedDashboard() {
                     <Group justify="space-between" align="flex-start">
                       <Stack gap="xs" style={{ flex: 1 }}>
                         <Group gap="sm">
-                          <Badge variant="light" color="violet">
+                          <Badge variant="light" color="brand">
                             مهمة #{index + 1}
                           </Badge>
                           <Badge 
@@ -269,13 +269,13 @@ export default function SalariedDashboard() {
                           <Progress 
                             value={60 + (index * 15)} // محاكاة تقدم مختلف
                             size="sm" 
-                            color="violet"
+                            color="brand"
                           />
                         )}
                       </Stack>
                       
                       <Group gap="xs">
-                        <ActionIcon variant="light" color="violet">
+                        <ActionIcon variant="light" color="brand">
                           <IconEye size={16} />
                         </ActionIcon>
                         <ActionIcon variant="light" color="blue">
@@ -287,7 +287,7 @@ export default function SalariedDashboard() {
                 ))}
               </Stack>
             ) : (
-              <Alert variant="light" color="violet" icon={<IconBriefcase size={16} />}>
+              <Alert variant="light" color="brand" icon={<IconBriefcase size={16} />}>
                 ما عندك مهام مسندة اليوم. استمتع بيومك! 
               </Alert>
             )}
@@ -305,7 +305,7 @@ export default function SalariedDashboard() {
               <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                 <Button
                   variant="light"
-                  color="violet"
+                  color="brand"
                   size="md"
                   fullWidth
                   leftSection={<IconBriefcase size={20} />}
@@ -354,7 +354,7 @@ export default function SalariedDashboard() {
         </Card>
 
         {/* تنبيه مهم حول عدم رؤية الأسعار */}
-        <Alert variant="light" color="violet" title="🧪 وضع الاختبار - دور الموظف براتب">
+  <Alert variant="light" color="brand" title="🧪 وضع الاختبار - دور الموظف براتب">
           <Text size="sm">
             أنت الآن تختبر شاشة <strong>الموظف براتب الثابت</strong>. هذا الموظف يرى:
             <br />
@@ -382,7 +382,7 @@ export default function SalariedDashboard() {
             </Button>
             <Button 
               variant="light" 
-              color="violet" 
+              color="brand" 
               size="sm"
             >
               🔄 جرب موظف آخر
@@ -401,7 +401,7 @@ export default function SalariedDashboard() {
               <Grid.Col span={{ base: 12, md: 6 }}>
                 <Stack gap="xs">
                   <Text size="sm" c="dimmed">القسم</Text>
-                  <Badge variant="light" color="violet" size="lg">
+                  <Badge variant="light" color="brand" size="lg">
                     {currentEmployee.department === 'photography' ? '📷 تصوير' :
                      currentEmployee.department === 'videography' ? '🎬 فيديو' :
                      currentEmployee.department === 'design' ? '🎨 تصميم' :

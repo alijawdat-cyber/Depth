@@ -79,7 +79,7 @@ export default function CreatorDashboard() {
                 <Badge variant="outline" color="blue">
                   ⭐ {currentCreator.rating}/5
                 </Badge>
-                <Badge variant="outline" color="violet">
+                <Badge variant="outline" color="brand">
                   {currentCreator.equipmentTier === 'platinum' ? '🥇 بلاتيني' :
                    currentCreator.equipmentTier === 'gold' ? '🥈 ذهبي' : '🥉 فضي'}
                 </Badge>
@@ -350,7 +350,7 @@ export default function CreatorDashboard() {
               <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                 <Button
                   variant="light"
-                  color="violet"
+                  color="brand"
                   size="md"
                   fullWidth
                   leftSection={<IconChartLine size={20} />}
