@@ -1,0 +1,18 @@
+/* 🎛️ Media queries مركزية مبنية على التوكنز */
+/* لازم يتم استيراد tokens.css قبل هذا الملف حتى تنحل var() داخل media */
+
+/* max-width aliases (Down) */
+@custom-media --bp-xs (max-width: var(--bp-xs));
+@custom-media --bp-sm (max-width: var(--bp-sm));
+@custom-media --bp-mobile (max-width: var(--bp-mobile));
+@custom-media --bp-tablet (max-width: var(--bp-tablet));
+@custom-media --bp-desktop (max-width: var(--bp-desktop));
+@custom-media --bp-2xl (max-width: var(--bp-2xl));
+
+/* min-width aliases (Up) */
+@custom-media --bp-xs-up (min-width: var(--bp-xs));
+@custom-media --bp-sm-up (min-width: var(--bp-sm));
+@custom-media --bp-mobile-up (min-width: var(--bp-mobile));
+@custom-media --bp-tablet-up (min-width: var(--bp-tablet));
+@custom-media --bp-desktop-up (min-width: var(--bp-desktop));
+@custom-media --bp-2xl-up (min-width: var(--bp-2xl));

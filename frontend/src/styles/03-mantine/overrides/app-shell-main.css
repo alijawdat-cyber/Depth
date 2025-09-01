@@ -10,8 +10,8 @@
   scrollbar-gutter: stable both-edges; /* ثبات التخطيط مع شريط التمرير */
 }
 
-/* موبايل - 640px ثابت */
-@media (max-width: 640px) {
+/* موبايل — مركزية: --bp-mobile */
+@media (--bp-mobile) {
   .app-shell .app-main {
   padding-inline: calc(var(--space-sm) + var(--space-xs)); /* حافة */
     padding-block: var(--space-sm); /* عمودي */

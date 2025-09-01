@@ -1,6 +1,7 @@
 /* globals.css — نقطة تجميع الأنماط */
 @import url("tailwindcss"); /* إطار Tailwind */
 @import url('../00-tokens/tokens.css'); /* توكنز مركزية */
+@import url('../00-tokens/media.css'); /* ميديا مركزية */
 @import url('../01-base/reset.css'); /* إعادة ضبط */
 @import url('../00-tokens/typography.css'); /* الخطوط */
 @import url('../03-mantine/index.css'); /* تخصيصات Mantine */

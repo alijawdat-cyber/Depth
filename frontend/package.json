@@ -51,6 +51,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-tailwindcss": "^3.17.5",
     "husky": "^9",
+    "postcss-custom-media": "^10.0.8",
     "postcss-import": "^16.1.1",
     "postcss-media-variables": "^2.0.1",
     "stylelint": "^16",

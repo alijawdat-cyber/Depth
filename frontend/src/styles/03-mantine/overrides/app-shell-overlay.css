@@ -21,8 +21,8 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* موبايل - 640px ثابت */
-@media (max-width: 640px) {
+/* موبايل — مركزية: --bp-mobile */
+@media (--bp-mobile) {
   .mobile-sidebar { padding: var(--space-sm) !important; /* حشو */ width: min( calc(var(--sidebar-width) - var(--space-xl)), calc(100vw - var(--space-lg)) ) !important; /* عرض متكيّف */ padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0)); }
   .mobile-sidebar .mantine-NavLink-root { padding-block: var(--space-sm) !important; /* كثافة أقل */ }
   .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; /* حشو */ }
