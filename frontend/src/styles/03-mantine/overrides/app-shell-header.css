@@ -7,7 +7,7 @@
   justify-content: space-between; /* توزيع */
   padding: 0 calc(var(--space-md) + env(safe-area-inset-left, 0)) 0 calc(var(--space-md) + env(safe-area-inset-right, 0)); /* حواف آمنة */
   background-color: var(--color-bg-secondary); /* خلفية */
-  border-bottom: 1px solid var(--color-border-primary); /* حد */
+  border-bottom: var(--border-width-sm) var(--border-style) var(--color-border-primary); /* حد */
   z-index: var(--z-fixed);
   height: var(--header-height); /* طبقة/ارتفاع */
 }
@@ -21,4 +21,4 @@
 [data-mantine-color-scheme="dark"] .app-header .app-logo { filter: brightness(0) invert(1); /* عكس ألوان الشعار بالداكن */ }
 
 /* في حال كان الشعار داخل رابط، أضف تركيز واضح */
-.app-header a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+.app-header a:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); border-radius: var(--radius-sm); }

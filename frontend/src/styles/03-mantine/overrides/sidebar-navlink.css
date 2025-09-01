@@ -26,13 +26,10 @@
 .app-sidebar .mantine-NavLink-label { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .app-sidebar .mantine-NavLink-section:first-child { margin-inline-end: var(--space-xs); }
 .app-sidebar .mantine-NavLink-section:last-child { margin-inline-start: var(--space-sm); }
-.app-sidebar .mantine-NavLink-children { border-inline-start: 1px solid var(--color-border-primary); margin-inline-start: var(--space-md); padding-inline-start: var(--space-sm); }
+.app-sidebar .mantine-NavLink-children { border-inline-start: var(--border-width-sm) var(--border-style) var(--color-border-primary); margin-inline-start: var(--space-md); padding-inline-start: var(--space-sm); }
 
 /* تركيز لوحة المفاتيح */
-.app-sidebar .mantine-NavLink-root:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
+.app-sidebar .mantine-NavLink-root:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }
 
 /* أسهم التوسيع: نغّمقها شوية بالهوفر */
 .app-sidebar .mantine-NavLink-chevron { transition: transform var(--motion-duration-sm) var(--motion-ease-standard), opacity var(--motion-duration-sm) var(--motion-ease-standard); }

@@ -14,9 +14,8 @@
 	font-family: var(--mantine-font-family);  /* خط دبي */
 	padding: var(--space-xs) var(--space-sm);  /* حشو صغير */
 	border-radius: var(--radius-sm);  /* زوايا صغيرة */
-	transition: background-color 0.2s ease;  /* انتقال سلس */
+	transition: background-color var(--motion-duration-md) var(--motion-ease-standard);
 }
 
-.mantine-Menu-item:hover {
-	background-color: var(--color-bg-secondary);  /* خلفية ثانوية عند التمرير */
-}
+.mantine-Menu-item:hover { background-color: var(--color-bg-secondary); }
+/* توحيد الانتقال ضمن نفس القاعدة لتفادي تكرار السلكتور */

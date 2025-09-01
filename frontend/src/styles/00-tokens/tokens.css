@@ -16,6 +16,12 @@
   --color-error: #f85050;          /* أحمر خطأ - رسالة خطأ، زر حذف، شارة إشعارات */
   --color-info: #8db5f5;           /* أزرق معلومات - رسالة معلومة، شارة معلق */
 
+  /* light-variants للألوان الثانوية */
+  --color-success-light: color-mix(in oklab, var(--color-success) 15%, transparent);
+  --color-warning-light: color-mix(in oklab, var(--color-warning) 15%, transparent);
+  --color-error-light:   color-mix(in oklab, var(--color-error)   15%, transparent);
+  --color-info-light:    color-mix(in oklab, var(--color-info)    15%, transparent);
+
   /* ========== ألوان الخلفيات (3 مستويات) ========== */
   --color-bg-primary: #ffffff;     /* أبيض نقي - خلفية صفحة رئيسية، نوافذ منبثقة */
   --color-bg-secondary: #fafafb;   /* رمادي فاتح - خلفية بطاقات، شريط جانبي للتمييز */
@@ -181,10 +187,3 @@ body {
   --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.60);
 }
 
-/* ========== light-variants للألوان الثانوية (اختياري حاليًا) ========== */
-:root {
-  --color-success-light: color-mix(in oklab, var(--color-success) 15%, transparent);
-  --color-warning-light: color-mix(in oklab, var(--color-warning) 15%, transparent);
-  --color-error-light:   color-mix(in oklab, var(--color-error)   15%, transparent);
-  --color-info-light:    color-mix(in oklab, var(--color-info)    15%, transparent);
-}

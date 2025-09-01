@@ -1,12 +1,11 @@
-.mantine-Notification-root {
-	background-color: var(--color-bg-primary); /* خلفية */
-	border: 1px solid var(--color-border-primary); /* حد */
-	border-radius: var(--radius-md); /* زوايا */
-	box-shadow: var(--shadow-md); /* ظل */
-	padding: var(--space-lg); /* حشو */
-	font-family: var(--mantine-font-family); /* خط */
+.mantine-Notifications-root {
+	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	padding: var(--space-lg);
+	font-family: var(--mantine-font-family);
 }
 
-.mantine-Notification-root[data-variant="success"] { border-left: 4px solid var(--color-success); /* شريط نجاح */ }
-.mantine-Notification-root[data-variant="error"] { border-left: 4px solid var(--color-error); /* شريط خطأ */ }
-.mantine-Notification-root[data-variant="warning"] { border-left: 4px solid var(--color-warning); /* شريط تحذير */ }
+.mantine-Notification-root[data-variant="success"] { border-left: var(--border-width-lg) var(--border-style) var(--color-success); }
+.mantine-Notification-root[data-variant="error"] { border-left: var(--border-width-lg) var(--border-style) var(--color-error); }
+.mantine-Notification-root[data-variant="warning"] { border-left: var(--border-width-lg) var(--border-style) var(--color-warning); }
