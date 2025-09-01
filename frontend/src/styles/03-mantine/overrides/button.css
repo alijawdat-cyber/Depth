@@ -8,9 +8,23 @@
 
 /* variants الأساسية (light محددة مسبقًا عبر الثيم — نخلي الباقي هنا حسب سياسة التحكم من overrides) */
 .mantine-Button-root[data-variant="filled"] { background-color: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-primary); }
+.mantine-Button-root[data-variant="filled"][data-color="brand"] { background-color: var(--color-primary); border-color: var(--color-primary); } /* filled: brand */
+.mantine-Button-root[data-variant="filled"][data-color="blue"] { background-color: var(--color-info); border-color: var(--color-info); } /* filled: blue */
+.mantine-Button-root[data-variant="filled"][data-color="green"] { background-color: var(--color-success); border-color: var(--color-success); } /* filled: green */
+.mantine-Button-root[data-variant="filled"][data-color="orange"],
+.mantine-Button-root[data-variant="filled"][data-color="yellow"] { background-color: var(--color-warning); border-color: var(--color-warning); } /* filled: orange/yellow = warning */
+.mantine-Button-root[data-variant="filled"][data-color="red"] { background-color: var(--color-error); border-color: var(--color-error); } /* filled: red */
+.mantine-Button-root[data-variant="filled"][data-color="gray"] { background-color: var(--color-text-secondary); border-color: var(--color-text-secondary); color: var(--color-bg-primary); } /* filled: gray */
 .mantine-Button-root[data-variant="filled"]:hover { background-color: var(--color-primary-hover); }
 
 .mantine-Button-root[data-variant="outline"] { background-color: transparent; color: var(--color-primary); border-color: var(--color-border-primary); }
+.mantine-Button-root[data-variant="outline"][data-color="brand"] { color: var(--color-primary); border-color: var(--color-border-primary); } /* outline: brand */
+.mantine-Button-root[data-variant="outline"][data-color="blue"] { color: var(--color-info); border-color: var(--color-border-primary); } /* outline: blue */
+.mantine-Button-root[data-variant="outline"][data-color="green"] { color: var(--color-success); border-color: var(--color-border-primary); } /* outline: green */
+.mantine-Button-root[data-variant="outline"][data-color="orange"],
+.mantine-Button-root[data-variant="outline"][data-color="yellow"] { color: var(--color-warning); border-color: var(--color-border-primary); } /* outline: orange/yellow */
+.mantine-Button-root[data-variant="outline"][data-color="red"] { color: var(--color-error); border-color: var(--color-border-primary); } /* outline: red */
+.mantine-Button-root[data-variant="outline"][data-color="gray"] { color: var(--color-text-secondary); border-color: var(--color-border-primary); } /* outline: gray */
 .mantine-Button-root[data-variant="outline"]:hover { background-color: var(--color-bg-tertiary); }
 
 .mantine-Button-root[data-variant="transparent"] { background-color: transparent; color: var(--color-primary); }

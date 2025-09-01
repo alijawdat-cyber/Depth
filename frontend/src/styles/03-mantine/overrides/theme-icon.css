@@ -11,6 +11,6 @@
 .mantine-ThemeIcon-root[data-variant="light"][data-color="blue"] { color: var(--color-info); }
 .mantine-ThemeIcon-root[data-variant="light"][data-color="green"] { color: var(--color-success); }
 .mantine-ThemeIcon-root[data-variant="light"][data-color="orange"],
-.mantine-ThemeIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); } /* yellow = warning */
 .mantine-ThemeIcon-root[data-variant="light"][data-color="red"] { color: var(--color-error); }
 .mantine-ThemeIcon-root[data-variant="light"][data-color="gray"] { color: var(--color-text-secondary); }

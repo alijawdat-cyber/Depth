@@ -5,7 +5,19 @@
 }
 
 .mantine-Badge-root[data-variant="filled"] { background-color: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-primary); }
+.mantine-Badge-root[data-variant="filled"][data-color="brand"] { background-color: var(--color-primary); } /* filled: brand */
+.mantine-Badge-root[data-variant="filled"][data-color="blue"] { background-color: var(--color-info); } /* filled: blue */
+.mantine-Badge-root[data-variant="filled"][data-color="green"] { background-color: var(--color-success); } /* filled: green */
+.mantine-Badge-root[data-variant="filled"][data-color="orange"],
+.mantine-Badge-root[data-variant="filled"][data-color="yellow"] { background-color: var(--color-warning); } /* filled: orange/yellow */
+.mantine-Badge-root[data-variant="filled"][data-color="red"] { background-color: var(--color-error); } /* filled: red */
 .mantine-Badge-root[data-variant="outline"] { background-color: transparent; color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.mantine-Badge-root[data-variant="outline"][data-color="brand"] { color: var(--color-primary); } /* outline: brand */
+.mantine-Badge-root[data-variant="outline"][data-color="blue"] { color: var(--color-info); } /* outline: blue */
+.mantine-Badge-root[data-variant="outline"][data-color="green"] { color: var(--color-success); } /* outline: green */
+.mantine-Badge-root[data-variant="outline"][data-color="orange"],
+.mantine-Badge-root[data-variant="outline"][data-color="yellow"] { color: var(--color-warning); } /* outline: orange/yellow */
+.mantine-Badge-root[data-variant="outline"][data-color="red"] { color: var(--color-error); } /* outline: red */
 
 /* حالة gray الخاصة موجودة بالثيم — هنانا نخلي العام */
 .mantine-Badge-root[data-color="gray"],

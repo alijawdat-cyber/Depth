@@ -19,6 +19,6 @@
 .mantine-ActionIcon-root[data-variant="light"][data-color="blue"] { color: var(--color-info); }
 .mantine-ActionIcon-root[data-variant="light"][data-color="green"] { color: var(--color-success); }
 .mantine-ActionIcon-root[data-variant="light"][data-color="orange"],
-.mantine-ActionIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); } /* دعم yellow = warning */
 .mantine-ActionIcon-root[data-variant="light"][data-color="red"] { color: var(--color-error); }
 .mantine-ActionIcon-root[data-variant="light"][data-color="gray"] { color: var(--color-text-secondary); }

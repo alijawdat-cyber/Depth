@@ -72,6 +72,18 @@ const mantineTheme = createTheme({
       'var(--color-warning)',
       'var(--color-warning)'
     ],
+  yellow: [ // أصفر موحّد مرتبط بالتحذير
+      'var(--color-warning)', // درجة 0
+      'var(--color-warning)', // درجة 1
+      'var(--color-warning)', // درجة 2
+      'var(--color-warning)', // درجة 3
+      'var(--color-warning)', // درجة 4
+      'var(--color-warning)', // درجة 5
+      'var(--color-warning)', // درجة 6
+      'var(--color-warning)', // درجة 7
+      'var(--color-warning)', // درجة 8
+      'var(--color-warning)'  // درجة 9
+    ],
   red: [ // خطأ
       'var(--color-error)',
       'var(--color-error)',
