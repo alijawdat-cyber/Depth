@@ -3,8 +3,7 @@
 .u-scroll-x { display: block; /* كتلي */ max-width: 100%; /* لا يتجاوز */ overflow-x: auto; /* تمرير أفقي */ overscroll-behavior-x: contain; /* احتواء */ -webkit-overflow-scrolling: touch; /* iOS */ /* stylelint-disable-line property-no-vendor-prefix */ scrollbar-width: thin; /* شريط رفيع */ }
 
 .u-scroll-x::-webkit-scrollbar { height: var(--space-xs); /* ارتفاع الشريط */ }
-.u-scroll-x::-webkit-scrollbar-track { background-color: transparent; /* خلفية شفافة افتراضيًا */ }
-.u-scroll-x:hover::-webkit-scrollbar-track { background-color: var(--color-bg-secondary); /* تظهر عند hover فقط */ }
+.u-scroll-x::-webkit-scrollbar-track { background-color: var(--color-bg-secondary); /* خلفية المسار */ }
 .u-scroll-x::-webkit-scrollbar-thumb { background-color: var(--color-border-primary); /* لون المقبض */ border-radius: var(--radius-sm); /* زوايا */ }
 
 /* ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */

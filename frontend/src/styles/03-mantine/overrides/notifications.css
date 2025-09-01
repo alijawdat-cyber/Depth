@@ -1,9 +1,22 @@
+/* ملاحظة مهمة:
+   كان الجذر .mantine-Notifications-root مُنمّق بحد/ظل/حشو
+   وهذا خلى إطار مستطيل شفاف يظهر حتى لما ماكو إشعارات (عنصر فارغ position: fixed).
+   الحل: تنظيف الجذر وخلي التنسيق على عناصر الإشعار نفسها فقط. */
+
+/* الجذر: بدون أي زخرفة حتى ما يظهر كصندوق فارغ */
 .mantine-Notifications-root {
+	padding: 0; /* بدون حشو */
+	border: 0; /* بدون حد */
+	box-shadow: none; /* بدون ظل */
+	background: transparent; /* شفافية بالكامل */
+	font-family: var(--mantine-font-family);
+}
+
+/* الإشعار نفسه: تطبيق التنسيق المطلوب */
+.mantine-Notification-root {
 	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
-	padding: var(--space-lg);
-	font-family: var(--mantine-font-family);
 }
 
 .mantine-Notification-root[data-variant="success"] { border-left: var(--border-width-lg) var(--border-style) var(--color-success); }
