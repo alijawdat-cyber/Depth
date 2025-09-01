@@ -11,8 +11,8 @@
   padding-bottom: env(safe-area-inset-bottom, 0); /* احترام الحافة الآمنة */
 }
 
-/* موبايل — مركزية: --bp-mobile */
-@media (--bp-mobile) {
+/* موبايل — مركزية: --mq-mobile */
+@media (--mq-mobile) {
   .app-shell {
     grid-template-areas: "header" "main"; /* عمود واحد */
     grid-template-columns: 1fr; /* عمود */

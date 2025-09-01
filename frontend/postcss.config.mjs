@@ -1,9 +1,9 @@
 const config = {
-  plugins: {
-    'postcss-custom-media': {}, // توسعة @custom-media إلى شروط media عادية
-    'postcss-media-variables': {}, // حل var(--bp-*) داخل media
-    '@tailwindcss/postcss': {},
-  },
+  plugins: [
+    'postcss-media-variables', // حل var(--bp-*) داخل media أولاً
+    'postcss-custom-media', // بعدها نوسّع @custom-media
+    '@tailwindcss/postcss',
+  ],
 };
 
 export default config;
