@@ -10,8 +10,8 @@
   scrollbar-gutter: stable both-edges; /* ثبات التخطيط مع الشريط */
 }
 
-/* موبايل — مركزية: --mq-mobile */
-@media (--mq-mobile) {
+/* موبايل - ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
+@media (max-width: 640px) {
   .mobile-sidebar { padding: var(--space-sm) !important; /* حشو */ width: min( calc(var(--sidebar-width) - var(--space-xl)), calc(100vw - var(--space-lg)) ) !important; /* عرض متكيّف */ }
   .mobile-sidebar .mantine-NavLink-root { padding-block: var(--space-sm) !important; /* كثافة أقل */ }
   .mobile-sidebar .sidebar-inner { padding: var(--space-sm) !important; /* حشو */ }

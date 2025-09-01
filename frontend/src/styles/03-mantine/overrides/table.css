@@ -4,8 +4,8 @@
 .mantine-Stack-root[data-fit="content"] :is(table, .mantine-Table-table),
 .mantine-Group-root[data-fit="content"] :is(table, .mantine-Table-table) { width: max-content; /* عرض=محتوى */ table-layout: auto; /* حساب أعمدة ديناميكي */ }
 
-/* دِسكتوب — مركزية: --mq-desktop-up */
-@media (--mq-desktop-up) {
+/* ميديا كويري مقفلة: min-width 1024px ثابت حسب سياسة breakpoints */
+@media (min-width: 1024px) {
 	.mantine-Card-root[data-fit="content"],
 	.mantine-Stack-root[data-fit="content"],
 	.mantine-Group-root[data-fit="content"] { width: max-content; /* تتقلص */ max-width: 100%; /* لا تتجاوز الشبكة */ }
@@ -28,8 +28,8 @@
 	padding-inline: calc(var(--space-sm) * 0.75);
 }
 
-/* موبايل — مركزية: --mq-mobile */
-@media (--mq-mobile) {
+/* ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
+@media (max-width: 640px) {
 	.mantine-Card-root[data-responsive="wide"],
 	.mantine-Stack-root[data-responsive="wide"],
 	.mantine-Group-root[data-responsive="wide"] { overflow-x: auto; /* تمرير أفقي */ overscroll-behavior-x: contain; /* احتواء */ -webkit-overflow-scrolling: touch; /* iOS */ display: block; /* بلوك */ max-width: 100%; /* لا يتجاوز */ }

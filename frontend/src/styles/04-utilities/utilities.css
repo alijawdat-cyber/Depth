@@ -6,8 +6,8 @@
 .u-scroll-x::-webkit-scrollbar-track { background-color: var(--color-bg-secondary); /* خلفية المسار */ }
 .u-scroll-x::-webkit-scrollbar-thumb { background-color: var(--color-border-primary); /* لون المقبض */ border-radius: var(--radius-sm); /* زوايا */ }
 
-/* موبايل — مركزية: --mq-mobile */
-@media (--mq-mobile) {
+/* ميديا كويري مقفلة: 640px ثابت حسب سياسة breakpoints */
+@media (max-width: 640px) {
   .u-wide-min { min-width: var(--wide-content-min-w-sm); /* حد أدنى */ width: max-content; /* حسب المحتوى */ table-layout: auto !important; /* تخطيط تلقائي */ }
 }
 

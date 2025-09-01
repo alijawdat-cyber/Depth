@@ -7,9 +7,9 @@ export default {
       // الأساسية - Mobile-first - موحدة مع tokens.css
       'xs': '360px',     /* Android الشائع */
       'sm': '430px',     /* iPhone 12/13/14/15 Pro Max */
-  'md': '640px',     /* حد الموبايل الحقيقي - موحد مع --bp-mobile */
-  'lg': '768px',     /* iPad Portrait - موحد مع --bp-tablet */
-  'xl': '1024px',    /* لابتوب / iPad Landscape - موحد مع --bp-desktop */
+      'md': '640px',     /* حد الموبايل الحقيقي - موحد مع --bp-mobile */
+      'lg': '768px',     /* iPad Portrait - موحد مع --bp-tablet */
+      'xl': '1024px',    /* لابتوب / iPad Landscape - موحد مع --bp-desktop */
       '2xl': '1280px',   /* Desktop قياسي */
     },
     extend: {

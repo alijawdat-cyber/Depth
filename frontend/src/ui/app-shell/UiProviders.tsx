@@ -73,9 +73,9 @@ const mantineTheme = createTheme({
   headings: {
     fontFamily: 'var(--font-primary)',
     sizes: {
-      h1: { fontSize: 'var(--fs-xl)', lineHeight: 'var(--line-height-tight)', fontWeight: 'var(--font-weight-bold)' },
-      h2: { fontSize: 'var(--fs-lg)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-bold)' },
-      h3: { fontSize: 'var(--fs-md)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-semibold)' },
+  h1: { fontSize: 'var(--fs-xl)', lineHeight: 'var(--line-height-tight)', fontWeight: 'var(--font-weight-bold)' },
+  h2: { fontSize: 'var(--fs-lg)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-bold)' },
+  h3: { fontSize: 'var(--fs-md)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-medium)' },
       h4: { fontSize: 'var(--fs-md)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-medium)' },
       h5: { fontSize: 'var(--fs-sm)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-medium)' },
       h6: { fontSize: 'var(--fs-xs)', lineHeight: 'var(--line-height-tight)', fontWeight: 'var(--font-weight-medium)' }
@@ -201,6 +201,11 @@ const mantineTheme = createTheme({
 
 const cssVariablesResolver: CSSVariablesResolver = () => ({ // ربط Mantine vars بالتوكنز
   variables: {
+  // ربط عائلات الخطوط الخاصة بـ Mantine بخط التوكنز الأساسي
+  '--mantine-font-family': 'var(--font-primary)',
+  '--mantine-font-family-headings': 'var(--font-primary)',
+  // يمكن إضافة monospace عند الحاجة
+  // '--mantine-font-family-monospace': 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
     // أحجام الخطوط العامة
     '--mantine-font-size-xs': 'var(--fs-xs)',
     '--mantine-font-size-sm': 'var(--fs-sm)',

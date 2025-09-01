@@ -314,7 +314,7 @@ export default function ClientDashboard() {
                 <Stack gap="xs">
                   <Text size="sm" c="dimmed">تقييم الحساب</Text>
                   <Group gap="sm">
-                    <Text size="lg" fw={600} style={{ fontWeight: 'var(--font-weight-semibold)' }}>
+                    <Text size="lg" fw={500} style={{ fontWeight: 'var(--font-weight-medium)' }}>
                       ⭐ {currentClient.rating}/5
           </Text>
                     <Badge variant="light" color="green">

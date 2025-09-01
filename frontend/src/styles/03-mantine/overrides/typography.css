@@ -3,7 +3,7 @@
 .mantine-Text-root:not([c],[data-c]) { color: var(--color-text-secondary); }
 .mantine-Text-root:not([c],[data-c])[size="lg"],
 .mantine-Text-root:not([c],[data-c])[size="xl"],
-.mantine-Text-root:not([c],[data-c])[fw="600"],
+.mantine-Text-root:not([c],[data-c])[fw="500"],
 .mantine-Text-root:not([c],[data-c])[fw="700"] { color: var(--color-text-primary); }
 .mantine-Text-root[c="dimmed"], .mantine-Text-root[data-c="dimmed"] { color: var(--color-text-secondary) !important; }
 
