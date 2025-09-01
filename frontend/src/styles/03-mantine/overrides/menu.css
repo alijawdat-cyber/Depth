@@ -6,6 +6,8 @@
 	border-radius: var(--radius-md);  /* زوايا متوسطة */
 	box-shadow: var(--shadow-md);  /* ظل متوسط */
 	padding: var(--space-xs);  /* حشو صغير */
+	/* طبقة منسدلة: فوق المحتوى وتحت الثابت/المودال حسب التوكنز */
+	z-index: var(--z-dropdown);
 }
 
 .mantine-Menu-item {
