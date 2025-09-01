@@ -16,6 +16,17 @@
 .mantine-Button-root[data-variant="transparent"] { background-color: transparent; color: var(--color-primary); }
 .mantine-Button-root[data-variant="transparent"]:hover { background-color: var(--color-bg-tertiary); }
 
+/* variant=light موحّد على التوكنز */
+.mantine-Button-root[data-variant="light"] { background-color: var(--color-bg-tertiary) !important; color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.mantine-Button-root[data-variant="light"][data-color] { background-color: var(--color-bg-tertiary) !important; }
+.mantine-Button-root[data-variant="light"][data-color="brand"] { color: var(--color-primary); }
+.mantine-Button-root[data-variant="light"][data-color="blue"] { color: var(--color-info); }
+.mantine-Button-root[data-variant="light"][data-color="green"] { color: var(--color-success); }
+.mantine-Button-root[data-variant="light"][data-color="orange"],
+.mantine-Button-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); }
+.mantine-Button-root[data-variant="light"][data-color="red"] { color: var(--color-error); }
+.mantine-Button-root[data-variant="light"][data-color="gray"] { color: var(--color-text-secondary); }
+
 /* أحجام من التوكنز */
 .mantine-Button-root[data-size="sm"] { min-height: var(--size-sm); }
 .mantine-Button-root[data-size="md"] { min-height: var(--size-md); }

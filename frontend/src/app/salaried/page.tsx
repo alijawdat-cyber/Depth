@@ -11,7 +11,6 @@ import {
   Stack,
   Badge,
   Button,
-  Progress,
   ActionIcon,
   Divider,
   Alert,
@@ -33,7 +32,7 @@ import {
 // البيانات الوهمية للموظف الحالي
 import { mockSalariedEmployees } from '@/data/employees';
 import { mockProjects } from '@/data/projects';
-import { formatNumber } from '@/shared/format';
+import { CountUp, AnimatedProgress } from '@/shared/motion';
 
 export default function SalariedDashboard() {
   // الموظف الحالي (محاكاة - في الحقيقة يجي من authentication)
@@ -108,7 +107,7 @@ export default function SalariedDashboard() {
                     مهام نشطة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(activeTasks)}
+                    <CountUp value={activeTasks} />
                   </Text>
                   <Text size="xs" c="blue">
                     يجري العمل عليها
@@ -129,7 +128,7 @@ export default function SalariedDashboard() {
                     مهام مكتملة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(completedTasks)}
+                    <CountUp value={completedTasks} />
                   </Text>
                   <Text size="xs" c="green">
                     هذا الشهر
@@ -150,7 +149,7 @@ export default function SalariedDashboard() {
                     مهام معلقة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(pendingTasks)}
+                    <CountUp value={pendingTasks} />
                   </Text>
                   <Text size="xs" c="orange">
                     تحتاج متابعة
@@ -266,11 +265,7 @@ export default function SalariedDashboard() {
                         
                         {/* شريط التقدم للمهام النشطة */}
                         {project.status === 'active' && (
-                          <Progress 
-                            value={60 + (index * 15)} // محاكاة تقدم مختلف
-                            size="sm" 
-                            color="brand"
-                          />
+                          <AnimatedProgress value={60 + (index * 15)} />
                         )}
                       </Stack>
                       

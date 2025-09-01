@@ -8,3 +8,5 @@
 .mantine-Badge-root[data-variant="outline"] { background-color: transparent; color: var(--color-text-primary); border-color: var(--color-border-primary); }
 
 /* حالة gray الخاصة موجودة بالثيم — هنانا نخلي العام */
+.mantine-Badge-root[data-color="gray"],
+.mantine-Badge-root[color="gray"] { background-color: var(--color-bg-tertiary); color: var(--color-text-secondary); }

@@ -16,3 +16,7 @@
   border-radius: var(--radius-full);
   transition: inline-size .15s linear;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-progress-bar { transition: none; }
+}

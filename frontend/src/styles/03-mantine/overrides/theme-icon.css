@@ -3,3 +3,14 @@
 .mantine-ThemeIcon-root[data-size="sm"] { width: var(--size-sm); height: var(--size-sm); }
 .mantine-ThemeIcon-root[data-size="md"] { width: var(--size-md); height: var(--size-md); }
 .mantine-ThemeIcon-root[data-size="lg"] { width: var(--size-lg); height: var(--size-lg); }
+
+/* variant=light موحّد */
+.mantine-ThemeIcon-root[data-variant="light"] { background-color: var(--color-bg-tertiary) !important; }
+.mantine-ThemeIcon-root[data-variant="light"][data-color] { background-color: var(--color-bg-tertiary) !important; }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="brand"] { color: var(--color-primary); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="blue"] { color: var(--color-info); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="green"] { color: var(--color-success); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="orange"],
+.mantine-ThemeIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="red"] { color: var(--color-error); }
+.mantine-ThemeIcon-root[data-variant="light"][data-color="gray"] { color: var(--color-text-secondary); }

@@ -11,8 +11,8 @@
 	.mantine-Group-root[data-fit="content"] { width: max-content; /* تتقلص */ max-width: 100%; /* لا تتجاوز الشبكة */ }
 }
 
-.mantine-Table-root th { background-color: var(--color-bg-secondary); /* رأس: خلفية */ padding: var(--space-sm); /* حشو */ font-weight: var(--font-weight-bold); /* ثقيل */ border-bottom: 2px solid var(--color-border-primary); /* حد سفلي */ }
-.mantine-Table-root td { padding: var(--space-sm); /* حشو */ border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */ }
+.mantine-Table-root th { background-color: var(--color-bg-secondary); /* رأس: خلفية */ padding: var(--space-sm); /* حشو */ font-weight: var(--font-weight-bold); /* ثقيل */ border-bottom: 2px solid var(--color-border-primary); /* حد سفلي */ vertical-align: middle; /* محاذاة عمودية */ }
+.mantine-Table-root td { padding: var(--space-sm); /* حشو */ border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */ vertical-align: middle; /* محاذاة عمودية */ }
 
 .mantine-Card-root[data-compact="true"] .mantine-Table-root :is(th, td),
 .mantine-Stack-root[data-compact="true"] .mantine-Table-root :is(th, td),

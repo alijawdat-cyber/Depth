@@ -118,39 +118,14 @@ const mantineTheme = createTheme({
         root: {
           '--button-radius': 'var(--radius-md)',
           '--button-bg': 'var(--color-primary)',
-          '--button-color': 'var(--color-text-inverse)',
-          '&[data-variant="light"]': { // خلفية light من التوكنز
-            backgroundColor: 'var(--color-bg-tertiary) !important',
-            color: 'var(--color-text-primary)',
-            borderColor: 'var(--color-border-primary)'
-          },
-          '&[data-variant="light"][data-color]': {
-            backgroundColor: 'var(--color-bg-tertiary) !important'
-          },
-          '&[data-variant="light"][data-color="brand"]': {
-            color: 'var(--color-primary)'
-          },
-          '&[data-variant="light"][data-color="blue"]': {
-            color: 'var(--color-info)'
-          },
-          '&[data-variant="light"][data-color="green"]': {
-            color: 'var(--color-success)'
-          },
-          '&[data-variant="light"][data-color="orange"], &[data-variant="light"][data-color="yellow"]': {
-            color: 'var(--color-warning)'
-          },
-          '&[data-variant="light"][data-color="red"]': {
-            color: 'var(--color-error)'
-          },
-          '&[data-variant="light"][data-color="gray"]': {
-            color: 'var(--color-text-secondary)'
-          }
+          '--button-color': 'var(--color-text-inverse)'
         }
       }
     },
-  Badge: { styles: { root: { '&[data-color="gray"], &[color="gray"]': { backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)' } } } }, // شارة رمادية
-  ThemeIcon: { styles: { root: { '&[data-variant="light"]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color="brand"]': { color: 'var(--color-primary)' }, '&[data-variant="light"][data-color="blue"]': { color: 'var(--color-info)' }, '&[data-variant="light"][data-color="green"]': { color: 'var(--color-success)' }, '&[data-variant="light"][data-color="orange"], &[data-variant="light"][data-color="yellow"]': { color: 'var(--color-warning)' }, '&[data-variant="light"][data-color="red"]': { color: 'var(--color-error)' }, '&[data-variant="light"][data-color="gray"]': { color: 'var(--color-text-secondary)' } } } }, // light ties to tokens
-  ActionIcon: { styles: { root: { '&[data-variant="light"]': { backgroundColor: 'var(--color-bg-tertiary) !important', borderColor: 'var(--color-border-primary)' }, '&[data-variant="light"][data-color]': { backgroundColor: 'var(--color-bg-tertiary) !important' }, '&[data-variant="light"][data-color="brand"]': { color: 'var(--color-primary)' }, '&[data-variant="light"][data-color="blue"]': { color: 'var(--color-info)' }, '&[data-variant="light"][data-color="green"]': { color: 'var(--color-success)' }, '&[data-variant="light"][data-color="orange"], &[data-variant="light"][data-color="yellow"]': { color: 'var(--color-warning)' }, '&[data-variant="light"][data-color="red"]': { color: 'var(--color-error)' }, '&[data-variant="light"][data-color="gray"]': { color: 'var(--color-text-secondary)' } } } }, // light ties + borders
+    // نقل قواعد variant="light" والألوان للـ CSS overrides
+    Badge: { },
+    ThemeIcon: { },
+    ActionIcon: { },
   Card: {
       defaultProps: { withBorder: true }, // حدود افتراضيًا
       styles: {
@@ -172,25 +147,7 @@ const mantineTheme = createTheme({
         }
       }
     },
-    Text: {
-      styles: {
-        root: {
-          '&:not([c]):not([data-c])': { color: 'var(--color-text-secondary)' }, // نص ثانوي افتراضي
-          '&:not([c]):not([data-c])[size="lg"],&:not([c]):not([data-c])[size="xl"],&:not([c]):not([data-c])[fw="600"],&:not([c]):not([data-c])[fw="700"]': { color: 'var(--color-text-primary)' },
-          '&[data-c="dimmed"], &[c="dimmed"]': { color: 'var(--color-text-secondary) !important' } // dimmed ثابت
-        }
-      }
-    },
-    Title: {
-      styles: {
-        root: {
-          '&[data-order="1"], &[order="1"], &[data-order="2"], &[order="2"]': {
-            color: 'var(--color-text-primary)'
-          },
-          '&[data-order="3"], &[order="3"], &[data-order="4"], &[order="4"], &[data-order="5"], &[order="5"], &[data-order="6"], &[order="6"]': { color: 'var(--color-text-secondary)' }
-        }
-      }
-    },
+    // Text و Title مُغطّاة بقواعد CSS في overrides/typography.css
   },
 });
 

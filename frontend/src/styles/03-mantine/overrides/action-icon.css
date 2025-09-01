@@ -11,3 +11,14 @@
 
 .mantine-ActionIcon-root:hover { box-shadow: var(--shadow-sm); }
 .mantine-ActionIcon-root[data-disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
+
+/* variant=light موحّد */
+.mantine-ActionIcon-root[data-variant="light"] { background-color: var(--color-bg-tertiary) !important; border-color: var(--color-border-primary); }
+.mantine-ActionIcon-root[data-variant="light"][data-color] { background-color: var(--color-bg-tertiary) !important; }
+.mantine-ActionIcon-root[data-variant="light"][data-color="brand"] { color: var(--color-primary); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="blue"] { color: var(--color-info); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="green"] { color: var(--color-success); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="orange"],
+.mantine-ActionIcon-root[data-variant="light"][data-color="yellow"] { color: var(--color-warning); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="red"] { color: var(--color-error); }
+.mantine-ActionIcon-root[data-variant="light"][data-color="gray"] { color: var(--color-text-secondary); }

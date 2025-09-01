@@ -17,3 +17,9 @@
 
 .m-row-tight th, .m-row-tight td { line-height: var(--line-height-tight); /* خط ضيّق */ padding-block: var(--space-xs); /* حشو عمودي أقل */ }
 
+/* أرقام ذات عرض خانات ثابت "tabular" لتجنب قفزات العرض أثناء العد */
+/* ملاحظة: الاسم القديم .tabularNumbers مُستبدَل بـ .u-tabular-nums */
+.u-tabular-nums {
+  font-variant-numeric: tabular-nums; /* إن مدعوم */
+}
+

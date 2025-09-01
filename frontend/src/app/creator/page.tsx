@@ -11,7 +11,6 @@ import {
   Stack,
   Badge,
   Button,
-  Progress,
   ActionIcon,
   Divider,
   Alert,
@@ -34,6 +33,7 @@ import {
 import { mockCreators } from '@/data/creators';
 import { mockProjects } from '@/data/projects';
 import { formatNumber } from '@/shared/format';
+import { CountUp, AnimatedProgress } from '@/shared/motion';
 
 export default function CreatorDashboard() {
   // المبدع الحالي (محاكاة - في الحقيقة يجي من authentication)
@@ -108,7 +108,7 @@ export default function CreatorDashboard() {
                     مشاريع نشطة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(activeProjects)}
+                    <CountUp value={activeProjects} />
                   </Text>
                   <Text size="xs" c="blue">
                     يجري العمل عليها
@@ -129,7 +129,7 @@ export default function CreatorDashboard() {
                     مشاريع مكتملة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(completedProjects)}
+                    <CountUp value={completedProjects} />
                   </Text>
                   <Text size="xs" c="green">
                     إنجاز ممتاز
@@ -275,11 +275,7 @@ export default function CreatorDashboard() {
                         
                         {/* شريط التقدم للمشاريع النشطة */}
                         {project.status === 'active' && (
-                          <Progress 
-                            value={Math.random() * 100} // في الحقيقة يجي من API
-                            size="sm" 
-                            color="green"
-                          />
+                          <AnimatedProgress value={Math.floor(Math.random() * 100)} />
                         )}
                       </Stack>
                       

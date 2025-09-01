@@ -11,7 +11,6 @@ import {
   Stack,
   Badge,
   Button,
-  Progress,
   ActionIcon,
   Divider,
   Alert,
@@ -32,7 +31,8 @@ import {
 import { mockClients } from '@/data/clients';
 import { mockProjects } from '@/data/projects';
 import { mockInvoices } from '@/data/invoicing';
-import { formatCurrencyIQD, formatNumber } from '@/shared/format';
+import { formatCurrencyIQD } from '@/shared/format';
+import { CountUp, AnimatedProgress } from '@/shared/motion';
 
 export default function ClientDashboard() {
   // العميل الحالي (محاكاة - في الحقيقة يجي من authentication)
@@ -84,7 +84,7 @@ export default function ClientDashboard() {
                     المشاريع النشطة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(activeProjects)}
+                    <CountUp value={activeProjects} />
                   </Text>
                   <Text size="xs" c="blue">
                     يجري العمل عليها
@@ -105,7 +105,7 @@ export default function ClientDashboard() {
                     مشاريع مكتملة
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatNumber(completedProjects)}
+                    <CountUp value={completedProjects} />
                   </Text>
                   <Text size="xs" c="green">
                     تم تسليمها بنجاح
@@ -126,7 +126,7 @@ export default function ClientDashboard() {
                     إجمالي الاستثمار
                   </Text>
                   <Text size="xl" fw={700}>
-                    {formatCurrencyIQD(currentClient.totalSpent)}
+                    <CountUp value={currentClient.totalSpent} format={formatCurrencyIQD} />
                   </Text>
                   <Text size="xs" c="green">
                     نمو مستمر
@@ -147,7 +147,7 @@ export default function ClientDashboard() {
                     فواتير معلقة
                   </Text>
                   <Text size="xl" fw={700} c={pendingInvoices > 0 ? "orange" : "green"}>
-                    {formatNumber(pendingInvoices)}
+                    <CountUp value={pendingInvoices} />
                   </Text>
                   <Text size="xs" c={pendingInvoices > 0 ? "orange" : "green"}>
                     {pendingInvoices > 0 ? 'تحتاج متابعة' : 'كل شي مدفوع'}
@@ -219,11 +219,7 @@ export default function ClientDashboard() {
                         
                         {/* شريط التقدم للمشاريع النشطة */}
                         {project.status === 'active' && (
-                          <Progress 
-                            value={Math.random() * 100} // في الحقيقة يجي من API
-                            size="sm" 
-                            color="blue"
-                          />
+                          <AnimatedProgress value={Math.floor(Math.random() * 100)} />
                         )}
                       </Stack>
                       
