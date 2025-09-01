@@ -50,15 +50,41 @@
   --radius-lg: 12px;  /* كبيرة - نوافذ منبثقة، بطاقات كبيرة */
   --radius-full: 9999px; /* فل حقيقي (pill) - صور مستخدمين، أزرار دائرية */
 
+  /* ========== حدود موحّدة (عرض/نمط) ========== */
+  --border-style: solid;           /* نمط الحد الافتراضي */
+  --border-width-sm: 1px;          /* عرض حد خفيف */
+  --border-width-md: 2px;          /* عرض متوسط */
+  --border-width-lg: 4px;          /* عرض عريض (شق لوني/تأشير) */
+
   /* ========== الأحجام الثابتة (3 مستويات) ========== */
   --size-sm: 36px; /* صغيرة - أزرار صغيرة، حقول بحث مصغرة */
   --size-md: 44px; /* عادية - أزرار عادية، حقول إدخال، عناصر قائمة */
   --size-lg: 52px; /* كبيرة - أزرار كبيرة للأجهزة لمسية، حقول كبيرة */
 
+  /* ========== أحجام شائعة إضافية ========== */
+  /* أيقونات وأفاتار — توحيد الاستخدامات الأكثر شيوعاً */
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --avatar-size-sm: 32px;
+  --avatar-size-md: 40px;
+  --avatar-size-lg: 48px;
+
+  /* حاوية موحّدة للعرض الأقصى (مربوطة بالبريك بوينت 2xl) */
+  --container-max-w: var(--bp-2xl);
+
   /* ========== الظلال (3 مستويات) ========== */
   --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.12);   /* خفيف جداً - بطاقات عادية/أساس */
   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.16);   /* متوسط ناعم - لحظات hover/تركيز */
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.20);  /* كبير متوازن - قوائم/سايدبار */
+
+  /* ========== الحركة (durations/easing) ========== */
+  --motion-duration-sm: .15s;      /* تفاعلات سريعة */
+  --motion-duration-md: .20s;      /* انتقالات متوسطة */
+  --motion-duration-lg: .30s;      /* انتقالات بصرية أكبر */
+  --motion-ease-standard: ease;    /* منحنى قياسي */
+  --motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1); /* منحنى مؤكد */
+  --motion-ease-linear: linear;    /* خطي */
 
   /* ========== التخطيط الثابت ========== */
   --header-height: 60px;   /* ارتفاع شريط "لوحة التحكم" العلوي */
@@ -99,6 +125,16 @@
   /* ضبابية خفيفة متوازنة للواجهات المنبثقة والـmobile overlay */
   /* استخدام rgba بدل أسماء ألوان لتوافق lint */
   --overlay-scrim: color-mix(in oklab, rgba(0, 0, 0, 1) 30%, transparent);
+
+  /* تدرّجات شفافية موحّدة */
+  --opacity-sm: .60;   /* معطّل/خافت */
+  --opacity-md: .85;   /* hover خفيف */
+  --opacity-lg: .95;   /* خفيف جداً */
+
+  /* إعدادات فوكس موحّدة */
+  --focus-ring-color: var(--color-primary);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
 
   /* ظل داخلي موحّد لاستخدامات تمييز العناصر النشطة */
   --shadow-inset: inset 0 0 0 1px var(--color-border-primary);
@@ -143,4 +179,12 @@ body {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
   --shadow-md: 0 3px 10px rgba(0, 0, 0, 0.55);
   --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.60);
+}
+
+/* ========== light-variants للألوان الثانوية (اختياري حاليًا) ========== */
+:root {
+  --color-success-light: color-mix(in oklab, var(--color-success) 15%, transparent);
+  --color-warning-light: color-mix(in oklab, var(--color-warning) 15%, transparent);
+  --color-error-light:   color-mix(in oklab, var(--color-error)   15%, transparent);
+  --color-info-light:    color-mix(in oklab, var(--color-info)    15%, transparent);
 }

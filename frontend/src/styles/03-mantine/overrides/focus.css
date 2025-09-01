@@ -7,8 +7,8 @@
 .mantine-NavLink-root:focus-visible,
 .mantine-Alert-root:focus-visible,
 .mantine-Card-root:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
   border-radius: var(--radius-sm);
 }
 
@@ -16,8 +16,8 @@
 .mantine-Input-input:focus-visible,
 .mantine-Select-input:focus-visible,
 .mantine-Textarea-input:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
   border-radius: var(--radius-md);
 }
 

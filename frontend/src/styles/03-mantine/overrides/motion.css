@@ -14,7 +14,7 @@
   inline-size: 0%;
   background: var(--color-success);
   border-radius: var(--radius-full);
-  transition: inline-size .15s linear;
+  transition: inline-size var(--motion-duration-sm) var(--motion-ease-linear);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,7 +3,7 @@
 .mantine-Button-root {
   border-radius: var(--radius-md);
   min-height: var(--size-md);
-  transition: background-color .15s ease, box-shadow .15s ease, color .15s ease, border-color .15s ease;
+  transition: background-color var(--motion-duration-sm) var(--motion-ease-standard), box-shadow var(--motion-duration-sm) var(--motion-ease-standard), color var(--motion-duration-sm) var(--motion-ease-standard), border-color var(--motion-duration-sm) var(--motion-ease-standard);
 }
 
 /* variants الأساسية (light محددة مسبقًا عبر الثيم — نخلي الباقي هنا حسب سياسة التحكم من overrides) */
@@ -47,4 +47,4 @@
 .mantine-Button-root[data-size="lg"] { min-height: var(--size-lg); }
 
 /* حالة التعطيل */
-.mantine-Button-root[data-disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
+.mantine-Button-root[data-disabled] { opacity: var(--opacity-sm); cursor: not-allowed; box-shadow: none; }

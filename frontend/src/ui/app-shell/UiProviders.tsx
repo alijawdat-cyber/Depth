@@ -192,6 +192,7 @@ const mantineTheme = createTheme({
       styles: {
         root: {
           padding: 'var(--space-lg)',
+          maxInlineSize: 'var(--container-max-w)',
         }
       }
     },

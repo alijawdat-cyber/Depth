@@ -6,7 +6,7 @@
   min-height: 40px; /* هدف لمس مريح */
   text-align: right;
   border-radius: var(--radius-md);
-  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease;
+  transition: background-color var(--motion-duration-sm) var(--motion-ease-standard), color var(--motion-duration-sm) var(--motion-ease-standard), box-shadow var(--motion-duration-sm) var(--motion-ease-standard), transform var(--motion-duration-sm) var(--motion-ease-standard);
 }
 
 .app-sidebar .mantine-NavLink-root:hover,
@@ -35,8 +35,8 @@
 }
 
 /* أسهم التوسيع: نغّمقها شوية بالهوفر */
-.app-sidebar .mantine-NavLink-chevron { transition: transform .15s ease, opacity .15s ease; }
-.app-sidebar .mantine-NavLink-root:hover .mantine-NavLink-chevron { opacity: .85; }
+.app-sidebar .mantine-NavLink-chevron { transition: transform var(--motion-duration-sm) var(--motion-ease-standard), opacity var(--motion-duration-sm) var(--motion-ease-standard); }
+.app-sidebar .mantine-NavLink-root:hover .mantine-NavLink-chevron { opacity: var(--opacity-md); }
 .app-sidebar .mantine-NavLink-root[data-expanded="true"] .mantine-NavLink-chevron { transform: rotate(90deg); }
 
 /* أجهزة بواجهة لمس (coarse) نزيد المساحة العمودية قليلاً */

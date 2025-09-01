@@ -2,7 +2,7 @@
 
 .mantine-ActionIcon-root {
   border-radius: var(--radius-md);
-  transition: box-shadow .15s ease, background-color .15s ease;
+  transition: box-shadow var(--motion-duration-sm) var(--motion-ease-standard), background-color var(--motion-duration-sm) var(--motion-ease-standard);
 }
 
 .mantine-ActionIcon-root[data-size="sm"] { width: var(--size-sm); height: var(--size-sm); }
@@ -10,7 +10,7 @@
 .mantine-ActionIcon-root[data-size="lg"] { width: var(--size-lg); height: var(--size-lg); }
 
 .mantine-ActionIcon-root:hover { box-shadow: var(--shadow-sm); }
-.mantine-ActionIcon-root[data-disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
+.mantine-ActionIcon-root[data-disabled] { opacity: var(--opacity-sm); cursor: not-allowed; box-shadow: none; }
 
 /* variant=light موحّد */
 .mantine-ActionIcon-root[data-variant="light"] { background-color: var(--color-bg-tertiary) !important; border-color: var(--color-border-primary); }

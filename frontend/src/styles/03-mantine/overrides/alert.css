@@ -13,9 +13,9 @@
 .mantine-Alert-root[data-variant="light"] { background-color: var(--color-bg-tertiary); }
 
 /* شريط جانبي لوني حسب التوكنز */
-.mantine-Alert-root[data-color="brand"] { border-inline-start: 4px solid var(--color-primary); }
-.mantine-Alert-root[data-color="blue"] { border-inline-start: 4px solid var(--color-info); }
-.mantine-Alert-root[data-color="green"] { border-inline-start: 4px solid var(--color-success); }
-.mantine-Alert-root[data-color="orange"], .mantine-Alert-root[data-color="yellow"] { border-inline-start: 4px solid var(--color-warning); }
-.mantine-Alert-root[data-color="red"] { border-inline-start: 4px solid var(--color-error); }
-.mantine-Alert-root[data-color="gray"] { border-inline-start: 4px solid var(--color-border-primary); }
+.mantine-Alert-root[data-color="brand"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-primary); }
+.mantine-Alert-root[data-color="blue"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-info); }
+.mantine-Alert-root[data-color="green"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-success); }
+.mantine-Alert-root[data-color="orange"], .mantine-Alert-root[data-color="yellow"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-warning); }
+.mantine-Alert-root[data-color="red"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-error); }
+.mantine-Alert-root[data-color="gray"] { border-inline-start: var(--border-width-lg) var(--border-style) var(--color-border-primary); }

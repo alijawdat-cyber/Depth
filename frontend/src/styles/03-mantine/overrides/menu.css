@@ -2,7 +2,7 @@
 
 .mantine-Menu-dropdown {
 	background-color: var(--color-bg-primary);  /* خلفية أساسية */
-	border: 1px solid var(--color-border-primary);  /* حد رمادي */
+	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);  /* حد رمادي */
 	border-radius: var(--radius-md);  /* زوايا متوسطة */
 	box-shadow: var(--shadow-md);  /* ظل متوسط */
 	padding: var(--space-xs);  /* حشو صغير */
