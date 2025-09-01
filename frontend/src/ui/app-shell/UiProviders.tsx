@@ -37,6 +37,30 @@ const mantineTheme = createTheme({
   fontFamily: 'var(--font-primary)', // خط من التوكنز
   primaryColor: 'brand', // اللون الأساسي
   defaultRadius: 'md', // نصف قطر افتراضي
+  // أحجام الخط الافتراضية (xs..xl) مربوطة بالتوكنز
+  fontSizes: {
+    xs: 'var(--fs-xs)',
+    sm: 'var(--fs-sm)',
+    md: 'var(--fs-md)',
+    lg: 'var(--fs-lg)',
+    xl: 'var(--fs-xl)'
+  },
+  // مسافات موحّدة من التوكنز
+  spacing: {
+    xs: 'var(--space-xs)',
+    sm: 'var(--space-sm)',
+    md: 'var(--space-md)',
+    lg: 'var(--space-lg)',
+    xl: 'var(--space-xl)'
+  },
+  // دوائر الزوايا وفق التوكنز (تعيين xs=sm حتى نبقى ضمن القيم المتاحة)
+  radius: {
+    xs: 'var(--radius-sm)',
+    sm: 'var(--radius-sm)',
+    md: 'var(--radius-md)',
+    lg: 'var(--radius-lg)',
+    xl: 'var(--radius-lg)'
+  },
   // ربط الظلال بقيم التوكنز المركزية
   shadows: {
     xs: 'var(--shadow-sm)',
@@ -44,6 +68,18 @@ const mantineTheme = createTheme({
     md: 'var(--shadow-md)',
     lg: 'var(--shadow-lg)',
     xl: 'var(--shadow-lg)'
+  },
+  // ربط عناوين h1..h6 مباشرة بأحجام/أسطر من التوكنز
+  headings: {
+    fontFamily: 'var(--font-primary)',
+    sizes: {
+      h1: { fontSize: 'var(--fs-xl)', lineHeight: 'var(--line-height-tight)', fontWeight: 'var(--font-weight-bold)' },
+      h2: { fontSize: 'var(--fs-lg)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-bold)' },
+      h3: { fontSize: 'var(--fs-md)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-semibold)' },
+      h4: { fontSize: 'var(--fs-md)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-medium)' },
+      h5: { fontSize: 'var(--fs-sm)', lineHeight: 'var(--line-height-normal)', fontWeight: 'var(--font-weight-medium)' },
+      h6: { fontSize: 'var(--fs-xs)', lineHeight: 'var(--line-height-tight)', fontWeight: 'var(--font-weight-medium)' }
+    }
   },
   colors: {
   brand: brandScale, // أساسي
@@ -164,7 +200,27 @@ const mantineTheme = createTheme({
 });
 
 const cssVariablesResolver: CSSVariablesResolver = () => ({ // ربط Mantine vars بالتوكنز
-  variables: {},
+  variables: {
+    // أحجام الخطوط العامة
+    '--mantine-font-size-xs': 'var(--fs-xs)',
+    '--mantine-font-size-sm': 'var(--fs-sm)',
+    '--mantine-font-size-md': 'var(--fs-md)',
+    '--mantine-font-size-lg': 'var(--fs-lg)',
+    '--mantine-font-size-xl': 'var(--fs-xl)',
+    // مسافات موحّدة
+    '--mantine-spacing-xs': 'var(--space-xs)',
+    '--mantine-spacing-sm': 'var(--space-sm)',
+    '--mantine-spacing-md': 'var(--space-md)',
+    '--mantine-spacing-lg': 'var(--space-lg)',
+    '--mantine-spacing-xl': 'var(--space-xl)',
+    // أنصاف الأقطار (زوايا)
+    '--mantine-radius-xs': 'var(--radius-sm)',
+    '--mantine-radius-sm': 'var(--radius-sm)',
+    '--mantine-radius-md': 'var(--radius-md)',
+    '--mantine-radius-lg': 'var(--radius-lg)',
+    '--mantine-radius-xl': 'var(--radius-lg)',
+    '--mantine-radius-default': 'var(--radius-md)'
+  },
   light: {
     '--mantine-color-body': 'var(--color-bg-primary)',
     '--mantine-color-text': 'var(--color-text-primary)',
