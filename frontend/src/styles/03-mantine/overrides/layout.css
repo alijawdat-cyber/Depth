@@ -3,6 +3,33 @@
 /* Container padding الافتراضي */
 .mantine-Container-root { padding: var(--space-lg); }
 
+/* شريط أدوات داخل بطاقة: محاذاة عمودية وسط + فجوة موحّدة */
+.mantine-Card-root[data-toolbar="true"] { padding-block: var(--space-sm) !important; }
+.mantine-Card-root[data-toolbar="true"] .mantine-Group-root { align-items: center; gap: var(--space-sm); }
+/* ارتفاع أدنى محسوب: ارتفاع عنصر التحكم + حشو علوي/سفلي */
+.mantine-Card-root[data-toolbar="true"] .mantine-Stack-root { justify-content: center; min-height: calc(var(--size-sm) + (var(--space-sm) * 2)); }
+
+/* داخل شريط الأدوات: إزالة هامش سفلي افتراضي من حاويات الحقول حتى لا يختل السنتر العمودي */
+.mantine-Card-root[data-toolbar="true"] .mantine-Input-wrapper { margin-bottom: 0 !important; }
+
+/* تطبيق مركزي عام — أي بطاقة تحتوي أدوات (زر/إدخال/اختيار) توحيد المحاذاة العمودية */
+.mantine-Card-root:has(.mantine-Group-root :is(.mantine-Button-root, .mantine-Input-input, .mantine-Select-input)) .mantine-Group-root {
+	align-items: center;
+}
+
+/* داخل شريط الأدوات: نجبر الارتفاع على sm حتى لو محدد data-size=md|lg على المكوّنات */
+.mantine-Card-root[data-toolbar="true"] :is(.mantine-Button-root, .mantine-Input-input, .mantine-Select-input) {
+	min-height: var(--size-sm) !important;
+	height: var(--size-sm) !important;
+	padding-block: 0 !important;
+}
+
+/* ActionIcon داخل الشريط بنفس الارتفاع/العرض */
+.mantine-Card-root[data-toolbar="true"] .mantine-ActionIcon-root {
+	width: var(--size-sm) !important;
+	height: var(--size-sm) !important;
+}
+
 /* Group/Stack فواصل افتراضية حسب التوكنز عند وجود data-compact */
 .mantine-Group-root[data-compact="true"] { gap: var(--space-xs); }
 .mantine-Stack-root[data-compact="true"] { gap: var(--space-xs); }
