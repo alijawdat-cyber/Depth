@@ -10,4 +10,24 @@
 	.app-header { padding-inline: var(--space-sm); } /* حشو جانبي للهيدر */
 	.app-header .header-nav, .app-header .header-actions { gap: var(--space-sm); /* تباعد */ min-inline-size: 0; /* يسمح بالتقلص */ }
 	.app-header .header-nav > * { min-width: 0; } /* عناصر قابلة للتقلص */
+
+	/* شريط الأدوات داخل البطاقات على الموبايل: توزيع 2×2 متناسق */
+	.mantine-Card-root[data-toolbar="true"] .mantine-Group-root > .mantine-Group-root {
+		display: grid !important;
+		grid-template-columns: 1fr 1fr; /* عمودين متساويين */
+		gap: var(--space-sm);
+		width: 100%;
+	}
+
+	/* كل عنصر تحكم ياخذ عرض خانته بالكامل */
+	.mantine-Card-root[data-toolbar="true"] .mantine-Group-root > .mantine-Group-root > :is(.mantine-Input-wrapper, .mantine-Select-root, .mantine-Button-root) {
+		width: 100%;
+	}
+
+	/* ضمان ارتفاع موحد وقابلية اللمس على الموبايل حسب التوكنز */
+	.mantine-Card-root[data-toolbar="true"] :is(.mantine-Button-root, .mantine-Input-input, .mantine-Select-input) {
+		min-height: var(--size-sm) !important;
+		height: var(--size-sm) !important;
+		padding-block: 0 !important;
+	}
 }
