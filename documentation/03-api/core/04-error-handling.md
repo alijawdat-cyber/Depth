@@ -495,7 +495,7 @@ throw createError(
   {
     providedDeadline: '2025-09-03T10:00:00.000Z',
     minimumDeadline: '2025-09-09T10:00:00.000Z',
-    projectType: 'food_photography'
+    subcategory: 'food_photography'
   }
 );
 ```

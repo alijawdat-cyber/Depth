@@ -28,12 +28,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-// البيانات من الموك
-import { mockProjects } from '@/data/projects';
-import { mockClients } from '@/data/clients';
-import { mockCreators } from '@/data/creators';
-import { mockInvoices, mockPayments } from '@/data/invoicing';
-import { mockNotifications } from '@/data/notifications';
+// البيانات من الموك (موحّدة من المصدر المركزي)
+import { mockProjects, mockClients, mockCreators, mockInvoices, mockPayments, mockNotifications, mockActivityLogs } from '@/data';
 import { formatCurrencyIQD, formatDateYMD } from '@/shared/format';
 import { CountUp, AnimatedProgress } from '@/shared/motion';
 
@@ -51,12 +47,11 @@ export default function AdminDashboard() {
   // الإشعارات غير المقروءة
   const unreadNotifications = mockNotifications.filter(n => !n.isRead);
   
-  // آخر الأنشطة
-  const recentActivities = [
-    { user: 'فاطمة أحمد علي', action: 'أكملت مشروع تصوير المطعم', time: 'منذ ساعتين' },
-    { user: 'أحمد محمد حسن', action: 'وافق على طلب عميل جديد', time: 'منذ 3 ساعات' },
-    { user: 'مريم كاظم جواد', action: 'سلمت تصميم الهوية البصرية', time: 'منذ 5 ساعات' },
-  ];
+  // آخر الأنشطة من mockActivityLogs (أحدث 3)
+  const recentActivities = mockActivityLogs
+    .slice()
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 3);
 
   return (
   <Container size="xl" className="admin-main" px={0}>
@@ -178,15 +173,15 @@ export default function AdminDashboard() {
                 </Group>
                 
                 <Stack gap="sm">
-                  {recentActivities.map((activity, index) => (
-                    <Group key={index} justify="space-between" align="center">
+                  {recentActivities.map((activity) => (
+                    <Group key={activity.id} justify="space-between" align="center">
                       <Group gap="sm">
                         <Avatar size="sm" radius="xl">
-                          {activity.user.charAt(0)}
+                          {activity.actorId.charAt(0)}
                         </Avatar>
                         <Stack gap={0}>
                           <Text size="sm" fw={500}>
-                            {activity.user}
+                            {activity.actorId}
                           </Text>
                           <Text size="xs" c="dimmed">
                             {activity.action}
@@ -194,7 +189,7 @@ export default function AdminDashboard() {
                         </Stack>
                       </Group>
                       <Text size="xs" c="dimmed">
-                        {activity.time}
+                        {formatDateYMD(activity.createdAt)}
                       </Text>
                     </Group>
                   ))}

@@ -1,4 +1,33 @@
+
 .mantine-Table-root { width: 100%; /* عرض كامل */ border-collapse: collapse; /* دمج حدود */ font-family: var(--mantine-font-family); /* خط */ }
+
+/* محاذاة أفقية وعمودية موحّدة لكل خلايا الجدول */
+.mantine-Table-root :is(th, td) { text-align: center; vertical-align: middle; }
+/* رفع الخصوصية + ضمان التغلّب على أي توريث start/يمين من reset/Mantine */
+.mantine-Table-root .mantine-Table-table :is(th, td) { text-align: center !important; vertical-align: middle !important; }
+/* استهداف أصناف Mantine المباشرة (th/td) للتأكد من التوسيط دائماً */
+.mantine-Table-th,
+.mantine-Table-td { text-align: center !important; vertical-align: middle !important; }
+/* توسيط أي Group داخل رأس الجدول أيضاً */
+.mantine-Table-th .mantine-Group-root { justify-content: center !important; }
+
+/* توسّط العناصر المبنية على flex داخل الخلايا (Group/ActionIcon/Badge) */
+.mantine-Table-root :is(td, th) .mantine-Group-root { justify-content: center !important; }
+
+/* توسيط العناصر الفردية داخل الخلية إذا ماكو Group يلفّها */
+.mantine-Table-root td > :where(.mantine-Text-root, .mantine-Badge-root, .mantine-ActionIcon-root, .mantine-Switch-root, span, strong) {
+	margin-inline: auto; /* توسيط أفقي */
+	display: inline-flex; /* يسمح بالتوسيط البصري */
+}
+
+.mantine-Table-root td :is(.mantine-ActionIcon-root, .mantine-Badge-root) {
+	/* لو وُجدت مفردة داخل الخلية بدون Group */
+	margin-inline: auto;
+	display: inline-flex;
+}
+
+/* حماية: داخل Popover ما نريد إجبار inline-flex حتى لا يختفي نص الباجات بأي سيناريو */
+.mantine-Popover-dropdown .mantine-Badge-root { display: inline-block; }
 
 .mantine-Card-root[data-fit="content"] :is(table, .mantine-Table-table),
 .mantine-Stack-root[data-fit="content"] :is(table, .mantine-Table-table),
@@ -11,7 +40,7 @@
 	.mantine-Group-root[data-fit="content"] { width: max-content; /* تتقلص */ max-width: 100%; /* لا تتجاوز الشبكة */ }
 }
 
-.mantine-Table-root th { background-color: var(--color-bg-secondary); /* رأس: خلفية */ padding: var(--space-sm); /* حشو */ font-weight: var(--font-weight-bold); /* ثقيل */ border-bottom: 2px solid var(--color-border-primary); /* حد سفلي */ vertical-align: middle; /* محاذاة عمودية */ }
+.mantine-Table-root th { background-color: var(--color-bg-secondary); /* رأس: خلفية */ padding: var(--space-sm); /* حشو */ font-weight: var(--font-weight-bold); /* ثقيل */ border-bottom: 2px solid var(--color-border-primary); /* حد سفلي */ vertical-align: middle; /* محاذاة عمودية */ position: sticky; top: 0; z-index: 1; }
 .mantine-Table-root td { padding: var(--space-sm); /* حشو */ border-bottom: 1px solid var(--color-border-primary); /* حد سفلي */ vertical-align: middle; /* محاذاة عمودية */ }
 
 .mantine-Card-root[data-compact="true"] .mantine-Table-root :is(th, td),
@@ -47,12 +76,12 @@
 	.mantine-Group-root[data-responsive="wide"][data-wide-min="true"] :is(table, .mantine-Table-table) { min-width: var(--wide-content-min-w-sm) !important; /* حد أدنى */ }
 
 	.mantine-Table-root th[data-cell="num"],
-	.mantine-Table-root th[data-cell="date"] { white-space: nowrap; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ }
+	.mantine-Table-root th[data-cell="date"] { white-space: nowrap; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ text-align: center !important; }
 
 	.mantine-Table-root td[data-cell="num"],
 	.mantine-Table-root td[data-cell="date"],
 	.mantine-Table-root td[data-cell="id"],
-	.mantine-Table-root td[data-cell="code"] { white-space: nowrap !important; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ }
+	.mantine-Table-root td[data-cell="code"] { white-space: nowrap !important; /* بدون لف */ direction: ltr; /* يسار→يمين */ unicode-bidi: isolate; /* عزل */ font-variant-numeric: tabular-nums; /* أرقام ثابتة */ text-align: center !important; }
 
 	.mantine-Table-root td[data-cell="num"],
 	.mantine-Table-root td[data-cell="date"],

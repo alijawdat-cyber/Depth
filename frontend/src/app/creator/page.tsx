@@ -11,7 +11,6 @@ import {
   Stack,
   Badge,
   Button,
-  ActionIcon,
   Divider,
   Alert,
   ThemeIcon,
@@ -19,21 +18,20 @@ import {
 } from '@mantine/core';
   import {
     Camera,
-    Eye,
     Upload,
     Calendar,
     Star,
     Clock,
     Check,
-  Paintbrush,
   LineChart
   } from 'lucide-react';
+
+import ProjectsTable from '@/components/projects/ProjectsTable';
 
 // البيانات الوهمية للمبدع الحالي
 import { mockCreators } from '@/data/creators';
 import { mockProjects } from '@/data/projects';
-import { formatNumber } from '@/shared/format';
-import { CountUp, AnimatedProgress } from '@/shared/motion';
+import { CountUp } from '@/shared/motion';
 
 export default function CreatorDashboard() {
   // المبدع الحالي (محاكاة - في الحقيقة يجي من authentication)
@@ -221,81 +219,19 @@ export default function CreatorDashboard() {
           </Stack>
         </Card>
 
-        {/* المشاريع المسندة */}
+        {/* مشاريعي */}
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Stack gap="md">
             <Group justify="space-between">
               <Title order={3} size="lg">
-                مشاريعي الحالية
+                مشاريعي
               </Title>
-              <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
-                عرض الكل
-              </Button>
+              <Badge variant="light" color="green">
+                {assignedProjects.length} مشروع
+              </Badge>
             </Group>
             
-            {assignedProjects.length > 0 ? (
-              <Stack gap="sm">
-                {assignedProjects.slice(0, 3).map((project) => (
-                  <Card key={project.id} p="md" withBorder>
-                    <Group justify="space-between" align="flex-start">
-                      <Stack gap="xs" style={{ flex: 1 }}>
-                        <Group gap="sm">
-                          <Badge 
-                            variant="light" 
-                            color={
-                              project.status === 'active' ? 'blue' :
-                              project.status === 'completed' ? 'green' :
-                              project.status === 'pending' ? 'orange' : 'gray'
-                            }
-                          >
-                            {project.status === 'active' ? '🔄 نشط' :
-                             project.status === 'completed' ? '✅ مكتمل' :
-                             project.status === 'pending' ? '⏳ معلق' : '❌ ملغي'}
-        </Badge>
-                          <Text size="xs" c="dimmed">
-                            {project.id}
-                          </Text>
-                        </Group>
-                        
-                        <Text fw={500} size="sm">
-                          {project.notes || 'مشروع بدون وصف'}
-                        </Text>
-                        
-                        <Group gap="sm">
-                          <Text size="xs" c="dimmed">
-                            📅 التسليم: {project.deliveryDate}
-                          </Text>
-                          {/* ملاحظة: المبدع يشوف سعره فقط بعد موافقة الأدمن */}
-                          {project.approvedAt && (
-                            <Text size="xs" c="green">
-                              💰 سعرك: {formatNumber(project.totalCreatorPrice)} IQD
-                            </Text>
-                          )}
-                        </Group>
-                        
-                        {/* شريط التقدم للمشاريع النشطة */}
-                        {project.status === 'active' && (
-                          <AnimatedProgress value={Math.floor(Math.random() * 100)} />
-                        )}
-                      </Stack>
-                      
-                      <Group gap="xs">
-                        <ActionIcon variant="light" color="green">
-                          <Eye size={16} />
-                        </ActionIcon>
-                        <ActionIcon variant="light" color="blue">
-                          <Upload size={16} />
-                        </ActionIcon>
-                      </Group>
-                    </Group>
-                  </Card>
-                ))}
-              </Stack>
-            ) : (
-              <Alert variant="light" color="green" icon={<Paintbrush size={16} />}>
-                ما عندك مشاريع مسندة حالياً. راح تيجيك إشعارات عند توفر مشاريع جديدة!
-              </Alert>
-            )}
+            <ProjectsTable role="creator" userId={currentCreator.id} />
           </Stack>
         </Card>
 

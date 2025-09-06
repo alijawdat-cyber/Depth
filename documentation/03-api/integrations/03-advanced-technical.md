@@ -497,7 +497,7 @@ query GetProjectDetails($projectId: ID!, $includeCreator: Boolean = true) {
   "secret": "webhook_secret_xyz789",
   "filters": {
     "clientId": "client_123", // استقبال أحداث عميل محدد فقط
-    "projectTypes": ["food_photography", "product_photography"]
+    "subcategories": ["food_photography", "product_photography"]
   },
   "options": {
     "retryCount": 3,

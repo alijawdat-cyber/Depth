@@ -19,7 +19,6 @@ import {
 } from '@mantine/core';
 import {
   Briefcase,
-  Eye,
   Upload,
   Calendar,
   Clock,
@@ -29,22 +28,21 @@ import {
   LineChart
 } from 'lucide-react';
 
+import ProjectsTable from '@/components/projects/ProjectsTable';
+
 // البيانات الوهمية للموظف الحالي
 import { mockSalariedEmployees } from '@/data/employees';
 import { mockProjects } from '@/data/projects';
-import { CountUp, AnimatedProgress } from '@/shared/motion';
+import { CountUp } from '@/shared/motion';
 
 export default function SalariedDashboard() {
   // الموظف الحالي (محاكاة - في الحقيقة يجي من authentication)
   const currentEmployee = mockSalariedEmployees[0]; // سارة عبد الله محمد - مصورة
   
-  // المشاريع المسندة للموظف (محاكاة - في الحقيقة هاي تيجي من جدول منفصل للمهام)
-  const assignedProjects = mockProjects.filter(p => 
-    p.lineItems.some(item => 
-      // محاكاة إسناد مهام للموظف
-      item.assignedCreators.some(id => id.includes('employee') || Math.random() > 0.7)
-    )
-  ).slice(0, 3); // محاكاة 3 مهام
+  // المشاريع المسندة للموظف (محاكاة حتمية: نعتمد وجود معرف الموظف ضمن assignedCreators)
+  const assignedProjects = mockProjects
+    .filter(p => p.lineItems.some(item => item.assignedCreators.some(id => id === currentEmployee.id)))
+    .slice(0, 3);
   
   // إحصائيات المهام
   const activeTasks = 3; // محاكاة
@@ -213,79 +211,19 @@ export default function SalariedDashboard() {
           </Stack>
         </Card>
 
-        {/* المهام المسندة */}
+        {/* مهامي */}
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Stack gap="md">
             <Group justify="space-between">
               <Title order={3} size="lg">
-                مهامي اليوم
+                مهامي
               </Title>
-              <Button variant="light" size="sm" rightSection={<Eye size={16} />}>
-                عرض الكل
-              </Button>
+              <Badge variant="light" color="brand">
+                {assignedProjects.length} مهمة
+              </Badge>
             </Group>
             
-            {assignedProjects.length > 0 ? (
-              <Stack gap="sm">
-                {assignedProjects.map((project, index) => (
-                  <Card key={project.id} p="md" withBorder>
-                    <Group justify="space-between" align="flex-start">
-                      <Stack gap="xs" style={{ flex: 1 }}>
-                        <Group gap="sm">
-                          <Badge variant="light" color="brand">
-                            مهمة #{index + 1}
-                          </Badge>
-                          <Badge 
-                            variant="light" 
-                            color={
-                              project.status === 'active' ? 'blue' :
-                              project.status === 'completed' ? 'green' :
-                              project.status === 'pending' ? 'orange' : 'gray'
-                            }
-                          >
-                            {project.status === 'active' ? '🔄 نشط' :
-                             project.status === 'completed' ? '✅ مكتمل' :
-                             project.status === 'pending' ? '⏳ معلق' : '❌ ملغي'}
-                          </Badge>
-                        </Group>
-                        
-                        <Text fw={500} size="sm">
-                          {project.notes || 'مهمة بدون وصف'}
-                        </Text>
-                        
-                        <Group gap="sm">
-                          <Text size="xs" c="dimmed">
-                            📅 التسليم: {project.deliveryDate}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            📍 {project.location === 'studio' ? 'استوديو' : 'موقع العميل'}
-                          </Text>
-                          {/* ملاحظة مهمة: الموظف لا يرى أي أسعار إطلاقاً */}
-                        </Group>
-                        
-                        {/* شريط التقدم للمهام النشطة */}
-                        {project.status === 'active' && (
-                          <AnimatedProgress value={60 + (index * 15)} />
-                        )}
-                      </Stack>
-                      
-                      <Group gap="xs">
-                        <ActionIcon variant="light" color="brand">
-                          <Eye size={16} />
-                        </ActionIcon>
-                        <ActionIcon variant="light" color="blue">
-                          <Upload size={16} />
-                        </ActionIcon>
-                      </Group>
-                    </Group>
-                  </Card>
-                ))}
-              </Stack>
-            ) : (
-              <Alert variant="light" color="brand" icon={<Briefcase size={16} />}>
-                ما عندك مهام مسندة اليوم. استمتع بيومك! 
-              </Alert>
-            )}
+            <ProjectsTable role="salaried" userId={currentEmployee.id} />
           </Stack>
         </Card>
 

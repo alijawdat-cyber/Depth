@@ -10,6 +10,11 @@
 	box-shadow: none; /* بدون ظل */
 	background: transparent; /* شفافية بالكامل */
 	font-family: var(--mantine-font-family);
+	position: fixed; /* نثبتها */
+	inset-inline: 0; /* تمتد بعرض الصفحة */
+	bottom: var(--space-md); /* مسافة من الأسفل حسب التوكنز */
+	top: auto; /* نلغي أي تموضع علوي */
+	pointer-events: none; /* حتى ما تمنع نقرات الصفحة، العناصر الداخلية تسمح */
 }
 
 /* الإشعار نفسه: تطبيق التنسيق المطلوب */
@@ -17,6 +22,7 @@
 	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
+	pointer-events: auto; /* تسمح بالتفاعل داخل الإشعار */
 }
 
 .mantine-Notification-root[data-variant="success"] { border-left: var(--border-width-lg) var(--border-style) var(--color-success); }

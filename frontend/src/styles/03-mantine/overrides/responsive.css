@@ -11,17 +11,16 @@
 	.app-header .header-nav, .app-header .header-actions { gap: var(--space-sm); /* تباعد */ min-inline-size: 0; /* يسمح بالتقلص */ }
 	.app-header .header-nav > * { min-width: 0; } /* عناصر قابلة للتقلص */
 
-	/* شريط الأدوات داخل البطاقات على الموبايل: توزيع 2×2 متناسق */
-	.mantine-Card-root[data-toolbar="true"] .mantine-Group-root > .mantine-Group-root {
-		display: grid !important;
-		grid-template-columns: 1fr 1fr; /* عمودين متساويين */
-		gap: var(--space-sm);
-		width: 100%;
+	/* شريط الأدوات: يبقى أفقي ويتمّ لفّه بسطرين بدون تكديس عمودي خانق */
+	.mantine-Card-root[data-toolbar="true"] [data-role="toolbar"] {
+		display: flex !important;
+		flex-wrap: wrap !important;
+		gap: var(--space-sm) !important;
+		align-items: center;
 	}
-
-	/* كل عنصر تحكم ياخذ عرض خانته بالكامل */
-	.mantine-Card-root[data-toolbar="true"] .mantine-Group-root > .mantine-Group-root > :is(.mantine-Input-wrapper, .mantine-Select-root, .mantine-Button-root) {
-		width: 100%;
+	.mantine-Card-root[data-toolbar="true"] [data-role="toolbar"] > :is(.mantine-Input-wrapper, .mantine-Select-root, .mantine-Button-root) {
+		flex: 1 1 160px; /* كل عنصر يتمدد ويكسر للسطر التالي إذا ضاق المكان */
+		min-width: 140px;
 	}
 
 	/* ضمان ارتفاع موحد وقابلية اللمس على الموبايل حسب التوكنز */
@@ -30,4 +29,8 @@
 		height: var(--size-sm) !important;
 		padding-block: 0 !important;
 	}
+
+	/* التمرير الأفقي محصور بغلاف الجدول فقط */
+	[data-responsive="wide"] { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+	[data-responsive="wide"] :is(table, .mantine-Table-table) { width: max-content; table-layout: auto; display: inline-table; }
 }

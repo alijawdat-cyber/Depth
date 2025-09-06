@@ -19,6 +19,8 @@
 @import url('./overrides/typography.css');
 @import url('./overrides/tooltip.css');
 @import url('./overrides/popover.css');
+@import url('./overrides/tabs.css');
+@import url('./overrides/collapsed-badges.css');
 @import url('./overrides/sidebar.css');
 @import url('./overrides/sidebar-navlink.css');
 @import url('./overrides/app-shell-grid.css');
@@ -27,3 +29,10 @@
 @import url('./overrides/app-shell-overlay.css');
 @import url('./overrides/focus.css');
 @import url('./overrides/motion.css');
+@import url('./overrides/switch.css');
+@import url('./overrides/pagination.css');
+
+/* سطوح فرعية خفيفة للاستخدام داخل الجداول (تفاصيل موسعة) */
+[data-surface="subtle"] {
+	background-color: var(--color-bg-secondary);
+}

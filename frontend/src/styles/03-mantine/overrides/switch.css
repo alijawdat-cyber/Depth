@@ -1,0 +1,32 @@
+/* ⚙️ Overrides: Mantine Switch — مقفول على التوكنز */
+
+.mantine-Switch-root { --switch-radius: var(--radius-md); }
+.mantine-Switch-input { cursor: pointer; }
+
+/* حجم المقبض والخلفية حسب التوكنز */
+.mantine-Switch-track { 
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--switch-radius);
+  transition: background-color var(--motion-duration-sm) var(--motion-ease-standard),
+              border-color var(--motion-duration-sm) var(--motion-ease-standard);
+}
+
+.mantine-Switch-thumb {
+  box-shadow: var(--shadow-sm);
+}
+
+/* حالة التفعيل */
+.mantine-Switch-root[data-checked] .mantine-Switch-track {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* تعطيل */
+.mantine-Switch-root[data-disabled] { opacity: var(--opacity-sm); cursor: not-allowed; }
+
+/* تركيز لوحة المفاتيح */
+.mantine-Switch-input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}

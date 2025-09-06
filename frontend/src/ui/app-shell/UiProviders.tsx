@@ -268,7 +268,7 @@ function MantineBridge({ children }: Props){
   const colorScheme = theme === 'system' ? 'auto' : theme; // 'light' | 'dark' | 'auto'
   return (
     <MantineProvider theme={mantineTheme} defaultColorScheme={colorScheme} cssVariablesResolver={cssVariablesResolver}>
-      <Notifications position="top-left" />
+  <Notifications position="bottom-center" />
       <ShellGate>{children}</ShellGate>
     </MantineProvider>
   );

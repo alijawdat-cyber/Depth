@@ -10,7 +10,9 @@
 	font-size: var(--fs-md);  /* حجم أساسي */
 	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);  /* حد رمادي */
 	border-radius: var(--radius-md);  /* زوايا أساسية */
-	padding: 0 var(--space-sm);  /* عمودي يُحكم من min-height */
+	/* استخدم padding-inline حتى نقدر نزيد الجهة اللي بيها section */
+	padding-inline: var(--space-sm);
+	padding-block: 0; /* الارتفاع من min-height */
 	transition: border-color var(--motion-duration-md) var(--motion-ease-standard);  /* انتقال سلس للحد */
 }
 
@@ -45,7 +47,8 @@
 	font-size: var(--fs-md);
 	border: var(--border-width-sm) var(--border-style) var(--color-border-primary);
 	border-radius: var(--radius-md);
-	padding: 0 var(--space-sm);
+	padding-inline: var(--space-sm);
+	padding-block: 0;
 	transition: border-color var(--motion-duration-md) var(--motion-ease-standard), box-shadow var(--motion-duration-md) var(--motion-ease-standard);
 }
 .mantine-Select-input:focus { border-color: var(--color-primary); box-shadow: var(--shadow-sm); outline: none; }
@@ -70,3 +73,15 @@
 /* كثافة مضغوطة للحقول عند الطلب */
 .mantine-Input-wrapper[data-compact="true"] .mantine-Input-input,
 .mantine-Select-root[data-compact="true"] .mantine-Select-input { padding-inline: var(--space-sm); }
+
+/* دعم وجود أيقونة بقسم يسار/يمين بدون تداخل مع النص */
+.mantine-Input-wrapper[data-with-left-section] .mantine-Input-input,
+.mantine-Select-root[data-with-left-section] .mantine-Select-input {
+	/* عرض تقريبي لقسم الأيقونة + مسافة: 1.75rem = 28px */
+	padding-inline-start: calc(var(--space-sm) + 1.75rem);
+}
+
+.mantine-Input-wrapper[data-with-right-section] .mantine-Input-input,
+.mantine-Select-root[data-with-right-section] .mantine-Select-input {
+	padding-inline-end: calc(var(--space-sm) + 1.75rem);
+}

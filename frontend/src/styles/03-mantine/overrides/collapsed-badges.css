@@ -1,0 +1,13 @@
+/* CollapsedBadges adjustments */
+/* خارج الـ Popover (داخل الجدول) */
+[data-collapsed-badges] .mantine-Badge-root { line-height: var(--line-height-normal); }
+
+/* داخل الـ Popover (منفصل عبر Portal، لذلك نستهدف الـ dropdown مباشرة) */
+.mantine-Popover-dropdown .mantine-Badge-root {
+	color: var(--color-text-primary) !important; /* نص واضح حسب التوكنز */
+	line-height: var(--line-height-normal); /* ارتفاع سطر مقروء */
+}
+/* لو كانت filled داخل القائمة، نخلي النص معكوس وواضح */
+.mantine-Popover-dropdown .mantine-Badge-root[data-variant="filled"] {
+	color: var(--color-text-inverse) !important;
+}

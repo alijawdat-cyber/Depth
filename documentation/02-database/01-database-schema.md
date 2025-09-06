@@ -1,12 +1,18 @@
-# 📊 مخطط قاعدة البيانات V2.0 - Firestore Collections
+# 📊 مخطط قاعدة البيانات V2.1 - Firestore Collections (نظام المشاريع المتطور)
 
 > 🔒 **SSOT — مصدر الحقيقة الوحيد:**
 > - المتطلبات: `documentation/01-requirements/00-requirements-v2.0.md`
 > - التعدادات والمعادلات: `documentation/99-reference/02-enums-standard.md`
 > - قاموس البيانات: `documentation/02-database/00-data-dictionary.md`
 
-**تاريخ الإنشاء:** 2025-08-23  
-**النسخة:** V2.0 - مُحدث ومطابق للمتطلبات النهائية
+**تاريخ التطوير:** 2025-09-04  
+**النسخة:** V2.1 - نظام المشاريع المتطور مع Tasks والترشيح الذكي
+
+**الميزات الجديدة في V2.1:**
+- ✅ **نظام المهام المتعددة (tasks)** - كل مشروع يحتوي على مهام متعددة
+- ✅ **الترشيح الذكي للمبدعين (recommendations)** - نظام ترشيح متطور
+- ✅ **ربط الصنعة بالمشروع** - كل مشروع مرتبط بمجال العميل التجاري
+- ✅ **التسعير على مستوى المهمة** - حساب دقيق لكل خدمة منفصلة
 
 ---
 
@@ -138,7 +144,17 @@
   fullName: string,
   companyName: string,
   businessType: 'individual' | 'company' | 'agency',
-  industry: string,
+```javascript
+{
+  id: string,                     // معرف العميل (PK)
+  userId: string,                 // FK → users (unique)
+  fullName: string,
+  companyName: string,
+  businessType: 'individual' | 'company' | 'agency',
+  
+  // ربط الصنعة (محدث في V2.1)
+  industry: string,               // اسم الصنعة مباشرة - restaurants, fashion, etc
+  industryExperience: string,     // وصف الخبرة في المجال
   
   // الموقع
   location: {
@@ -153,17 +169,32 @@
     postalCode: string
   },
   preferredLanguage: 'ar' | 'en',
-    paymentTerms: 'advance_50' | 'advance_100' | 'net_15' | 'net_30',
+  paymentTerms: 'advance_50' | 'advance_100' | 'net_15' | 'net_30',
   
-  // الإحصائيات
+  // الإحصائيات المحسنة (V2.1)
   totalSpent: number,             // بالدينار العراقي
   totalProjects: number,
+  activeProjects: number,         // عدد المشاريع النشطة
+  completedProjects: number,      // عدد المشاريع المكتملة
+  averageProjectValue: number,    // متوسط قيمة المشروع
+  
+  // تفضيلات الخدمات (جديد في V2.1)
+  preferredServices: string[],    // الفئات الفرعية المفضلة
+  serviceHistory: [{              // تاريخ الخدمات المطلوبة
+    subcategoryId: string,
+    frequency: number,            // عدد مرات الطلب
+    lastOrderDate: date
+  }],
+  
+  // تقييم ومعلومات الجودة
   rating: number,                 // 0.0-5.0
+  relationshipScore: number,      // نقاط العلاقة مع الوكالة
   
   // التواريخ
   createdAt: timestamp,
   updatedAt: timestamp
 }
+```
 ```
 
 ### 6. مجموعة الموظفين براتب ثابت (salariedEmployees)
@@ -230,7 +261,160 @@
 }
 ```
 
-### 10. مجموعة المشاريع (projects)
+### 10. مجموعة بنود المشاريع (tasks) - محدث في V2.1
+```javascript
+{
+  id: string,                     // معرف المهمة (PK)
+  projectId: string,              // FK → projects
+  subcategoryId: string,          // FK → subcategories
+  
+  // تفاصيل المهمة
+  quantity: number,               // الكمية المطلوبة
+  processingLevel: 'raw' | 'basic' | 'color_correction' | 'full_retouch' | 'advanced_composite',
+  
+  // التعيين والترشيح
+  assignedCreatorId: string,      // FK → creators - المبدع المعين
+  recommendedCreators: [{         // قائمة المبدعين المرشحين
+    creatorId: string,
+    matchScore: number,           // درجة التطابق (0-100)
+    reasons: string[],            // أسباب الترشيح
+    estimatedPrice: number,       // السعر المقدر
+    availability: string          // حالة التوفر
+  }],
+  assignmentReason: string,       // سبب اختيار المبدع المعين
+  
+  // التسعير على مستوى المهمة
+  basePrice: number,              // السعر الأساسي للوحدة
+  unitCreatorPrice: number,       // سعر المبدع للوحدة (بعد المعاملات)
+  unitClientPrice: number,        // السعر النهائي للوحدة (+ هامش)
+  totalCreatorPrice: number,      // unitCreatorPrice × quantity
+  totalClientPrice: number,       // unitClientPrice × quantity
+  
+  // معاملات التسعير المطبقة (للشفافية)
+  pricingFactors: {
+    experienceMultiplier: number,
+    equipmentMultiplier: number,
+    processingMultiplier: number,
+    rushMultiplier: number,
+    ownershipFactor: number,
+    locationAddition: number,
+    agencyMarginPercent: number
+  },
+  
+  // حالة وتتبع المهمة
+  status: 'pending' | 'assigned' | 'in_progress' | 'review' | 'completed' | 'cancelled',
+  progress: number,               // نسبة الإنجاز (0-100)
+  
+  // جدولة وتوقيتات
+  estimatedHours: number,
+  actualHours: number,
+  plannedStartDate: date,
+  actualStartDate: date,
+  plannedEndDate: date,
+  actualEndDate: date,
+  
+  // متطلبات وملاحظات
+  requirements: string,           // متطلبات خاصة بالمهمة
+  clientNotes: string,           // ملاحظات العميل
+  creatorNotes: string,          // ملاحظات المبدع
+  adminNotes: string,            // ملاحظات الأدمن
+  
+  // ملفات ومرفقات
+  referenceFiles: string[],      // ملفات مرجعية
+  deliverableFiles: string[],    // الملفات المسلمة
+  
+  // تاريخ إعادة التعيين (إن وجد)
+  reassignmentHistory: [{
+    fromCreatorId: string,
+    toCreatorId: string,
+    reason: string,
+    date: timestamp,
+    initiatedBy: string          // admin ID
+  }],
+  
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 11. مجموعة ترشيحات المبدعين (recommendations) - محدث في V2.1
+```javascript
+{
+  id: string,                     // معرف الترشيح (PK)
+  taskId: string,                 // FK → tasks
+  creatorId: string,              // FK → creators
+  
+  // درجة التطابق والترشيح
+  matchScore: number,             // درجة التطابق الإجمالية (0-100)
+  scoreBreakdown: {               // تفصيل النقاط
+    skillMatch: number,           // تطابق المهارات (0-25)
+    experienceLevel: number,      // مستوى الخبرة (0-20)
+    equipmentQuality: number,     // جودة المعدات (0-15)
+    availabilityFactor: number,   // عامل التوفر (0-20)
+    locationCompatibility: number, // تطابق الموقع (0-10)
+    rating: number                // التقييم العام (0-10)
+  },
+  
+  // أسباب الترشيح
+  recommendationReasons: string[], // قائمة أسباب الترشيح
+  warningFlags: string[],         // تحذيرات أو نقاط ضعف
+  
+  // معلومات التسعير والتوفر
+  estimatedPrice: number,         // السعر المقدر للمهمة
+  availability: {
+    status: 'available' | 'busy' | 'partially_available',
+    availableFrom: date,
+    notes: string
+  },
+  
+  // معلومات إضافية
+  responseTimeHours: number,      // متوسط وقت الاستجابة
+  completionRate: number,         // معدل إنجاز المشاريع
+  industryExperience: boolean,    // خبرة في نفس الصنعة
+  
+  // حالة الترشيح
+  status: 'pending' | 'accepted' | 'rejected' | 'expired',
+  expiresAt: timestamp,          // تاريخ انتهاء صلاحية الترشيح
+  
+  // معلومات النظام
+  algorithmVersion: string,       // إصدار خوارزمية الترشيح المستخدمة
+  generatedAt: timestamp,
+  lastUpdated: timestamp
+}
+```
+
+### 12. مجموعة ربط المبدع بالفئات الفرعية (creatorSubcategories) - محدث
+```javascript
+{
+  id: string,                     // معرف الربط (PK)
+  creatorId: string,              // FK → creators
+  subcategoryId: string,          // FK → subcategories
+  processingLevel: 'raw' | 'basic' | 'color_correction' | 'full_retouch' | 'advanced_composite',
+  
+  // مستوى المهارة والخبرة (جديد في V2.1)
+  skillLevel: number,             // مستوى المهارة (1-100)
+  experienceProjects: number,     // عدد المشاريع السابقة في هذه الفئة
+  lastProjectDate: date,          // تاريخ آخر مشروع في هذه الفئة
+  averageRating: number,          // متوسط التقييم في هذه الفئة
+  
+  // تفضيلات وأولويات
+  isPreferred: boolean,           // فئة مفضلة للمبدع
+  priority: number,               // أولوية الفئة (1-10)
+  
+  // إعدادات التوفر والتسعير
+  customPricing: {                // تسعير مخصص (اختياري)
+    hasCustomRate: boolean,
+    customMultiplier: number
+  },
+  availabilityNotes: string,      // ملاحظات خاصة بالتوفر
+  
+  isActive: boolean,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### 13. مجموعة المشاريع (projects) - محدث للنظام الجديد
 ```javascript
 {
   id: string,                     // معرف المشروع (PK)
@@ -238,50 +422,78 @@
   categoryId: string,             // FK → categories
   subcategoryId: string,          // FK → subcategories (لا يتغير بعد التحويل من الطلب)
 
-  // البنود والتعيينات (يدعم تعدد المبدعين/الأدوار)
-  lineItems: [{
-    subcategoryId: string,
-    quantity: number,
-    processingLevel: 'raw'|'basic'|'color_correction'|'full_retouch'|'advanced_composite',
-    assignedCreators: string[]    // IDs لمبدعين متعددين
-  }],
-  assignments: [{
-    role: 'shoot'|'edit'|'design',
-    type: 'creator'|'salaried',
-    assigneeId: string            // creatorId أو salariedEmployeeId
-  }],
-
-  // حالة المشروع
+  // المهام والتعيينات (يدعم تعدد المبدعين/الأدوار)
+```javascript
+{
+  id: string,                     // معرف المشروع (PK)
+  clientId: string,               // FK → clients
+  
+  // معلومات المشروع الأساسية
+  title: string,                  // عنوان المشروع
+  description: string,            // وصف تفصيلي
+  industryId: string,             // FK → industries - ربط الصنعة
+  
+  // التصنيف الرئيسي للمشروع
+  categoryId: string,             // FK → categories - الفئة الرئيسية
+  subcategoryId: string,          // FK → subcategories - الفئة الفرعية الأساسية
+  
+  // النظام الجديد - دعم المهام المتعددة
+  // ❌ تم إزالة: creatorId - منقول لـ tasks
+  
+  // معلومات التسعير الإجمالية (محسوبة من المهام)
+  totalBasePrice: number,         // مجموع الأسعار الأساسية لكل المهام
+  totalCreatorPrice: number,      // مجموع أسعار المبدعين لكل المهام
+  totalClientPrice: number,       // السعر النهائي الإجمالي للعميل
+  agencyMarginPercent: number,    // متوسط نسبة هامش الوكالة المطبقة
+  agencyMarginAmount: number,     // إجمالي مبلغ هامش الوكالة
+  
+  // إحصائيات المهام (مشتقة)
+  tasksCount: number,             // عدد المهام في المشروع
+  totalQuantity: number,          // إجمالي الكميات
+  assignedCreatorsCount: number,  // عدد المبدعين المعينين
+  
+  // حالة ومعلومات المشروع
   status: 'draft' | 'pending' | 'active' | 'completed' | 'cancelled',
+  priority: 'low' | 'normal' | 'high' | 'urgent',
   isArchived: boolean,            // الأرشفة كفلاغ مستقل دون تغيير SSOT
-
-  // التسعير (محسوب تلقائياً)
-  basePrice: number,              // من subcategories
-  experienceMod: number,          // معامل الخبرة
-  equipmentMod: number,           // معامل المعدات
-  ownershipFactor: number,        // 1.0 أو 0.9
-  processingMod: number,          // معامل المعالجة
-  rushMod: number,                // معامل الاستعجال
-  locationAddition: number,       // إضافة الموقع الثابتة
-  creatorPrice: number,           // السعر النهائي للمبدع
-  agencyMarginPercent: number,    // نسبة هامش الوكالة (مفتوحة بلا حدود)
-  clientPrice: number,            // السعر النهائي للعميل
-
-  // تفاصيل المشروع
+  
+  // التوقيتات والجدولة
   isRush: boolean,
   location: 'studio' | 'client' | 'outskirts' | 'nearby' | 'far',
-  deliveryDate: date,
-  notes: string,
-
-  // الموافقة
-  approvedBy: string,             // admin email
-  approvedAt: timestamp,
-
-  // التواريخ
-  createdBy: string,              // admin email
+  requestedDeliveryDate: date,    // التاريخ المطلوب من العميل
+  plannedDeliveryDate: date,      // التاريخ المخطط داخلياً
+  actualDeliveryDate: date,       // التاريخ الفعلي للتسليم
+  
+  // معلومات الطلب الأصلي
+  originalRequestId: string,      // FK → projectRequests
+  requestSubcategoryId: string,   // الفئة الفرعية الأصلية في الطلب
+  
+  // ملاحظات ومتطلبات
+  clientRequirements: string,     // متطلبات العميل الأساسية
+  internalNotes: string,          // ملاحظات داخلية للفريق
+  publicNotes: string,            // ملاحظات عامة مرئية للعميل
+  
+  // معلومات الموافقة والإدارة
+  approvedBy: string,             // admin email الذي وافق
+  approvedAt: timestamp,          // تاريخ الموافقة
+  
+  // تتبع التقدم الإجمالي
+  overallProgress: number,        // نسبة الإنجاز الإجمالية (0-100)
+  progressLastUpdated: timestamp, // آخر تحديث للتقدم
+  
+  // معلومات التقييم والجودة
+  clientRating: number,           // تقييم العميل للمشروع (1-5)
+  clientFeedback: string,         // تعليق العميل
+  internalQualityScore: number,   // نقاط الجودة الداخلية
+  
+  // التواريخ الأساسية
+  createdBy: string,              // admin email منشئ المشروع
   createdAt: timestamp,
   updatedAt: timestamp
 }
+```
+
+### 14. مجموعة العملاء (clients) - محدث لربط الصنعة
 ```
 
 ### 11. مجموعة طلبات المشاريع (projectRequests)
@@ -492,7 +704,7 @@
   dueDate: date,
   issuedAt: timestamp,
   notes: string,
-  lineItems: [{
+  invoiceItems: [{
     description: string,
     quantity: number,
     unitPrice: number,
@@ -540,29 +752,65 @@
 
 ---
 
-## 🔍 الفهارس المطلوبة (Composite Indexes)
+## 🔍 الفهارس المطلوبة (Composite Indexes) - محدث V2.1
 
-### الفهارس الأساسية:
+### الفهارس الأساسية المحدثة:
 ```javascript
-// Projects
+// Projects - محدث للنظام الجديد
 projects: [
   ['clientId', 'status'],
-  ['creatorId', 'status'],
-  ['categoryId', 'status'],
+  ['industryId', 'status'],        // جديد - فلترة حسب الصنعة
+  ['categoryId', 'status'],        // فلترة حسب الفئة الرئيسية
+  ['status', 'createdAt'],
+  ['isArchived', 'status', 'createdAt'],
+  ['priority', 'status'],          // جديد - فلترة حسب الأولوية
+  ['overallProgress', 'status']    // جديد - فلترة حسب التقدم
+]
+
+// Tasks - جديد في V2.1
+tasks: [
+  ['projectId', 'status'],
+  ['assignedCreatorId', 'status'],
+  ['subcategoryId', 'status'],
+  ['status', 'plannedEndDate'],
+  ['assignedCreatorId', 'status', 'plannedEndDate'],
+  ['projectId', 'progress'],
   ['status', 'createdAt']
 ]
 
-// Creators
+// Recommendations - جديد في V2.1  
+recommendations: [
+  ['taskId', 'matchScore'],
+  ['creatorId', 'status'],
+  ['taskId', 'status', 'matchScore'],
+  ['expiresAt', 'status'],
+  ['generatedAt', 'algorithmVersion']
+]
+
+// Creators - محدث
 creators: [
   ['onboardingStatus', 'createdAt'],
   ['experienceLevel', 'equipmentTier'],
-  ['isAvailable', 'rating']
+  ['isAvailable', 'rating'],
+  ['location.city', 'isAvailable'], // جديد - فلترة جغرافية
+  ['specialties', 'rating']         // جديد - فلترة حسب التخصص
 ]
 
-// CreatorSubcategories
+// CreatorSubcategories - محدث
 creatorSubcategories: [
   ['creatorId', 'isActive'],
-  ['subcategoryId', 'isActive']
+  ['subcategoryId', 'isActive'],
+  ['creatorId', 'skillLevel'],      // جديد - ترتيب حسب المهارة
+  ['subcategoryId', 'skillLevel'],  // جديد
+  ['isPreferred', 'skillLevel']     // جديد - المفضلة أولاً
+]
+
+// Clients - محدث
+clients: [
+  ['industryId', 'totalSpent'],     // جديد - فلترة حسب الصنعة
+  ['businessType', 'createdAt'],
+  ['totalProjects', 'rating'],
+  ['preferredServices', 'totalSpent'] // جديد
 ]
 
 // Notifications
@@ -577,16 +825,63 @@ creatorAvailability: [
   ['creatorId', 'status', 'date']
 ]
 
-// ProjectRequests
+// ProjectRequests - محدث
 projectRequests: [
   ['status', 'createdAt'],
-  ['clientId', 'status']
+  ['clientId', 'status'],
+  ['convertedProjectId', 'status']  // جديد - ربط مع المشروع
 ]
 
 // Sessions
 sessions: [
   ['userId', 'isActive', 'createdAt'],
   ['userId', 'createdAt']
+]
+
+// Industries - جديد
+industries: [
+  ['isActive', 'displayOrder'],
+  ['code', 'isActive']
+]
+```
+
+### فهارس البحث المتقدم (V2.1):
+```javascript
+// للبحث المعقد في المشاريع
+projects_advanced_search: [
+  ['industryId', 'status', 'createdAt'],
+  ['clientId', 'industryId', 'status'],
+  ['assignedCreatorsCount', 'totalClientPrice'],
+  ['overallProgress', 'plannedDeliveryDate']
+]
+
+// للترشيح الذكي
+creator_matching: [
+  ['subcategoryId', 'skillLevel', 'isActive'],
+  ['creatorId', 'experienceProjects', 'averageRating'],
+  ['processingLevel', 'skillLevel']
+]
+
+// لتحليل الأداء
+performance_analytics: [
+  ['projectId', 'status', 'actualEndDate'],
+  ['assignedCreatorId', 'status', 'actualHours'],
+  ['industryId', 'totalClientPrice', 'createdAt']
+]
+```
+
+### فهارس التقارير والإحصائيات:
+```javascript
+// تقارير العملاء
+client_analytics: [
+  ['industryId', 'totalSpent', 'createdAt'],
+  ['clientId', 'serviceHistory.subcategoryId', 'serviceHistory.frequency']
+]
+
+// تقارير المبدعين
+creator_analytics: [
+  ['assignedCreatorId', 'totalCreatorPrice', 'actualEndDate'],
+  ['skillLevel', 'experienceProjects', 'averageRating']
 ]
 ```
 

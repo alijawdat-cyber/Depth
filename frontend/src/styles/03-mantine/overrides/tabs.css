@@ -1,0 +1,19 @@
+/* ⚙️ Overrides: Mantine Tabs — مقفول على التوكنز */
+
+.mantine-Tabs-list {
+  background-color: var(--color-bg-secondary);
+  border: var(--border-width-sm) var(--border-style) var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
+  gap: var(--space-xs);
+}
+
+.mantine-Tabs-tab {
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.mantine-Tabs-tab[aria-selected="true"] {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}

@@ -1,27 +1,427 @@
 
-# 📋 إدارة المشاريع - Depth API v2.0
+# 📋 إدارة المشاريع المتطورة - Depth API v2.1
+
+> 🚀 **النسخة 2.1 - نظام المشاريع متعدد المهام:**
+> - ✅ **المهام المتعددة (Tasks)**: كل مشروع يحتوي على مهام متعددة
+> - ✅ **الترشيح الذكي للمبدعين**: نظام ترشيح متطور حسب المعايير المتعددة
+> - ✅ **القالب الموحد للعرض**: واجهة موحدة مع تخصيص حسب الدور
+> - ✅ **ربط الصنعة بالمشروع**: كل مشروع مرتبط بمجال العميل التجاري
 
 > مصطلحات هذا المستند:
-> - واجهة برمجة التطبيقات: Application Programming Interface — API
-> - إنشاء/قراءة/تحديث/حذف: Create, Read, Update, Delete — CRUD
-> - التحكم بالوصول المعتمد على الأدوار: Role-Based Access Control — RBAC
+> - مهمة المشروع: Project Task — PT
+> - نظام الترشيح الذكي: Smart Creator Recommendation — SCR
+> - القالب الموحد: Unified Project Template — UPT
 > (انظر أيضًا: `99-reference/06-terminology-glossary-ar.md`)
 
 ---
 
 ## المحتويات
-- [إنشاء مشروع جديد](#إنشاء-مشروع-جديد)
-- [تعيين المبدعين والموظفين](#تعيين-المبدعين-والموظفين)
-- [متابعة التقدم](#متابعة-التقدم)
-- [تسليم المشاريع](#تسليم-المشاريع)
-- [النتائج والتقييم](#النتائج-والتقييم)
+- [إنشاء مشروع متعدد المهام](#إنشاء-مشروع-متعدد-المهام)
+- [إدارة مهام المشروع (Tasks)](#إدارة-مهام-المشروع-tasks)
+- [النظام الذكي لترشيح المبدعين](#النظام-الذكي-لترشيح-المبدعين)
+- [تعيين المبدعين للبنود](#تعيين-المبدعين-للبنود)
+- [القالب الموحد للعرض](#القالب-الموحد-للعرض)
+- [متابعة التقدم والإنجاز](#متابعة-التقدم-والإنجاز)
+- [عروض الأسعار والموافقات](#عروض-الأسعار-والموافقات)
 
 ---
 
-## إنشاء مشروع جديد
+## إنشاء مشروع متعدد المهام
 
-### `POST /projects`
-إنشاء مشروع جديد من طلب معتمد.
+### `POST /projects/create-multi-task`
+إنشاء مشروع جديد مع مهام متعددة من طلب معتمد.
+
+**الطلب:**
+```json
+{
+  "projectRequestId": "req_123abc",
+  "clientId": "cl_123abc",
+  "title": "حملة تسويقية شاملة لمطعم الشام",
+  "description": "حملة متكاملة تشمل تصوير، تصميم، وفيديو",
+  "industryId": "ind_restaurants",
+  "categoryId": "cat_photo",
+  "priority": "normal",
+  
+  "tasks": [
+    {
+      "subcategoryId": "sub_food_photo",
+      "quantity": 15,
+      "processingLevel": "full_retouch",
+      "requirements": "تصوير 15 طبق مختلف بإضاءة احترافية",
+      "clientNotes": "التركيز على الأطباق التراثية"
+    },
+    {
+      "subcategoryId": "sub_social_posts",
+      "quantity": 8,
+      "processingLevel": "basic",
+      "requirements": "تصميم منشورات للفيسبوك وانستقرام",
+      "clientNotes": "استخدام ألوان العلامة التجارية"
+    },
+    {
+      "subcategoryId": "sub_reels_30s", 
+      "quantity": 3,
+      "processingLevel": "advanced",
+      "requirements": "فيديوهات قصيرة لعرض الأطباق",
+      "clientNotes": "موسيقى هادئة ومناسبة للثقافة العراقية"
+    }
+  ],
+  
+  "projectSettings": {
+    "isRush": false,
+    "location": "client",
+    "requestedDeliveryDate": "2025-09-15",
+    "budget": {
+      "min": 400000,
+      "max": 600000,
+      "currency": "IQD"
+    }
+  },
+  
+  "clientRequirements": "مشروع متكامل للافتتاح الجديد للمطعم",
+  "internalNotes": "عميل مهم - يُفضل تعيين أفضل المبدعين"
+}
+```
+
+**الاستجابة الناجحة (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "project": {
+      "id": "p_123abc",
+      "title": "حملة تسويقية شاملة لمطعم الشام",
+      "projectNumber": "DP-2025-0345",
+      "status": "pending",
+      
+      "client": {
+        "id": "cl_123abc",
+        "companyName": "مطعم الشام الأصيل",
+        "industry": "مطاعم وكافيهات"
+      },
+      
+      "tasks": [
+        {
+          "id": "t_001",
+          "subcategoryId": "sub_food_photo",
+          "service": "تصوير طعام احترافي",
+          "quantity": 15,
+          "status": "pending",
+          "estimatedPrice": 275400,
+          "recommendedCreators": [
+            {
+              "creatorId": "c_fatima", 
+              "matchScore": 95,
+              "availability": "متاحة فوراً"
+            }
+          ]
+        },
+        {
+          "id": "t_002",
+          "subcategoryId": "sub_social_posts", 
+          "service": "تصميم منشورات سوشيال",
+          "quantity": 8,
+          "status": "pending",
+          "estimatedPrice": 59840,
+          "recommendedCreators": [
+            {
+              "creatorId": "c_maryam",
+              "matchScore": 88,
+              "availability": "متاحة غداً"
+            }
+          ]
+        },
+        {
+          "id": "t_003",
+          "subcategoryId": "sub_reels_30s",
+          "service": "فيديو ريلز قصيرة", 
+          "quantity": 3,
+          "status": "pending",
+          "estimatedPrice": 171360,
+          "recommendedCreators": [
+            {
+              "creatorId": "c_ali",
+              "matchScore": 92,
+              "availability": "متاح الأسبوع القادم"
+            }
+          ]
+        }
+      ],
+      
+      "projectTotals": {
+        "totalEstimatedPrice": 506600,
+        "estimatedDuration": "12 يوم عمل",
+        "assignmentsNeeded": 3
+      },
+      
+      "timeline": {
+        "requestedDelivery": "2025-09-15",
+        "estimatedStart": "2025-09-01",
+        "estimatedCompletion": "2025-09-13"
+      }
+    },
+    
+    "nextSteps": [
+      "مراجعة الترشيحات وتعيين المبدعين",
+      "توليد عرض السعر للعميل", 
+      "جدولة اجتماع التنسيق"
+    ]
+  },
+  "message": "تم إنشاء المشروع بنجاح مع 3 بنود! جاري ترشيح أفضل المبدعين."
+}
+```
+
+---
+
+## إدارة مهام المشروع (Tasks)
+
+### `POST /projects/:projectId/tasks`
+إضافة مهمة جديدة لمشروع موجود.
+
+**الطلب:**
+```json
+{
+  "subcategoryId": "sub_logo_design",
+  "service": "تصميم لوجو احترافي",
+  "quantity": 1,
+  "specifications": {
+    "style": "مودرن مع لمسة عربية",
+    "formats": ["PNG", "SVG", "AI"],
+    "concepts": 3,
+    "revisions": 2
+  },
+  "priority": "high",
+  "clientNotes": "يُفضل استخدام الألوان الدافئة"
+}
+```
+
+**الاستجابة الناجحة (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "task": {
+      "id": "t_004",
+      "subcategoryId": "sub_logo_design",
+      "service": "تصميم لوجو احترافي",
+      "quantity": 1,
+      "status": "pending",
+      "estimatedPrice": 95000,
+      "specifications": {
+        "style": "مودرن مع لمسة عربية",
+        "formats": ["PNG", "SVG", "AI"],
+        "concepts": 3,
+        "revisions": 2
+      },
+      "recommendedCreators": [
+        {
+          "creatorId": "c_sara",
+          "matchScore": 94,
+          "availability": "متاحة اليوم",
+          "portfolio": ["logo_sample_1", "logo_sample_2"],
+          "avgRating": 4.8,
+          "completedProjects": 23
+        },
+        {
+          "creatorId": "c_omar",
+          "matchScore": 89,
+          "availability": "متاح غداً",
+          "portfolio": ["logo_sample_3", "logo_sample_4"],
+          "avgRating": 4.6,
+          "completedProjects": 18
+        }
+      ],
+      "createdAt": "2025-08-27T10:30:00Z",
+      "updatedAt": "2025-08-27T10:30:00Z"
+    }
+  },
+  "message": "تم إضافة المهمة بنجاح مع ترشيح 2 مبدع متخصص في التصميم"
+}
+```
+
+### `PUT /projects/:projectId/tasks/:taskId`
+تحديث مهمة مشروع موجودة.
+
+**الطلب:**
+```json
+{
+  "quantity": 2,
+  "specifications": {
+    "style": "مودرن مع لمسة عربية",
+    "formats": ["PNG", "SVG", "AI", "PDF"],
+    "concepts": 5,
+    "revisions": 3
+  },
+  "priority": "urgent",
+  "clientNotes": "طلب العميل زيادة عدد المفاهيم"
+}
+```
+
+### `DELETE /projects/:projectId/tasks/:taskId`
+حذف مهمة من المشروع.
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "message": "تم حذف المهمة بنجاح وإعادة حساب إجمالي المشروع"
+}
+```
+
+---
+
+## الترشيح الذكي للمبدعين (Smart Creator Recommendations)
+
+### `GET /projects/:projectId/tasks/:taskId/recommendations`
+الحصول على قائمة مُحدثة من المبدعين المرشحين لمهمة معينة.
+
+**معايير الترشيح:**
+- التخصص والخبرة
+- التقييمات والمراجعات
+- معدل الإنجاز في الوقت المحدد
+- التوفر الحالي
+- الموقع الجغرافي
+- السعر المناسب للميزانية
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "recommendations": [
+      {
+        "creatorId": "c_sara",
+        "profile": {
+          "name": "سارة أحمد",
+          "specializations": ["تصميم لوجو", "هوية بصرية", "تصميم جرافيك"],
+          "location": "بغداد",
+          "languages": ["عربي", "إنجليزي"]
+        },
+        "matchScore": 94,
+        "matchFactors": {
+          "expertise": 95,
+          "availability": 90,
+          "rating": 96,
+          "budget": 92,
+          "location": 100
+        },
+        "availability": {
+          "status": "available",
+          "nextSlot": "2025-08-27",
+          "estimatedDuration": "3-4 أيام"
+        },
+        "performance": {
+          "avgRating": 4.8,
+          "completedProjects": 23,
+          "onTimeDelivery": 95,
+          "clientSatisfaction": 98
+        },
+        "portfolio": [
+          {
+            "projectId": "p_logo_001",
+            "title": "لوجو مطعم الأصالة",
+            "thumbnail": "portfolio/sara_logo_001.jpg",
+            "category": "logo_design"
+          }
+        ],
+        "pricing": {
+          "estimatedCost": 95000,
+          "currency": "IQD",
+          "includes": ["3 مفاهيم", "2 تعديل", "ملفات متعددة"]
+        }
+      },
+      {
+        "creatorId": "c_omar",
+        "profile": {
+          "name": "عمر محمد",
+          "specializations": ["تصميم لوجو", "تصميم أغلفة"],
+          "location": "أربيل",
+          "languages": ["عربي", "كردي", "إنجليزي"]
+        },
+        "matchScore": 89,
+        "matchFactors": {
+          "expertise": 88,
+          "availability": 95,
+          "rating": 92,
+          "budget": 90,
+          "location": 75
+        },
+        "availability": {
+          "status": "available_tomorrow",
+          "nextSlot": "2025-08-28",
+          "estimatedDuration": "4-5 أيام"
+        },
+        "performance": {
+          "avgRating": 4.6,
+          "completedProjects": 18,
+          "onTimeDelivery": 89,
+          "clientSatisfaction": 94
+        },
+        "pricing": {
+          "estimatedCost": 85000,
+          "currency": "IQD",
+          "includes": ["3 مفاهيم", "2 تعديل", "ملفات أساسية"]
+        }
+      }
+    ],
+    "algorithmVersion": "SCR-v2.1",
+    "lastUpdated": "2025-08-27T10:35:00Z"
+  }
+}
+```
+
+### `POST /projects/:projectId/tasks/:taskId/assign`
+تعيين مبدع لمهمة معينة.
+
+**الطلب:**
+```json
+{
+  "creatorId": "c_sara",
+  "assignmentType": "direct",
+  "customPricing": {
+    "agreedAmount": 95000,
+    "currency": "IQD",
+    "paymentTerms": "50% مقدم، 50% عند التسليم"
+  },
+  "timeline": {
+    "startDate": "2025-08-28",
+    "expectedDelivery": "2025-08-31"
+  },
+  "specialInstructions": "التركيز على البساطة والوضوح"
+}
+```
+
+**الاستجابة الناجحة (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "assignment": {
+      "id": "assign_001",
+      "taskId": "t_004",
+      "creatorId": "c_sara",
+      "status": "assigned",
+      "assignedAt": "2025-08-27T11:00:00Z",
+      "timeline": {
+        "startDate": "2025-08-28",
+        "expectedDelivery": "2025-08-31"
+      },
+      "pricing": {
+        "agreedAmount": 95000,
+        "currency": "IQD",
+        "paymentTerms": "50% مقدم، 50% عند التسليم"
+      }
+    }
+  },
+  "message": "تم تعيين سارة أحمد لتصميم اللوجو بنجاح"
+}
+```
+
+---
+
+## إنشاء مشروع جديد (النسخة القديمة - متوافق مع الأسفل)
+
+### `POST /projects/legacy`
+إنشاء مشروع بالطريقة القديمة (خدمة واحدة).
 
 **الطلب:**
 ```json
@@ -597,7 +997,7 @@
 
 ## Quote / عرض السعر
 
-- يظهر للعميل فقط: lineItemTotal (Subcategory × Quantity) والمجموع الكلي.
+- يظهر للعميل فقط: taskTotal (Subcategory × Quantity) والمجموع الكلي.
 - لا تُعرض تفاصيل CreatorPrice أو Margin أو اسم المبدع.
 - عرض السعر يُنشَر بعد موافقة الأدمن.
 
@@ -912,6 +1312,314 @@
         "جلسة تصوير خارجية لأجواء مختلفة"
       ]
     }
+  }
+}
+```
+
+---
+
+## القوالب الموحدة (Unified Templates)
+
+### `GET /projects/:projectId/view/:roleType`
+عرض المشروع وفقاً لنوع المستخدم - قالب موحد مع فلترة حسب الدور.
+
+**المعاملات:**
+- `projectId`: معرف المشروع
+- `roleType`: نوع المستخدم (`client`, `creator`, `admin`, `salaried_employee`)
+
+**استجابة للعميل (client):**
+```json
+{
+  "success": true,
+  "data": {
+    "project": {
+      "id": "p_123abc",
+      "title": "حملة تسويقية شاملة لمطعم الشام",
+      "status": "in_progress",
+      "progress": 65,
+      
+      "services": [
+        {
+          "name": "تصوير طعام احترافي",
+          "status": "completed",
+          "progress": 100,
+          "assignedTo": "فاطمة أحمد",
+          "expectedDelivery": "2025-08-30"
+        },
+        {
+          "name": "تصميم منشورات سوشيال",
+          "status": "in_progress", 
+          "progress": 40,
+          "assignedTo": "مريم سالم",
+          "expectedDelivery": "2025-09-05"
+        }
+      ],
+      
+      "timeline": {
+        "startDate": "2025-08-15",
+        "expectedCompletion": "2025-09-15",
+        "nextMilestone": "تسليم التصاميم الأولية"
+      },
+      
+      "communication": {
+        "lastUpdate": "2025-08-28T14:30:00Z",
+        "nextMeeting": "2025-08-30T10:00:00Z",
+        "unreadMessages": 2
+      },
+      
+      "budget": {
+        "totalApproved": 506600,
+        "spent": 275400,
+        "remaining": 231200,
+        "currency": "IQD"
+      }
+    }
+  }
+}
+```
+
+**استجابة للمبدع (creator):**
+```json
+{
+  "success": true,
+  "data": {
+    "project": {
+      "id": "p_123abc",
+      "title": "حملة تسويقية شاملة لمطعم الشام",
+      
+      "myAssignments": [
+        {
+          "taskId": "t_001",
+          "service": "تصوير طعام احترافي", 
+          "status": "in_progress",
+          "deadline": "2025-08-30",
+          "deliverables": [
+            "15 صورة عالية الجودة",
+            "نسخ مصغرة للسوشيال ميديا"
+          ],
+          "clientFeedback": "ممتاز! نرجو التركيز على الإضاءة الطبيعية"
+        }
+      ],
+      
+      "projectContext": {
+        "clientIndustry": "مطاعم وكافيهات",
+        "projectGoals": "افتتاح فرع جديد وزيادة الوعي بالعلامة التجارية",
+        "targetAudience": "العائلات والشباب في بغداد"
+      },
+      
+      "collaboration": {
+        "otherCreators": [
+          {
+            "name": "مريم سالم",
+            "role": "مصممة جرافيك",
+            "contact": "available_in_project_chat"
+          }
+        ],
+        "projectManager": "أحمد محمد",
+        "communicationChannel": "project_chat"
+      },
+      
+      "payment": {
+        "agreedAmount": 275400,
+        "paidAmount": 137700,
+        "pendingAmount": 137700,
+        "nextPayment": "عند تسليم المرحلة الثانية"
+      }
+    }
+  }
+}
+```
+
+### `GET /projects/dashboard/:roleType`
+لوحة مراقبة المشاريع مخصصة حسب نوع المستخدم.
+
+**لوحة الأدمن:**
+```json
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "totalActiveProjects": 45,
+      "projectsByStatus": {
+        "planning": 8,
+        "in_progress": 28,
+        "review": 6,
+        "completed": 3
+      },
+      "weeklyRevenue": 12850000,
+      "topPerformingCreators": ["c_fatima", "c_omar", "c_sara"]
+    },
+    
+    "urgentItems": [
+      {
+        "projectId": "p_urgent_01",
+        "issue": "تأخير في التسليم",
+        "daysOverdue": 2,
+        "impact": "high"
+      }
+    ],
+    
+    "recommendations": {
+      "unassignedTasks": 12,
+      "creatorsNeedingWork": ["c_ali", "c_layla"],
+      "budgetAlerts": 3
+    }
+  }
+}
+```
+
+---
+
+## ربط المشاريع بالصناعات (Industry Integration)
+
+### `GET /projects/industry-insights/:industryId`
+رؤى وتحليلات خاصة بصناعة معينة.
+
+**الاستجابة:**
+```json
+{
+  "success": true,
+  "data": {
+    "industry": {
+      "id": "ind_restaurants",
+      "name": "مطاعم وكافيهات",
+      "trends": [
+        "زيادة الطلب على المحتوى المرئي",
+        "التركيز على الطعام الصحي",
+        "استخدام منصات التوصيل"
+      ]
+    },
+    
+    "projectPatterns": {
+      "mostRequestedServices": [
+        {
+          "subcategory": "food_photography",
+          "frequency": 78,
+          "avgBudget": 320000
+        },
+        {
+          "subcategory": "menu_design", 
+          "frequency": 45,
+          "avgBudget": 150000
+        }
+      ],
+      
+      "seasonalDemand": {
+        "high": ["رمضان", "العيد", "بداية السنة"],
+        "medium": ["الصيف", "الشتاء"],
+        "low": ["منتصف العام"]
+      }
+    },
+    
+    "bestPractices": [
+      "التصوير في الصباح الباكر يعطي إضاءة أفضل",
+      "استخدام الألوان الدافئة يزيد الشهية",
+      "التركيز على تجربة العميل في التصاميم"
+    ],
+    
+    "suggestedPackages": [
+      {
+        "name": "حزمة الافتتاح الشاملة",
+        "services": ["food_photography", "logo_design", "social_posts"],
+        "estimatedPrice": 680000,
+        "duration": "2-3 أسابيع"
+      }
+    ]
+  }
+}
+```
+
+### `POST /projects/:projectId/industry-analysis`
+تحليل المشروع في سياق صناعة العميل.
+
+**الطلب:**
+```json
+{
+  "analysisType": "competitive_benchmarking",
+  "includeMarketTrends": true,
+  "generateRecommendations": true
+}
+```
+
+**الاستجابة:**
+```json
+{
+  "success": true,
+  "data": {
+    "analysis": {
+      "competitivePosition": "above_average",
+      "marketGap": "تحتاج إلى مزيد من المحتوى التفاعلي",
+      "opportunities": [
+        "إضافة فيديوهات قصيرة للطبخ",
+        "تطوير هوية بصرية للتطبيق",
+        "حملة إعلانية موسمية"
+      ]
+    },
+    
+    "benchmarking": {
+      "averageIndustryBudget": 450000,
+      "yourProjectBudget": 506600,
+      "performanceExpectation": "high",
+      "timelineComparison": "faster_than_average"
+    },
+    
+    "recommendations": [
+      {
+        "priority": "high",
+        "suggestion": "إضافة تصوير 360 درجة للمطعم",
+        "rationale": "يزيد التفاعل بنسبة 40% في قطاع المطاعم",
+        "estimatedCost": 180000
+      }
+    ]
+  }
+}
+```
+
+---
+
+## تقارير وتحليلات متقدمة
+
+### `GET /projects/analytics/performance`
+تقرير شامل عن أداء المشاريع.
+
+**الاستجابة:**
+```json
+{
+  "success": true,
+  "data": {
+    "timeframe": "last_30_days",
+    
+    "projectMetrics": {
+      "totalCompleted": 23,
+      "averageCompletionTime": "14.2 days",
+      "onTimeDeliveryRate": 91,
+      "clientSatisfactionScore": 4.7,
+      "revenueClosure": 18650000
+    },
+    
+    "creatorPerformance": {
+      "topPerformers": [
+        {
+          "creatorId": "c_fatima",
+          "projectsCompleted": 8,
+          "avgRating": 4.9,
+          "revenue": 2240000
+        }
+      ],
+      "needsImprovement": [
+        {
+          "creatorId": "c_ahmad",
+          "issues": ["deadline_delays"],
+          "suggestedActions": ["time_management_training"]
+        }
+      ]
+    },
+    
+    "insights": [
+      "مشاريع التصوير تحقق أعلى معدل رضا للعملاء",
+      "العملاء في قطاع المطاعم يطلبون مشاريع متكررة",
+      "زيادة الطلب على المحتوى للسوشيال ميديا بنسبة 35%"
+    ]
   }
 }
 ```

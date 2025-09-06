@@ -6,3 +6,6 @@
 .mantine-Table-root td { direction: rtl; /* جدول RTL */ }
 
 .mantine-Table-root :is(th, td) { text-align: center !important; /* توسيط نص */ vertical-align: middle !important; /* توسيط عمودي */ }
+/* تأكيد إضافي: أصناف Mantine المباشرة */
+.mantine-Table-th,
+.mantine-Table-td { text-align: center !important; vertical-align: middle !important; }

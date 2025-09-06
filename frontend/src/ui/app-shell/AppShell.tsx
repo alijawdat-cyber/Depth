@@ -1,10 +1,10 @@
 "use client"; // مكوّن عميل
 import React from "react"; // React
-import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Divider, Badge, useMantineColorScheme } from "@mantine/core"; // Mantine
+import { Box, Group, Burger, ScrollArea, NavLink, Text, ActionIcon, Badge, useMantineColorScheme } from "@mantine/core"; // Mantine
 import Image from "next/image"; // صورة
 import Link from "next/link"; // روابط
 import { useDisclosure } from "@mantine/hooks"; // فتح/غلق
-import { Bell, Settings, User, Home, LayoutGrid, Camera, Briefcase, FileText, DollarSign, Calendar, Sun, Moon, Monitor, Users, Shapes, Wrench, BarChart3 } from "lucide-react"; // أيقونات
+import { Bell, Settings, User, Home, LayoutGrid, Camera, Briefcase, FileText, DollarSign, Calendar, Sun, Moon, Monitor, Users, Shapes, BarChart3 } from "lucide-react"; // أيقونات
 import { useTheme } from "@/shared/theme"; // ثيم
 
 type Props = { children: React.ReactNode; userRole: 'admin' | 'creator' | 'client' | 'salariedEmployee' | 'guest'; }; // خصائص المكوّن
@@ -43,92 +43,14 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
   const base: NavItem[] = [{ label: 'الرئيسية', href: `/${userRole}`, icon: Home }]; // أساس
 
     if (userRole === 'admin') { // أدمن
-      return [ // قوائم الأدمن
-        { label: 'لوحة التحكم', href: '/admin', icon: Home }, // داشبورد
-        { label: 'إدارة المستخدمين', icon: Users, children: [ // مستخدمين
-          { label: 'الأدمـنز', icon: User, children: [ // أدمـنز
-            { label: 'قائمة الأدمنز', href: '/admin/users/admins' }, // قائمة
-            { label: 'إضافة أدمن جديد', href: '/admin/users/admins/new' }, // إضافة
-          ]},
-          { label: 'المبدعون', icon: Camera, children: [ // مبدعون
-            { label: 'قائمة المبدعين', href: '/admin/users/creators' }, // قائمة
-            { label: 'طلبات الانضمام', href: '/admin/users/creators/pending' }, // انضمام
-            { label: 'طلبات المعدات', href: '/admin/users/creators/equipment-requests' }, // معدات
-            { label: 'طلبات الأوقات', href: '/admin/users/creators/schedule-requests' }, // أوقات
-            { label: 'طلبات الفئات الرئيسية', href: '/admin/users/creators/category-requests' }, // فئات رئيسية
-            { label: 'طلبات الفئات الفرعية', href: '/admin/users/creators/subcategory-requests' }, // فئات فرعية
-          ]},
-          { label: 'العملاء', icon: Users, children: [ // عملاء
-            { label: 'قائمة العملاء', href: '/admin/users/clients' }, // قائمة
-            { label: 'طلبات الانضمام', href: '/admin/users/clients/pending-registrations' }, // انضمام
-          ]},
-          { label: 'الموظفون بالراتب', icon: Briefcase, children: [ // موظفون
-            { label: 'قائمة الموظفين', href: '/admin/users/employees' }, // قائمة
-            { label: 'دعوة موظف', href: '/admin/users/employees/invite' }, // دعوة
-            { label: 'الدعوات المرسلة', href: '/admin/users/employees/invitations' }, // دعوات
-          ]},
-          { label: 'مركز الطلبات الشامل', href: '/admin/users/requests-center', icon: LayoutGrid }, // مركز الطلبات
-        ]},
-        { label: 'إدارة الخدمات والتصنيفات', icon: Shapes, children: [ // خدمات وتصنيفات
-          { label: 'الفئات الرئيسية', children: [ // رئيسية
-            { label: 'قائمة الفئات', href: '/admin/services/categories' }, // قائمة
-            { label: 'إضافة فئة جديدة', href: '/admin/services/categories/new' }, // إضافة
-          ]},
-          { label: 'الفئات الفرعية', children: [ // فرعية
-            { label: 'قائمة الفئات الفرعية', href: '/admin/services/subcategories' }, // قائمة
-            { label: 'إضافة فئة فرعية', href: '/admin/services/subcategories/new' }, // إضافة
-          ]},
-          { label: 'المجالات الصناعية', children: [ // صناعات
-            { label: 'قائمة المجالات', href: '/admin/services/industries' }, // قائمة
-            { label: 'إضافة مجال جديد', href: '/admin/services/industries/new' }, // إضافة
-          ]},
-          { label: 'ربط الفئات بالصناعات', href: '/admin/services/mappings', icon: LayoutGrid }, // ربط
-        ]},
-        { label: 'التسعير والماليات', icon: DollarSign, children: [ // تسعير
-          { label: 'معدلات التسعير', children: [ // معدلات
-            { label: 'جميع المعدلات', href: '/admin/pricing/modifiers' }, // الكل
-            { label: 'حاسبة التسعير', href: '/admin/pricing/modifiers/calculator' }, // حاسبة
-          ]},
-          { label: 'هوامش الوكالة', children: [ // هوامش
-            { label: 'إدارة الهوامش', href: '/admin/pricing/margins' }, // إدارة
-          ]},
-          { label: 'الفواتير', children: [ // فواتير
-            { label: 'قائمة الفواتير', href: '/admin/pricing/invoices' }, // قائمة
-            { label: 'إنشاء فاتورة جديدة', href: '/admin/pricing/invoices/new' }, // إنشاء
-          ]},
-          { label: 'المدفوعات', children: [ // مدفوعات
-            { label: 'قائمة المدفوعات', href: '/admin/pricing/payments' }, // قائمة
-          ]},
-          { label: 'التقارير المالية', href: '/admin/pricing/reports/financial' }, // تقارير
-        ]},
-        { label: 'إدارة المشاريع', icon: Briefcase, children: [ // مشاريع
-          { label: 'طلبات المشاريع', children: [ // طلبات
-            { label: 'قائمة الطلبات', href: '/admin/projects/requests' }, // قائمة
-          ]},
-          { label: 'المشاريع النشطة', children: [ // نشطة
-            { label: 'قائمة المشاريع', href: '/admin/projects/active' }, // قائمة
-          ]},
-          { label: 'تعيين المبدعين', href: '/admin/projects/assignment' }, // تعيين
-          { label: 'عروض الأسعار', children: [ // عروض
-            { label: 'قائمة العروض', href: '/admin/projects/quotes' }, // قائمة
-            { label: 'إنشاء عرض سعر', href: '/admin/projects/quotes/new' }, // إنشاء
-          ]},
-          { label: 'العقود', children: [ // عقود
-            { label: 'قائمة العقود', href: '/admin/projects/contracts' }, // قائمة
-            { label: 'إنشاء عقد', href: '/admin/projects/contracts/new' }, // إنشاء
-          ]},
-        ]},
-        { label: 'النظام والإعدادات', icon: Wrench, children: [ // نظام
-          { label: 'الإعدادات العامة', href: '/admin/system/settings' }, // عامة
-          { label: 'المحتوى والقوالب', href: '/admin/system/content' }, // محتوى
-          { label: 'الأدوات المساعدة', href: '/admin/system/tools' }, // أدوات
-          { label: 'المراقبة والسجلات', href: '/admin/system/monitoring' }, // مراقبة
-        ]},
-        { label: 'التقارير والتحليلات', icon: BarChart3, children: [ // تقارير
-          { label: 'تقارير الأداء', href: '/admin/analytics/performance' }, // أداء
-          { label: 'التحليلات المتقدمة', href: '/admin/analytics/advanced' }, // متقدمة
-          { label: 'التصدير والمشاركة', href: '/admin/analytics/export' }, // تصدير
-        ]},
+      return [
+        { label: 'لوحة التحكم', href: '/admin', icon: Home },
+        { label: 'المستخدمون', href: '/admin/users', icon: Users },
+        { label: 'الخدمات والتصنيفات', href: '/admin/services', icon: Shapes },
+        { label: 'المشاريع', href: '/admin/projects', icon: Briefcase },
+        { label: 'التسعير والماليات', href: '/admin/pricing', icon: DollarSign },
+        { label: 'النظام والإعدادات', href: '/admin/system', icon: Settings },
+        { label: 'التقارير والتحليلات', href: '/admin/analytics', icon: BarChart3 },
       ];
     }
 
@@ -196,8 +118,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
           <Box p="lg" className="sidebar-inner"> {/* داخل الشريط */}
             <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text> {/* عنوان */}
             {navigationItems.map(renderNavItem)} {/* عناصر */}
-            <Divider my="sm" /> {/* فاصل */}
-            <NavLink label="الإعدادات" leftSection={<Settings size={18} />} c="dimmed" /> {/* إعدادات */}
+            {/* أزلنا عنصر إعدادات المكرر لأن "النظام والإعدادات" موجود ضمن العناصر */}
           </Box>
         </ScrollArea.Autosize>
       </Box>
@@ -213,8 +134,7 @@ export function DepthAppShell({ children, userRole }: Props){ // غلاف الت
               <Box p="md" className="sidebar-inner"> {/* داخل الشريط */}
                 <Text fw={700} size="sm" mb="sm" c="var(--color-text-primary)">القائمة</Text> {/* عنوان */}
                 {navigationItems.map(renderNavItem)} {/* عناصر */}
-                <Divider my="sm" /> {/* فاصل */}
-                <NavLink label="الإعدادات" leftSection={<Settings size={18} />} onClick={close} c="dimmed" /> {/* إعدادات */}
+                {/* أزلنا عنصر إعدادات المكرر في الموبايل أيضًا */}
               </Box>
             </ScrollArea.Autosize>
           </Box>
